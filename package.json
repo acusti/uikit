@@ -1,0 +1,19 @@
+{
+    "name": "@acusti/uikit",
+    "version": "0.0.1",
+    "description": "UI toolkit monorepo containing a React component library, UI utilities, a drag-and-drop library, and more",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/acusti/uikit.git"
+    },
+    "author": "andrew@acusti.ca",
+    "license": "Unlicense",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
+    },
+    "homepage": "https://github.com/acusti/uikit#readme",
+    "private": true,
+    "workspaces": [
+        "packages/*"
+    ]
+}
