@@ -2,6 +2,9 @@
     "name": "@acusti/uikit",
     "version": "0.0.1",
     "description": "UI toolkit monorepo containing a React component library, UI utilities, a drag-and-drop library, and more",
+    "scripts": {
+        "format": "prettier --write package.json README.md ./packages/"
+    },
     "repository": {
         "type": "git",
         "url": "git+https://github.com/acusti/uikit.git"
@@ -15,5 +18,37 @@
     "private": true,
     "workspaces": [
         "packages/*"
-    ]
+    ],
+    "devDependencies": {
+        "prettier": "^2.2.1"
+    },
+    "prettier": {
+        "arrowParens": "always",
+        "printWidth": 90,
+        "singleQuote": true,
+        "tabWidth": 4,
+        "trailingComma": "all",
+        "useTabs": false,
+        "overrides": [
+            {
+                "files": [
+                    "*.css",
+                    "*.scss"
+                ],
+                "options": {
+                    "singleQuote": false
+                }
+            },
+            {
+                "files": [
+                    "*.md",
+                    "*.markdown"
+                ],
+                "options": {
+                    "printWidth": 75,
+                    "proseWrap": "always"
+                }
+            }
+        ]
+    }
 }

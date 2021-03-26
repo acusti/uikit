@@ -1,4 +1,3 @@
-@acusti/components
-==================
+# @acusti/components
 
 React component library

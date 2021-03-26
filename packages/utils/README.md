@@ -1,4 +1,3 @@
-@acusti/utils
-=============
+# @acusti/utils
 
 UI utilities and helpers
