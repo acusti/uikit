@@ -11,6 +11,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@acusti/uikit-docs@workspace:packages/docs":
+  version: 0.0.0-use.local
+  resolution: "@acusti/uikit-docs@workspace:packages/docs"
+  languageName: unknown
+  linkType: soft
+
 "@acusti/uikit@workspace:.":
   version: 0.0.0-use.local
   resolution: "@acusti/uikit@workspace:."

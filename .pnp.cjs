@@ -27,6 +27,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/components"
       },
       {
+        "name": "@acusti/uikit-docs",
+        "reference": "workspace:packages/docs"
+      },
+      {
         "name": "@acusti/utils",
         "reference": "workspace:packages/utils"
       }
@@ -36,6 +40,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "fallbackExclusionList": [
       ["@acusti/components", ["workspace:packages/components"]],
       ["@acusti/uikit", ["workspace:."]],
+      ["@acusti/uikit-docs", ["workspace:packages/docs"]],
       ["@acusti/utils", ["workspace:packages/utils"]]
     ],
     "fallbackPool": [
@@ -65,6 +70,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@acusti/uikit", "workspace:."],
             ["prettier", "npm:2.2.1"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@acusti/uikit-docs", [
+        ["workspace:packages/docs", {
+          "packageLocation": "./packages/docs/",
+          "packageDependencies": [
+            ["@acusti/uikit-docs", "workspace:packages/docs"]
           ],
           "linkType": "SOFT",
         }]
