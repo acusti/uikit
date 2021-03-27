@@ -1,3 +1,6 @@
 {
-    "name": "@acusti/components"
+    "name": "@acusti/components",
+    "devDependencies": {
+        "typescript": "^4.2.3"
+    }
 }
