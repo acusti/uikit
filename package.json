@@ -3,7 +3,8 @@
     "version": "0.0.1",
     "description": "UI toolkit monorepo containing a React component library, UI utilities, a drag-and-drop library, and more",
     "scripts": {
-        "format": "prettier --write package.json README.md ./packages/"
+        "format": "prettier --write package.json README.md ./packages/",
+        "storybook": "yarn workspace @acusti/uikit-docs storybook"
     },
     "repository": {
         "type": "git",
