@@ -1,5 +1,8 @@
 {
     "name": "@acusti/components",
+    "main": "build/cjs/index.js",
+    "module": "build/esm/index.js",
+    "typings": "build/cjs/index.d.ts",
     "devDependencies": {
         "typescript": "^4.2.3"
     }

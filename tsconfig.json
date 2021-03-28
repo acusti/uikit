@@ -1,0 +1,22 @@
+{
+    "compilerOptions": {
+        "declaration": true,
+        "esModuleInterop": true,
+        "jsx": "react",
+        "module": "esnext",
+        "moduleResolution": "node",
+        "outDir": "build",
+        "sourceMap": true,
+        "target": "es5",
+
+        "allowJs": false,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "noImplicitThis": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "strictNullChecks": true,
+        "suppressImplicitAnyIndexErrors": true
+    }
+}
