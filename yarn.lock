@@ -13,6 +13,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@acusti/css-values@workspace:packages/css-values":
+  version: 0.0.0-use.local
+  resolution: "@acusti/css-values@workspace:packages/css-values"
+  dependencies:
+    typescript: ^4.2.3
+  languageName: unknown
+  linkType: soft
+
 "@acusti/uikit-docs@workspace:packages/docs":
   version: 0.0.0-use.local
   resolution: "@acusti/uikit-docs@workspace:packages/docs"
@@ -37,14 +45,6 @@ __metadata:
   resolution: "@acusti/uikit@workspace:."
   dependencies:
     prettier: ^2.2.1
-  languageName: unknown
-  linkType: soft
-
-"@acusti/utils@workspace:packages/utils":
-  version: 0.0.0-use.local
-  resolution: "@acusti/utils@workspace:packages/utils"
-  dependencies:
-    typescript: ^4.2.3
   languageName: unknown
   linkType: soft
 

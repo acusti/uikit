@@ -27,21 +27,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/components"
       },
       {
-        "name": "@acusti/uikit-docs",
-        "reference": "workspace:packages/docs"
+        "name": "@acusti/css-values",
+        "reference": "workspace:packages/css-values"
       },
       {
-        "name": "@acusti/utils",
-        "reference": "workspace:packages/utils"
+        "name": "@acusti/uikit-docs",
+        "reference": "workspace:packages/docs"
       }
     ],
     "enableTopLevelFallback": true,
     "ignorePatternData": "(^(?:\\.yarn\\/sdks(?:\\/(?!\\.{1,2}(?:\\/|$))(?:(?:(?!(?:^|\\/)\\.{1,2}(?:\\/|$)).)*?)|$))$)",
     "fallbackExclusionList": [
       ["@acusti/components", ["workspace:packages/components"]],
+      ["@acusti/css-values", ["workspace:packages/css-values"]],
       ["@acusti/uikit", ["workspace:."]],
-      ["@acusti/uikit-docs", ["workspace:packages/docs"]],
-      ["@acusti/utils", ["workspace:packages/utils"]]
+      ["@acusti/uikit-docs", ["workspace:packages/docs"]]
     ],
     "fallbackPool": [
     ],
@@ -60,6 +60,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/components/",
           "packageDependencies": [
             ["@acusti/components", "workspace:packages/components"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@acusti/css-values", [
+        ["workspace:packages/css-values", {
+          "packageLocation": "./packages/css-values/",
+          "packageDependencies": [
+            ["@acusti/css-values", "workspace:packages/css-values"],
             ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
           ],
           "linkType": "SOFT",
@@ -91,16 +101,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["core-js", "npm:3.9.1"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
-          ],
-          "linkType": "SOFT",
-        }]
-      ]],
-      ["@acusti/utils", [
-        ["workspace:packages/utils", {
-          "packageLocation": "./packages/utils/",
-          "packageDependencies": [
-            ["@acusti/utils", "workspace:packages/utils"],
             ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
           ],
           "linkType": "SOFT",

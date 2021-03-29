@@ -2,7 +2,7 @@
     "files": [],
     "references": [
         { "path": "packages/components" },
-        { "path": "packages/docs" },
-        { "path": "packages/utils" }
+        { "path": "packages/css-values" },
+        { "path": "packages/docs" }
     ]
 }
