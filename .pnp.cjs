@@ -27,6 +27,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/components"
       },
       {
+        "name": "@acusti/css-value-input",
+        "reference": "workspace:packages/css-value-input"
+      },
+      {
         "name": "@acusti/css-values",
         "reference": "workspace:packages/css-values"
       },
@@ -39,6 +43,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "ignorePatternData": "(^(?:\\.yarn\\/sdks(?:\\/(?!\\.{1,2}(?:\\/|$))(?:(?:(?!(?:^|\\/)\\.{1,2}(?:\\/|$)).)*?)|$))$)",
     "fallbackExclusionList": [
       ["@acusti/components", ["workspace:packages/components"]],
+      ["@acusti/css-value-input", ["workspace:packages/css-value-input"]],
       ["@acusti/css-values", ["workspace:packages/css-values"]],
       ["@acusti/uikit", ["workspace:."]],
       ["@acusti/uikit-docs", ["workspace:packages/docs"]]
@@ -50,7 +55,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         [null, {
           "packageLocation": "./",
           "packageDependencies": [
-            ["prettier", "npm:2.2.1"]
+            ["prettier", "npm:2.2.1"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
           ],
           "linkType": "SOFT",
         }]
@@ -60,6 +66,22 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/components/",
           "packageDependencies": [
             ["@acusti/components", "workspace:packages/components"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@acusti/css-value-input", [
+        ["workspace:packages/css-value-input", {
+          "packageLocation": "./packages/css-value-input/",
+          "packageDependencies": [
+            ["@acusti/css-value-input", "workspace:packages/css-value-input"],
+            ["@acusti/css-values", "workspace:packages/css-values"],
+            ["@types/classnames", "npm:2.2.11"],
+            ["@types/react", "npm:17.0.3"],
+            ["classnames", "npm:2.2.6"],
+            ["react", "npm:17.0.2"],
+            ["react-dom", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#npm:17.0.2"],
             ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
           ],
           "linkType": "SOFT",
@@ -80,7 +102,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",
           "packageDependencies": [
             ["@acusti/uikit", "workspace:."],
-            ["prettier", "npm:2.2.1"]
+            ["prettier", "npm:2.2.1"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
           ],
           "linkType": "SOFT",
         }]
@@ -4101,6 +4124,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-braces-npm-3.0.0-511ab9ce35-4f2a99b04c.zip/node_modules/@types/braces/",
           "packageDependencies": [
             ["@types/braces", "npm:3.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/classnames", [
+        ["npm:2.2.11", {
+          "packageLocation": "./.yarn/cache/@types-classnames-npm-2.2.11-442af4f8b3-80f5798896.zip/node_modules/@types/classnames/",
+          "packageDependencies": [
+            ["@types/classnames", "npm:2.2.11"]
           ],
           "linkType": "HARD",
         }]
@@ -13099,6 +13131,22 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
             ["@types/react", null],
+            ["loose-envify", "npm:1.4.0"],
+            ["object-assign", "npm:4.1.1"],
+            ["react", "npm:17.0.2"],
+            ["scheduler", "npm:0.20.2"]
+          ],
+          "packagePeers": [
+            "@types/react",
+            "react"
+          ],
+          "linkType": "HARD",
+        }],
+        ["virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#npm:17.0.2", {
+          "packageLocation": "./.yarn/__virtual__/react-dom-virtual-bbd89bb9ea/0/cache/react-dom-npm-17.0.2-f551215af1-1c1eaa3bca.zip/node_modules/react-dom/",
+          "packageDependencies": [
+            ["react-dom", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#npm:17.0.2"],
+            ["@types/react", "npm:17.0.3"],
             ["loose-envify", "npm:1.4.0"],
             ["object-assign", "npm:4.1.1"],
             ["react", "npm:17.0.2"],

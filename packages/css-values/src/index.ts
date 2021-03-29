@@ -12,9 +12,9 @@ const CSS_UNIT_REGEX = Object.freeze({
 export type CSSValueType = 'angle' | 'time' | 'length' | 'percent';
 
 export type Payload = {
-    cssValueType: CSSValueType,
-    defaultUnit: string,
-    value: string | number,
+    cssValueType: CSSValueType;
+    defaultUnit: string;
+    value: string | number;
 };
 
 export const getUnitForCSSValue = ({ cssValueType, defaultUnit, value }: Payload) => {
@@ -22,17 +22,17 @@ export const getUnitForCSSValue = ({ cssValueType, defaultUnit, value }: Payload
     if (typeof value === 'number') return defaultUnit;
 
     const matchedUnit = CSS_UNIT_REGEX[cssValueType].exec(value);
-    if (matchedUnit === null) return
+    if (matchedUnit === null) return;
     return matchedUnit === null ? defaultUnit : matchedUnit[0];
 };
 
 export const getCSSValueAsNumber = (value: string | number): number =>
     typeof value === 'number' ? value : parseFloat(value.trim());
 
-export const getCSSValueWithUnit = (payload: Payload) => {
+export const getCSSValueWithUnit = (payload: Payload): string => {
     const valueAsNumber = getCSSValueAsNumber(payload.value);
     // If value is not a number, don’t try to add a unit
-    if (Number.isNaN(valueAsNumber)) return payload.value;
+    if (Number.isNaN(valueAsNumber)) return payload.value.toString();
 
     return `${valueAsNumber}${getUnitForCSSValue(payload)}`;
 };

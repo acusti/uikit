@@ -13,7 +13,21 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/css-values@workspace:packages/css-values":
+"@acusti/css-value-input@workspace:packages/css-value-input":
+  version: 0.0.0-use.local
+  resolution: "@acusti/css-value-input@workspace:packages/css-value-input"
+  dependencies:
+    "@acusti/css-values": ">=0.1"
+    "@types/classnames": ^2.2.11
+    "@types/react": ^17.0.3
+    classnames: ^2
+    react: ">=16.8"
+    react-dom: ">=16.8"
+    typescript: ^4.2.3
+  languageName: unknown
+  linkType: soft
+
+"@acusti/css-values@>=0.1, @acusti/css-values@workspace:packages/css-values":
   version: 0.0.0-use.local
   resolution: "@acusti/css-values@workspace:packages/css-values"
   dependencies:
@@ -45,6 +59,7 @@ __metadata:
   resolution: "@acusti/uikit@workspace:."
   dependencies:
     prettier: ^2.2.1
+    typescript: ^4.2.3
   languageName: unknown
   linkType: soft
 
@@ -2591,6 +2606,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/classnames@npm:^2.2.11":
+  version: 2.2.11
+  resolution: "@types/classnames@npm:2.2.11"
+  checksum: 80f5798896565c8b6525e401f425593a4c7771eb06c4e52e1bbaf18f4e0a37f4fb998247e8a6a6e5abf8a9e2af2aa50d2abf5ad615c7e7a835bd083408a1dc4d
+  languageName: node
+  linkType: hard
+
 "@types/glob-base@npm:^0.3.0":
   version: 0.3.0
   resolution: "@types/glob-base@npm:0.3.0"
@@ -2793,7 +2815,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*":
+"@types/react@npm:*, @types/react@npm:^17.0.3":
   version: 17.0.3
   resolution: "@types/react@npm:17.0.3"
   dependencies:
@@ -4687,7 +4709,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:^2.2.5":
+"classnames@npm:^2, classnames@npm:^2.2.5":
   version: 2.2.6
   resolution: "classnames@npm:2.2.6"
   checksum: 09a4fda780158aa8399079898eabeeca0c48c28641d9e4de140db7412e5e346843039ded1af0152f755afc2cc246ff8c3d6f227bf0dcb004e070b7fa14ec54cc
@@ -10296,7 +10318,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^17.0.2":
+"react-dom@npm:>=16.8, react-dom@npm:^17.0.2":
   version: 17.0.2
   resolution: "react-dom@npm:17.0.2"
   dependencies:
@@ -10484,7 +10506,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"react@npm:^17.0.2":
+"react@npm:>=16.8, react@npm:^17.0.2":
   version: 17.0.2
   resolution: "react@npm:17.0.2"
   dependencies:
