@@ -3,15 +3,15 @@
     "version": "0.0.1",
     "description": "UI toolkit monorepo containing a React component library, UI utilities, a drag-and-drop library, and more",
     "scripts": {
-        "build:cjs": "yarn module:cjs && tsc --build tsconfig.project.json",
-        "build:esm": "yarn module:esm && tsc --build tsconfig.project.json",
-        "build": "yarn build:cjs && yarn build:esm",
-        "dev": "yarn build:esm --watch",
-        "format": "prettier --write package.json README.md tsconfig.json tsconfig.project.json ./packages/",
-        "module:cjs": "sed -i -e '0,/target/{s:es2017:es5:}' -e '0,/module/{s:esnext:commonjs:}' ./tsconfig.json && sed -i -e s:dist/esm:dist/cjs: packages/**/tsconfig.json",
-        "module:esm": "sed -i -e '0,/target/{s:es5:es2017:}' -e '0,/module/{s:commonjs:esnext:}' ./tsconfig.json && sed -i -e s:dist/cjs:dist/esm: packages/**/tsconfig.json",
-        "prebuild": "rm -rf ./packages/*/dist",
-        "storybook": "yarn workspace @acusti/uikit-docs storybook"
+        "build:stories": "yarn workspace @acusti/uikit-docs build",
+        "build": "tsc --build",
+        "clean": "tsc --build --clean",
+        "format": "prettier --write package.json README.md tsconfig.json ./packages/",
+        "prestart": "yarn build",
+        "pretest": "yarn build",
+        "start:stories": "yarn workspace @acusti/uikit-docs storybook",
+        "start:watch": "tsc --build --watch",
+        "start": "run-p start:*",
         "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest"
     },
     "repository": {
