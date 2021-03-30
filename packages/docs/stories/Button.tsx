@@ -26,7 +26,7 @@ type Props = {
     /**
      * Optional click handler
      */
-    onClick: () => mixed;
+    onClick: () => unknown;
 };
 
 export const Button = ({ primary, backgroundColor, size, label, ...props }: Props) => {
@@ -35,7 +35,7 @@ export const Button = ({ primary, backgroundColor, size, label, ...props }: Prop
         <button
             type="button"
             className={['storybook-button', `storybook-button--${size}`, mode].join(' ')}
-            style={backgroundColor && { backgroundColor }}
+            style={backgroundColor ? { backgroundColor } : undefined}
             {...props}
         >
             {label}

@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { Header } from './Header.tsx';
+import { Header } from './Header';
 import './page.css';
 
 type Props = {
-    onCreateAccount: () => mixed;
-    onLogin: () => mixed;
-    onLogout: () => mixed;
+    onCreateAccount: () => unknown;
+    onLogin: () => unknown;
+    onLogout: () => unknown;
     user: {} | null;
 };
 

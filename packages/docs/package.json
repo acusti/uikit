@@ -9,6 +9,9 @@
         "@storybook/addon-essentials": "^6.1.21",
         "@storybook/addon-links": "^6.1.21",
         "@storybook/react": "^6.1.21",
+        "@types/react": "^17.0.3",
+        "@types/storybook__addon-info": "^5.2.3",
+        "@types/storybook__react": "^5.2.1",
         "babel-loader": "^8.2.2",
         "core-js": "^3.9.1",
         "react": "^17.0.2",
@@ -16,7 +19,7 @@
         "typescript": "^4.2.3"
     },
     "scripts": {
-        "storybook": "start-storybook -p 6006",
-        "build-storybook": "build-storybook"
+        "build": "build-storybook -o dist",
+        "storybook": "start-storybook -p 6006"
     }
 }

@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { Button } from './Button.tsx';
+import { Button } from './Button';
 import './header.css';
 
 type Props = {
-    onCreateAccount: () => mixed;
-    onLogin: () => mixed;
-    onLogout: () => mixed;
+    onCreateAccount: () => unknown;
+    onLogin: () => unknown;
+    onLogout: () => unknown;
     user: {} | null;
 };
 
