@@ -23,8 +23,14 @@
         "strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": true
     },
-    "exclude": ["node_modules", "dist", "__tests__", "**/*.test*", "**/*.spec*"],
-    "files": [],
+    "exclude": [
+        "node_modules",
+        "packages/docs",
+        "dist",
+        "__tests__",
+        "**/*.test*",
+        "**/*.spec*"
+    ],
     "references": [
         { "path": "packages/css-value-input" },
         { "path": "packages/css-values" }
