@@ -1,6 +1,6 @@
 // @flow
 import classnames from 'classnames';
-import * as React from "react";
+import * as React from 'react';
 import {
     CSSValueType,
     getCSSValueAsNumber,
@@ -79,9 +79,9 @@ const CSSValueInput = ({
                 value: currentValue,
             });
             const valueAsNumber = getCSSValueAsNumber(currentValue);
-            const modifier = key === 'ArrowUp' ? -1 : 1;
-            const multiplier = shiftKey ? 10 : 1;
-            setValue(`${valueAsNumber + (modifier * multiplier)}${currentUnit}`);
+            const signum = key === 'ArrowUp' ? -1 : 1;
+            const modifier = signum * (shiftKey ? 10 : 1);
+            setValue(`${valueAsNumber + modifier}${currentUnit}`);
             if (repeat) return;
 
             handleSubmit();
