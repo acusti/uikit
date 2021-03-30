@@ -1,7 +1,6 @@
 {
     "files": [],
     "references": [
-        { "path": "packages/components" },
         { "path": "packages/css-value-input" },
         { "path": "packages/css-values" }
     ]

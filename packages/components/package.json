@@ -1,9 +1,0 @@
-{
-    "name": "@acusti/components",
-    "main": "dist/cjs/index.js",
-    "module": "dist/esm/index.js",
-    "typings": "dist/cjs/index.d.ts",
-    "devDependencies": {
-        "typescript": "^4.2.3"
-    }
-}
