@@ -22,7 +22,6 @@ export const getUnitForCSSValue = ({ cssValueType, defaultUnit, value }: Payload
     if (typeof value === 'number') return defaultUnit;
 
     const matchedUnit = CSS_UNIT_REGEX[cssValueType].exec(value);
-    if (matchedUnit === null) return;
     return matchedUnit === null ? defaultUnit : matchedUnit[0];
 };
 
