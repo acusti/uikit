@@ -31,7 +31,7 @@ export const getCSSValueAsNumber = (value: string | number): number =>
 export const getCSSValueWithUnit = (payload: Payload): string => {
     const valueAsNumber = getCSSValueAsNumber(payload.value);
     // If value is not a number, don’t try to add a unit
-    if (Number.isNaN(valueAsNumber)) return payload.value.toString();
+    if (Number.isNaN(valueAsNumber)) return payload.value.toString().trim();
 
     return `${valueAsNumber}${getUnitForCSSValue(payload)}`;
 };
