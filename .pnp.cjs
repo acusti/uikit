@@ -23,10 +23,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:."
       },
       {
-        "name": "@acusti/components",
-        "reference": "workspace:packages/components"
-      },
-      {
         "name": "@acusti/css-value-input",
         "reference": "workspace:packages/css-value-input"
       },
@@ -42,7 +38,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "enableTopLevelFallback": true,
     "ignorePatternData": "(^(?:\\.yarn\\/sdks(?:\\/(?!\\.{1,2}(?:\\/|$))(?:(?:(?!(?:^|\\/)\\.{1,2}(?:\\/|$)).)*?)|$))$)",
     "fallbackExclusionList": [
-      ["@acusti/components", ["workspace:packages/components"]],
       ["@acusti/css-value-input", ["workspace:packages/css-value-input"]],
       ["@acusti/css-values", ["workspace:packages/css-values"]],
       ["@acusti/uikit", ["workspace:."]],
@@ -62,16 +57,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["prettier", "npm:2.2.1"],
             ["slash", "npm:3.0.0"],
             ["ts-jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.0.0-next.9"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
-          ],
-          "linkType": "SOFT",
-        }]
-      ]],
-      ["@acusti/components", [
-        ["workspace:packages/components", {
-          "packageLocation": "./packages/components/",
-          "packageDependencies": [
-            ["@acusti/components", "workspace:packages/components"],
             ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
           ],
           "linkType": "SOFT",
