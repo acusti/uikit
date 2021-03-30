@@ -12,6 +12,7 @@
         "module:esm": "sed -i -e '0,/target/{s:es5:es2017:}' -e '0,/module/{s:commonjs:esnext:}' ./tsconfig.json && sed -i -e s:dist/cjs:dist/esm: packages/**/tsconfig.json",
         "prebuild": "rm -rf ./packages/*/dist",
         "storybook": "yarn workspace @acusti/uikit-docs storybook"
+        "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest"
     },
     "repository": {
         "type": "git",
@@ -28,8 +29,31 @@
         "packages/*"
     ],
     "devDependencies": {
+        "@babel/core": "^7.13.14",
+        "@types/jest": "^26.0.22",
+        "jest": "next",
+        "jest-runner": "next",
         "prettier": "^2.2.1",
+        "slash": "^3.0.0",
+        "ts-jest": "next",
         "typescript": "^4.2.3"
+    },
+    "jest": {
+        "transform": {
+            "^.+\\.tsx?$": "ts-jest"
+        },
+        "extensionsToTreatAsEsm": [
+            ".ts",
+            ".tsx"
+        ],
+        "globals": {
+            "ts-jest": {
+                "useESM": true
+            }
+        },
+        "moduleNameMapper": {
+            "@acusti/(.*)$": "<rootDir>/packages/$1"
+        }
     },
     "prettier": {
         "arrowParens": "always",
