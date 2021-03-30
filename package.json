@@ -4,11 +4,9 @@
     "description": "UI toolkit monorepo containing a React component library, UI utilities, a drag-and-drop library, and more",
     "scripts": {
         "build:stories": "yarn workspace @acusti/uikit-docs build",
-        "build": "tsc --build",
+        "build": "yarn clean && tsc --build",
         "clean": "tsc --build --clean",
         "format": "prettier --write package.json README.md tsconfig.json ./packages/",
-        "prestart": "yarn build",
-        "pretest": "yarn build",
         "start:stories": "yarn workspace @acusti/uikit-docs storybook",
         "start:watch": "tsc --build --watch",
         "start": "run-p start:*",
