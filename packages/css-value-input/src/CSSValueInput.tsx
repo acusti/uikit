@@ -39,24 +39,31 @@ const CSSValueInput = ({
     }, [valueFromProps]);
 
     const getValueWithUnit = useCallback(
-        (rawValue = value) =>
+        (rawValue) =>
             getCSSValueWithUnit({
                 cssValueType,
                 defaultUnit: unit,
                 value: rawValue,
             }),
-        [cssValueType, value, unit],
+        [cssValueType, unit],
     );
 
     const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
         setValue(event.currentTarget.value);
     }, []);
 
-    const handleSubmit = useCallback(() => {
-        const valueWithUnit = getValueWithUnit();
-        setValue(valueWithUnit);
-        if (onSubmit) onSubmit(valueWithUnit);
-    }, [getValueWithUnit, onSubmit]);
+    const handleSubmit = useCallback(
+        (valueToSubmit) => {
+            const valueWithUnit = getValueWithUnit(valueToSubmit);
+            setValue(valueWithUnit);
+            if (onSubmit) onSubmit(valueWithUnit);
+        },
+        [getValueWithUnit, onSubmit],
+    );
+
+    const handleBlur = useCallback(() => {
+        handleSubmit(value);
+    }, [value]);
 
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLInputElement>) => {
@@ -77,10 +84,13 @@ const CSSValueInput = ({
             const valueAsNumber = getCSSValueAsNumber(currentValue);
             const signum = event.key === 'ArrowUp' ? 1 : -1;
             const modifier = signum * (event.shiftKey ? 10 : 1);
-            setValue(`${valueAsNumber + modifier}${currentUnit}`);
-            if (event.repeat) return;
+            const nextValue = `${valueAsNumber + modifier}${currentUnit}`;
+            if (event.repeat) {
+                setValue(nextValue);
+                return;
+            }
 
-            handleSubmit();
+            handleSubmit(nextValue);
         },
         [cssValueType, handleSubmit, unit],
     );
@@ -93,7 +103,7 @@ const CSSValueInput = ({
             <div className="css-value-input-value">
                 <input
                     disabled={disabled}
-                    onBlur={handleSubmit}
+                    onBlur={handleBlur}
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
