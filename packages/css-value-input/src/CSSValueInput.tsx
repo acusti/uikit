@@ -32,6 +32,7 @@ const CSSValueInput = ({
     unit,
     value,
 }: Props) => {
+    const defaultValue = placeholder || `0${unit}`;
     const [inputValue, setInputValue] = useState<string>(value || placeholder || '');
     const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -84,7 +85,7 @@ const CSSValueInput = ({
             if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
 
             event.preventDefault();
-            const currentValue = event.currentTarget.value;
+            const currentValue = event.currentTarget.value || placeholder || defaultValue;
             const currentUnit = getUnitForCSSValue({
                 cssValueType,
                 defaultUnit: unit,
@@ -101,7 +102,7 @@ const CSSValueInput = ({
 
             handleSubmit(nextValue);
         },
-        [cssValueType, handleSubmit, unit],
+        [cssValueType, handleSubmit, placeholder, unit],
     );
 
     return (
