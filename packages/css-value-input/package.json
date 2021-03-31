@@ -1,9 +1,9 @@
 {
     "name": "@acusti/css-value-input",
     "version": "0.1.0",
-    "main": "dist/index.js",
-    "module": "dist/index.js",
-    "typings": "dist/index.d.ts",
+    "main": "dist/CSSValueInput.js",
+    "module": "dist/CSSValueInput.js",
+    "typings": "dist/CSSValueInput.d.ts",
     "devDependencies": {
         "typescript": "^4.2.3"
     },
