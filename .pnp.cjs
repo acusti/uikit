@@ -112,6 +112,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/docs/",
           "packageDependencies": [
             ["@acusti/uikit-docs", "workspace:packages/docs"],
+            ["@acusti/css-value-input", "workspace:packages/css-value-input"],
             ["@babel/core", "npm:7.13.13"],
             ["@mdx-js/react", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:1.6.22"],
             ["@storybook/addon-actions", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:6.1.21"],
