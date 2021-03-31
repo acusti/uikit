@@ -26,7 +26,7 @@
     "exclude": [
         "node_modules",
         "packages/docs",
-        "dist",
+        "**/dist/*",
         "__tests__",
         "**/*.test*",
         "**/*.spec*"
