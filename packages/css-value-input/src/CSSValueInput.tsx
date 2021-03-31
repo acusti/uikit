@@ -105,7 +105,7 @@ const CSSValueInput = ({
     );
 
     return (
-        <div className={classnames(ROOT_CLASS_NAME, className)}>
+        <label className={classnames(ROOT_CLASS_NAME, className)}>
             <div className={`${ROOT_CLASS_NAME}-label`}>
                 <p className={`${ROOT_CLASS_NAME}-label-text`}>{label}</p>
             </div>
@@ -122,7 +122,7 @@ const CSSValueInput = ({
                     value={inputValue}
                 />
             </div>
-        </div>
+        </label>
     );
 };
 
