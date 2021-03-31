@@ -33,6 +33,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       {
         "name": "@acusti/uikit-docs",
         "reference": "workspace:packages/docs"
+      },
+      {
+        "name": "@acusti/styling",
+        "reference": "workspace:packages/styling"
       }
     ],
     "enableTopLevelFallback": true,
@@ -40,6 +44,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "fallbackExclusionList": [
       ["@acusti/css-value-input", ["workspace:packages/css-value-input"]],
       ["@acusti/css-values", ["workspace:packages/css-values"]],
+      ["@acusti/styling", ["workspace:packages/styling"]],
       ["@acusti/uikit", ["workspace:."]],
       ["@acusti/uikit-docs", ["workspace:packages/docs"]]
     ],
@@ -84,6 +89,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/css-values/",
           "packageDependencies": [
             ["@acusti/css-values", "workspace:packages/css-values"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@acusti/styling", [
+        ["workspace:packages/styling", {
+          "packageLocation": "./packages/styling/",
+          "packageDependencies": [
+            ["@acusti/styling", "workspace:packages/styling"],
+            ["@types/react", "npm:17.0.3"],
+            ["react", "npm:17.0.2"],
+            ["react-dom", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#npm:17.0.2"],
             ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
           ],
           "linkType": "SOFT",
