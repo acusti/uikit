@@ -12,6 +12,7 @@ const Template: Story<Props> = (args) => <CSSValueInput {...args} />;
 
 export const Length = Template.bind({});
 Length.args = {
+    className: 'my-special-input',
     cssValueType: 'length',
     label: 'Font size',
     onSubmit: () => {},
@@ -21,6 +22,7 @@ Length.args = {
 
 export const Time = Template.bind({});
 Time.args = {
+    className: 'my-panel-input',
     cssValueType: 'time',
     label: 'Duration',
     onSubmit: () => {},
@@ -30,6 +32,7 @@ Time.args = {
 
 export const Angle = Template.bind({});
 Angle.args = {
+    className: 'flex-item-example',
     cssValueType: 'angle',
     label: 'Rotate Z',
     onSubmit: () => {},
@@ -40,6 +43,7 @@ Angle.args = {
 
 export const Percent = Template.bind({});
 Percent.args = {
+    className: 'highlighted',
     cssValueType: 'percent',
     label: 'Width',
     onSubmit: () => {},
