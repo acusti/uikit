@@ -75,7 +75,7 @@ const CSSValueInput = ({
                 value: currentValue,
             });
             const valueAsNumber = getCSSValueAsNumber(currentValue);
-            const signum = event.key === 'ArrowUp' ? -1 : 1;
+            const signum = event.key === 'ArrowUp' ? 1 : -1;
             const modifier = signum * (event.shiftKey ? 10 : 1);
             setValue(`${valueAsNumber + modifier}${currentUnit}`);
             if (event.repeat) return;
