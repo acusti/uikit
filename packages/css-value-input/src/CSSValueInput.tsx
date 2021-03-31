@@ -28,15 +28,16 @@ const CSSValueInput = ({
     onSubmit,
     placeholder,
     unit,
-    value: valueFromProps = placeholder || '',
+    value,
 }: Props) => {
-    const [value, setValue] = useState<string>(valueFromProps);
+    const [inputValue, setInputValue] = useState<string>(value || placeholder || '');
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     // If props.value changes, override value from it
     useEffect(() => {
-        setValue(valueFromProps);
-    }, [valueFromProps]);
+        if (typeof value !== 'string') return;
+        setInputValue(value);
+    }, [value]);
 
     const getValueWithUnit = useCallback(
         (rawValue) =>
@@ -49,21 +50,21 @@ const CSSValueInput = ({
     );
 
     const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setValue(event.currentTarget.value);
+        setInputValue(event.currentTarget.value);
     }, []);
 
     const handleSubmit = useCallback(
         (valueToSubmit) => {
             const valueWithUnit = getValueWithUnit(valueToSubmit);
-            setValue(valueWithUnit);
+            setInputValue(valueWithUnit);
             if (onSubmit) onSubmit(valueWithUnit);
         },
         [getValueWithUnit, onSubmit],
     );
 
     const handleBlur = useCallback(() => {
-        handleSubmit(value);
-    }, [value]);
+        handleSubmit(inputValue);
+    }, [inputValue]);
 
     const handleFocus = useCallback(() => {
         const inputElement = inputRef.current;
@@ -92,7 +93,7 @@ const CSSValueInput = ({
             const modifier = signum * (event.shiftKey ? 10 : 1);
             const nextValue = `${valueAsNumber + modifier}${currentUnit}`;
             if (event.repeat) {
-                setValue(nextValue);
+                setInputValue(nextValue);
                 return;
             }
 
@@ -116,7 +117,7 @@ const CSSValueInput = ({
                     placeholder={placeholder}
                     ref={inputRef}
                     type="text"
-                    value={value}
+                    value={inputValue}
                 />
             </div>
         </div>
