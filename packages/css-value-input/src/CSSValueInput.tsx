@@ -59,30 +59,26 @@ const CSSValueInput = ({
     }, [getValueWithUnit, onSubmit]);
 
     const handleKeyDown = useCallback(
-        ({
-            currentTarget,
-            key,
-            repeat,
-            shiftKey,
-        }: React.KeyboardEvent<HTMLInputElement>) => {
-            if (key === 'Enter' || key === 'Escape') {
+        (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (event.key === 'Enter' || event.key === 'Escape') {
                 if (inputRef.current) inputRef.current.blur();
                 return;
             }
 
-            if (key !== 'ArrowUp' && key !== 'ArrowDown') return;
+            if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
 
-            const currentValue = currentTarget.value;
+            event.preventDefault();
+            const currentValue = event.currentTarget.value;
             const currentUnit = getUnitForCSSValue({
                 cssValueType,
                 defaultUnit: unit,
                 value: currentValue,
             });
             const valueAsNumber = getCSSValueAsNumber(currentValue);
-            const signum = key === 'ArrowUp' ? -1 : 1;
-            const modifier = signum * (shiftKey ? 10 : 1);
+            const signum = event.key === 'ArrowUp' ? -1 : 1;
+            const modifier = signum * (event.shiftKey ? 10 : 1);
             setValue(`${valueAsNumber + modifier}${currentUnit}`);
-            if (repeat) return;
+            if (event.repeat) return;
 
             handleSubmit();
         },
