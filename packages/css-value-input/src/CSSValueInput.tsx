@@ -1,4 +1,3 @@
-// @flow
 import classnames from 'classnames';
 import * as React from 'react';
 import {
@@ -19,7 +18,7 @@ type Props = {
     value?: string;
 };
 
-const { useCallback, useEffect, useState } = React;
+const { useCallback, useEffect, useRef, useState } = React;
 
 const CSSValueInput = ({
     className,
@@ -32,6 +31,7 @@ const CSSValueInput = ({
     value: valueFromProps = placeholder || '',
 }: Props) => {
     const [value, setValue] = useState<string>(valueFromProps);
+    const inputRef = useRef<HTMLInputElement | null>(null);
 
     // If props.value changes, override value from it
     useEffect(() => {
@@ -66,7 +66,7 @@ const CSSValueInput = ({
             shiftKey,
         }: React.KeyboardEvent<HTMLInputElement>) => {
             if (key === 'Enter' || key === 'Escape') {
-                handleSubmit();
+                if (inputRef.current) inputRef.current.blur();
                 return;
             }
 
@@ -101,6 +101,7 @@ const CSSValueInput = ({
                     onChange={handleChange}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
+                    ref={inputRef}
                     type="text"
                     value={value}
                 />
