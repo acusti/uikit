@@ -65,6 +65,12 @@ const CSSValueInput = ({
         handleSubmit(value);
     }, [value]);
 
+    const handleFocus = useCallback(() => {
+        const inputElement = inputRef.current;
+        if (!inputElement) return;
+        inputElement.select();
+    }, []);
+
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === 'Enter' || event.key === 'Escape') {
@@ -105,6 +111,7 @@ const CSSValueInput = ({
                     disabled={disabled}
                     onBlur={handleBlur}
                     onChange={handleChange}
+                    onFocus={handleFocus}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
                     ref={inputRef}
