@@ -1,0 +1,70 @@
+import { Meta, Story, Canvas, Props } from '@storybook/addon-docs/blocks';
+import CSSValueInput from '@acusti/css-value-input';
+
+<Meta title="UIKit/Inputs/CSSValueInput" component={CSSValueInput} />
+
+# CSSValueInput
+
+`CSSValueInput` is a React component that renders a text input that can take
+and update a CSS value of a particular type with a default unit. The
+input’s behavior is similar to those in design applications such as Adobe
+Illustrator or XD.
+
+<Canvas>
+    <Story
+        name="Length"
+        args={{
+            className: 'my-special-input',
+            cssValueType: 'length',
+            label: 'Font size',
+            onSubmit: () => {},
+            placeholder: '1rem',
+            unit: 'rem',
+            value: '24px',
+        }}
+    >
+        {(args) => <CSSValueInput {...args} />}
+    </Story>
+    <Story
+        name="Time"
+        args={{
+            className: 'my-panel-input',
+            cssValueType: 'time',
+            label: 'Duration',
+            onSubmit: () => {},
+            placeholder: '0.25s',
+            unit: 's',
+        }}
+    >
+        {(args) => <CSSValueInput {...args} />}
+    </Story>
+    <Story
+        name="Angle"
+        args={{
+            className: 'flex-item-example',
+            cssValueType: 'angle',
+            label: 'Rotate Z',
+            onSubmit: () => {},
+            placeholder: '0deg',
+            unit: 'deg',
+            value: '90deg',
+        }}
+    >
+        {(args) => <CSSValueInput {...args} />}
+    </Story>
+    <Story
+        name="Percent"
+        args={{
+            cssValueType: 'percent',
+            label: 'Width',
+            onSubmit: () => {},
+            placeholder: '100%',
+            unit: '%',
+            value: '25%',
+        }}
+    >
+        {(args) => <CSSValueInput {...args} />}
+    </Story>
+</Canvas>
+
+<Props story="Length" />
