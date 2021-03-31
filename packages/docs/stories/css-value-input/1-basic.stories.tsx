@@ -1,11 +1,12 @@
-import { Meta, Story } from '@storybook/react';
+import { Story } from '@storybook/addon-docs/blocks';
+import { Meta } from '@storybook/react';
 import * as React from 'react';
 
 import CSSValueInput, { Props } from '@acusti/css-value-input';
 
 export default {
     component: CSSValueInput,
-    title: '@acusti/css-value-input',
+    title: 'UIKit/Inputs/CSSValueInput',
 } as Meta;
 
 const Template: Story<Props> = (args) => <CSSValueInput {...args} />;
