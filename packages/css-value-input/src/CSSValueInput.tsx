@@ -20,6 +20,8 @@ type Props = {
 
 const { useCallback, useEffect, useRef, useState } = React;
 
+const ROOT_CLASS_NAME = 'cssvalueinput';
+
 const CSSValueInput = ({
     className,
     cssValueType,
@@ -103,11 +105,11 @@ const CSSValueInput = ({
     );
 
     return (
-        <div className={classnames('css-value-input', className)}>
-            <div className="css-value-input-label">
-                <p className="css-value-input-label-text">{label}</p>
+        <div className={classnames(ROOT_CLASS_NAME, className)}>
+            <div className={`${ROOT_CLASS_NAME}-label`}>
+                <p className={`${ROOT_CLASS_NAME}-label-text`}>{label}</p>
             </div>
-            <div className="css-value-input-value">
+            <div className={`${ROOT_CLASS_NAME}-value`}>
                 <input
                     disabled={disabled}
                     onBlur={handleBlur}
