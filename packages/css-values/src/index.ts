@@ -17,6 +17,9 @@ export type Payload = {
     value: string | number;
 };
 
+export const roundToPrecision = (value: number, precision: number) =>
+    parseFloat(value.toFixed(precision));
+
 export const getUnitForCSSValue = ({ cssValueType, defaultUnit, value }: Payload) => {
     // If value is a number, return the defaultUnit
     if (typeof value === 'number') return defaultUnit;
@@ -26,7 +29,7 @@ export const getUnitForCSSValue = ({ cssValueType, defaultUnit, value }: Payload
 };
 
 export const getCSSValueAsNumber = (value: string | number): number =>
-    typeof value === 'number' ? value : parseFloat(value.trim());
+    typeof value === 'number' ? value : roundToPrecision(parseFloat(value.trim()), 5);
 
 export const getCSSValueWithUnit = (payload: Payload): string => {
     const valueAsNumber = getCSSValueAsNumber(payload.value);
