@@ -4,6 +4,9 @@
     "main": "dist/CSSValueInput.js",
     "module": "dist/CSSValueInput.js",
     "typings": "dist/CSSValueInput.d.ts",
+    "files": [
+        "dist"
+    ],
     "repository": {
         "type": "git",
         "url": "git+https://github.com/acusti/uikit.git"
