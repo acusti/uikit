@@ -7,7 +7,7 @@ import {
     getUnitForCSSValue,
 } from '@acusti/css-values';
 
-type Props = {
+export type Props = {
     className?: string;
     cssValueType: CSSValueType;
     disabled?: boolean;
