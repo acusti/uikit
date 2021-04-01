@@ -57,6 +57,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@babel/core", "npm:7.13.14"],
             ["@types/jest", "npm:26.0.22"],
+            ["flowgen", "npm:1.13.0"],
             ["jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.0.0-next.6"],
             ["jest-runner", "npm:27.0.0-next.6"],
             ["npm-run-all", "npm:4.1.5"],
@@ -131,6 +132,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/uikit", "workspace:."],
             ["@babel/core", "npm:7.13.14"],
             ["@types/jest", "npm:26.0.22"],
+            ["flowgen", "npm:1.13.0"],
             ["jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.0.0-next.6"],
             ["jest-runner", "npm:27.0.0-next.6"],
             ["npm-run-all", "npm:4.1.5"],
@@ -11774,6 +11776,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["commander", "npm:5.1.0"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:6.2.1", {
+          "packageLocation": "./.yarn/cache/commander-npm-6.2.1-d5b635f237-d7090410c0.zip/node_modules/commander/",
+          "packageDependencies": [
+            ["commander", "npm:6.2.1"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["commondir", [
@@ -14015,6 +14024,23 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["find-up", "npm:4.1.0"],
             ["locate-path", "npm:5.0.0"],
             ["path-exists", "npm:4.0.0"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["flowgen", [
+        ["npm:1.13.0", {
+          "packageLocation": "./.yarn/cache/flowgen-npm-1.13.0-7659829ac4-760b479952.zip/node_modules/flowgen/",
+          "packageDependencies": [
+            ["flowgen", "npm:1.13.0"],
+            ["@babel/code-frame", "npm:7.12.13"],
+            ["@babel/highlight", "npm:7.13.10"],
+            ["commander", "npm:6.2.1"],
+            ["lodash", "npm:4.17.21"],
+            ["prettier", "npm:2.2.1"],
+            ["shelljs", "npm:0.8.4"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"],
+            ["typescript-compiler", "npm:1.4.1"]
           ],
           "linkType": "HARD",
         }]
@@ -23248,6 +23274,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/typescript-patch-99fe32b02b-497e9ee956.zip/node_modules/typescript/",
           "packageDependencies": [
             ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["typescript-compiler", [
+        ["npm:1.4.1", {
+          "packageLocation": "./.yarn/cache/typescript-compiler-npm-1.4.1-d2950f411c-160c148d26.zip/node_modules/typescript-compiler/",
+          "packageDependencies": [
+            ["typescript-compiler", "npm:1.4.1"]
           ],
           "linkType": "HARD",
         }]

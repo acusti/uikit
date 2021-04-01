@@ -69,6 +69,7 @@ __metadata:
   dependencies:
     "@babel/core": ^7.13.14
     "@types/jest": ^26.0.22
+    flowgen: ^1.13.0
     jest: next
     jest-runner: next
     npm-run-all: ^4.1.5
@@ -6152,6 +6153,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^6.1.0":
+  version: 6.2.1
+  resolution: "commander@npm:6.2.1"
+  checksum: d7090410c0de6bc5c67d3ca41c41760d6d268f3c799e530aafb73b7437d1826bbf0d2a3edac33f8b57cc9887b4a986dce307fa5557e109be40eadb7c43b21742
+  languageName: node
+  linkType: hard
+
 "commondir@npm:^1.0.1":
   version: 1.0.1
   resolution: "commondir@npm:1.0.1"
@@ -7964,6 +7972,24 @@ __metadata:
   dependencies:
     locate-path: ^2.0.0
   checksum: 43284fe4da09f89011f08e3c32cd38401e786b19226ea440b75386c1b12a4cb738c94969808d53a84f564ede22f732c8409e3cfc3f7fb5b5c32378ad0bbf28bd
+  languageName: node
+  linkType: hard
+
+"flowgen@npm:^1.13.0":
+  version: 1.13.0
+  resolution: "flowgen@npm:1.13.0"
+  dependencies:
+    "@babel/code-frame": ^7.10.4
+    "@babel/highlight": ^7.10.4
+    commander: ^6.1.0
+    lodash: ^4.17.20
+    prettier: ^2.1.1
+    shelljs: ^0.8.4
+    typescript: ^4.0.2
+    typescript-compiler: ^1.4.1-2
+  bin:
+    flowgen: lib/cli/index.js
+  checksum: 760b47995226d88b9ac7857dfce17cedf97bca30891f31a1d33fbc5f72a1e0c37ac50237e186512d0d2162f3fefc84afa77042882f72164da402bb6ea44d2c23
   languageName: node
   linkType: hard
 
@@ -12700,7 +12726,7 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-"prettier@npm:^2.2.1":
+"prettier@npm:^2.1.1, prettier@npm:^2.2.1":
   version: 2.2.1
   resolution: "prettier@npm:2.2.1"
   bin:
@@ -15658,7 +15684,14 @@ fsevents@^1.2.7:
   languageName: node
   linkType: hard
 
-typescript@^4.2.3:
+"typescript-compiler@npm:^1.4.1-2":
+  version: 1.4.1
+  resolution: "typescript-compiler@npm:1.4.1"
+  checksum: 160c148d263f8feda3777c3043040a61d7f4eccf127c459012ef6a0ad2158dc9888e0dec40e0ea14194edb1a7a5113bc120eef6f71cf36c723319a8345d05238
+  languageName: node
+  linkType: hard
+
+"typescript@^4.0.2, typescript@^4.2.3":
   version: 4.2.3
   resolution: "typescript@npm:4.2.3"
   bin:
@@ -15668,7 +15701,7 @@ typescript@^4.2.3:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.2.3#builtin<compat/typescript>":
+"typescript@patch:typescript@^4.0.2#builtin<compat/typescript>, typescript@patch:typescript@^4.2.3#builtin<compat/typescript>":
   version: 4.2.3
   resolution: "typescript@patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"
   bin:
