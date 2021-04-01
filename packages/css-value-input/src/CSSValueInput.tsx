@@ -78,7 +78,10 @@ const CSSValueInput = ({
     const handleFocus = useCallback(() => {
         const inputElement = inputRef.current;
         if (!inputElement) return;
-        inputElement.select();
+        // Select contents of input in around 4(ish) frames to allow re-renders
+        setTimeout(() => {
+            inputElement.select();
+        }, 66);
     }, []);
 
     const getNextValue = useCallback(
