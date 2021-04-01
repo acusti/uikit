@@ -14,6 +14,7 @@ type Props = {
     label: string;
     onSubmit: (value: string) => unknown;
     placeholder?: string;
+    step: number;
     unit: string;
     value?: string;
 };
@@ -29,6 +30,7 @@ const CSSValueInput = ({
     label,
     onSubmit,
     placeholder,
+    step,
     unit,
     value,
 }: Props) => {
@@ -75,6 +77,28 @@ const CSSValueInput = ({
         inputElement.select();
     }, []);
 
+    const getNextValue = useCallback(
+        ({
+            currentValue,
+            multiplier = 1,
+            signum = 1,
+        }: {
+            currentValue: string | number;
+            multiplier?: number;
+            signum?: number;
+        }) => {
+            const modifier = multiplier * step * signum;
+            const nextValue = getCSSValueAsNumber(currentValue) + modifier;
+            const nextUnit = getUnitForCSSValue({
+                cssValueType,
+                defaultUnit: unit,
+                value: currentValue,
+            });
+            return `${nextValue}${nextUnit}`;
+        },
+        [cssValueType, step, unit],
+    );
+
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLInputElement>) => {
             if (event.key === 'Enter' || event.key === 'Escape') {
@@ -85,16 +109,13 @@ const CSSValueInput = ({
             if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
 
             event.preventDefault();
-            const currentValue = event.currentTarget.value || placeholder || defaultValue;
-            const currentUnit = getUnitForCSSValue({
-                cssValueType,
-                defaultUnit: unit,
-                value: currentValue,
+
+            const nextValue = getNextValue({
+                currentValue: event.currentTarget.value || placeholder || defaultValue,
+                multiplier: event.shiftKey ? 10 : 1,
+                signum: event.key === 'ArrowUp' ? 1 : -1,
             });
-            const valueAsNumber = getCSSValueAsNumber(currentValue);
-            const signum = event.key === 'ArrowUp' ? 1 : -1;
-            const modifier = signum * (event.shiftKey ? 10 : 1);
-            const nextValue = `${valueAsNumber + modifier}${currentUnit}`;
+
             if (event.repeat) {
                 setInputValue(nextValue);
                 return;
@@ -102,7 +123,7 @@ const CSSValueInput = ({
 
             handleSubmit(nextValue);
         },
-        [cssValueType, handleSubmit, placeholder, unit],
+        [getNextValue, handleSubmit, placeholder],
     );
 
     return (
@@ -131,6 +152,7 @@ const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';
 
 CSSValueInput.defaultProps = {
     cssValueType: DEFAULT_CSS_VALUE_TYPE,
+    step: 1,
 };
 
 export default CSSValueInput;
