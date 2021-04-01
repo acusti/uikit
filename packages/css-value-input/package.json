@@ -23,9 +23,11 @@
         "typescript": "^4.2.3"
     },
     "dependencies": {
-        "@acusti/css-values": "*",
-        "classnames": "*",
-        "react": "*",
-        "react-dom": "*"
+        "@acusti/css-values": "*"
+    },
+    "peerDependencies": {
+        "classnames": "^2",
+        "react": "^16.8 || ^17",
+        "react-dom": "^16.8 || ^17"
     }
 }
