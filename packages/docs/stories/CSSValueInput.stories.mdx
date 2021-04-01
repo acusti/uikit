@@ -31,6 +31,8 @@ Illustrator or XD.
             className: 'my-panel-input',
             cssValueType: 'time',
             label: 'Duration',
+            max: 20,
+            min: 0,
             onSubmit: () => {},
             placeholder: '0.25s',
             step: .25,
@@ -59,6 +61,7 @@ Illustrator or XD.
         args={{
             cssValueType: 'percent',
             label: 'Width',
+            min: 0,
             onSubmit: () => {},
             placeholder: '100%',
             step: 10,
