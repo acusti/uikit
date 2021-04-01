@@ -4,6 +4,16 @@
     "main": "dist/CSSValueInput.js",
     "module": "dist/CSSValueInput.js",
     "typings": "dist/CSSValueInput.d.ts",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/acusti/uikit.git"
+    },
+    "author": "andrew patton <andrew@acusti.ca> (http://acusti.ca)",
+    "license": "Unlicense",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
+    },
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/css-value-input#readme",
     "devDependencies": {
         "@types/classnames": "^2.2.11",
         "@types/react": "^17.0.3",
