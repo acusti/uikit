@@ -56,6 +56,7 @@ __metadata:
     "@types/storybook__addon-info": ^5.2.3
     "@types/storybook__react": ^5.2.1
     babel-loader: ^8.2.2
+    classnames: ^2.3.0
     core-js: ^3.9.1
     react: ^17.0.2
     react-dom: ^17.0.2
@@ -5900,6 +5901,13 @@ __metadata:
   version: 2.2.6
   resolution: "classnames@npm:2.2.6"
   checksum: 09a4fda780158aa8399079898eabeeca0c48c28641d9e4de140db7412e5e346843039ded1af0152f755afc2cc246ff8c3d6f227bf0dcb004e070b7fa14ec54cc
+  languageName: node
+  linkType: hard
+
+"classnames@npm:^2.3.0":
+  version: 2.3.0
+  resolution: "classnames@npm:2.3.0"
+  checksum: 1cc54da92ec1921ab6593662d1808ddf382141cd2d2a278e76344c5eb2008d59ab044276273d77e7238b46453458dcf094bb927fda40f37b0d63324611c49c9e
   languageName: node
   linkType: hard
 

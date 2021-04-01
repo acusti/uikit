@@ -78,7 +78,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/classnames", "npm:2.2.11"],
             ["@types/react", "npm:17.0.3"],
             ["@types/react-dom", null],
-            ["classnames", null],
+            ["classnames", "npm:2.3.0"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
             ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
@@ -161,6 +161,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/storybook__addon-info", "npm:5.2.3"],
             ["@types/storybook__react", "npm:5.2.1"],
             ["babel-loader", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.2.2"],
+            ["classnames", "npm:2.3.0"],
             ["core-js", "npm:3.9.1"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
@@ -11499,6 +11500,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/classnames-npm-2.2.6-98e9901cf4-09a4fda780.zip/node_modules/classnames/",
           "packageDependencies": [
             ["classnames", "npm:2.2.6"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:2.3.0", {
+          "packageLocation": "./.yarn/cache/classnames-npm-2.3.0-8972516692-1cc54da92e.zip/node_modules/classnames/",
+          "packageDependencies": [
+            ["classnames", "npm:2.3.0"]
           ],
           "linkType": "HARD",
         }]
