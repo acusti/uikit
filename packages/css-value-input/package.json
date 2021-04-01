@@ -1,6 +1,6 @@
 {
     "name": "@acusti/css-value-input",
-    "version": "0.2.0",
+    "version": "0.2.1",
     "main": "dist/CSSValueInput.js",
     "module": "dist/CSSValueInput.js",
     "typings": "dist/CSSValueInput.d.ts",
