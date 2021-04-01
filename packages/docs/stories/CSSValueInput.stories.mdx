@@ -33,6 +33,7 @@ Illustrator or XD.
             label: 'Duration',
             onSubmit: () => {},
             placeholder: '0.25s',
+            step: .25,
             unit: 's',
         }}
     >
@@ -46,6 +47,7 @@ Illustrator or XD.
             label: 'Rotate Z',
             onSubmit: () => {},
             placeholder: '0deg',
+            step: 45,
             unit: 'deg',
             value: '90deg',
         }}
@@ -59,8 +61,9 @@ Illustrator or XD.
             label: 'Width',
             onSubmit: () => {},
             placeholder: '100%',
+            step: 10,
             unit: '%',
-            value: '25%',
+            value: '30%',
         }}
     >
         {(args) => <CSSValueInput {...args} />}
