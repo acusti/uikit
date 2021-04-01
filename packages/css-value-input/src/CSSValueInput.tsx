@@ -12,6 +12,8 @@ type Props = {
     cssValueType: CSSValueType;
     disabled?: boolean;
     label: string;
+    max?: number;
+    min?: number;
     onSubmit: (value: string) => unknown;
     placeholder?: string;
     step: number;
@@ -28,6 +30,8 @@ const CSSValueInput = ({
     cssValueType,
     disabled,
     label,
+    max,
+    min,
     onSubmit,
     placeholder,
     step,
@@ -88,7 +92,14 @@ const CSSValueInput = ({
             signum?: number;
         }) => {
             const modifier = multiplier * step * signum;
-            const nextValue = getCSSValueAsNumber(currentValue) + modifier;
+            let nextValue = getCSSValueAsNumber(currentValue) + modifier;
+            if (typeof max === 'number') {
+                nextValue = Math.min(max, nextValue);
+            }
+            if (typeof min === 'number') {
+                nextValue = Math.max(min, nextValue);
+            }
+
             const nextUnit = getUnitForCSSValue({
                 cssValueType,
                 defaultUnit: unit,
@@ -96,7 +107,7 @@ const CSSValueInput = ({
             });
             return `${nextValue}${nextUnit}`;
         },
-        [cssValueType, step, unit],
+        [cssValueType, max, min, step, unit],
     );
 
     const handleKeyDown = useCallback(
