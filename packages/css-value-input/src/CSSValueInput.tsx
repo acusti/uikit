@@ -25,7 +25,7 @@ const { useCallback, useEffect, useRef, useState } = React;
 
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
-const CSSValueInput = ({
+const CSSValueInput: React.FC<Props> = ({
     className,
     cssValueType,
     disabled,
@@ -37,7 +37,7 @@ const CSSValueInput = ({
     step,
     unit,
     value,
-}: Props) => {
+}) => {
     const defaultValue = placeholder || `0${unit}`;
     const [inputValue, setInputValue] = useState<string>(value || placeholder || '');
     const inputRef = useRef<HTMLInputElement | null>(null);
