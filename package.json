@@ -9,6 +9,8 @@
         "build": "run-s clean build:tsc build:flowtypes",
         "clean": "tsc --build --clean",
         "format": "prettier --write package.json README.md tsconfig.json ./packages/",
+        "publish": "run-s build publish:all",
+        "publish:all": "run-p publish:css-values publish:css-value-input",
         "publish:css-value-input": "yarn workspace @acusti/css-value-input npm publish --access public",
         "publish:css-values": "yarn workspace @acusti/css-values npm publish --access public",
         "start:stories": "yarn workspace @acusti/uikit-docs storybook",
