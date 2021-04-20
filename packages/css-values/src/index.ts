@@ -5,7 +5,7 @@ const CSS_UNIT_REGEX = Object.freeze({
     length: /(em|rem|ch|ex|vh|vw|vmin|vmax|px|cm|mm|in|pc|pt|%)\s*$/i,
     // https://developer.mozilla.org/en-US/docs/Web/CSS/time
     time: /(s|ms)\s*$/i,
-    percent: /%\s*$/,
+    percent: /(%)\s*$/,
 });
 
 // CSS value types https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Values_and_Units#Dimensions
@@ -25,7 +25,7 @@ export const getUnitForCSSValue = ({ cssValueType, defaultUnit, value }: Payload
     if (typeof value === 'number') return defaultUnit;
 
     const matchedUnit = CSS_UNIT_REGEX[cssValueType].exec(value);
-    return matchedUnit === null ? defaultUnit : matchedUnit[0];
+    return matchedUnit === null ? defaultUnit : matchedUnit[1];
 };
 
 export const getCSSValueAsNumber = (value: string | number): number =>

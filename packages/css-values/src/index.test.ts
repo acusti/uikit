@@ -23,7 +23,7 @@ describe('css-units.js utilities', () => {
                 getUnitForCSSValue({
                     cssValueType: 'time',
                     defaultUnit: 'ms',
-                    value: '1.25s',
+                    value: '  1.25s ',
                 }),
             ).toBe('s');
 
@@ -97,7 +97,7 @@ describe('css-units.js utilities', () => {
                 getCSSValueWithUnit({
                     cssValueType: 'length',
                     defaultUnit: 'px',
-                    value: '47vw',
+                    value: '    47vw  ',
                 }),
             ).toBe('47vw');
 
