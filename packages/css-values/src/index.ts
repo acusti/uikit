@@ -38,3 +38,14 @@ export const getCSSValueWithUnit = (payload: Payload): string => {
 
     return `${valueAsNumber}${getUnitForCSSValue(payload)}`;
 };
+
+export const getMillisecondsFromCSSValue = (value: string | number): number => {
+    if (typeof value === 'number') return Number.isNaN(value) ? 0 : value;
+    if (!CSS_UNIT_REGEX.time.test(value)) return 0;
+
+    const valueAsNumber = getCSSValueAsNumber(value);
+    if (Number.isNaN(valueAsNumber)) return 0;
+
+    const multiplier = /[^m]s/i.test(value) ? 1000 : 1;
+    return valueAsNumber * multiplier;
+};

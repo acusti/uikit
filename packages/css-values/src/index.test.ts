@@ -1,4 +1,4 @@
-import { getCSSValueWithUnit, getUnitForCSSValue } from './';
+import { getCSSValueWithUnit, getMillisecondsFromCSSValue, getUnitForCSSValue } from './';
 
 describe('css-units.js utilities', () => {
     describe('getUnitForCSSValue', () => {
@@ -180,6 +180,25 @@ describe('css-units.js utilities', () => {
                     value: '   ',
                 }),
             ).toBe('');
+        });
+    });
+
+    describe('getMillisecondsFromCSSValue', () => {
+        it('returns value converted to number of milliseconds for CSS time values', () => {
+            expect(getMillisecondsFromCSSValue('250ms')).toBe(250);
+            expect(getMillisecondsFromCSSValue('  1.75s ')).toBe(1750);
+        });
+
+        it('returns same value that was passed in if value is numeric or 0 if NaN', () => {
+            expect(getMillisecondsFromCSSValue(1263)).toBe(1263);
+            expect(getMillisecondsFromCSSValue(-62.56)).toBe(-62.56);
+            expect(getMillisecondsFromCSSValue(NaN)).toBe(0);
+        });
+
+        it('returns 0 for any non-time values', () => {
+            expect(getMillisecondsFromCSSValue('1.75turn')).toBe(0);
+            expect(getMillisecondsFromCSSValue('90%')).toBe(0);
+            expect(getMillisecondsFromCSSValue(' ')).toBe(0);
         });
     });
 });
