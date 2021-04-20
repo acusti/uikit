@@ -7,3 +7,44 @@
 
 UI toolkit monorepo containing a React component library, UI utilities, a
 drag-and-drop library, and more
+
+## Packages
+
+| NPM Package Name                | Description                                         |
+| ------------------------------- | --------------------------------------------------- |
+| **[@acusti/css-values][]**      | Utilities for parsing different types of CSS values |
+| **[@acusti/css-value-input][]** | React component that renders a CSS value input      |
+| **[@acusti/uikit-docs][]**      | Storybook instance illustrating all components      |
+
+[@acusti/css-values]:
+    https://github.com/acusti/uikit/tree/main/packages/css-values
+[@acusti/css-value-input]:
+    https://github.com/acusti/uikit/tree/main/packages/css-value-input
+[@acusti/uikit-docs]:
+    https://github.com/acusti/uikit/tree/main/packages/docs
+
+## Tests
+
+The monorepo uses jest to run its tests. To run tests across all packages,
+use `yarn test`. To run them in watch mode, use `yarn test:watch`.
+
+## Building and Publishing
+
+To build all packages, run `yarn build`. This will trigger `tsc --build`
+and `yarn flowgen` for all packages.
+
+To build the storybook docs, run `yarn build:stories`, which will run
+`yarn build` and then the default storybook `build` command.
+
+To publish all packages, manually update each packages’s `version` field in
+their package.json, then run `yarn publish`. To publish only a single
+package, use `yarn publish:<package-name>` (e.g.
+`yarn publish:css-value-input`). Publishing will trigger a build as well as
+`npm publish` to ensure that the latest changes get published.
+
+## Developing
+
+The two main run scripts for developing are `yarn start:watch`, which kicks
+off the TypeScript compiler in `--watch` mode, and `yarn start:stories`,
+which kicks off the default `storybook` command from packages/docs/. To run
+both of those in a single terminal window, use `yarn start`.
