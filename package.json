@@ -16,7 +16,8 @@
         "start:stories": "yarn workspace @acusti/uikit-docs storybook",
         "start:watch": "tsc --build --watch",
         "start": "run-p 'start:*'",
-        "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest"
+        "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest",
+        "test:watch": "NODE_OPTIONS=--experimental-vm-modules yarn jest --watch"
     },
     "repository": {
         "type": "git",
