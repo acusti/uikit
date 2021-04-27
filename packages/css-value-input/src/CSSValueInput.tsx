@@ -11,7 +11,7 @@ export type Props = {
     className?: string;
     cssValueType: CSSValueType;
     disabled?: boolean;
-    label: string;
+    label: string | null;
     max?: number;
     min?: number;
     onSubmit: (value: string) => unknown;
@@ -142,9 +142,11 @@ const CSSValueInput: React.FC<Props> = ({
 
     return (
         <label className={classnames(ROOT_CLASS_NAME, className)}>
-            <div className={`${ROOT_CLASS_NAME}-label`}>
-                <p className={`${ROOT_CLASS_NAME}-label-text`}>{label}</p>
-            </div>
+            {label && (
+                <div className={`${ROOT_CLASS_NAME}-label`}>
+                    <p className={`${ROOT_CLASS_NAME}-label-text`}>{label}</p>
+                </div>
+            )}
             <div className={`${ROOT_CLASS_NAME}-value`}>
                 <input
                     disabled={disabled}
