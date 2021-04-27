@@ -71,6 +71,20 @@ Illustrator or XD.
     >
         {(args) => <CSSValueInput {...args} />}
     </Story>
+    <Story
+        name="Label-less"
+        args={{
+            className: 'my-special-input',
+            cssValueType: 'length',
+            label: null,
+            onSubmit: () => {},
+            placeholder: '1rem',
+            unit: 'rem',
+            value: '24px',
+        }}
+    >
+        {(args) => <CSSValueInput {...args} />}
+    </Story>
 </Canvas>
 
 <Props story="Length" />
