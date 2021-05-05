@@ -64,7 +64,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["prettier", "npm:2.2.1"],
             ["slash", "npm:3.0.0"],
             ["ts-jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.0.0-next.9"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"]
           ],
           "linkType": "SOFT",
         }]
@@ -81,7 +81,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["classnames", "npm:2.3.0"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -99,7 +99,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/css-values", "workspace:packages/css-values"],
             ["@types/classnames", "npm:2.2.11"],
             ["@types/react", "npm:17.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"]
           ],
           "linkType": "SOFT",
         }]
@@ -109,7 +109,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/css-values/",
           "packageDependencies": [
             ["@acusti/css-values", "workspace:packages/css-values"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"]
           ],
           "linkType": "SOFT",
         }]
@@ -120,7 +120,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@acusti/styling", "workspace:packages/styling"],
             ["@types/react", "npm:17.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"]
           ],
           "linkType": "SOFT",
         }]
@@ -139,7 +139,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["prettier", "npm:2.2.1"],
             ["slash", "npm:3.0.0"],
             ["ts-jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.0.0-next.9"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"]
           ],
           "linkType": "SOFT",
         }]
@@ -165,7 +165,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["core-js", "npm:3.9.1"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"]
           ],
           "linkType": "SOFT",
         }]
@@ -223,7 +223,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["gensync", "npm:1.0.0-beta.2"],
             ["json5", "npm:2.2.0"],
             ["lodash", "npm:4.17.21"],
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"],
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"],
             ["semver", "npm:5.7.1"],
             ["source-map", "npm:0.5.7"]
           ],
@@ -505,7 +505,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/babel__core", null],
             ["debug", "virtual:877b553b60b9c0a2b06217c487c6ff09d68792cf3fe025beb7fec8d1d55e0ad216174b2def4118ba748692c39f0eb896f93b6cfa8141804d933268746165cf68#npm:4.3.2"],
             ["lodash.debounce", "npm:4.0.8"],
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"],
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"],
             ["semver", "npm:6.3.0"]
           ],
           "packagePeers": [
@@ -526,7 +526,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/babel__core", null],
             ["debug", "virtual:877b553b60b9c0a2b06217c487c6ff09d68792cf3fe025beb7fec8d1d55e0ad216174b2def4118ba748692c39f0eb896f93b6cfa8141804d933268746165cf68#npm:4.3.2"],
             ["lodash.debounce", "npm:4.0.8"],
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"],
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"],
             ["semver", "npm:6.3.0"]
           ],
           "packagePeers": [
@@ -547,7 +547,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/babel__core", null],
             ["debug", "virtual:877b553b60b9c0a2b06217c487c6ff09d68792cf3fe025beb7fec8d1d55e0ad216174b2def4118ba748692c39f0eb896f93b6cfa8141804d933268746165cf68#npm:4.3.2"],
             ["lodash.debounce", "npm:4.0.8"],
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"],
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"],
             ["semver", "npm:6.3.0"]
           ],
           "packagePeers": [
@@ -7556,7 +7556,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-dev-utils", "npm:9.1.0"],
             ["react-dom", null],
             ["regenerator-runtime", "npm:0.13.8"],
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"],
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"],
             ["resolve-from", "npm:5.0.0"],
             ["semver", "npm:6.3.0"],
             ["serve-favicon", "npm:2.5.0"],
@@ -10092,7 +10092,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["babel-plugin-macros", "npm:2.8.0"],
             ["@babel/runtime", "npm:7.13.10"],
             ["cosmiconfig", "npm:6.0.0"],
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"]
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"]
           ],
           "linkType": "HARD",
         }]
@@ -11392,7 +11392,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["anymatch", "npm:2.0.0"],
             ["async-each", "npm:1.0.3"],
             ["braces", "npm:2.3.2"],
-            ["fsevents", "patch:fsevents@npm%3A1.2.13#builtin<compat/fsevents>::version=1.2.13&hash=11e9ea"],
+            ["fsevents", "patch:fsevents@npm%3A1.2.13#~builtin<compat/fsevents>::version=1.2.13&hash=1cc4b2"],
             ["glob-parent", "npm:3.1.0"],
             ["inherits", "npm:2.0.4"],
             ["is-binary-path", "npm:1.0.1"],
@@ -11410,7 +11410,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["chokidar", "npm:3.5.1"],
             ["anymatch", "npm:3.1.1"],
             ["braces", "npm:3.0.2"],
-            ["fsevents", "patch:fsevents@npm%3A2.3.2#builtin<compat/fsevents>::version=2.3.2&hash=11e9ea"],
+            ["fsevents", "patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=1cc4b2"],
             ["glob-parent", "npm:5.1.2"],
             ["is-binary-path", "npm:2.1.0"],
             ["is-glob", "npm:4.0.1"],
@@ -14047,7 +14047,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["lodash", "npm:4.17.21"],
             ["prettier", "npm:2.2.1"],
             ["shelljs", "npm:0.8.4"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"],
             ["typescript-compiler", "npm:1.4.1"]
           ],
           "linkType": "HARD",
@@ -14360,19 +14360,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["fsevents", [
-        ["patch:fsevents@npm%3A1.2.13#builtin<compat/fsevents>::version=1.2.13&hash=11e9ea", {
-          "packageLocation": "./.yarn/unplugged/fsevents-patch-268c0b888d/node_modules/fsevents/",
+        ["patch:fsevents@npm%3A1.2.13#~builtin<compat/fsevents>::version=1.2.13&hash=1cc4b2", {
+          "packageLocation": "./.yarn/unplugged/fsevents-patch-a7944b1d53/node_modules/fsevents/",
           "packageDependencies": [
-            ["fsevents", "patch:fsevents@npm%3A1.2.13#builtin<compat/fsevents>::version=1.2.13&hash=11e9ea"],
+            ["fsevents", "patch:fsevents@npm%3A1.2.13#~builtin<compat/fsevents>::version=1.2.13&hash=1cc4b2"],
             ["bindings", "npm:1.5.0"],
             ["nan", "npm:2.14.2"]
           ],
           "linkType": "HARD",
         }],
-        ["patch:fsevents@npm%3A2.3.2#builtin<compat/fsevents>::version=2.3.2&hash=11e9ea", {
-          "packageLocation": "./.yarn/unplugged/fsevents-patch-3bc6df0d9f/node_modules/fsevents/",
+        ["patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=1cc4b2", {
+          "packageLocation": "./.yarn/unplugged/fsevents-patch-34a78773f2/node_modules/fsevents/",
           "packageDependencies": [
-            ["fsevents", "patch:fsevents@npm%3A2.3.2#builtin<compat/fsevents>::version=2.3.2&hash=11e9ea"],
+            ["fsevents", "patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=1cc4b2"],
             ["node-gyp", "npm:7.1.2"]
           ],
           "linkType": "HARD",
@@ -16501,7 +16501,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:14.14.37"],
             ["anymatch", "npm:3.1.1"],
             ["fb-watchman", "npm:2.0.1"],
-            ["fsevents", "patch:fsevents@npm%3A2.3.2#builtin<compat/fsevents>::version=2.3.2&hash=11e9ea"],
+            ["fsevents", "patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=1cc4b2"],
             ["graceful-fs", "npm:4.2.6"],
             ["jest-regex-util", "npm:26.0.0"],
             ["jest-serializer", "npm:26.6.2"],
@@ -16522,7 +16522,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/node", "npm:14.14.37"],
             ["anymatch", "npm:3.1.1"],
             ["fb-watchman", "npm:2.0.1"],
-            ["fsevents", "patch:fsevents@npm%3A2.3.2#builtin<compat/fsevents>::version=2.3.2&hash=11e9ea"],
+            ["fsevents", "patch:fsevents@npm%3A2.3.2#~builtin<compat/fsevents>::version=2.3.2&hash=1cc4b2"],
             ["graceful-fs", "npm:4.2.6"],
             ["jest-regex-util", "npm:27.0.0-next.0"],
             ["jest-serializer", "npm:27.0.0-next.0"],
@@ -16663,7 +16663,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["graceful-fs", "npm:4.2.6"],
             ["jest-pnp-resolver", "virtual:3eedaa24b63047c4d9030d8ae41e5c5c7db1aa59a4a13072959ce124ff853bf659423774d5d026edb8ed1b12e60224874236f0371c0e3825261a2636a001f22a#npm:1.2.2"],
             ["jest-util", "npm:27.0.0-next.6"],
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"],
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"],
             ["slash", "npm:3.0.0"]
           ],
           "linkType": "HARD",
@@ -18342,7 +18342,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["normalize-package-data", "npm:2.5.0"],
             ["hosted-git-info", "npm:2.8.8"],
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"],
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"],
             ["semver", "npm:5.7.1"],
             ["validate-npm-package-license", "npm:3.0.4"]
           ],
@@ -20927,7 +20927,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/rechoir-npm-0.6.2-0df5f171ec-fe76bf9c21.zip/node_modules/rechoir/",
           "packageDependencies": [
             ["rechoir", "npm:0.6.2"],
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"]
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"]
           ],
           "linkType": "HARD",
         }]
@@ -21300,10 +21300,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["resolve", [
-        ["patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa", {
-          "packageLocation": "./.yarn/cache/resolve-patch-55fcdb097c-bed00be983.zip/node_modules/resolve/",
+        ["patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff", {
+          "packageLocation": "./.yarn/cache/resolve-patch-da1bf0dd3c-bed00be983.zip/node_modules/resolve/",
           "packageDependencies": [
-            ["resolve", "patch:resolve@npm%3A1.20.0#builtin<compat/resolve>::version=1.20.0&hash=3388aa"],
+            ["resolve", "patch:resolve@npm%3A1.20.0#~builtin<compat/resolve>::version=1.20.0&hash=00b1ff"],
             ["is-core-module", "npm:2.2.0"],
             ["path-parse", "npm:1.0.6"]
           ],
@@ -23127,7 +23127,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["make-error", "npm:1.3.6"],
             ["mkdirp", "npm:1.0.4"],
             ["semver", "npm:7.3.5"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"],
             ["yargs-parser", "npm:20.2.7"]
           ],
           "packagePeers": [
@@ -23278,10 +23278,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["typescript", [
-        ["patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e", {
-          "packageLocation": "./.yarn/cache/typescript-patch-99fe32b02b-497e9ee956.zip/node_modules/typescript/",
+        ["patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d", {
+          "packageLocation": "./.yarn/cache/typescript-patch-20f6ea6d48-c1dd9e722d.zip/node_modules/typescript/",
           "packageDependencies": [
-            ["typescript", "patch:typescript@npm%3A4.2.3#builtin<compat/typescript>::version=4.2.3&hash=a45b0e"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=34ad7d"]
           ],
           "linkType": "HARD",
         }]
@@ -27824,7 +27824,6 @@ class ZipFS extends BasePortableFakeFS {
   readFileBuffer(p, opts = {
     asyncDecompress: false
   }) {
-    if (typeof p !== `string`) throw EBADF(`read`);
     const resolvedP = this.resolveFilename(`open '${p}'`, p);
     if (!this.entries.has(resolvedP) && !this.listings.has(resolvedP)) throw ENOENT(`open '${p}'`); // Ensures that the last component is a directory, if the user said so (even if it is we'll throw right after with EISDIR anyway)
 
@@ -28981,7 +28980,8 @@ class ZipOpenFS extends BasePortableFakeFS {
 
 }
 // CONCATENATED MODULE: ../yarnpkg-libzip/sources/makeInterface.ts
-const number64 = [`number`, `number`];
+const number64 = [`number`, `number` // high
+];
 var Errors;
 
 (function (Errors) {
@@ -29723,7 +29723,6 @@ function hydrateRuntimeState(data, {
   const absolutePortablePath = ppath.resolve(portablePath);
   const ignorePattern = data.ignorePatternData !== null ? new RegExp(data.ignorePatternData) : null;
   const packageLocatorsByLocations = new Map();
-  const packageLocationLengths = new Set();
   const packageRegistry = new Map(data.packageRegistryData.map(([packageName, packageStoreData]) => {
     return [packageName, new Map(packageStoreData.map(([packageReference, packageInformationData]) => {
       var _a;
@@ -29750,7 +29749,6 @@ function hydrateRuntimeState(data, {
         }
       }
 
-      packageLocationLengths.add(packageInformationData.packageLocation.length);
       let resolvedPackageLocation = null;
       return [packageReference, {
         packageDependencies: new Map(packageInformationData.packageDependencies),
@@ -29783,7 +29781,6 @@ function hydrateRuntimeState(data, {
     fallbackExclusionList,
     fallbackPool,
     ignorePattern,
-    packageLocationLengths: [...packageLocationLengths].sort((a, b) => b - a),
     packageLocatorsByLocations,
     packageRegistry
   };
@@ -30004,8 +30001,7 @@ function makeApi(runtimeState, opts) {
   const {
     ignorePattern,
     packageRegistry,
-    packageLocatorsByLocations,
-    packageLocationLengths
+    packageLocatorsByLocations
   } = runtimeState;
   /**
    * Allows to print useful logs just be setting a value in the environment
@@ -30021,14 +30017,14 @@ function makeApi(runtimeState, opts) {
   }
 
   function trace(entry) {
-    var _a, _b, _c, _d, _e;
+    var _a, _b, _c, _d, _e, _f;
 
-    const colors = (_b = (_a = process.stderr) === null || _a === void 0 ? void 0 : _a.hasColors()) !== null && _b !== void 0 ? _b : process.stdout.isTTY;
+    const colors = (_c = (_b = (_a = process.stderr) === null || _a === void 0 ? void 0 : _a.hasColors) === null || _b === void 0 ? void 0 : _b.call(_a)) !== null && _c !== void 0 ? _c : process.stdout.isTTY;
 
     const c = (n, str) => `\u001b[${n}m${str}\u001b[0m`;
 
     const error = entry.error;
-    if (error) console.error(c(`31;1`, `✖ ${(_c = entry.error) === null || _c === void 0 ? void 0 : _c.message.replace(/\n.*/s, ``)}`));else console.error(c(`33;1`, `‼ Resolution`));
+    if (error) console.error(c(`31;1`, `✖ ${(_d = entry.error) === null || _d === void 0 ? void 0 : _d.message.replace(/\n.*/s, ``)}`));else console.error(c(`33;1`, `‼ Resolution`));
     if (entry.args.length > 0) console.error();
 
     for (const arg of entry.args) console.error(`  ${c(`37;1`, `In ←`)} ${(0,external_util_namespaceObject.inspect)(arg, {
@@ -30044,7 +30040,7 @@ function makeApi(runtimeState, opts) {
       })}`);
     }
 
-    const stack = (_e = (_d = new Error().stack.match(/(?<=^ +)at.*/gm)) === null || _d === void 0 ? void 0 : _d.slice(2)) !== null && _e !== void 0 ? _e : [];
+    const stack = (_f = (_e = new Error().stack.match(/(?<=^ +)at.*/gm)) === null || _e === void 0 ? void 0 : _e.slice(2)) !== null && _f !== void 0 ? _f : [];
 
     if (stack.length > 0) {
       console.error();
@@ -30393,18 +30389,17 @@ function makeApi(runtimeState, opts) {
     let relativeLocation = ppath.relative(runtimeState.basePath, location);
     if (!relativeLocation.match(isStrictRegExp)) relativeLocation = `./${relativeLocation}`;
     if (!relativeLocation.endsWith(`/`)) relativeLocation = `${relativeLocation}/`;
-    let from = 0; // If someone wants to use a binary search to go from O(n) to O(log n), be my guest
 
-    while (from < packageLocationLengths.length && packageLocationLengths[from] > relativeLocation.length) from += 1;
+    do {
+      const entry = packageLocatorsByLocations.get(relativeLocation);
 
-    for (let t = from; t < packageLocationLengths.length; ++t) {
-      const entry = packageLocatorsByLocations.get(relativeLocation.substr(0, packageLocationLengths[t]));
-
-      if (typeof entry !== `undefined`) {
-        if (entry.discardFromLookup && !includeDiscardFromLookup) continue;
-        return entry.locator;
+      if (typeof entry === `undefined` || entry.discardFromLookup && !includeDiscardFromLookup) {
+        relativeLocation = relativeLocation.substring(0, relativeLocation.lastIndexOf(`/`, relativeLocation.length - 2) + 1);
+        continue;
       }
-    }
+
+      return entry.locator;
+    } while (relativeLocation !== ``);
 
     return null;
   }
