@@ -5,6 +5,7 @@ import {
     getCSSValueAsNumber,
     getCSSValueWithUnit,
     getUnitForCSSValue,
+    roundToPrecision,
 } from '@acusti/css-values';
 
 export type Props = {
@@ -96,7 +97,10 @@ const CSSValueInput: React.FC<Props> = ({
             signum?: number;
         }) => {
             const modifier = multiplier * step * signum;
-            let nextValue = getCSSValueAsNumber(currentValue) + modifier;
+            let nextValue = roundToPrecision(
+                getCSSValueAsNumber(currentValue) + modifier,
+                5,
+            );
             if (typeof max === 'number') {
                 nextValue = Math.min(max, nextValue);
             }
