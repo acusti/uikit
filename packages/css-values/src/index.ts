@@ -29,7 +29,7 @@ export const getUnitForCSSValue = ({ cssValueType, defaultUnit, value }: Payload
 };
 
 export const getCSSValueAsNumber = (value: string | number): number =>
-    typeof value === 'number' ? value : roundToPrecision(parseFloat(value), 5);
+    typeof value === 'number' ? value : parseFloat(value);
 
 export const getCSSValueWithUnit = (payload: Payload): string => {
     const valueAsNumber = getCSSValueAsNumber(payload.value);
