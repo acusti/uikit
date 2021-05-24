@@ -17,7 +17,7 @@ export type Payload = {
     value: string | number;
 };
 
-export const roundToPrecision = (value: number, precision: number) =>
+export const roundToPrecision = (value: number, precision: number): number =>
     parseFloat(value.toFixed(precision));
 
 export const getUnitForCSSValue = ({ cssValueType, defaultUnit, value }: Payload) => {
