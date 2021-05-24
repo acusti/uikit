@@ -37,10 +37,12 @@ To build the storybook docs, run `yarn build:stories`, which will run
 `yarn build` and then the default storybook `build` command.
 
 To publish all packages, manually update each packages’s `version` field in
-their package.json, then run `yarn publish`. To publish only a single
+their package.json. If any of the packages depends on any of the other packages being updated, be sure to update the dependency version as well. Then run `yarn publish`. To publish only a single
 package, use `yarn publish:<package-name>` (e.g.
 `yarn publish:css-value-input`). Publishing will trigger a build as well as
 `npm publish` to ensure that the latest changes get published.
+
+After publishing the packages, run `yarn` to update the yarn.lock file and then commit the version updates with a message in the form of: `:arrow_up: Bump package versions to _._._`.
 
 ## Developing
 
