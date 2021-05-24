@@ -17,6 +17,7 @@ export type Props = {
     onSubmit: (value: string) => unknown;
     placeholder?: string;
     step: number;
+    title?: string;
     unit: string;
     value?: string;
 };
@@ -35,6 +36,7 @@ const CSSValueInput: React.FC<Props> = ({
     onSubmit,
     placeholder,
     step,
+    title,
     unit,
     value,
 }) => {
@@ -140,7 +142,7 @@ const CSSValueInput: React.FC<Props> = ({
     );
 
     return (
-        <label className={classnames(ROOT_CLASS_NAME, className)}>
+        <label className={classnames(ROOT_CLASS_NAME, className)} title={title}>
             {label && (
                 <div className={`${ROOT_CLASS_NAME}-label`}>
                     <p className={`${ROOT_CLASS_NAME}-label-text`}>{label}</p>
