@@ -44,8 +44,7 @@ const CSSValueInput: React.FC<Props> = ({
 
     // If props.value changes, override value from it
     useEffect(() => {
-        if (typeof value !== 'string') return;
-        setInputValue(value);
+        setInputValue(value || '');
     }, [value]);
 
     const getValueWithUnit = useCallback(
