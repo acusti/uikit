@@ -10,14 +10,14 @@ import {
 
 export type Props = {
     className?: string;
-    cssValueType: CSSValueType;
+    cssValueType?: CSSValueType;
     disabled?: boolean;
     label: string | null;
     max?: number;
     min?: number;
     onSubmit: (value: string) => unknown;
     placeholder?: string;
-    step: number;
+    step?: number;
     title?: string;
     unit: string;
     value?: string;
@@ -25,18 +25,19 @@ export type Props = {
 
 const { useCallback, useEffect, useRef, useState } = React;
 
+const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
 const CSSValueInput: React.FC<Props> = ({
     className,
-    cssValueType,
+    cssValueType = DEFAULT_CSS_VALUE_TYPE,
     disabled,
     label,
     max,
     min,
     onSubmit,
     placeholder,
-    step,
+    step = 1,
     title,
     unit,
     value,
@@ -167,13 +168,6 @@ const CSSValueInput: React.FC<Props> = ({
             </div>
         </label>
     );
-};
-
-const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';
-
-CSSValueInput.defaultProps = {
-    cssValueType: DEFAULT_CSS_VALUE_TYPE,
-    step: 1,
 };
 
 export default CSSValueInput;
