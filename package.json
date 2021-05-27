@@ -12,7 +12,7 @@
         "clean": "run-p 'clean:*'",
         "format": "prettier --write package.json README.md tsconfig.json ./packages/",
         "publish": "run-s build publish:all",
-        "publish:all": "yarn workspaces foreach npm publish --access public",
+        "publish:all": "yarn workspaces foreach --parallel --exclude '@acusti/uikit' npm publish --access public",
         "start:stories": "yarn workspace @acusti/uikit-docs storybook",
         "start:watch": "tsc --build --watch",
         "start": "run-p 'start:*'",
