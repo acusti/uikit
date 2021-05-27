@@ -12,6 +12,7 @@ export type Props = {
     className?: string;
     cssValueType?: CSSValueType;
     disabled?: boolean;
+    icon?: React.ReactNode;
     label: string | null;
     max?: number;
     min?: number;
@@ -32,6 +33,7 @@ const CSSValueInput: React.FC<Props> = ({
     className,
     cssValueType = DEFAULT_CSS_VALUE_TYPE,
     disabled,
+    icon,
     label,
     max,
     min,
@@ -148,6 +150,7 @@ const CSSValueInput: React.FC<Props> = ({
 
     return (
         <label className={classnames(ROOT_CLASS_NAME, className)} title={title}>
+            {icon && <div className={`${ROOT_CLASS_NAME}-icon`}>{icon}</div>}
             {label && (
                 <div className={`${ROOT_CLASS_NAME}-label`}>
                     <p className={`${ROOT_CLASS_NAME}-label-text`}>{label}</p>
