@@ -39,11 +39,13 @@ To build the storybook docs, run `yarn build:stories`, which will run
 To publish all packages, manually update each packages’s `version` field in
 their package.json. If any of the packages depends on any of the other
 packages being updated, be sure to update the dependency version as well.
-Then run `yarn publish`. To publish only a single package, use
-`yarn workspace <package-name> npm publish --access` (e.g.
-`yarn workspace @acusti/css-value-input npm publish --access`). Publishing
-will trigger a build as well as `npm publish` to ensure that the latest
-changes get published.
+Then run `yarn publish`. Publishing will trigger a build before running
+`npm publish` to ensure that the latest changes are published. To publish
+only a single package, use
+`yarn workspace <package-name> npm publish --access public` (e.g.
+`yarn workspace @acusti/css-value-input npm publish --access public`), but
+note that in that case, you are responsible for running `yarn build`
+yourself before triggering the publish.
 
 After publishing the packages, run `yarn` to update the yarn.lock file and
 then commit the version updates with a message in the form of:
