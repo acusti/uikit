@@ -34,6 +34,7 @@
     "references": [
         { "path": "packages/css-value-input" },
         { "path": "packages/css-values" },
-        { "path": "packages/dropdown" }
+        { "path": "packages/dropdown" },
+        { "path": "packages/styling" }
     ]
 }

@@ -1,15 +1,15 @@
 import * as React from 'react';
 
-import { unregisterStyles, updateStyles } from './';
+import { unregisterStyles, updateStyles } from './style-registry';
 
 const { useEffect, useRef } = React;
 
 type Props = {
+    children: string;
     ownerDocument?: Document;
-    styles: string;
 };
 
-const Style = ({ ownerDocument = document, styles }: Props) => {
+const Style = ({ children: styles, ownerDocument = document }: Props) => {
     const previousStylesRef = useRef('');
     // const [ownerDocument, setOwnerDocument] = useState(ownerDocumentFromProps || document);
     // useEffect(() => {

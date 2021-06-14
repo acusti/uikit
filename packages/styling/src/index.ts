@@ -1,4 +1,3 @@
-export { registerStyles, unregisterStyles, updateStyles } from './style-registry';
 export { default as Style } from './Style';
 
 export const SYSTEM_UI_FONT =
