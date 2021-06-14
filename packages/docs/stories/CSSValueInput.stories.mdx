@@ -1,5 +1,6 @@
-import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
 import CSSValueInput from '@acusti/css-value-input';
+import { SYSTEM_UI_FONT } from '@acusti/styling';
+import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
 
 <Meta title="UIKit/Controls/CSSValueInput" component={CSSValueInput} />
 
@@ -35,7 +36,7 @@ Illustrator or XD.
 }
 
 .cssvalueinput-label-text {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+    font-family: ${SYSTEM_UI_FONT};
     font-size: 14px;
     margin: 0;
 }

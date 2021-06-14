@@ -42,7 +42,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/styling@workspace:packages/styling":
+"@acusti/styling@*, @acusti/styling@workspace:packages/styling":
   version: 0.0.0-use.local
   resolution: "@acusti/styling@workspace:packages/styling"
   dependencies:
@@ -60,6 +60,7 @@ __metadata:
   dependencies:
     "@acusti/css-value-input": "*"
     "@acusti/dropdown": "*"
+    "@acusti/styling": "*"
     "@babel/core": ^7.13.13
     "@mdx-js/react": ^1.6.22
     "@storybook/addon-actions": ^6.3.0-rc.5
