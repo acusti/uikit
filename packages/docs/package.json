@@ -20,6 +20,7 @@
     },
     "dependencies": {
         "@acusti/css-value-input": "*",
+        "@acusti/dropdown": "*",
         "classnames": "^2.3.0"
     },
     "scripts": {

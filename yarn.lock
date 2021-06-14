@@ -28,6 +28,20 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@acusti/dropdown@*, @acusti/dropdown@workspace:packages/dropdown":
+  version: 0.0.0-use.local
+  resolution: "@acusti/dropdown@workspace:packages/dropdown"
+  dependencies:
+    "@types/classnames": ^2.2.11
+    "@types/react": ^17.0.3
+    typescript: ^4.2.3
+  peerDependencies:
+    classnames: ^2
+    react: ^16.8 || ^17
+    react-dom: ^16.8 || ^17
+  languageName: unknown
+  linkType: soft
+
 "@acusti/styling@workspace:packages/styling":
   version: 0.0.0-use.local
   resolution: "@acusti/styling@workspace:packages/styling"
@@ -45,6 +59,7 @@ __metadata:
   resolution: "@acusti/uikit-docs@workspace:packages/docs"
   dependencies:
     "@acusti/css-value-input": "*"
+    "@acusti/dropdown": "*"
     "@babel/core": ^7.13.13
     "@mdx-js/react": ^1.6.22
     "@storybook/addon-actions": ^6.3.0-rc.5

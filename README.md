@@ -14,12 +14,15 @@ drag-and-drop library, and more
 | ------------------------------- | --------------------------------------------------- |
 | **[@acusti/css-values][]**      | Utilities for parsing different types of CSS values |
 | **[@acusti/css-value-input][]** | React component that renders a CSS value input      |
+| **[@acusti/dropdown][]**        | React component that renders a dropdown UI element  |
 | **[@acusti/uikit-docs][]**      | Storybook instance illustrating all components      |
 
 [@acusti/css-values]:
     https://github.com/acusti/uikit/tree/main/packages/css-values
 [@acusti/css-value-input]:
     https://github.com/acusti/uikit/tree/main/packages/css-value-input
+[@acusti/dropdown]:
+    https://github.com/acusti/uikit/tree/main/packages/dropdown
 [@acusti/uikit-docs]:
     https://github.com/acusti/uikit/tree/main/packages/docs
 
