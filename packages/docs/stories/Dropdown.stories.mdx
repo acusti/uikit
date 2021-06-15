@@ -1,5 +1,4 @@
 import Dropdown from '@acusti/dropdown';
-import { SYSTEM_UI_FONT } from '@acusti/styling';
 import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
 
 <Meta title="UIKit/Controls/Dropdown" component={Dropdown} />
@@ -16,6 +15,14 @@ of macOS.
 .innerZoomElementWrapper {
     margin-bottom: 100px;
 }
+.uktdropdown ul {
+    text-align: left;
+    list-style-type: none;
+    padding-left: 0px;
+}
+.uktdropdown li {
+    padding: 4px 8px;
+}
 `}</style>
 
 <Canvas>
@@ -25,7 +32,16 @@ of macOS.
             className: 'my-context-menu',
         }}
     >
-        {(args) => <Dropdown {...args} />}
+        {(args) => (
+            <Dropdown {...args}>
+                View menu
+                <ul>
+                    <li>Save</li>
+                    <li>Edit</li>
+                    <li>Delete</li>
+                </ul>
+            </Dropdown>
+        )}
     </Story>
     <Story
         name="Show Open On Mount"
@@ -34,7 +50,16 @@ of macOS.
             isOpenOnMount: true,
         }}
     >
-        {(args) => <Dropdown {...args} />}
+        {(args) => (
+            <Dropdown {...args}>
+                View menu
+                <ul>
+                    <li>Save</li>
+                    <li>Edit</li>
+                    <li>Delete</li>
+                </ul>
+            </Dropdown>
+        )}
     </Story>
 </Canvas>
 
