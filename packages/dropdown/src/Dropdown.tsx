@@ -9,7 +9,7 @@ export type Props = {
     styles?: string;
 };
 
-const { Children, Fragment, useCallback, useState } = React;
+const { Children, Fragment, useCallback, useRef, useState } = React;
 
 const ROOT_CLASS_NAME = 'uktdropdown';
 
@@ -60,20 +60,111 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
     }
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
+    const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
 
-    const handleMouseDown = useCallback(() => {
-        if (isOpen) return;
+    const dropdownElementRef = useRef<HTMLElement | null>(null);
+    const closingTimerRef = useRef<number | null>(null);
+    const isOpeningTimerRef = useRef<number | null>(null);
+    const mouseDownPositionRef = useRef<{ clientX: number; clientY: number } | null>(
+        null,
+    );
+
+    const closeDropdown = useCallback(() => {
+        setIsOpen(false);
+        setIsOpening(false);
+        mouseDownPositionRef.current = null;
+        if (closingTimerRef.current) {
+            clearTimeout(closingTimerRef.current);
+            closingTimerRef.current = null;
+        }
+    }, []);
+
+    const openDropdown = useCallback(() => {
         setIsOpen(true);
-    }, [isOpen]);
+        if (dropdownElementRef.current) {
+            dropdownElementRef.current.focus();
+        }
+    }, []);
+
+    const handleKeyDown = useCallback(
+        ({ key }: React.KeyboardEvent<HTMLElement>) => {
+            switch (key) {
+                case 'Escape':
+                    if (isOpen) {
+                        closeDropdown();
+                    }
+                    return;
+                case ' ':
+                case 'Enter':
+                    if (isOpen) {
+                        closeDropdown();
+                    } else {
+                        openDropdown();
+                    }
+                    return;
+            }
+        },
+        [closeDropdown, isOpen],
+    );
+
+    const handleMouseDown = useCallback(
+        ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
+            if (isOpen) return;
+            openDropdown();
+            setIsOpening(true);
+            mouseDownPositionRef.current = { clientX, clientY };
+            isOpeningTimerRef.current = setTimeout(() => {
+                setIsOpening(false);
+                isOpeningTimerRef.current = null;
+            }, 1000);
+        },
+        [isOpen],
+    );
+
+    const handleMouseMove = useCallback(
+        ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
+            const initialPosition = mouseDownPositionRef.current;
+            if (!initialPosition) return;
+            if (
+                Math.abs(initialPosition.clientX - clientX) < 12 &&
+                Math.abs(initialPosition.clientY - clientY) < 12
+            ) {
+                return;
+            }
+            setIsOpening(false);
+        },
+        [],
+    );
 
     const handleMouseUp = useCallback(() => {
-        if (!isOpen) return;
-        setIsOpen(false);
-    }, [isOpen]);
+        if (!isOpen || closingTimerRef.current) return;
+        // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
+        if (isOpening) {
+            setIsOpening(false);
+            if (isOpeningTimerRef.current) {
+                clearTimeout(isOpeningTimerRef.current);
+                isOpeningTimerRef.current = null;
+            }
+            return;
+        }
+        // A short timeout before closing is better UX when user selects an item so that dropdown
+        // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
+        closingTimerRef.current = setTimeout(closeDropdown, 90);
+    }, [isOpen, isOpening]);
+
+    const handleBlur = useCallback(() => {
+        if (!isOpen || isOpening) return;
+        closeDropdown();
+    }, [closeDropdown, isOpen, isOpening]);
 
     const handleRef = useCallback((ref: HTMLElement | null) => {
+        dropdownElementRef.current = ref;
         setOwnerDocument(ref?.ownerDocument || null);
+        // If dropdown should be open on mount, focus it
+        if (ref && isOpenOnMount) {
+            ref.focus();
+        }
     }, []);
 
     const styleElement = ownerDocument ? (
@@ -88,9 +179,13 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             {styleElement}
             <button
                 className={classnames(ROOT_CLASS_NAME, className, { 'is-open': isOpen })}
+                onBlur={handleBlur}
+                onKeyDown={handleKeyDown}
                 onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
                 onMouseUp={handleMouseUp}
                 ref={handleRef}
+                tabIndex={0}
             >
                 {children[0]}
                 {isOpen ? (
