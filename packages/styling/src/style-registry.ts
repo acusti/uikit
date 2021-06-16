@@ -41,9 +41,16 @@ export const unregisterStyles = ({ ownerDocument, styles }: Payload) => {
     stylesItem.referenceCount--;
     if (stylesItem.referenceCount) return;
 
+    // If no more references to these styles in this document, remove <style> element from the DOM
+    const { parentElement } = stylesItem.element;
+    if (parentElement) {
+        parentElement.removeChild(stylesItem.element);
+    }
+    // Then remove the document Map
     stylesMap.delete(ownerDocument);
-    if (stylesMap.size) return;
 
+    if (stylesMap.size) return;
+    // If no more references to these styles in any document, remove it entirely
     styleRegistry.delete(styles);
 };
 
