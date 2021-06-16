@@ -41,7 +41,7 @@ const BASE_STYLES = `
     background-color: var(--uktdropdown-body-bg-color);
     box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.25);
 }
-.${ROOT_CLASS_NAME}-body > * > *:hover {
+.${ROOT_CLASS_NAME}-body [data-uktdropdown-active] {
     background-color: var(--uktdropdown-body-bg-color-hover);
     color: var(--uktdropdown-body-color-hover);
 }
@@ -62,6 +62,9 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
+    const [dropdownBodyItems, setDropdownBodyItems] = useState<Array<HTMLElement> | null>(
+        null,
+    );
 
     const dropdownElementRef = useRef<HTMLElement | null>(null);
     const closingTimerRef = useRef<number | null>(null);
@@ -87,6 +90,53 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
         }
     }, []);
 
+    const setActiveItem = useCallback(
+        ({
+            element,
+            indexAddend,
+        }:
+            | { element: HTMLElement; indexAddend?: null }
+            | { element?: null; indexAddend: number }) => {
+            if (!element && !indexAddend) return;
+            if (!dropdownBodyItems || !dropdownBodyItems.length) return;
+
+            const itemsCount = dropdownBodyItems.length;
+            const lastIndex = itemsCount - 1;
+            const currentActiveIndex = dropdownBodyItems.findIndex(
+                (item) => item.dataset.uktdropdownActive,
+            );
+            let nextActiveIndex = currentActiveIndex;
+            if (element) {
+                nextActiveIndex = dropdownBodyItems.findIndex((item) => item === element);
+            } else if (indexAddend) {
+                // If there’s no currentActiveIndex and we are handling -1, start at lastIndex
+                if (currentActiveIndex === -1 && indexAddend === -1) {
+                    nextActiveIndex = lastIndex;
+                } else {
+                    nextActiveIndex += indexAddend;
+                }
+                // Keep it within the bounds of the items list
+                if (nextActiveIndex < 0) {
+                    nextActiveIndex = 0;
+                } else if (nextActiveIndex > lastIndex) {
+                    nextActiveIndex = lastIndex;
+                }
+            }
+
+            if (nextActiveIndex === -1 || nextActiveIndex === currentActiveIndex) return;
+
+            const currentActiveItem = dropdownBodyItems[currentActiveIndex];
+            if (currentActiveItem) {
+                delete currentActiveItem.dataset.uktdropdownActive;
+            }
+            const nextActiveItem = dropdownBodyItems[nextActiveIndex];
+            if (nextActiveItem) {
+                nextActiveItem.dataset.uktdropdownActive = '1';
+            }
+        },
+        [dropdownBodyItems],
+    );
+
     const handleKeyDown = useCallback(
         ({ key }: React.KeyboardEvent<HTMLElement>) => {
             switch (key) {
@@ -103,9 +153,15 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                         openDropdown();
                     }
                     return;
+                case 'ArrowUp':
+                    setActiveItem({ indexAddend: -1 });
+                    return;
+                case 'ArrowDown':
+                    setActiveItem({ indexAddend: 1 });
+                    return;
             }
         },
-        [closeDropdown, isOpen],
+        [closeDropdown, isOpen, setActiveItem],
     );
 
     const handleMouseDown = useCallback(
@@ -135,6 +191,17 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             setIsOpening(false);
         },
         [],
+    );
+
+    const handleMouseOver = useCallback(
+        ({ target }: React.MouseEvent<HTMLElement>) => {
+            if (!dropdownBodyItems) return;
+            const element = target as HTMLElement;
+            if (dropdownBodyItems.includes(element)) {
+                setActiveItem({ element });
+            }
+        },
+        [dropdownBodyItems, setActiveItem],
     );
 
     const handleMouseUp = useCallback(() => {
@@ -167,6 +234,24 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
         }
     }, []);
 
+    const handleBodyRef = useCallback((ref: HTMLElement | null) => {
+        if (!ref) {
+            setDropdownBodyItems(null);
+            return;
+        }
+        // If mounting the dropdown body, find the list items
+        let { children } = ref;
+        while (children.length === 1) {
+            if (!children[0].children) break;
+            children = children[0].children;
+        }
+        // If unable to find an element with more than one child, treat direct child as children
+        if (children.length === 1) {
+            children = ref.children;
+        }
+        setDropdownBodyItems(Array.from(children) as Array<HTMLElement>);
+    }, []);
+
     const styleElement = ownerDocument ? (
         <Fragment>
             <Style ownerDocument={ownerDocument}>{BASE_STYLES}</Style>
@@ -183,13 +268,16 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                 onKeyDown={handleKeyDown}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
+                onMouseOver={handleMouseOver}
                 onMouseUp={handleMouseUp}
                 ref={handleRef}
                 tabIndex={0}
             >
                 {children[0]}
                 {isOpen ? (
-                    <div className={`${ROOT_CLASS_NAME}-body`}>{children[1]}</div>
+                    <div className={`${ROOT_CLASS_NAME}-body`} ref={handleBodyRef}>
+                        {children[1]}
+                    </div>
                 ) : null}
             </button>
         </Fragment>
