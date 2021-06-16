@@ -19,7 +19,7 @@ export const registerStyles = ({ ownerDocument, styles }: Payload) => {
     }
 
     const element = ownerDocument.createElement('style');
-    element.innerText = styles;
+    element.innerHTML = styles;
     ownerDocument.head.appendChild(element);
     const stylesItem = { element, referenceCount: 1 };
 
