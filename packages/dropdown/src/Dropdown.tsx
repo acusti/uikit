@@ -213,6 +213,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                 clearTimeout(isOpeningTimerRef.current);
                 isOpeningTimerRef.current = null;
             }
+            dropdownElementRef.current?.focus();
             return;
         }
         // A short timeout before closing is better UX when user selects an item so that dropdown
