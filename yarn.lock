@@ -43,6 +43,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@acusti/matchmaking@workspace:packages/matchmaking":
+  version: 0.0.0-use.local
+  resolution: "@acusti/matchmaking@workspace:packages/matchmaking"
+  dependencies:
+    typescript: ^4.2.3
+  languageName: unknown
+  linkType: soft
+
 "@acusti/styling@*, @acusti/styling@workspace:packages/styling":
   version: 0.0.0-use.local
   resolution: "@acusti/styling@workspace:packages/styling"

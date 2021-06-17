@@ -1,0 +1,23 @@
+{
+    "name": "@acusti/matchmaking",
+    "version": "0.1.0",
+    "main": "dist/index.js",
+    "module": "dist/index.js",
+    "typings": "dist/index.d.ts",
+    "files": [
+        "dist"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/acusti/uikit.git"
+    },
+    "author": "andrew patton <andrew@acusti.ca> (http://acusti.ca)",
+    "license": "Unlicense",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
+    },
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/matchmaking#readme",
+    "devDependencies": {
+        "typescript": "^4.2.3"
+    }
+}
