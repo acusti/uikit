@@ -1,3 +1,4 @@
+import { getBestMatch } from '@acusti/matchmaking';
 import { Style, SYSTEM_UI_FONT } from '@acusti/styling';
 import classnames from 'classnames';
 import * as React from 'react';
@@ -69,9 +70,11 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
     const dropdownElementRef = useRef<HTMLElement | null>(null);
     const closingTimerRef = useRef<number | null>(null);
     const isOpeningTimerRef = useRef<number | null>(null);
+    const clearEnteredCharactersTimerRef = useRef<number | null>(null);
     const mouseDownPositionRef = useRef<{ clientX: number; clientY: number } | null>(
         null,
     );
+    const enteredCharactersRef = useRef<string>('');
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
@@ -94,10 +97,12 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
         ({
             element,
             indexAddend,
+            text,
         }:
-            | { element: HTMLElement; indexAddend?: null }
-            | { element?: null; indexAddend: number }) => {
-            if (!element && !indexAddend) return;
+            | { element: HTMLElement; indexAddend?: null; text?: null }
+            | { element?: null; indexAddend: number; text?: null }
+            | { element?: null; indexAddend?: null; text: string }) => {
+            if (!element && !indexAddend && typeof text !== 'string') return;
             if (!dropdownBodyItems || !dropdownBodyItems.length) return;
 
             const itemsCount = dropdownBodyItems.length;
@@ -105,6 +110,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             const currentActiveIndex = dropdownBodyItems.findIndex(
                 (item) => item.dataset.uktdropdownActive,
             );
+
             let nextActiveIndex = currentActiveIndex;
             if (element) {
                 nextActiveIndex = dropdownBodyItems.findIndex((item) => item === element);
@@ -121,6 +127,10 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                 } else if (nextActiveIndex > lastIndex) {
                     nextActiveIndex = lastIndex;
                 }
+            } else if (typeof text === 'string') {
+                const itemTexts = dropdownBodyItems.map((item) => item.innerText);
+                const bestMatch = getBestMatch({ items: itemTexts, text });
+                nextActiveIndex = itemTexts.findIndex((text) => text === bestMatch);
             }
 
             if (nextActiveIndex === -1 || nextActiveIndex === currentActiveIndex) return;
@@ -139,6 +149,34 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
 
     const handleKeyDown = useCallback(
         ({ key }: React.KeyboardEvent<HTMLElement>) => {
+            let isEditingCharacters = /^[A-Za-z0-9]$/.test(key);
+            // User could also be editing characters if there are already characters entered
+            // and they are hitting delete or spacebar
+            if (!isEditingCharacters && enteredCharactersRef.current) {
+                isEditingCharacters = key === ' ' || key === 'Backspace';
+            }
+
+            if (isEditingCharacters) {
+                if (key === 'Backspace') {
+                    enteredCharactersRef.current = enteredCharactersRef.current.slice(-1);
+                } else {
+                    enteredCharactersRef.current += key;
+                }
+
+                setActiveItem({ text: enteredCharactersRef.current });
+
+                if (clearEnteredCharactersTimerRef.current) {
+                    clearTimeout(clearEnteredCharactersTimerRef.current);
+                }
+
+                clearEnteredCharactersTimerRef.current = setTimeout(() => {
+                    enteredCharactersRef.current = '';
+                    clearEnteredCharactersTimerRef.current = null;
+                }, 2000);
+
+                return;
+            }
+
             switch (key) {
                 case 'Escape':
                     if (isOpen) {
