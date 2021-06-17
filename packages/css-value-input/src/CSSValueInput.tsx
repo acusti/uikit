@@ -4,7 +4,7 @@ import {
     CSSValueType,
     getCSSValueAsNumber,
     getCSSValueWithUnit,
-    getUnitForCSSValue,
+    getUnitFromCSSValue,
     roundToPrecision,
 } from '@acusti/css-values';
 
@@ -111,7 +111,7 @@ const CSSValueInput: React.FC<Props> = ({
                 nextValue = Math.max(min, nextValue);
             }
 
-            const nextUnit = getUnitForCSSValue({
+            const nextUnit = getUnitFromCSSValue({
                 cssValueType,
                 defaultUnit: unit,
                 value: currentValue,
