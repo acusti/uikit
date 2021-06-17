@@ -1,10 +1,14 @@
-import { getCSSValueWithUnit, getMillisecondsFromCSSValue, getUnitForCSSValue } from './';
+import {
+    getCSSValueWithUnit,
+    getMillisecondsFromCSSValue,
+    getUnitFromCSSValue,
+} from './';
 
-describe('css-units.js utilities', () => {
-    describe('getUnitForCSSValue', () => {
+describe('@acusti/css-values', () => {
+    describe('getUnitFromCSSValue', () => {
         it('returns any valid unit (according to CSS value type) already on the CSS value', () => {
             expect(
-                getUnitForCSSValue({
+                getUnitFromCSSValue({
                     cssValueType: 'angle',
                     defaultUnit: 'deg',
                     value: '1.75turn',
@@ -12,7 +16,7 @@ describe('css-units.js utilities', () => {
             ).toBe('turn');
 
             expect(
-                getUnitForCSSValue({
+                getUnitFromCSSValue({
                     cssValueType: 'length',
                     defaultUnit: 'px',
                     value: '47vw',
@@ -20,7 +24,7 @@ describe('css-units.js utilities', () => {
             ).toBe('vw');
 
             expect(
-                getUnitForCSSValue({
+                getUnitFromCSSValue({
                     cssValueType: 'time',
                     defaultUnit: 'ms',
                     value: '  1.25s ',
@@ -30,7 +34,7 @@ describe('css-units.js utilities', () => {
             // Percent is a simpler case because there is only one valid unit
             // Though passing defaultUnit as an empty string would mean empty unit if no match
             expect(
-                getUnitForCSSValue({
+                getUnitFromCSSValue({
                     cssValueType: 'percent',
                     defaultUnit: '',
                     value: '1.75%',
@@ -40,7 +44,7 @@ describe('css-units.js utilities', () => {
 
         it('returns the default unit when the given value has no valid unit', () => {
             expect(
-                getUnitForCSSValue({
+                getUnitFromCSSValue({
                     cssValueType: 'angle',
                     defaultUnit: 'deg',
                     value: '1.75%',
@@ -48,7 +52,7 @@ describe('css-units.js utilities', () => {
             ).toBe('deg');
 
             expect(
-                getUnitForCSSValue({
+                getUnitFromCSSValue({
                     cssValueType: 'length',
                     defaultUnit: 'px',
                     value: '47deg',
@@ -56,7 +60,7 @@ describe('css-units.js utilities', () => {
             ).toBe('px');
 
             expect(
-                getUnitForCSSValue({
+                getUnitFromCSSValue({
                     cssValueType: 'time',
                     defaultUnit: 'ms',
                     value: '1.25em',
@@ -64,7 +68,7 @@ describe('css-units.js utilities', () => {
             ).toBe('ms');
 
             expect(
-                getUnitForCSSValue({
+                getUnitFromCSSValue({
                     cssValueType: 'percent',
                     defaultUnit: '%',
                     value: '23px',
@@ -74,7 +78,7 @@ describe('css-units.js utilities', () => {
 
         it('returns the default unit when the given value is a number', () => {
             expect(
-                getUnitForCSSValue({
+                getUnitFromCSSValue({
                     cssValueType: 'length',
                     defaultUnit: 'vh',
                     value: 10,

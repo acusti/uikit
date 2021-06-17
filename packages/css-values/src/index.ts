@@ -20,7 +20,7 @@ export type Payload = {
 export const roundToPrecision = (value: number, precision: number): number =>
     parseFloat(value.toFixed(precision));
 
-export const getUnitForCSSValue = ({ cssValueType, defaultUnit, value }: Payload) => {
+export const getUnitFromCSSValue = ({ cssValueType, defaultUnit, value }: Payload) => {
     // If value is a number, return the defaultUnit
     if (typeof value === 'number') return defaultUnit;
 
@@ -36,7 +36,7 @@ export const getCSSValueWithUnit = (payload: Payload): string => {
     // If value is not a number, don’t try to add a unit
     if (Number.isNaN(valueAsNumber)) return payload.value.toString().trim();
 
-    return `${valueAsNumber}${getUnitForCSSValue(payload)}`;
+    return `${valueAsNumber}${getUnitFromCSSValue(payload)}`;
 };
 
 export const getMillisecondsFromCSSValue = (value: string | number): number => {
