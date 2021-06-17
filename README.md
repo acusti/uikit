@@ -10,13 +10,14 @@ drag-and-drop library, and more
 
 ## Packages
 
-| NPM Package Name                | Description                                               |
-| ------------------------------- | --------------------------------------------------------- |
-| **[@acusti/css-values][]**      | Utilities for parsing different types of CSS values       |
-| **[@acusti/css-value-input][]** | React component that renders a CSS value input            |
-| **[@acusti/dropdown][]**        | React component that renders a dropdown UI element        |
-| **[@acusti/styling][]**         | React component that renders a CSS string to the `<head>` |
-| **[@acusti/uikit-docs][]**      | Storybook instance illustrating all components            |
+| NPM Package Name                | Description                                                   |
+| ------------------------------- | ------------------------------------------------------------- |
+| **[@acusti/css-values][]**      | Utilities for parsing different types of CSS values           |
+| **[@acusti/css-value-input][]** | React component that renders a CSS value input                |
+| **[@acusti/dropdown][]**        | React component that renders a dropdown UI element            |
+| **[@acusti/matchmaking][]**     | Utilities for approximate string matching (i.e. fuzzy search) |
+| **[@acusti/styling][]**         | React component that renders a CSS string to the `<head>`     |
+| **[@acusti/uikit-docs][]**      | Storybook instance illustrating all components                |
 
 [@acusti/css-values]:
     https://github.com/acusti/uikit/tree/main/packages/css-values
@@ -24,6 +25,8 @@ drag-and-drop library, and more
     https://github.com/acusti/uikit/tree/main/packages/css-value-input
 [@acusti/dropdown]:
     https://github.com/acusti/uikit/tree/main/packages/dropdown
+[@acusti/matchmaking]:
+    https://github.com/acusti/uikit/tree/main/packages/matchmaking
 [@acusti/styling]:
     https://github.com/acusti/uikit/tree/main/packages/styling
 [@acusti/uikit-docs]:
