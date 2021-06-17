@@ -32,7 +32,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
-    "@acusti/matchmaking": ^0.1.0
+    "@acusti/matchmaking": ^0.1.1
     "@acusti/styling": ^0.1.0
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
@@ -44,7 +44,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/matchmaking@^0.1.0, @acusti/matchmaking@workspace:packages/matchmaking":
+"@acusti/matchmaking@^0.1.1, @acusti/matchmaking@workspace:packages/matchmaking":
   version: 0.0.0-use.local
   resolution: "@acusti/matchmaking@workspace:packages/matchmaking"
   dependencies:
