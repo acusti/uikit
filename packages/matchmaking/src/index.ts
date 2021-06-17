@@ -4,19 +4,26 @@ const FIRST_LETTER = 'A'.charCodeAt(0);
 
 // Consider every distance greater than or equal to 15 to be functionally equivalent
 const MAX_DISTANCE = 15;
-const MAX_INEXACT_SCORE = 0.999999;
+const MAX_INEXACT_SCORE = 0.99999;
+const MAX_PARTIAL_EXACT_SCORE = 0.999999;
 
 export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean) => {
     if (!isSanitized) {
         strA = strA.trim().toUpperCase();
         strB = strB.trim().toUpperCase();
     }
-
+    // Exact match scores 1
     if (strA === strB) return 1;
 
     const strALength = strA.length;
     const strBLength = strB.length;
     const shortestLength = Math.min(strALength, strBLength);
+
+    // Exact partial match is next best score to exact match
+    if (strA.slice(0, shortestLength) === strB.slice(0, shortestLength)) {
+        return MAX_PARTIAL_EXACT_SCORE;
+    }
+
     // To proportionally weight consecutive exact matches, increase bonus relative to total length
     const bonusMultiplier = Math.min(0.25, 3 / shortestLength);
     let score = 0;
@@ -50,7 +57,9 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
         }
     }
     // If score came out at 0 or less, give it best possible score for an inexact match
-    if (score <= 0) return MAX_INEXACT_SCORE;
+    if (score <= 0) {
+        return MAX_INEXACT_SCORE;
+    }
 
     score = (worstPossibleScore - score) / worstPossibleScore;
     // Don’t allow an inexact match to get a score of 1 (reserved for an exact match)
