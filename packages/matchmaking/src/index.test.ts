@@ -74,6 +74,11 @@ describe('@acusti/matchmaking', () => {
                 'Michigan',
             ]);
 
+            expect(sortByBestMatch({ items: STATES, text: 'mass' }).slice(0, 2)).toEqual([
+                'Massachusetts',
+                'Maryland',
+            ]);
+
             expect(
                 sortByBestMatch({ items: STATES, text: 'nassadgysrtys' }).slice(0, 3),
             ).toEqual([
