@@ -5,6 +5,9 @@
     "exports": "./dist/Dropdown.js",
     "module": "./dist/Dropdown.js",
     "types": "./dist/Dropdown.d.ts",
+    "engines": {
+        "node": ">=12"
+    },
     "files": [
         "dist"
     ],

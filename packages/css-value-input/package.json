@@ -5,6 +5,9 @@
     "exports": "./dist/CSSValueInput.js",
     "module": "./dist/CSSValueInput.js",
     "types": "./dist/CSSValueInput.d.ts",
+    "engines": {
+        "node": ">=12"
+    },
     "files": [
         "dist"
     ],

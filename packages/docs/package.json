@@ -1,6 +1,9 @@
 {
     "name": "@acusti/uikit-docs",
     "version": "0.1.0",
+    "engines": {
+        "node": ">=12"
+    },
     "devDependencies": {
         "@babel/core": "^7.13.13",
         "@mdx-js/react": "^1.6.22",
