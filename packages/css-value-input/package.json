@@ -3,8 +3,8 @@
     "version": "0.5.0",
     "type": "module",
     "exports": "./dist/CSSValueInput.js",
-    "module": "dist/CSSValueInput.js",
-    "typings": "dist/CSSValueInput.d.ts",
+    "module": "./dist/CSSValueInput.js",
+    "typings": "./dist/CSSValueInput.d.ts",
     "files": [
         "dist"
     ],
