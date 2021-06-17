@@ -1,5 +1,3 @@
-import classnames from 'classnames';
-import * as React from 'react';
 import {
     CSSValueType,
     getCSSValueAsNumber,
@@ -7,6 +5,8 @@ import {
     getUnitFromCSSValue,
     roundToPrecision,
 } from '@acusti/css-values';
+import classnames from 'classnames';
+import * as React from 'react';
 
 export type Props = {
     className?: string;
