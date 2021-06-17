@@ -303,6 +303,8 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             {styleElement}
             <button
                 className={classnames(ROOT_CLASS_NAME, className, { 'is-open': isOpen })}
+                // In react, onBlur and onFocus bubble like focusin and focusout
+                // Reference: https://github.com/facebook/react/issues/6410
                 onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 onMouseDown={handleMouseDown}
