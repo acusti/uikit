@@ -1,7 +1,8 @@
 {
     "name": "@acusti/dropdown",
     "version": "0.0.1",
-    "main": "dist/Dropdown.js",
+    "type": "module",
+    "exports": "./dist/Dropdown.js",
     "module": "dist/Dropdown.js",
     "typings": "dist/Dropdown.d.ts",
     "files": [

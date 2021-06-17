@@ -1,6 +1,7 @@
 {
     "name": "@acusti/uikit",
     "version": "0.0.1",
+    "type": "module",
     "description": "UI toolkit monorepo containing a React component library, UI utilities, a drag-and-drop library, and more",
     "scripts": {
         "build:flowtypes": "find . -type f -not -path './node_modules/*' -regex '.*/dist/[^/]*.d.ts' -exec sh -c 'yarn flowgen --add-flow-header --no-inexact $1 -o ${1%.*.*}.js.flow; sed -E -i \"s/React\\\\.(V?FC|(Void)?FunctionComponent)/React.StatelessFunctionalComponent/g; s/React\\\\.ReactNode/React.Node/g; s/import \\\\{ CSSValueType/import type { CSSValueType/\" ${1%.*.*}.js.flow' _ '{}' \\;",
