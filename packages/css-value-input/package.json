@@ -4,7 +4,7 @@
     "type": "module",
     "exports": "./dist/CSSValueInput.js",
     "module": "./dist/CSSValueInput.js",
-    "typings": "./dist/CSSValueInput.d.ts",
+    "types": "./dist/CSSValueInput.d.ts",
     "files": [
         "dist"
     ],
