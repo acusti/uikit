@@ -178,7 +178,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                 clearEnteredCharactersTimerRef.current = setTimeout(() => {
                     enteredCharactersRef.current = '';
                     clearEnteredCharactersTimerRef.current = null;
-                }, 2000);
+                }, 1500);
 
                 return;
             }
