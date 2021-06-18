@@ -73,6 +73,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
     const dropdownElementRef = useRef<HTMLElement | null>(null);
     const closingTimerRef = useRef<number | null>(null);
     const isOpeningTimerRef = useRef<number | null>(null);
+    const currentInputMethodRef = useRef<'mouse' | 'keyboard'>('mouse');
     const clearEnteredCharactersTimerRef = useRef<number | null>(null);
     const mouseDownPositionRef = useRef<{ clientX: number; clientY: number } | null>(
         null,
@@ -142,6 +143,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             if (currentActiveItem) {
                 delete currentActiveItem.dataset.uktdropdownActive;
             }
+
             const nextActiveItem = dropdownBodyItems[nextActiveIndex];
             if (nextActiveItem) {
                 nextActiveItem.dataset.uktdropdownActive = '1';
@@ -160,6 +162,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             }
 
             if (isEditingCharacters) {
+                currentInputMethodRef.current = 'keyboard';
                 if (key === 'Backspace') {
                     enteredCharactersRef.current = enteredCharactersRef.current.slice(-1);
                 } else {
@@ -183,11 +186,13 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             switch (key) {
                 case 'Escape':
                     if (isOpen) {
+                        currentInputMethodRef.current = 'keyboard';
                         closeDropdown();
                     }
                     return;
                 case ' ':
                 case 'Enter':
+                    currentInputMethodRef.current = 'keyboard';
                     if (isOpen) {
                         closeDropdown();
                     } else {
@@ -195,9 +200,11 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                     }
                     return;
                 case 'ArrowUp':
+                    currentInputMethodRef.current = 'keyboard';
                     setActiveItem({ indexAddend: -1 });
                     return;
                 case 'ArrowDown':
+                    currentInputMethodRef.current = 'keyboard';
                     setActiveItem({ indexAddend: 1 });
                     return;
             }
@@ -221,6 +228,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
 
     const handleMouseMove = useCallback(
         ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
+            currentInputMethodRef.current = 'mouse';
             const initialPosition = mouseDownPositionRef.current;
             if (!initialPosition) return;
             if (
@@ -237,6 +245,9 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
     const handleMouseOver = useCallback(
         ({ target }: React.MouseEvent<HTMLElement>) => {
             if (!dropdownBodyItems) return;
+            // If user isn’t currently using the mouse to navigate the dropdown, do nothing
+            if (currentInputMethodRef.current !== 'mouse') return;
+
             const element = target as HTMLElement;
             if (dropdownBodyItems.includes(element)) {
                 setActiveItem({ element });
