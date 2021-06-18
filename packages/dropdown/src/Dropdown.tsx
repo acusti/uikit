@@ -13,6 +13,7 @@ export type Props = {
 const { Children, Fragment, useCallback, useRef, useState } = React;
 
 const ROOT_CLASS_NAME = 'uktdropdown';
+const BODY_CLASS_NAME = `${ROOT_CLASS_NAME}-body`;
 
 const BASE_STYLES = `
 :root {
@@ -30,11 +31,13 @@ const BASE_STYLES = `
     cursor: default;
     font-family: var(--uktdropdown-font-family);
 }
-.${ROOT_CLASS_NAME}-body {
+.${BODY_CLASS_NAME} {
+    box-sizing: border-box;
     position: absolute;
     left: 0px;
     top: 100%;
-    box-sizing: border-box;
+    max-height: calc(100vh - 50px);
+    overflow: auto;
     padding-bottom: var(--uktdropdown-body-pad-bottom);
     padding-left: var(--uktdropdown-body-pad-left);
     padding-right: var(--uktdropdown-body-pad-right);
@@ -42,7 +45,7 @@ const BASE_STYLES = `
     background-color: var(--uktdropdown-body-bg-color);
     box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.25);
 }
-.${ROOT_CLASS_NAME}-body [data-uktdropdown-active] {
+.${BODY_CLASS_NAME} [data-uktdropdown-active] {
     background-color: var(--uktdropdown-body-bg-color-hover);
     color: var(--uktdropdown-body-color-hover);
 }
@@ -316,7 +319,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             >
                 {children[0]}
                 {isOpen ? (
-                    <div className={`${ROOT_CLASS_NAME}-body`} ref={handleBodyRef}>
+                    <div className={BODY_CLASS_NAME} ref={handleBodyRef}>
                         {children[1]}
                     </div>
                 ) : null}
