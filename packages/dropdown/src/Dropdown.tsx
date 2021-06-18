@@ -186,7 +186,10 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             if (isEditingCharacters) {
                 currentInputMethodRef.current = 'keyboard';
                 if (key === 'Backspace') {
-                    enteredCharactersRef.current = enteredCharactersRef.current.slice(-1);
+                    enteredCharactersRef.current = enteredCharactersRef.current.slice(
+                        0,
+                        -1,
+                    );
                 } else {
                     enteredCharactersRef.current += key;
                 }
