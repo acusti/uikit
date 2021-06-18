@@ -147,6 +147,28 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             const nextActiveItem = dropdownBodyItems[nextActiveIndex];
             if (nextActiveItem) {
                 nextActiveItem.dataset.uktdropdownActive = '1';
+                // If dropdown body element has at least 15px of overflow,
+                // verify that next active item is visible and scroll to it if it isn’t
+                const dropdownBody = dropdownBodyItems[0].closest('.' + BODY_CLASS_NAME);
+                if (
+                    dropdownBody &&
+                    dropdownBody.scrollHeight >= dropdownBody.clientHeight + 15
+                ) {
+                    const dropdownBodyRect = dropdownBody.getBoundingClientRect();
+                    const itemRect = nextActiveItem.getBoundingClientRect();
+                    const isAboveTop = itemRect.top < dropdownBodyRect.top;
+                    const isBelowBottom = itemRect.bottom > dropdownBodyRect.bottom;
+                    if (isAboveTop || isBelowBottom) {
+                        let { scrollTop } = dropdownBody;
+                        // Item isn’t fully visible; adjust scrollTop to put item within closest edge
+                        if (isAboveTop) {
+                            scrollTop -= dropdownBodyRect.top - itemRect.top;
+                        } else {
+                            scrollTop += itemRect.bottom - dropdownBodyRect.bottom;
+                        }
+                        dropdownBody.scrollTop = scrollTop;
+                    }
+                }
             }
         },
         [dropdownBodyItems],
