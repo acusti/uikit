@@ -15,24 +15,24 @@ of macOS.
 .innerZoomElementWrapper {
     margin-bottom: 140px;
 }
-.uktdropdown ul {
+.uktdropdown-body {
+    max-height: 150px;
+}
+.uktdropdown-body ul {
     text-align: left;
     list-style-type: none;
     padding-left: 0px;
     margin: 0px;
 }
-.uktdropdown li {
+.uktdropdown-body li {
     padding: 4px 8px;
     margin: 4px 0;
-}
-.states-dropdown .uktdropdown-body {
-    max-height: 150px;
 }
 `}</style>
 
 <Canvas>
     <Story
-        name="Context Menu"
+        name="States Dropdown"
         args={{
             className: 'states-dropdown',
         }}
@@ -96,7 +96,7 @@ of macOS.
         )}
     </Story>
     <Story
-        name="Show Open On Mount"
+        name="Show Context Menu On Mount"
         args={{
             className: 'my-open-on-mount-context-menu',
             isOpenOnMount: true,
@@ -115,4 +115,4 @@ of macOS.
     </Story>
 </Canvas>
 
-<Props story="Show Open On Mount" />
+<Props story="Show Context Menu On Mount" />
