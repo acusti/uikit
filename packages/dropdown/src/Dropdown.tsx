@@ -80,6 +80,21 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
     );
     const enteredCharactersRef = useRef<string>('');
 
+    const ensureFocus = useCallback(() => {
+        const dropdownElement = dropdownElementRef.current;
+        if (!dropdownElement) return;
+
+        const { activeElement } = dropdownElement.ownerDocument;
+        if (
+            dropdownElement === activeElement ||
+            dropdownElement.contains(activeElement)
+        ) {
+            return;
+        }
+
+        dropdownElement.focus();
+    }, []);
+
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
         setIsOpening(false);
@@ -92,10 +107,8 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
 
     const openDropdown = useCallback(() => {
         setIsOpen(true);
-        if (dropdownElementRef.current) {
-            dropdownElementRef.current.focus();
-        }
-    }, []);
+        ensureFocus();
+    }, [ensureFocus]);
 
     const setActiveItem = useCallback(
         ({
@@ -290,13 +303,13 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                 clearTimeout(isOpeningTimerRef.current);
                 isOpeningTimerRef.current = null;
             }
-            dropdownElementRef.current?.focus();
+            ensureFocus();
             return;
         }
         // A short timeout before closing is better UX when user selects an item so that dropdown
         // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
         closingTimerRef.current = setTimeout(closeDropdown, 90);
-    }, [isOpen, isOpening]);
+    }, [ensureFocus, isOpen, isOpening]);
 
     const handleBlur = useCallback(() => {
         if (!isOpen || isOpening) return;
