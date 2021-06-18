@@ -1,3 +1,4 @@
+import CSSValueInput from '@acusti/css-value-input';
 import Dropdown from '@acusti/dropdown';
 import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
 
@@ -103,7 +104,12 @@ of macOS.
     >
         {(args) => (
             <Dropdown {...args}>
-                CSS Lengths
+                <CSSValueInput
+                    cssValueType="length"
+                    label={null}
+                    placeholder="12px"
+                    unit="px"
+                />
                 <ul>
                     <li>0px</li>
                     <li>4px</li>
