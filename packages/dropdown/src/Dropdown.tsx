@@ -69,6 +69,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
     const [dropdownBodyItems, setDropdownBodyItems] = useState<Array<HTMLElement> | null>(
         null,
     );
+    const dropdownBodyItemsCount = dropdownBodyItems ? dropdownBodyItems.length : 0;
 
     const dropdownElementRef = useRef<HTMLElement | null>(null);
     const closingTimerRef = useRef<number | null>(null);
@@ -110,28 +111,39 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
         ensureFocus();
     }, [ensureFocus]);
 
+    const getCurrentActiveIndex = useCallback(
+        () =>
+            dropdownBodyItems
+                ? dropdownBodyItems.findIndex(
+                      (dropdownBodyItem) => dropdownBodyItem.dataset.uktdropdownActive,
+                  )
+                : -1,
+        [dropdownBodyItems],
+    );
+
     const setActiveItem = useCallback(
         ({
             element,
+            index,
             indexAddend,
             text,
         }:
-            | { element: HTMLElement; indexAddend?: null; text?: null }
-            | { element?: null; indexAddend: number; text?: null }
-            | { element?: null; indexAddend?: null; text: string }) => {
-            if (!element && !indexAddend && typeof text !== 'string') return;
-            if (!dropdownBodyItems || !dropdownBodyItems.length) return;
+            | { element: HTMLElement; index?: null; indexAddend?: null; text?: null }
+            | { element?: null; index: number; indexAddend?: null; text?: null }
+            | { element?: null; index?: null; indexAddend: number; text?: null }
+            | { element?: null; index?: null; indexAddend?: null; text: string }) => {
+            if (!dropdownBodyItems || !dropdownBodyItemsCount) return;
 
-            const itemsCount = dropdownBodyItems.length;
-            const lastIndex = itemsCount - 1;
-            const currentActiveIndex = dropdownBodyItems.findIndex(
-                (item) => item.dataset.uktdropdownActive,
-            );
+            const lastIndex = dropdownBodyItemsCount - 1;
+            const currentActiveIndex = getCurrentActiveIndex();
 
-            let nextActiveIndex = currentActiveIndex;
+            let nextActiveIndex = typeof index === 'number' ? index : currentActiveIndex;
+
             if (element) {
-                nextActiveIndex = dropdownBodyItems.findIndex((item) => item === element);
-            } else if (indexAddend) {
+                nextActiveIndex = dropdownBodyItems.findIndex(
+                    (dropdownBodyItem) => dropdownBodyItem === element,
+                );
+            } else if (typeof indexAddend === 'number') {
                 // If there’s no currentActiveIndex and we are handling -1, start at lastIndex
                 if (currentActiveIndex === -1 && indexAddend === -1) {
                     nextActiveIndex = lastIndex;
@@ -145,17 +157,20 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                     nextActiveIndex = lastIndex;
                 }
             } else if (typeof text === 'string') {
-                const itemTexts = dropdownBodyItems.map((item) => item.innerText);
+                const itemTexts = dropdownBodyItems.map(
+                    (dropdownBodyItem) => dropdownBodyItem.innerText,
+                );
                 const bestMatch = getBestMatch({ items: itemTexts, text });
                 nextActiveIndex = itemTexts.findIndex((text) => text === bestMatch);
             }
 
             if (nextActiveIndex === -1 || nextActiveIndex === currentActiveIndex) return;
 
-            const currentActiveItem = dropdownBodyItems[currentActiveIndex];
-            if (currentActiveItem) {
-                delete currentActiveItem.dataset.uktdropdownActive;
-            }
+            // Clear any existing active dropdown body item state
+            dropdownBodyItems.forEach(({ dataset }, index) => {
+                if (index === nextActiveIndex || !dataset.uktdropdownActive) return;
+                delete dataset.uktdropdownActive;
+            });
 
             const nextActiveItem = dropdownBodyItems[nextActiveIndex];
             if (nextActiveItem) {
@@ -184,7 +199,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                 }
             }
         },
-        [dropdownBodyItems],
+        [dropdownBodyItems, dropdownBodyItemsCount, getCurrentActiveIndex],
     );
 
     const handleKeyDown = useCallback(
