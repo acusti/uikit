@@ -188,7 +188,15 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
     );
 
     const handleKeyDown = useCallback(
-        ({ key }: React.KeyboardEvent<HTMLElement>) => {
+        (event: React.KeyboardEvent<HTMLElement>) => {
+            const { key } = event;
+
+            const onEventHandled = () => {
+                event.stopPropagation();
+                event.preventDefault();
+                currentInputMethodRef.current = 'keyboard';
+            };
+
             let isEditingCharacters = /^[A-Za-z0-9]$/.test(key);
             // User could also be editing characters if there are already characters entered
             // and they are hitting delete or spacebar
@@ -197,7 +205,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             }
 
             if (isEditingCharacters) {
-                currentInputMethodRef.current = 'keyboard';
+                onEventHandled();
                 if (key === 'Backspace') {
                     enteredCharactersRef.current = enteredCharactersRef.current.slice(
                         0,
@@ -224,13 +232,13 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
             switch (key) {
                 case 'Escape':
                     if (isOpen) {
-                        currentInputMethodRef.current = 'keyboard';
+                        onEventHandled();
                         closeDropdown();
                     }
                     return;
                 case ' ':
                 case 'Enter':
-                    currentInputMethodRef.current = 'keyboard';
+                    onEventHandled();
                     if (isOpen) {
                         closeDropdown();
                     } else {
@@ -238,11 +246,11 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                     }
                     return;
                 case 'ArrowUp':
-                    currentInputMethodRef.current = 'keyboard';
+                    onEventHandled();
                     setActiveItem({ indexAddend: -1 });
                     return;
                 case 'ArrowDown':
-                    currentInputMethodRef.current = 'keyboard';
+                    onEventHandled();
                     setActiveItem({ indexAddend: 1 });
                     return;
             }
