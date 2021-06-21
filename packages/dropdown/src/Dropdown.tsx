@@ -204,7 +204,7 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
 
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLElement>) => {
-            const { key } = event;
+            const { altKey, key, metaKey } = event;
 
             const onEventHandled = () => {
                 event.stopPropagation();
@@ -262,15 +262,23 @@ const Dropdown: React.FC<Props> = ({ children, className, isOpenOnMount, styles 
                     return;
                 case 'ArrowUp':
                     onEventHandled();
-                    setActiveItem({ indexAddend: -1 });
+                    if (altKey || metaKey) {
+                        setActiveItem({ index: 0 });
+                    } else {
+                        setActiveItem({ indexAddend: -1 });
+                    }
                     return;
                 case 'ArrowDown':
                     onEventHandled();
-                    setActiveItem({ indexAddend: 1 });
+                    if (altKey || metaKey) {
+                        setActiveItem({ index: dropdownBodyItemsCount - 1 });
+                    } else {
+                        setActiveItem({ indexAddend: 1 });
+                    }
                     return;
             }
         },
-        [closeDropdown, isOpen, setActiveItem],
+        [closeDropdown, dropdownBodyItemsCount, isOpen, setActiveItem],
     );
 
     const handleMouseDown = useCallback(
