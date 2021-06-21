@@ -8,7 +8,6 @@ export type Props = {
     className?: string;
     isOpenOnMount?: boolean;
     onChangeItem?: (payload: { element: HTMLElement; index: number }) => void;
-    styles?: string;
 };
 
 const { Children, Fragment, useCallback, useRef, useState } = React;
@@ -60,7 +59,6 @@ const Dropdown: React.FC<Props> = ({
     className,
     isOpenOnMount,
     onChangeItem,
-    styles,
 }) => {
     const childrenCount = Children.count(children);
     if (childrenCount !== 2) {
@@ -391,10 +389,7 @@ const Dropdown: React.FC<Props> = ({
     }, []);
 
     const styleElement = ownerDocument ? (
-        <Fragment>
-            <Style ownerDocument={ownerDocument}>{BASE_STYLES}</Style>
-            {styles ? <Style ownerDocument={ownerDocument}>{styles}</Style> : null}
-        </Fragment>
+        <Style ownerDocument={ownerDocument}>{BASE_STYLES}</Style>
     ) : null;
 
     return (
