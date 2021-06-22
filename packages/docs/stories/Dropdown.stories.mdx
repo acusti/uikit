@@ -29,6 +29,22 @@ of macOS.
     padding: 4px 8px;
     margin: 4px 0;
 }
+.css-lengths-wrapper {
+    display: flex;
+}
+.css-lengths .uktdropdown-trigger {
+    transform: rotateZ(90deg);
+    font-weight: 700;
+    font-size: 20px;
+    padding: 0 13px;
+    color: #666;
+    background: transparent;
+    border: none;
+}
+.css-lengths .uktdropdown-body {
+    left: auto;
+    right: 0px;
+}
 `}</style>
 
 <Canvas>
@@ -103,26 +119,29 @@ of macOS.
         }}
     >
         {(args) => (
-            <Dropdown {...args}>
+            <div className="css-lengths-wrapper">
                 <CSSValueInput
                     cssValueType="length"
                     label={null}
                     placeholder="12px"
                     unit="px"
                 />
-                <ul>
-                    <li>0px</li>
-                    <li>4px</li>
-                    <li>9px</li>
-                    <li>18px</li>
-                    <li>36px</li>
-                    <li>54px</li>
-                    <li>72px</li>
-                    <li>144px</li>
-                    <li>167px</li>
-                    <li>198px</li>
-                </ul>
-            </Dropdown>
+                <Dropdown {...args}>
+                    ›
+                    <ul>
+                        <li>0px</li>
+                        <li>4px</li>
+                        <li>9px</li>
+                        <li>18px</li>
+                        <li>36px</li>
+                        <li>54px</li>
+                        <li>72px</li>
+                        <li>144px</li>
+                        <li>167px</li>
+                        <li>198px</li>
+                    </ul>
+                </Dropdown>
+            </div>
         )}
     </Story>
     <Story
