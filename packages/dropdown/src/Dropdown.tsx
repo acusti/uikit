@@ -55,7 +55,7 @@ const BASE_STYLES = `
     background-color: var(--uktdropdown-body-bg-color);
     box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.25);
 }
-.${BODY_CLASS_NAME} [data-uktdropdown-active] {
+.${BODY_CLASS_NAME} [data-ukt-active] {
     background-color: var(--uktdropdown-body-bg-color-hover);
     color: var(--uktdropdown-body-color-hover);
 }
@@ -130,8 +130,8 @@ const Dropdown: React.FC<Props> = ({
     const getCurrentActiveIndex = useCallback(
         () =>
             dropdownBodyItems
-                ? dropdownBodyItems.findIndex(
-                      (dropdownBodyItem) => dropdownBodyItem.dataset.uktdropdownActive,
+                ? dropdownBodyItems.findIndex((dropdownBodyItem) =>
+                      dropdownBodyItem.hasAttribute('data-ukt-active'),
                   )
                 : -1,
         [dropdownBodyItems],
@@ -183,14 +183,16 @@ const Dropdown: React.FC<Props> = ({
             if (nextActiveIndex === -1 || nextActiveIndex === currentActiveIndex) return;
 
             // Clear any existing active dropdown body item state
-            dropdownBodyItems.forEach(({ dataset }, index) => {
-                if (index === nextActiveIndex || !dataset.uktdropdownActive) return;
-                delete dataset.uktdropdownActive;
+            dropdownBodyItems.forEach((dropdownBodyItem, index) => {
+                if (index === nextActiveIndex) return;
+                if (!dropdownBodyItem.hasAttribute('data-ukt-active')) return;
+
+                delete dropdownBodyItem.dataset.uktActive;
             });
 
             const nextActiveItem = dropdownBodyItems[nextActiveIndex];
             if (nextActiveItem) {
-                nextActiveItem.dataset.uktdropdownActive = '1';
+                nextActiveItem.dataset.uktActive = '';
                 // If dropdown body element has at least 15px of overflow,
                 // verify that next active item is visible and scroll to it if it isn’t
                 const dropdownBody = dropdownBodyItems[0].closest('.' + BODY_CLASS_NAME);
