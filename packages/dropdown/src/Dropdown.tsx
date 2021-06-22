@@ -395,16 +395,24 @@ const Dropdown: React.FC<Props> = ({
             return;
         }
         // If mounting the dropdown body, find the list items
-        let { children } = ref;
-        while (children.length === 1) {
-            if (!children[0].children) break;
-            children = children[0].children;
+        let items: NodeListOf<Element> | HTMLCollection = ref.querySelectorAll(
+            '[data-ukt-item], [data-ukt-value]:not([data-ukt-value=""])',
+        );
+        // If no items found via [data-ukt-item] selector or non-empty [data-ukt-value] selector,
+        // use first instance of multiple children found
+        if (!items.length) {
+            items = ref.children;
+            while (items.length === 1) {
+                if (!items[0].children) break;
+                items = items[0].children;
+            }
+            // If unable to find an element with more than one child, treat direct child as items
+            if (items.length === 1) {
+                items = ref.children;
+            }
         }
-        // If unable to find an element with more than one child, treat direct child as children
-        if (children.length === 1) {
-            children = ref.children;
-        }
-        setDropdownBodyItems(Array.from(children) as Array<HTMLElement>);
+
+        setDropdownBodyItems(Array.from(items) as Array<HTMLElement>);
     }, []);
 
     const styleElement = ownerDocument ? (
