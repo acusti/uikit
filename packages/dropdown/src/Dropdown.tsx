@@ -64,6 +64,8 @@ const BASE_STYLES = `
 const CHILDREN_ERROR =
     '@acusti/dropdown requires props.children to contain exactly two elements: the dropdown trigger and the dropdown body. Received %s children.';
 
+type Item = { label: string; value: string };
+
 const Dropdown: React.FC<Props> = ({
     children,
     className,
@@ -82,6 +84,7 @@ const Dropdown: React.FC<Props> = ({
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
+    const [currentItem, setCurrentItem] = useState<Item | null>(null);
     const [dropdownBodyItems, setDropdownBodyItems] = useState<Array<HTMLElement> | null>(
         null,
     );
@@ -222,18 +225,21 @@ const Dropdown: React.FC<Props> = ({
 
     const handleChangeItem = useCallback(() => {
         if (isOpen) closeDropdown();
-        if (!dropdownBodyItems || !onChangeItem) return;
+        if (!dropdownBodyItems) return;
 
         const index = getCurrentActiveIndex();
         const element = dropdownBodyItems[index];
         if (!element) return;
 
-        onChangeItem({
-            element,
-            index,
-            value: element.dataset.uktValue || element.innerText,
-        });
-    }, [dropdownBodyItems, getCurrentActiveIndex, isOpen, onChangeItem]);
+        const label = element.innerText;
+        const value = element.dataset.uktValue || label;
+        if (currentItem?.value === value) return;
+
+        setCurrentItem({ label, value });
+        if (!onChangeItem) return;
+
+        onChangeItem({ element, index, value });
+    }, [currentItem, dropdownBodyItems, getCurrentActiveIndex, isOpen, onChangeItem]);
 
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLElement>) => {
