@@ -29,6 +29,14 @@ of macOS.
     padding: 4px 8px;
     margin: 4px 0;
 }
+.uktdropdown-body .heading {
+    color: #aaa;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 700;
+}
+
 .css-lengths-wrapper {
     display: flex;
 }
@@ -154,11 +162,19 @@ of macOS.
         {(args) => (
             <Dropdown {...args}>
                 View menu
-                <ul>
-                    <li>Save</li>
-                    <li>Edit</li>
-                    <li>Delete</li>
-                </ul>
+                <Fragment>
+                    <h4 className="heading">View</h4>
+                    <ul>
+                        <li data-ukt-item>Open</li>
+                        <li data-ukt-item>Preview</li>
+                    </ul>
+                    <h4 className="heading">Edit</h4>
+                    <ul>
+                        <li data-ukt-value="save-item">Save</li>
+                        <li data-ukt-value="edit-item">Edit</li>
+                        <li data-ukt-value="delete-item">Delete</li>
+                    </ul>
+                </Fragment>
             </Dropdown>
         )}
     </Story>
