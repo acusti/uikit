@@ -6,6 +6,7 @@ import * as React from 'react';
 export type Props = {
     children: [React.ReactNode, React.ReactNode];
     className?: string;
+    hasItems?: boolean;
     isOpenOnMount?: boolean;
     onChangeItem?: (payload: {
         element: HTMLElement;
@@ -69,6 +70,7 @@ type Item = { label: string; value: string };
 const Dropdown: React.FC<Props> = ({
     children,
     className,
+    hasItems = true,
     isOpenOnMount,
     onChangeItem,
 }) => {
@@ -258,7 +260,7 @@ const Dropdown: React.FC<Props> = ({
                 isEditingCharacters = key === ' ' || key === 'Backspace';
             }
 
-            if (isEditingCharacters) {
+            if (isEditingCharacters && hasItems) {
                 onEventHandled();
                 if (key === 'Backspace') {
                     enteredCharactersRef.current = enteredCharactersRef.current.slice(
@@ -294,7 +296,11 @@ const Dropdown: React.FC<Props> = ({
                 case 'Enter':
                     onEventHandled();
                     if (isOpen) {
-                        handleChangeItem();
+                        if (hasItems) {
+                            handleChangeItem();
+                        } else if (key === ' ') {
+                            closeDropdown();
+                        }
                     } else {
                         openDropdown();
                     }
@@ -317,7 +323,14 @@ const Dropdown: React.FC<Props> = ({
                     return;
             }
         },
-        [closeDropdown, dropdownBodyItemsCount, handleChangeItem, isOpen, setActiveItem],
+        [
+            closeDropdown,
+            dropdownBodyItemsCount,
+            handleChangeItem,
+            hasItems,
+            isOpen,
+            setActiveItem,
+        ],
     );
 
     const handleMouseDown = useCallback(
@@ -395,31 +408,34 @@ const Dropdown: React.FC<Props> = ({
         }
     }, []);
 
-    const handleBodyRef = useCallback((ref: HTMLElement | null) => {
-        if (!ref) {
-            setDropdownBodyItems(null);
-            return;
-        }
-        // If mounting the dropdown body, find the list items
-        let items: NodeListOf<Element> | HTMLCollection = ref.querySelectorAll(
-            '[data-ukt-item], [data-ukt-value]:not([data-ukt-value=""])',
-        );
-        // If no items found via [data-ukt-item] selector or non-empty [data-ukt-value] selector,
-        // use first instance of multiple children found
-        if (!items.length) {
-            items = ref.children;
-            while (items.length === 1) {
-                if (!items[0].children) break;
-                items = items[0].children;
+    const handleBodyRef = useCallback(
+        (ref: HTMLElement | null) => {
+            if (!ref || !hasItems) {
+                setDropdownBodyItems(null);
+                return;
             }
-            // If unable to find an element with more than one child, treat direct child as items
-            if (items.length === 1) {
+            // If mounting the dropdown body, find the list items
+            let items: NodeListOf<Element> | HTMLCollection = ref.querySelectorAll(
+                '[data-ukt-item], [data-ukt-value]:not([data-ukt-value=""])',
+            );
+            // If no items found via [data-ukt-item] selector or non-empty [data-ukt-value] selector,
+            // use first instance of multiple children found
+            if (!items.length) {
                 items = ref.children;
+                while (items.length === 1) {
+                    if (!items[0].children) break;
+                    items = items[0].children;
+                }
+                // If unable to find an element with more than one child, treat direct child as items
+                if (items.length === 1) {
+                    items = ref.children;
+                }
             }
-        }
 
-        setDropdownBodyItems(Array.from(items) as Array<HTMLElement>);
-    }, []);
+            setDropdownBodyItems(Array.from(items) as Array<HTMLElement>);
+        },
+        [hasItems],
+    );
 
     const styleElement = ownerDocument ? (
         <Style ownerDocument={ownerDocument}>{BASE_STYLES}</Style>
