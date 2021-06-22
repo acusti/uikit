@@ -231,7 +231,7 @@ const Dropdown: React.FC<Props> = ({
         onChangeItem({
             element,
             index,
-            value: element.dataset.value || element.innerText,
+            value: element.dataset.uktValue || element.innerText,
         });
     }, [dropdownBodyItems, getCurrentActiveIndex, isOpen, onChangeItem]);
 
