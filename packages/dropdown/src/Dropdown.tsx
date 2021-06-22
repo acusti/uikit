@@ -14,9 +14,10 @@ export type Props = {
     }) => void;
 };
 
-const { Children, Fragment, useCallback, useRef, useState } = React;
+const { Children, Fragment, useCallback, useMemo, useRef, useState } = React;
 
 const ROOT_CLASS_NAME = 'uktdropdown';
+const TRIGGER_CLASS_NAME = `${ROOT_CLASS_NAME}-trigger`;
 const BODY_CLASS_NAME = `${ROOT_CLASS_NAME}-body`;
 
 const BASE_STYLES = `
@@ -30,10 +31,15 @@ const BASE_STYLES = `
     --uktdropdown-body-pad-right: 12px;
     --uktdropdown-body-pad-top: 10px;
 }
+.${ROOT_CLASS_NAME},
+.${TRIGGER_CLASS_NAME} {
+    font-family: var(--uktdropdown-font-family);
+}
 .${ROOT_CLASS_NAME} {
     position: relative;
+}
+.${ROOT_CLASS_NAME} > * {
     cursor: default;
-    font-family: var(--uktdropdown-font-family);
 }
 .${BODY_CLASS_NAME} {
     box-sizing: border-box;
@@ -72,6 +78,7 @@ const Dropdown: React.FC<Props> = ({
         console.error(CHILDREN_ERROR, childrenCount);
     }
 
+    const firstChild = children[0];
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
@@ -402,10 +409,17 @@ const Dropdown: React.FC<Props> = ({
         <Style ownerDocument={ownerDocument}>{BASE_STYLES}</Style>
     ) : null;
 
+    const trigger = useMemo(() => {
+        // If firstChild isn’t a primitive value, don’t wrap it
+        if (firstChild && typeof firstChild === 'object') return firstChild;
+        // If firstChild is a primitive value, wrap it in a button
+        return <button className={TRIGGER_CLASS_NAME}>{firstChild}</button>;
+    }, [firstChild]);
+
     return (
         <Fragment>
             {styleElement}
-            <button
+            <div
                 className={classnames(ROOT_CLASS_NAME, className, { 'is-open': isOpen })}
                 // In react, onBlur and onFocus bubble like focusin and focusout
                 // Reference: https://github.com/facebook/react/issues/6410
@@ -418,13 +432,13 @@ const Dropdown: React.FC<Props> = ({
                 ref={handleRef}
                 tabIndex={0}
             >
-                {children[0]}
+                {trigger}
                 {isOpen ? (
                     <div className={BODY_CLASS_NAME} ref={handleBodyRef}>
                         {children[1]}
                     </div>
                 ) : null}
-            </button>
+            </div>
         </Fragment>
     );
 };
