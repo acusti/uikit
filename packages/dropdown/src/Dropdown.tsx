@@ -7,7 +7,11 @@ export type Props = {
     children: [React.ReactNode, React.ReactNode];
     className?: string;
     isOpenOnMount?: boolean;
-    onChangeItem?: (payload: { element: HTMLElement; index: number }) => void;
+    onChangeItem?: (payload: {
+        element: HTMLElement;
+        index: number;
+        value: string;
+    }) => void;
 };
 
 const { Children, Fragment, useCallback, useRef, useState } = React;
@@ -210,10 +214,16 @@ const Dropdown: React.FC<Props> = ({
     const handleChangeItem = useCallback(() => {
         if (isOpen) closeDropdown();
         if (!dropdownBodyItems || !onChangeItem) return;
+
         const index = getCurrentActiveIndex();
         const element = dropdownBodyItems[index];
         if (!element) return;
-        onChangeItem({ element, index });
+
+        onChangeItem({
+            element,
+            index,
+            value: element.dataset.value || element.innerText,
+        });
     }, [dropdownBodyItems, getCurrentActiveIndex, isOpen, onChangeItem]);
 
     const handleKeyDown = useCallback(
