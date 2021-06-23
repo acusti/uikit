@@ -16,6 +16,8 @@ export type Props = {
     label: string | null;
     max?: number;
     min?: number;
+    onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
+    onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
     onSubmitValue: (value: string) => unknown;
     placeholder?: string;
     step?: number;
@@ -37,6 +39,8 @@ const CSSValueInput: React.FC<Props> = ({
     label,
     max,
     min,
+    onKeyDown,
+    onKeyUp,
     onSubmitValue,
     placeholder,
     step = 1,
@@ -107,6 +111,8 @@ const CSSValueInput: React.FC<Props> = ({
 
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (onKeyDown) onKeyDown(event);
+
             const input = event.currentTarget;
             if (event.key === 'Enter' || event.key === 'Escape') {
                 input.blur();
@@ -147,6 +153,7 @@ const CSSValueInput: React.FC<Props> = ({
                     onBlur={handleBlur}
                     onFocus={handleFocus}
                     onKeyDown={handleKeyDown}
+                    onKeyUp={onKeyUp}
                     placeholder={placeholder}
                     ref={inputRef}
                     type="text"
