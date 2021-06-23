@@ -62,9 +62,12 @@ const CSSValueInput: React.FC<Props> = ({
 
     const handleSubmitValue = useCallback(() => {
         if (!inputRef.current) return;
+        // If value hasn’t changed, do not trigger onSubmitValue
+        const currentValue = inputRef.current.value;
+        if (currentValue === submittedValueRef.current) return;
 
-        submittedValueRef.current = inputRef.current.value;
-        onSubmitValue(inputRef.current.value);
+        submittedValueRef.current = currentValue;
+        onSubmitValue(currentValue);
     }, [onSubmitValue]);
 
     const handleBlur = useCallback(() => {
