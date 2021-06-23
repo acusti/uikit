@@ -166,7 +166,10 @@ const CSSValueInput: React.FC<Props> = ({
     );
 
     return (
-        <label className={classnames(ROOT_CLASS_NAME, className)} title={title}>
+        <label
+            className={classnames(ROOT_CLASS_NAME, className, { disabled })}
+            title={title}
+        >
             {icon && <div className={`${ROOT_CLASS_NAME}-icon`}>{icon}</div>}
             {label && (
                 <div className={`${ROOT_CLASS_NAME}-label`}>
