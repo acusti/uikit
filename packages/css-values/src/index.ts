@@ -3,9 +3,10 @@ const CSS_UNIT_REGEX = Object.freeze({
     angle: /(deg|grad|rad|turn)\s*$/i,
     // https://developer.mozilla.org/en-US/docs/Web/CSS/length with addition of %
     length: /(em|rem|ch|ex|vh|vw|vmin|vmax|px|cm|mm|in|pc|pt|%)\s*$/i,
+    // custom (non-spec-defined) value type that only allows percentages
+    percent: /(%)\s*$/,
     // https://developer.mozilla.org/en-US/docs/Web/CSS/time
     time: /(s|ms)\s*$/i,
-    percent: /(%)\s*$/,
 });
 
 // CSS value types https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Values_and_Units#Dimensions
