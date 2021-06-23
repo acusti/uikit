@@ -16,7 +16,7 @@ export type Props = {
     label: string | null;
     max?: number;
     min?: number;
-    onSubmit: (value: string) => unknown;
+    onSubmitValue: (value: string) => unknown;
     placeholder?: string;
     step?: number;
     title?: string;
@@ -37,7 +37,7 @@ const CSSValueInput: React.FC<Props> = ({
     label,
     max,
     min,
-    onSubmit,
+    onSubmitValue,
     placeholder,
     step = 1,
     title,
@@ -71,9 +71,9 @@ const CSSValueInput: React.FC<Props> = ({
         (valueToSubmit) => {
             const valueWithUnit = getValueWithUnit(valueToSubmit);
             setInputValue(valueWithUnit);
-            if (onSubmit) onSubmit(valueWithUnit);
+            if (onSubmitValue) onSubmitValue(valueWithUnit);
         },
-        [getValueWithUnit, onSubmit],
+        [getValueWithUnit, onSubmitValue],
     );
 
     const handleBlur = useCallback(() => {
