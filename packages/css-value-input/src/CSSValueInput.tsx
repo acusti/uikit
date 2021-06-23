@@ -71,7 +71,7 @@ const CSSValueInput: React.FC<Props> = ({
         (valueToSubmit) => {
             const valueWithUnit = getValueWithUnit(valueToSubmit);
             setInputValue(valueWithUnit);
-            if (onSubmitValue) onSubmitValue(valueWithUnit);
+            onSubmitValue(valueWithUnit);
         },
         [getValueWithUnit, onSubmitValue],
     );
@@ -104,10 +104,10 @@ const CSSValueInput: React.FC<Props> = ({
                 getCSSValueAsNumber(currentValue) + modifier,
                 5,
             );
-            if (typeof max === 'number') {
+            if (typeof max === 'number' && Number.isFinite(max)) {
                 nextValue = Math.min(max, nextValue);
             }
-            if (typeof min === 'number') {
+            if (typeof min === 'number' && Number.isFinite(min)) {
                 nextValue = Math.max(min, nextValue);
             }
 
