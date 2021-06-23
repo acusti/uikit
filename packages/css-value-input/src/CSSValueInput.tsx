@@ -78,7 +78,11 @@ const CSSValueInput: React.FC<Props> = ({
         onSubmitValue(currentValue);
     }, [onSubmitValue]);
 
+    const isInitialSelectionRef = useRef<boolean>(true);
+
     const handleBlur = useCallback(() => {
+        // When input loses focus, reset isInitialSelection to true for next onSelect event
+        isInitialSelectionRef.current = true;
         if (!inputRef.current) return;
 
         inputRef.current.value = getCSSValueWithUnit({
@@ -90,16 +94,24 @@ const CSSValueInput: React.FC<Props> = ({
         handleSubmitValue();
     }, [cssValueType, handleSubmitValue, unit]);
 
-    const handleFocus = useCallback(() => {
-        const inputElement = inputRef.current;
-        if (!inputElement) return;
-        // Select contents of input in around 4(ish) frames to allow re-renders
-        setTimeout(() => {
-            // If inputElement is still focused, select the text of its contents
-            if (inputElement.ownerDocument.activeElement === inputElement) {
-                inputElement.select();
-            }
-        }, 66);
+    // NOTE Selecting the contents of the input onFocus makes for the best UX,
+    // but it doesn’t work in Safari, so we use the initial onSelect event instead
+    const handleSelect = useCallback(() => {
+        // Do nothing if this isn’t the initial select-on-focus event
+        if (!isInitialSelectionRef.current) return;
+        // This is the initial select-on-focus event, so reset isInitialSelection to false
+        isInitialSelectionRef.current = false;
+        const input = inputRef.current;
+        // Do nothing if input has no value
+        if (!input || !input.value) return;
+        // Do nothing if input is no longer the document’s activeElement
+        if (input.ownerDocument.activeElement !== input) return;
+        // Do nothing if input’s contents are already selected
+        const valueLength = input.value.length;
+        if (input.selectionStart === 0 && input.selectionEnd === valueLength) return;
+
+        input.selectionStart = 0;
+        input.selectionEnd = valueLength;
     }, []);
 
     const getNextValue = useCallback(
@@ -185,9 +197,9 @@ const CSSValueInput: React.FC<Props> = ({
                     disabled={disabled}
                     onBlur={handleBlur}
                     onChange={onChange}
-                    onFocus={handleFocus}
                     onKeyDown={handleKeyDown}
                     onKeyUp={onKeyUp}
+                    onSelect={handleSelect}
                     placeholder={placeholder}
                     ref={inputRef}
                     type="text"
