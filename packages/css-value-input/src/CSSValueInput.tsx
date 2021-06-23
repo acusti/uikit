@@ -1,6 +1,7 @@
 import {
     CSSValueType,
     DEFAULT_CSS_VALUE_TYPE,
+    DEFAULT_UNIT_BY_CSS_VALUE_TYPE,
     getCSSValueAsNumber,
     getCSSValueWithUnit,
     getUnitFromCSSValue,
@@ -24,7 +25,7 @@ export type Props = {
     placeholder?: string;
     step?: number;
     title?: string;
-    unit: string;
+    unit?: string;
     value?: string;
 };
 
@@ -47,7 +48,7 @@ const CSSValueInput: React.FC<Props> = ({
     placeholder,
     step = 1,
     title,
-    unit,
+    unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
     value,
 }) => {
     const inputRef = useRef<HTMLInputElement | null>(null);

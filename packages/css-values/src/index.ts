@@ -53,3 +53,10 @@ export const getMillisecondsFromCSSValue = (value: string | number): number => {
 };
 
 export const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';
+
+export const DEFAULT_UNIT_BY_CSS_VALUE_TYPE = Object.freeze({
+    angle: 'deg',
+    length: 'px',
+    percent: '%',
+    time: 's',
+});
