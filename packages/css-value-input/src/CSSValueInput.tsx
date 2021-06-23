@@ -44,7 +44,6 @@ const CSSValueInput: React.FC<Props> = ({
     unit,
     value,
 }) => {
-    const defaultValue = placeholder || `0${unit}`;
     const [inputValue, setInputValue] = useState<string>(value || placeholder || '');
     const inputRef = useRef<HTMLInputElement | null>(null);
 
@@ -133,7 +132,7 @@ const CSSValueInput: React.FC<Props> = ({
             event.preventDefault();
 
             const nextValue = getNextValue({
-                currentValue: event.currentTarget.value || placeholder || defaultValue,
+                currentValue: event.currentTarget.value || placeholder || `0${unit}`,
                 multiplier: event.shiftKey ? 10 : 1,
                 signum: event.key === 'ArrowUp' ? 1 : -1,
             });
@@ -145,7 +144,7 @@ const CSSValueInput: React.FC<Props> = ({
 
             handleSubmit(nextValue);
         },
-        [getNextValue, handleSubmit, placeholder],
+        [getNextValue, handleSubmit, placeholder, unit],
     );
 
     return (
