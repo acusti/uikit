@@ -51,3 +51,5 @@ export const getMillisecondsFromCSSValue = (value: string | number): number => {
     const multiplier = /[^m]s/i.test(value) ? 1000 : 1;
     return valueAsNumber * multiplier;
 };
+
+export const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';

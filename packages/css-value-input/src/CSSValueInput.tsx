@@ -1,5 +1,6 @@
 import {
     CSSValueType,
+    DEFAULT_CSS_VALUE_TYPE,
     getCSSValueAsNumber,
     getCSSValueWithUnit,
     getUnitFromCSSValue,
@@ -29,7 +30,6 @@ export type Props = {
 
 const { useCallback, useEffect, useRef } = React;
 
-const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
 const CSSValueInput: React.FC<Props> = ({
