@@ -95,7 +95,10 @@ const CSSValueInput: React.FC<Props> = ({
         if (!inputElement) return;
         // Select contents of input in around 4(ish) frames to allow re-renders
         setTimeout(() => {
-            inputElement.select();
+            // If inputElement is still focused, select the text of its contents
+            if (inputElement.ownerDocument.activeElement === inputElement) {
+                inputElement.select();
+            }
         }, 66);
     }, []);
 
