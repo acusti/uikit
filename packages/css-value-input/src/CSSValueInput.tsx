@@ -49,12 +49,23 @@ const CSSValueInput: React.FC<Props> = ({
     value,
 }) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
+    const submittedValueRef = useRef<string>(value || '');
 
-    // If props.value changes, override value from it
+    // If props.value changes, override input value from it
     useEffect(() => {
-        if (!inputRef.current) return;
-        inputRef.current.value = value || '';
+        const updatedValue = value || '';
+        submittedValueRef.current = updatedValue;
+        if (inputRef.current) {
+            inputRef.current.value = updatedValue;
+        }
     }, [value]);
+
+    const handleSubmitValue = useCallback(() => {
+        if (!inputRef.current) return;
+
+        submittedValueRef.current = inputRef.current.value;
+        onSubmitValue(inputRef.current.value);
+    }, [onSubmitValue]);
 
     const handleBlur = useCallback(() => {
         if (!inputRef.current) return;
@@ -65,8 +76,8 @@ const CSSValueInput: React.FC<Props> = ({
             value: inputRef.current.value,
         });
 
-        onSubmitValue(inputRef.current.value);
-    }, [cssValueType, onSubmitValue, unit]);
+        handleSubmitValue();
+    }, [cssValueType, handleSubmitValue, unit]);
 
     const handleFocus = useCallback(() => {
         const inputElement = inputRef.current;
@@ -114,7 +125,12 @@ const CSSValueInput: React.FC<Props> = ({
             if (onKeyDown) onKeyDown(event);
 
             const input = event.currentTarget;
-            if (event.key === 'Enter' || event.key === 'Escape') {
+
+            if (event.key === 'Escape') {
+                input.value = submittedValueRef.current;
+            }
+
+            if (event.key === 'Escape' || event.key === 'Enter') {
                 input.blur();
                 return;
             }
@@ -132,10 +148,10 @@ const CSSValueInput: React.FC<Props> = ({
             input.value = nextValue;
 
             if (!event.repeat) {
-                onSubmitValue(nextValue);
+                handleSubmitValue();
             }
         },
-        [getNextValue, onSubmitValue, placeholder, unit],
+        [getNextValue, handleSubmitValue, placeholder, unit],
     );
 
     return (
