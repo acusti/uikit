@@ -24,7 +24,7 @@ export type Props = {
     value?: string;
 };
 
-const { useCallback, useEffect, useRef, useState } = React;
+const { useCallback, useEffect, useRef } = React;
 
 const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';
 const ROOT_CLASS_NAME = 'cssvalueinput';
@@ -44,40 +44,25 @@ const CSSValueInput: React.FC<Props> = ({
     unit,
     value,
 }) => {
-    const [inputValue, setInputValue] = useState<string>(value || placeholder || '');
     const inputRef = useRef<HTMLInputElement | null>(null);
 
     // If props.value changes, override value from it
     useEffect(() => {
-        setInputValue(value || '');
+        if (!inputRef.current) return;
+        inputRef.current.value = value || '';
     }, [value]);
 
-    const getValueWithUnit = useCallback(
-        (rawValue) =>
-            getCSSValueWithUnit({
-                cssValueType,
-                defaultUnit: unit,
-                value: rawValue,
-            }),
-        [cssValueType, unit],
-    );
-
-    const handleChange = useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-        setInputValue(event.currentTarget.value);
-    }, []);
-
-    const handleSubmit = useCallback(
-        (valueToSubmit) => {
-            const valueWithUnit = getValueWithUnit(valueToSubmit);
-            setInputValue(valueWithUnit);
-            onSubmitValue(valueWithUnit);
-        },
-        [getValueWithUnit, onSubmitValue],
-    );
-
     const handleBlur = useCallback(() => {
-        handleSubmit(inputValue);
-    }, [inputValue]);
+        if (!inputRef.current) return;
+
+        inputRef.current.value = getCSSValueWithUnit({
+            cssValueType,
+            defaultUnit: unit,
+            value: inputRef.current.value,
+        });
+
+        onSubmitValue(inputRef.current.value);
+    }, [cssValueType, onSubmitValue, unit]);
 
     const handleFocus = useCallback(() => {
         const inputElement = inputRef.current;
@@ -122,8 +107,9 @@ const CSSValueInput: React.FC<Props> = ({
 
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLInputElement>) => {
+            const input = event.currentTarget;
             if (event.key === 'Enter' || event.key === 'Escape') {
-                if (inputRef.current) inputRef.current.blur();
+                input.blur();
                 return;
             }
 
@@ -137,14 +123,13 @@ const CSSValueInput: React.FC<Props> = ({
                 signum: event.key === 'ArrowUp' ? 1 : -1,
             });
 
-            if (event.repeat) {
-                setInputValue(nextValue);
-                return;
-            }
+            input.value = nextValue;
 
-            handleSubmit(nextValue);
+            if (!event.repeat) {
+                onSubmitValue(nextValue);
+            }
         },
-        [getNextValue, handleSubmit, placeholder, unit],
+        [getNextValue, onSubmitValue, placeholder, unit],
     );
 
     return (
@@ -157,15 +142,14 @@ const CSSValueInput: React.FC<Props> = ({
             )}
             <div className={`${ROOT_CLASS_NAME}-value`}>
                 <input
+                    defaultValue={value || placeholder || ''}
                     disabled={disabled}
                     onBlur={handleBlur}
-                    onChange={handleChange}
                     onFocus={handleFocus}
                     onKeyDown={handleKeyDown}
                     placeholder={placeholder}
                     ref={inputRef}
                     type="text"
-                    value={inputValue}
                 />
             </div>
         </label>
