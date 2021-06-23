@@ -3,7 +3,7 @@
     "version": "0.7.0",
     "type": "module",
     "exports": "./dist/CSSValueInput.js",
-    "module": "./dist/CSSValueInput.js",
+    "main": "./dist/CSSValueInput.js",
     "types": "./dist/CSSValueInput.d.ts",
     "engines": {
         "node": ">=12"
