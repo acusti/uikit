@@ -2,7 +2,11 @@ import CSSValueInput from '@acusti/css-value-input';
 import { SYSTEM_UI_FONT } from '@acusti/styling';
 import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
 
-<Meta title="UIKit/Controls/CSSValueInput" component={CSSValueInput} />
+<Meta
+    argTypes={{ onSubmitValue: { action: 'submitted' } }}
+    component={CSSValueInput}
+    title="UIKit/Controls/CSSValueInput"
+/>
 
 # CSSValueInput
 
@@ -56,7 +60,6 @@ Illustrator or XD.
             className: 'my-special-input',
             cssValueType: 'length',
             label: 'Font size',
-            onSubmit: () => {},
             placeholder: '1rem',
             unit: 'rem',
             value: '24px',
@@ -72,7 +75,6 @@ Illustrator or XD.
             label: 'Duration',
             max: 20,
             min: 0,
-            onSubmit: () => {},
             placeholder: '0.25s',
             step: 0.1,
             unit: 's',
@@ -105,7 +107,6 @@ Illustrator or XD.
                 </svg>
             ),
             label: 'Rotate Z',
-            onSubmit: () => {},
             placeholder: '0deg',
             step: 45,
             unit: 'deg',
@@ -120,7 +121,6 @@ Illustrator or XD.
             cssValueType: 'percent',
             label: 'Width',
             min: 0,
-            onSubmit: () => {},
             placeholder: '100%',
             step: 10,
             unit: '%',
@@ -135,7 +135,6 @@ Illustrator or XD.
             className: 'my-special-input',
             cssValueType: 'length',
             label: null,
-            onSubmit: () => {},
             placeholder: '1rem',
             title: 'No label',
             unit: 'rem',
