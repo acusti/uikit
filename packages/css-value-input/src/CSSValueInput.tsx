@@ -15,7 +15,7 @@ export type Props = {
     cssValueType?: CSSValueType;
     disabled?: boolean;
     icon?: React.ReactNode;
-    label: string | null;
+    label?: string;
     max?: number;
     min?: number;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => unknown;
