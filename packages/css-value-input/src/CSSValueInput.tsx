@@ -67,6 +67,11 @@ const CSSValueInput: React.FC<Props> = ({
         // If value hasn’t changed, do not trigger onSubmitValue
         const currentValue = inputRef.current.value;
         if (currentValue === submittedValueRef.current) return;
+        // If current value isn’t a number, revert to last submitted value
+        if (!Number.isFinite(getCSSValueAsNumber(currentValue))) {
+            inputRef.current.value = submittedValueRef.current;
+            return;
+        }
 
         submittedValueRef.current = currentValue;
         onSubmitValue(currentValue);
