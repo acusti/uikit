@@ -442,8 +442,8 @@ const Dropdown: React.FC<Props> = ({
     ) : null;
 
     const trigger = useMemo(() => {
-        // If firstChild isn’t a primitive value, don’t wrap it
-        if (firstChild && typeof firstChild === 'object') return firstChild;
+        // If firstChild is a React element, don’t wrap it
+        if (React.isValidElement(firstChild)) return firstChild;
         // If firstChild is a primitive value, wrap it in a button
         return <button className={TRIGGER_CLASS_NAME}>{firstChild}</button>;
     }, [firstChild]);
