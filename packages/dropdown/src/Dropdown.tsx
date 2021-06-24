@@ -102,20 +102,20 @@ const Dropdown: React.FC<Props> = ({
     );
     const enteredCharactersRef = useRef<string>('');
 
-    const ensureFocus = useCallback(() => {
+    const getIsFocused = useCallback(() => {
         const dropdownElement = dropdownElementRef.current;
-        if (!dropdownElement) return;
+        if (!dropdownElement) return false;
 
         const { activeElement } = dropdownElement.ownerDocument;
-        if (
-            dropdownElement === activeElement ||
-            dropdownElement.contains(activeElement)
-        ) {
-            return;
-        }
-
-        dropdownElement.focus();
+        return (
+            dropdownElement === activeElement || dropdownElement.contains(activeElement)
+        );
     }, []);
+
+    const ensureFocus = useCallback(() => {
+        if (!dropdownElementRef.current || getIsFocused()) return;
+        dropdownElementRef.current.focus();
+    }, [getIsFocused]);
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
