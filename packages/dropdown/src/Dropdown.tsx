@@ -230,12 +230,18 @@ const Dropdown: React.FC<Props> = ({
         if (isOpen) closeDropdown();
         if (!dropdownBodyItems) return;
 
+        let label = '';
+        let value = '';
         const index = getCurrentActiveIndex();
-        const element = dropdownBodyItems[index];
-        if (!element) return;
+        const element = dropdownBodyItems[index] || null;
+        if (element) {
+            label = element.innerText;
+            value = element.dataset.uktValue || label;
+            if (inputElementRef.current) {
+                inputElementRef.current.value = label;
+            }
+        }
 
-        const label = element.innerText;
-        const value = element.dataset.uktValue || label;
         if (currentItem?.value === value) return;
 
         setCurrentItem({ label, value });
@@ -337,6 +343,7 @@ const Dropdown: React.FC<Props> = ({
     const handleMouseDown = useCallback(
         ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
             if (isOpen) return;
+
             openDropdown();
             setIsOpening(true);
             mouseDownPositionRef.current = { clientX, clientY };
