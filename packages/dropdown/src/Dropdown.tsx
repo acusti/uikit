@@ -4,7 +4,8 @@ import classnames from 'classnames';
 import * as React from 'react';
 
 export type Props = {
-    children: [React.ReactNode, React.ReactNode];
+    // Can take a single React element (e.g. ReactChild) or exactly two renderable children
+    children: React.ReactChild | [React.ReactNode, React.ReactNode];
     className?: string;
     hasItems?: boolean;
     isOpenOnMount?: boolean;
@@ -15,7 +16,7 @@ export type Props = {
     }) => void;
 };
 
-const { Children, Fragment, useCallback, useMemo, useRef, useState } = React;
+const { Children, Fragment, useCallback, useRef, useState } = React;
 
 const ROOT_CLASS_NAME = 'uktdropdown';
 const TRIGGER_CLASS_NAME = `${ROOT_CLASS_NAME}-trigger`;
@@ -63,7 +64,7 @@ const BASE_STYLES = `
 `;
 
 const CHILDREN_ERROR =
-    '@acusti/dropdown requires props.children to contain exactly two elements: the dropdown trigger and the dropdown body. Received %s children.';
+    '@acusti/dropdown requires props.children to contain either one element, the dropdown body, or two elements: the dropdown trigger and the dropdown body. Received %s elements.';
 
 type Item = { label: string; value: string };
 
@@ -75,14 +76,13 @@ const Dropdown: React.FC<Props> = ({
     onSubmitItem,
 }) => {
     const childrenCount = Children.count(children);
-    if (childrenCount !== 2) {
-        if (childrenCount < 2) {
+    if (childrenCount !== 1 && childrenCount !== 2) {
+        if (childrenCount === 0) {
             throw new Error(CHILDREN_ERROR.replace('%s', childrenCount.toString()));
         }
         console.error(CHILDREN_ERROR, childrenCount);
     }
 
-    const firstChild = children[0];
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
@@ -245,7 +245,7 @@ const Dropdown: React.FC<Props> = ({
 
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLElement>) => {
-            const { altKey, key, metaKey } = event;
+            const { altKey, ctrlKey, key, metaKey } = event;
 
             const onEventHandled = () => {
                 event.stopPropagation();
@@ -441,12 +441,10 @@ const Dropdown: React.FC<Props> = ({
         <Style ownerDocument={ownerDocument}>{BASE_STYLES}</Style>
     ) : null;
 
-    const trigger = useMemo(() => {
-        // If firstChild is a React element, don’t wrap it
-        if (React.isValidElement(firstChild)) return firstChild;
-        // If firstChild is a primitive value, wrap it in a button
-        return <button className={TRIGGER_CLASS_NAME}>{firstChild}</button>;
-    }, [firstChild]);
+    let trigger = childrenCount > 1 ? children[0] : null;
+    if (!React.isValidElement(trigger)) {
+        trigger = <button className={TRIGGER_CLASS_NAME}>{trigger}</button>;
+    }
 
     return (
         <Fragment>
@@ -467,7 +465,7 @@ const Dropdown: React.FC<Props> = ({
                 {trigger}
                 {isOpen ? (
                     <div className={BODY_CLASS_NAME} ref={handleBodyRef}>
-                        {children[1]}
+                        {children[1] || children[0] || children}
                     </div>
                 ) : null}
             </div>
