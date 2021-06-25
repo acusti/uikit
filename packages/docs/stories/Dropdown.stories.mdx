@@ -83,14 +83,15 @@ of macOS.
 
 <Canvas>
     <Story
-        name="States Dropdown"
         args={{
             className: 'states-dropdown',
+            isSearchable: true,
+            placeholder: 'Choose a state…',
         }}
+        name="States Dropdown"
     >
         {(args) => (
             <Dropdown {...args}>
-                States
                 <ul>
                     <li>Alabama</li>
                     <li>Alaska</li>
@@ -147,10 +148,10 @@ of macOS.
         )}
     </Story>
     <Story
-        name="CSS Lengths Dropdown"
         args={{
             className: 'css-lengths',
         }}
+        name="CSS Lengths Dropdown"
     >
         {(args) => (
             <div className="css-lengths-wrapper">
@@ -178,11 +179,11 @@ of macOS.
         )}
     </Story>
     <Story
-        name="Show Context Menu On Mount"
         args={{
             className: 'my-open-on-mount-context-menu',
             isOpenOnMount: true,
         }}
+        name="Show Context Menu On Mount"
     >
         {(args) => (
             <Dropdown {...args}>
