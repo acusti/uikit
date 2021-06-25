@@ -9,11 +9,13 @@ export type Props = {
     className?: string;
     hasItems?: boolean;
     isOpenOnMount?: boolean;
+    isSearchable?: boolean;
     onSubmitItem?: (payload: {
-        element: HTMLElement;
+        element: HTMLElement | null;
         index: number;
         value: string;
     }) => void;
+    placeholder?: string;
 };
 
 const { Children, Fragment, useCallback, useRef, useState } = React;
@@ -74,7 +76,9 @@ const Dropdown: React.FC<Props> = ({
     className,
     hasItems = true,
     isOpenOnMount,
+    isSearchable,
     onSubmitItem,
+    placeholder,
 }) => {
     const childrenCount = Children.count(children);
     if (childrenCount !== 1 && childrenCount !== 2) {
@@ -94,6 +98,7 @@ const Dropdown: React.FC<Props> = ({
     const dropdownBodyItemsCount = dropdownBodyItems ? dropdownBodyItems.length : 0;
 
     const dropdownElementRef = useRef<HTMLElement | null>(null);
+    const inputElementRef = useRef<HTMLInputElement | null>(null);
     const closingTimerRef = useRef<number | null>(null);
     const isOpeningTimerRef = useRef<number | null>(null);
     const currentInputMethodRef = useRef<'mouse' | 'keyboard'>('mouse');
@@ -267,7 +272,7 @@ const Dropdown: React.FC<Props> = ({
                 isEditingCharacters = key === ' ' || key === 'Backspace';
             }
 
-            if (isEditingCharacters && hasItems) {
+            if (isEditingCharacters && hasItems && !isSearchable) {
                 onEventHandled();
                 if (key === 'Backspace') {
                     enteredCharactersRef.current = enteredCharactersRef.current.slice(
@@ -301,6 +306,9 @@ const Dropdown: React.FC<Props> = ({
                     return;
                 case ' ':
                 case 'Enter':
+                    // Only treat spacebar as toggle and select if no search input
+                    if (key === ' ' && isSearchable) return;
+
                     onEventHandled();
                     if (isOpen) {
                         if (hasItems) {
@@ -336,6 +344,7 @@ const Dropdown: React.FC<Props> = ({
             handleSubmitItem,
             hasItems,
             isOpen,
+            isSearchable,
             setActiveItem,
         ],
     );
@@ -464,20 +473,48 @@ const Dropdown: React.FC<Props> = ({
         [hasItems],
     );
 
+    const handleChange = useCallback(
+        (event: React.ChangeEvent<HTMLElement>) => {
+            if (!isOpen) openDropdown();
+
+            const input = event.target as HTMLInputElement;
+            enteredCharactersRef.current = input.value;
+            setActiveItem({ text: enteredCharactersRef.current });
+        },
+        [isOpen, openDropdown, setActiveItem],
+    );
+
     const styleElement = ownerDocument ? (
         <Style ownerDocument={ownerDocument}>{BASE_STYLES}</Style>
     ) : null;
 
     let trigger = childrenCount > 1 ? children[0] : null;
     if (!React.isValidElement(trigger)) {
-        trigger = <button className={TRIGGER_CLASS_NAME}>{trigger}</button>;
+        if (isSearchable) {
+            trigger = (
+                <input
+                    className={TRIGGER_CLASS_NAME}
+                    defaultValue=""
+                    onChange={handleChange}
+                    onFocus={openDropdown}
+                    placeholder={placeholder}
+                    ref={inputElementRef}
+                    type="text"
+                />
+            );
+        } else {
+            trigger = <button className={TRIGGER_CLASS_NAME}>{trigger}</button>;
+        }
     }
 
     return (
         <Fragment>
             {styleElement}
             <div
-                className={classnames(ROOT_CLASS_NAME, className, { 'is-open': isOpen })}
+                className={classnames(ROOT_CLASS_NAME, className, {
+                    'is-open': isOpen,
+                    'is-searchable': isSearchable,
+                })}
                 // In react, onBlur and onFocus bubble like focusin and focusout
                 // Reference: https://github.com/facebook/react/issues/6410
                 onBlur={handleBlur}
@@ -487,7 +524,7 @@ const Dropdown: React.FC<Props> = ({
                 onMouseOver={handleMouseOver}
                 onMouseUp={handleMouseUp}
                 ref={handleRef}
-                tabIndex={0}
+                tabIndex={isSearchable ? undefined : 0}
             >
                 {trigger}
                 {isOpen ? (
