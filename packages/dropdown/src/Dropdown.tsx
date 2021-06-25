@@ -253,7 +253,7 @@ const Dropdown: React.FC<Props> = ({
                 currentInputMethodRef.current = 'keyboard';
             };
 
-            let isEditingCharacters = /^[A-Za-z0-9]$/.test(key);
+            let isEditingCharacters = !ctrlKey && !metaKey && /^[A-Za-z0-9]$/.test(key);
             // User could also be editing characters if there are already characters entered
             // and they are hitting delete or spacebar
             if (!isEditingCharacters && enteredCharactersRef.current) {
