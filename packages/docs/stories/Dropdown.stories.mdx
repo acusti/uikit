@@ -45,13 +45,35 @@ of macOS.
     display: flex;
 }
 .css-lengths .uktdropdown-trigger {
-    transform: rotateZ(90deg);
-    font-weight: 700;
-    font-size: 20px;
-    padding: 0 13px;
-    color: #666;
-    background: transparent;
-    border: none;
+    position: relative;
+    margin-left: 3px;
+    width: 27px;
+    height: 21px;
+    vertical-align: top;
+}
+.css-lengths .uktdropdown-trigger:before {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 9px;
+    height: 2px;
+    top: 8px;
+    left: 4px;
+    border-radius: 2px 0 0 3px;
+    background-color: #666;
+    transform: rotateZ(38deg);
+}
+.css-lengths .uktdropdown-trigger:after {
+    content: "";
+    display: block;
+    position: absolute;
+    width: 9px;
+    height: 2px;
+    top: 8px;
+    right: 4px;
+    border-radius: 0 2px 2px 0;
+    background-color: #666;
+    transform: rotateZ(-38deg);
 }
 .css-lengths .uktdropdown-body {
     left: auto;
@@ -139,7 +161,6 @@ of macOS.
                     unit="px"
                 />
                 <Dropdown {...args}>
-                    ›
                     <ul>
                         <li>0px</li>
                         <li>4px</li>
