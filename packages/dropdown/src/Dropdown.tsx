@@ -8,7 +8,7 @@ export type Props = {
     className?: string;
     hasItems?: boolean;
     isOpenOnMount?: boolean;
-    onChangeItem?: (payload: {
+    onSubmitItem?: (payload: {
         element: HTMLElement;
         index: number;
         value: string;
@@ -72,7 +72,7 @@ const Dropdown: React.FC<Props> = ({
     className,
     hasItems = true,
     isOpenOnMount,
-    onChangeItem,
+    onSubmitItem,
 }) => {
     const childrenCount = Children.count(children);
     if (childrenCount !== 2) {
@@ -225,7 +225,7 @@ const Dropdown: React.FC<Props> = ({
         [dropdownBodyItems, dropdownBodyItemsCount, getCurrentActiveIndex],
     );
 
-    const handleChangeItem = useCallback(() => {
+    const handleSubmitItem = useCallback(() => {
         if (isOpen) closeDropdown();
         if (!dropdownBodyItems) return;
 
@@ -238,10 +238,10 @@ const Dropdown: React.FC<Props> = ({
         if (currentItem?.value === value) return;
 
         setCurrentItem({ label, value });
-        if (!onChangeItem) return;
+        if (!onSubmitItem) return;
 
-        onChangeItem({ element, index, value });
-    }, [currentItem, dropdownBodyItems, getCurrentActiveIndex, isOpen, onChangeItem]);
+        onSubmitItem({ element, index, value });
+    }, [currentItem, dropdownBodyItems, getCurrentActiveIndex, isOpen, onSubmitItem]);
 
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLElement>) => {
@@ -297,7 +297,7 @@ const Dropdown: React.FC<Props> = ({
                     onEventHandled();
                     if (isOpen) {
                         if (hasItems) {
-                            handleChangeItem();
+                            handleSubmitItem();
                         } else if (key === ' ') {
                             closeDropdown();
                         }
@@ -326,7 +326,7 @@ const Dropdown: React.FC<Props> = ({
         [
             closeDropdown,
             dropdownBodyItemsCount,
-            handleChangeItem,
+            handleSubmitItem,
             hasItems,
             isOpen,
             setActiveItem,
@@ -391,8 +391,8 @@ const Dropdown: React.FC<Props> = ({
         }
         // A short timeout before closing is better UX when user selects an item so that dropdown
         // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
-        closingTimerRef.current = setTimeout(handleChangeItem, 90);
-    }, [ensureFocus, handleChangeItem, isOpen, isOpening]);
+        closingTimerRef.current = setTimeout(handleSubmitItem, 90);
+    }, [ensureFocus, handleSubmitItem, isOpen, isOpening]);
 
     const handleBlur = useCallback(() => {
         if (!isOpen || isOpening) return;
