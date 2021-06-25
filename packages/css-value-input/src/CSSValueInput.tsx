@@ -11,6 +11,8 @@ import classnames from 'classnames';
 import * as React from 'react';
 
 export type Props = {
+    /** Boolean indicating if the user can submit an empty value (i.e. clear the value); defaults to true */
+    allowEmpty?: boolean;
     className?: string;
     cssValueType?: CSSValueType;
     disabled?: boolean;
@@ -36,6 +38,7 @@ const { useCallback, useEffect, useRef } = React;
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
 const CSSValueInput: React.FC<Props> = ({
+    allowEmpty = true,
     className,
     cssValueType = DEFAULT_CSS_VALUE_TYPE,
     disabled,
@@ -72,7 +75,10 @@ const CSSValueInput: React.FC<Props> = ({
         const currentValue = inputRef.current.value;
         if (currentValue === submittedValueRef.current) return;
 
-        let isValid = Number.isFinite(getCSSValueAsNumber(currentValue));
+        let isValid =
+            (allowEmpty && !currentValue) ||
+            Number.isFinite(getCSSValueAsNumber(currentValue));
+
         if (!isValid && validator) {
             isValid =
                 validator instanceof RegExp
@@ -87,7 +93,7 @@ const CSSValueInput: React.FC<Props> = ({
 
         submittedValueRef.current = currentValue;
         onSubmitValue(currentValue);
-    }, [onSubmitValue, validator]);
+    }, [allowEmpty, onSubmitValue, validator]);
 
     const isInitialSelectionRef = useRef<boolean>(true);
 
