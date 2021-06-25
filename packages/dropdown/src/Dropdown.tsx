@@ -56,6 +56,7 @@ const BASE_STYLES = `
     padding-top: var(--uktdropdown-body-pad-top);
     background-color: var(--uktdropdown-body-bg-color);
     box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.25);
+    user-select: none;
 }
 .${BODY_CLASS_NAME} [data-ukt-active] {
     background-color: var(--uktdropdown-body-bg-color-hover);
