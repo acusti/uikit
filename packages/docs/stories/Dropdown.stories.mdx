@@ -2,7 +2,11 @@ import CSSValueInput from '@acusti/css-value-input';
 import Dropdown from '@acusti/dropdown';
 import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
 
-<Meta title="UIKit/Controls/Dropdown" component={Dropdown} />
+<Meta
+    argTypes={{ onSubmitItem: { action: 'submitted' } }}
+    component={Dropdown}
+    title="UIKit/Controls/Dropdown"
+/>
 
 # Dropdown
 
