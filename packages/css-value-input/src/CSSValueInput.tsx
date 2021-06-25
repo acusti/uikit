@@ -26,6 +26,8 @@ export type Props = {
     step?: number;
     title?: string;
     unit?: string;
+    /** Regex or validator function to validate non-numeric values */
+    validator?: RegExp | ((value: string) => boolean);
     value?: string;
 };
 
@@ -49,6 +51,7 @@ const CSSValueInput: React.FC<Props> = ({
     step = 1,
     title,
     unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
+    validator,
     value,
 }) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -68,15 +71,23 @@ const CSSValueInput: React.FC<Props> = ({
         // If value hasn’t changed, do not trigger onSubmitValue
         const currentValue = inputRef.current.value;
         if (currentValue === submittedValueRef.current) return;
-        // If current value isn’t a number, revert to last submitted value
-        if (!Number.isFinite(getCSSValueAsNumber(currentValue))) {
+
+        let isValid = Number.isFinite(getCSSValueAsNumber(currentValue));
+        if (!isValid && validator) {
+            isValid =
+                validator instanceof RegExp
+                    ? validator.test(currentValue)
+                    : validator(currentValue);
+        }
+        // If current value isn’t valid, revert to last submitted value
+        if (!isValid) {
             inputRef.current.value = submittedValueRef.current;
             return;
         }
 
         submittedValueRef.current = currentValue;
         onSubmitValue(currentValue);
-    }, [onSubmitValue]);
+    }, [onSubmitValue, validator]);
 
     const isInitialSelectionRef = useRef<boolean>(true);
 
