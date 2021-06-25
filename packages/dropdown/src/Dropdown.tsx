@@ -396,9 +396,13 @@ const Dropdown: React.FC<Props> = ({
     }, [ensureFocus, handleSubmitItem, isOpen, isOpening]);
 
     const handleBlur = useCallback(() => {
+        // If dropdown isn’t open or is still opening, do nothing
         if (!isOpen || isOpening) return;
+        // If some part of the dropdown is still focused, do nothing
+        if (getIsFocused()) return;
+
         closeDropdown();
-    }, [closeDropdown, isOpen, isOpening]);
+    }, [closeDropdown, getIsFocused, isOpen, isOpening]);
 
     const handleRef = useCallback((ref: HTMLElement | null) => {
         dropdownElementRef.current = ref;
