@@ -395,11 +395,26 @@ const Dropdown: React.FC<Props> = ({
         closingTimerRef.current = setTimeout(handleSubmitItem, 90);
     }, [ensureFocus, handleSubmitItem, isOpen, isOpening]);
 
+    const isMouseDownOnDropdownBodyRef = useRef<boolean>(false);
+
+    const handleDropdownBodyMouseDown = useCallback(() => {
+        isMouseDownOnDropdownBodyRef.current = true;
+    }, []);
+
+    const handleDropdownBodyMouseUp = useCallback(() => {
+        isMouseDownOnDropdownBodyRef.current = false;
+    }, []);
+
     const handleBlur = useCallback(() => {
         // If dropdown isn’t open or is still opening, do nothing
         if (!isOpen || isOpening) return;
         // If some part of the dropdown is still focused, do nothing
         if (getIsFocused()) return;
+        // If blur event is the result of a mouse down on dropdown body, don’t close the dropdown
+        if (isMouseDownOnDropdownBodyRef.current) {
+            isMouseDownOnDropdownBodyRef.current = false;
+            return;
+        }
 
         closeDropdown();
     }, [closeDropdown, getIsFocused, isOpen, isOpening]);
@@ -469,7 +484,12 @@ const Dropdown: React.FC<Props> = ({
             >
                 {trigger}
                 {isOpen ? (
-                    <div className={BODY_CLASS_NAME} ref={handleBodyRef}>
+                    <div
+                        className={BODY_CLASS_NAME}
+                        onMouseDown={handleDropdownBodyMouseDown}
+                        onMouseUp={handleDropdownBodyMouseUp}
+                        ref={handleBodyRef}
+                    >
                         {children[1] || children[0] || children}
                     </div>
                 ) : null}
