@@ -1,7 +1,14 @@
 import { getBestMatch } from '@acusti/matchmaking';
-import { Style, SYSTEM_UI_FONT } from '@acusti/styling';
+import { Style } from '@acusti/styling';
 import classnames from 'classnames';
 import * as React from 'react';
+
+import {
+    BODY_CLASS_NAME,
+    ROOT_CLASS_NAME,
+    TRIGGER_CLASS_NAME,
+    STYLES,
+} from './dropdown-styles.js';
 
 export type Props = {
     // Can take a single React element (e.g. ReactChild) or exactly two renderable children
@@ -19,52 +26,6 @@ export type Props = {
 };
 
 const { Children, Fragment, useCallback, useRef, useState } = React;
-
-const ROOT_CLASS_NAME = 'uktdropdown';
-const TRIGGER_CLASS_NAME = `${ROOT_CLASS_NAME}-trigger`;
-const BODY_CLASS_NAME = `${ROOT_CLASS_NAME}-body`;
-
-const BASE_STYLES = `
-:root {
-    --uktdropdown-font-family: ${SYSTEM_UI_FONT};
-    --uktdropdown-body-bg-color: white;
-    --uktdropdown-body-bg-color-hover: rgb(105, 162, 249);
-    --uktdropdown-body-color-hover: white;
-    --uktdropdown-body-pad-bottom: 10px;
-    --uktdropdown-body-pad-left: 12px;
-    --uktdropdown-body-pad-right: 12px;
-    --uktdropdown-body-pad-top: 10px;
-}
-.${ROOT_CLASS_NAME},
-.${TRIGGER_CLASS_NAME} {
-    font-family: var(--uktdropdown-font-family);
-}
-.${ROOT_CLASS_NAME} {
-    position: relative;
-}
-.${ROOT_CLASS_NAME} > * {
-    cursor: default;
-}
-.${BODY_CLASS_NAME} {
-    box-sizing: border-box;
-    position: absolute;
-    left: 0px;
-    top: 100%;
-    max-height: calc(100vh - 50px);
-    overflow: auto;
-    padding-bottom: var(--uktdropdown-body-pad-bottom);
-    padding-left: var(--uktdropdown-body-pad-left);
-    padding-right: var(--uktdropdown-body-pad-right);
-    padding-top: var(--uktdropdown-body-pad-top);
-    background-color: var(--uktdropdown-body-bg-color);
-    box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.25);
-    user-select: none;
-}
-.${BODY_CLASS_NAME} [data-ukt-active] {
-    background-color: var(--uktdropdown-body-bg-color-hover);
-    color: var(--uktdropdown-body-color-hover);
-}
-`;
 
 const CHILDREN_ERROR =
     '@acusti/dropdown requires props.children to contain either one element, the dropdown body, or two elements: the dropdown trigger and the dropdown body. Received %s elements.';
@@ -485,7 +446,7 @@ const Dropdown: React.FC<Props> = ({
     );
 
     const styleElement = ownerDocument ? (
-        <Style ownerDocument={ownerDocument}>{BASE_STYLES}</Style>
+        <Style ownerDocument={ownerDocument}>{STYLES}</Style>
     ) : null;
 
     let trigger = childrenCount > 1 ? children[0] : null;
