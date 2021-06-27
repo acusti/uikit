@@ -379,22 +379,30 @@ const Dropdown: React.FC<Props> = ({
         [dropdownBodyItems, setActiveItem],
     );
 
-    const handleMouseUp = useCallback(() => {
-        if (!isOpen || closingTimerRef.current) return;
-        // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
-        if (isOpening) {
-            setIsOpening(false);
-            if (isOpeningTimerRef.current) {
-                clearTimeout(isOpeningTimerRef.current);
-                isOpeningTimerRef.current = null;
+    const handleMouseUp = useCallback(
+        ({ target }: React.MouseEvent<HTMLElement>) => {
+            if (!isOpen || closingTimerRef.current) return;
+            // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
+            if (isOpening) {
+                setIsOpening(false);
+                if (isOpeningTimerRef.current) {
+                    clearTimeout(isOpeningTimerRef.current);
+                    isOpeningTimerRef.current = null;
+                }
+                ensureFocus();
+                return;
             }
-            ensureFocus();
-            return;
-        }
-        // A short timeout before closing is better UX when user selects an item so that dropdown
-        // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
-        closingTimerRef.current = setTimeout(handleSubmitItem, 90);
-    }, [ensureFocus, handleSubmitItem, isOpen, isOpening]);
+            // If mouseup is on dropdown body and there are no items, don’t close the dropdown
+            const targetElement = target as HTMLElement;
+            if (!hasItems && targetElement.closest(BODY_SELECTOR)) {
+                return;
+            }
+            // A short timeout before closing is better UX when user selects an item so that dropdown
+            // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
+            closingTimerRef.current = setTimeout(handleSubmitItem, 90);
+        },
+        [ensureFocus, handleSubmitItem, hasItems, isOpen, isOpening],
+    );
 
     const isMouseDownOnDropdownBodyRef = useRef<boolean>(false);
 
