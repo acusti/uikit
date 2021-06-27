@@ -5,9 +5,6 @@
     "exports": "./dist/index.js",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
-    "engines": {
-        "node": ">=12"
-    },
     "files": [
         "dist"
     ],
