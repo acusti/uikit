@@ -8,7 +8,6 @@ import {
     BODY_SELECTOR,
     ROOT_CLASS_NAME,
     TRIGGER_CLASS_NAME,
-    TRIGGER_SELECTOR,
     STYLES,
 } from './dropdown-styles.js';
 
@@ -71,34 +70,6 @@ const Dropdown: React.FC<Props> = ({
     );
     const enteredCharactersRef = useRef<string>('');
 
-    const getIsFocused = useCallback(
-        ({
-            bodyOnly,
-            triggerOnly,
-        }: { bodyOnly?: boolean; triggerOnly?: boolean } = {}) => {
-            const dropdownElement = dropdownElementRef.current;
-            if (!dropdownElement) return false;
-
-            let parentElement: HTMLElement | null = dropdownElement;
-            if (bodyOnly) {
-                parentElement = dropdownElement.querySelector(BODY_SELECTOR);
-            } else if (triggerOnly) {
-                parentElement = dropdownElement.querySelector(TRIGGER_SELECTOR);
-            }
-
-            if (!parentElement) return false;
-
-            const { activeElement } = dropdownElement.ownerDocument;
-            return parentElement.contains(activeElement);
-        },
-        [],
-    );
-
-    const ensureFocus = useCallback(() => {
-        if (!dropdownElementRef.current || getIsFocused()) return;
-        dropdownElementRef.current.focus();
-    }, [getIsFocused]);
-
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
         setIsOpening(false);
@@ -111,8 +82,7 @@ const Dropdown: React.FC<Props> = ({
 
     const openDropdown = useCallback(() => {
         setIsOpen(true);
-        ensureFocus();
-    }, [ensureFocus]);
+    }, []);
 
     const getCurrentActiveIndex = useCallback(
         () =>
@@ -277,7 +247,17 @@ const Dropdown: React.FC<Props> = ({
                 case 'Escape':
                     if (!isOpen) return;
                     // If there are no items & focus is in the dropdown body, don’t close it
-                    if (!hasItems && getIsFocused({ bodyOnly: true })) return;
+                    if (!hasItems) {
+                        const dropdownElement = dropdownElementRef.current;
+                        if (
+                            dropdownElement &&
+                            dropdownElement.contains(
+                                dropdownElement.ownerDocument.activeElement,
+                            )
+                        ) {
+                            return;
+                        }
+                    }
 
                     onEventHandled();
                     closeDropdown();
@@ -325,7 +305,6 @@ const Dropdown: React.FC<Props> = ({
         [
             closeDropdown,
             dropdownBodyItemsCount,
-            getIsFocused,
             handleSubmitItem,
             hasItems,
             isOpen,
@@ -389,7 +368,6 @@ const Dropdown: React.FC<Props> = ({
                     clearTimeout(isOpeningTimerRef.current);
                     isOpeningTimerRef.current = null;
                 }
-                ensureFocus();
                 return;
             }
             // If mouseup is on dropdown body and there are no items, don’t close the dropdown
@@ -401,52 +379,46 @@ const Dropdown: React.FC<Props> = ({
             // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
             closingTimerRef.current = setTimeout(handleSubmitItem, 90);
         },
-        [ensureFocus, handleSubmitItem, hasItems, isOpen, isOpening],
+        [handleSubmitItem, hasItems, isOpen, isOpening],
     );
 
-    const isMouseDownOnDropdownBodyRef = useRef<boolean>(false);
+    const handleRef = useCallback(
+        (ref: HTMLElement | null) => {
+            dropdownElementRef.current = ref;
+            if (!ref) return;
 
-    const handleDropdownBodyMouseDown = useCallback(() => {
-        isMouseDownOnDropdownBodyRef.current = true;
-    }, []);
+            const { ownerDocument } = ref;
+            setOwnerDocument(ownerDocument);
 
-    const handleDropdownBodyMouseUp = useCallback(() => {
-        isMouseDownOnDropdownBodyRef.current = false;
-    }, []);
+            const handleMouseDown = (event: MouseEvent) => {
+                if (!ref) return;
 
-    const blurTimerRef = useRef<number | null>(null);
+                const eventTarget = event.target as HTMLElement;
+                if (ref.contains(eventTarget)) return;
 
-    const handleBlur = useCallback(() => {
-        // If dropdown isn’t open or is still opening, do nothing
-        if (!isOpen || isOpening) return;
-        // If blur event is the result of a mouse down on dropdown body, don’t close the dropdown
-        if (isMouseDownOnDropdownBodyRef.current) {
-            isMouseDownOnDropdownBodyRef.current = false;
-            return;
-        }
-        // If some part of the dropdown is still focused, do nothing
-        if (getIsFocused()) return;
+                // Close dropdown on an outside click
+                closeDropdown();
+            };
 
-        if (blurTimerRef.current) {
-            clearTimeout(blurTimerRef.current);
-        }
+            document.addEventListener('mousedown', handleMouseDown);
+            if (ownerDocument !== document) {
+                ownerDocument.addEventListener('mousedown', handleMouseDown);
+            }
+            // If dropdown should be open on mount, focus it
+            if (isOpenOnMount) {
+                ref.focus();
+            }
 
-        blurTimerRef.current = setTimeout(() => {
-            blurTimerRef.current = null;
-            // If dropdown is still blurred, close it
-            if (getIsFocused()) return;
-            closeDropdown();
-        }, 66);
-    }, [closeDropdown, getIsFocused, isOpen, isOpening]);
-
-    const handleRef = useCallback((ref: HTMLElement | null) => {
-        dropdownElementRef.current = ref;
-        setOwnerDocument(ref?.ownerDocument || null);
-        // If dropdown should be open on mount, focus it
-        if (ref && isOpenOnMount) {
-            ref.focus();
-        }
-    }, []);
+            return () => {
+                document.removeEventListener('mousedown', handleMouseDown);
+                if (ownerDocument !== document) {
+                    ownerDocument.removeEventListener('mousedown', handleMouseDown);
+                }
+                setOwnerDocument(null);
+            };
+        },
+        [closeDropdown],
+    );
 
     const handleBodyRef = useCallback(
         (ref: HTMLElement | null) => {
@@ -524,9 +496,6 @@ const Dropdown: React.FC<Props> = ({
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
                 })}
-                // In react, onBlur and onFocus bubble like focusin and focusout
-                // Reference: https://github.com/facebook/react/issues/6410
-                onBlur={handleBlur}
                 onKeyDown={handleKeyDown}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
@@ -538,8 +507,6 @@ const Dropdown: React.FC<Props> = ({
                 {trigger}
                 {isOpen ? (
                     <div
-                        onMouseDown={handleDropdownBodyMouseDown}
-                        onMouseUp={handleDropdownBodyMouseUp}
                         className={classnames(BODY_CLASS_NAME, {
                             'has-items': hasItems,
                         })}
