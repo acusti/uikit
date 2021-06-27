@@ -1,6 +1,6 @@
 {
     "name": "@acusti/dropdown",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "type": "module",
     "exports": "./dist/Dropdown.js",
     "main": "./dist/Dropdown.js",
@@ -24,8 +24,8 @@
         "typescript": "^4.2.3"
     },
     "dependencies": {
-        "@acusti/matchmaking": "^0.1.2",
-        "@acusti/styling": "^0.2.0"
+        "@acusti/matchmaking": "^0.1.3",
+        "@acusti/styling": "^0.2.1"
     },
     "peerDependencies": {
         "classnames": "^2",

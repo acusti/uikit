@@ -9,7 +9,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/css-value-input@workspace:packages/css-value-input"
   dependencies:
-    "@acusti/css-values": ^0.8.0
+    "@acusti/css-values": ^0.8.1
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
     typescript: ^4.2.3
@@ -20,7 +20,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/css-values@^0.8.0, @acusti/css-values@workspace:packages/css-values":
+"@acusti/css-values@^0.8.1, @acusti/css-values@workspace:packages/css-values":
   version: 0.0.0-use.local
   resolution: "@acusti/css-values@workspace:packages/css-values"
   dependencies:
@@ -32,8 +32,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
-    "@acusti/matchmaking": ^0.1.2
-    "@acusti/styling": ^0.2.0
+    "@acusti/matchmaking": ^0.1.3
+    "@acusti/styling": ^0.2.1
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
     typescript: ^4.2.3
@@ -44,7 +44,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/matchmaking@^0.1.2, @acusti/matchmaking@workspace:packages/matchmaking":
+"@acusti/matchmaking@^0.1.3, @acusti/matchmaking@workspace:packages/matchmaking":
   version: 0.0.0-use.local
   resolution: "@acusti/matchmaking@workspace:packages/matchmaking"
   dependencies:
@@ -52,7 +52,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/styling@*, @acusti/styling@^0.2.0, @acusti/styling@workspace:packages/styling":
+"@acusti/styling@*, @acusti/styling@^0.2.1, @acusti/styling@workspace:packages/styling":
   version: 0.0.0-use.local
   resolution: "@acusti/styling@workspace:packages/styling"
   dependencies:
