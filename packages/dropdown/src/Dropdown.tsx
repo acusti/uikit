@@ -5,8 +5,10 @@ import * as React from 'react';
 
 import {
     BODY_CLASS_NAME,
+    BODY_SELECTOR,
     ROOT_CLASS_NAME,
     TRIGGER_CLASS_NAME,
+    TRIGGER_SELECTOR,
     STYLES,
 } from './dropdown-styles.js';
 
@@ -69,15 +71,28 @@ const Dropdown: React.FC<Props> = ({
     );
     const enteredCharactersRef = useRef<string>('');
 
-    const getIsFocused = useCallback(() => {
-        const dropdownElement = dropdownElementRef.current;
-        if (!dropdownElement) return false;
+    const getIsFocused = useCallback(
+        ({
+            bodyOnly,
+            triggerOnly,
+        }: { bodyOnly?: boolean; triggerOnly?: boolean } = {}) => {
+            const dropdownElement = dropdownElementRef.current;
+            if (!dropdownElement) return false;
 
-        const { activeElement } = dropdownElement.ownerDocument;
-        return (
-            dropdownElement === activeElement || dropdownElement.contains(activeElement)
-        );
-    }, []);
+            let parentElement: HTMLElement | null = dropdownElement;
+            if (bodyOnly) {
+                parentElement = dropdownElement.querySelector(BODY_SELECTOR);
+            } else if (triggerOnly) {
+                parentElement = dropdownElement.querySelector(TRIGGER_SELECTOR);
+            }
+
+            if (!parentElement) return false;
+
+            const { activeElement } = dropdownElement.ownerDocument;
+            return parentElement.contains(activeElement);
+        },
+        [],
+    );
 
     const ensureFocus = useCallback(() => {
         if (!dropdownElementRef.current || getIsFocused()) return;
@@ -260,15 +275,19 @@ const Dropdown: React.FC<Props> = ({
 
             switch (key) {
                 case 'Escape':
-                    if (isOpen) {
-                        onEventHandled();
-                        closeDropdown();
-                    }
+                    if (!isOpen) return;
+                    // If there are no items & focus is in the dropdown body, don’t close it
+                    if (!hasItems && getIsFocused({ bodyOnly: true })) return;
+
+                    onEventHandled();
+                    closeDropdown();
                     return;
                 case ' ':
                 case 'Enter':
                     // Only treat spacebar as toggle and select if no search input
                     if (key === ' ' && isSearchable) return;
+                    // Do not close dropdown on spacebar or enter if there are no items
+                    if (isOpen && !hasItems) return;
 
                     onEventHandled();
                     if (isOpen) {
@@ -282,6 +301,8 @@ const Dropdown: React.FC<Props> = ({
                     }
                     return;
                 case 'ArrowUp':
+                    if (!hasItems) return;
+
                     onEventHandled();
                     if (altKey || metaKey) {
                         setActiveItem({ index: 0 });
@@ -290,6 +311,8 @@ const Dropdown: React.FC<Props> = ({
                     }
                     return;
                 case 'ArrowDown':
+                    if (!hasItems) return;
+
                     onEventHandled();
                     if (altKey || metaKey) {
                         setActiveItem({ index: dropdownBodyItemsCount - 1 });
@@ -302,6 +325,7 @@ const Dropdown: React.FC<Props> = ({
         [
             closeDropdown,
             dropdownBodyItemsCount,
+            getIsFocused,
             handleSubmitItem,
             hasItems,
             isOpen,
