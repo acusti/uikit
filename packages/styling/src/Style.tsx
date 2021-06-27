@@ -2,26 +2,23 @@ import * as React from 'react';
 
 import { unregisterStyles, updateStyles } from './style-registry.js';
 
-const { useEffect, useRef } = React;
+const { useCallback, useEffect, useRef, useState } = React;
 
 type Props = {
     children: string;
-    ownerDocument?: Document;
 };
 
-const Style = ({ children: styles, ownerDocument = document }: Props) => {
-    // const [ownerDocument, setOwnerDocument] = useState(ownerDocumentFromProps || document);
-    // useEffect(() => {
-    //     if (!ownerDocumentFromProps) return;
-    //     setOwnerDocument(ownerDocumentFromProps);
-    // }, [ownerDocumentFromProps]);
-    // const setRef = useCallback((element: HTMLElement | null) => {
-    //     if (!element) return;
-    //     setOwnerDocument(element.ownerDocument);
-    // }, []);
+const Style = ({ children: styles }: Props) => {
+    const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
+
+    const handleRef = useCallback((element: HTMLElement | null) => {
+        if (!element) return;
+        setOwnerDocument(element.ownerDocument);
+    }, []);
 
     useEffect(
         () => () => {
+            if (!ownerDocument) return;
             unregisterStyles({ ownerDocument, styles });
         },
         [ownerDocument], // eslint-disable-line react-hooks/exhaustive-deps
@@ -41,9 +38,9 @@ const Style = ({ children: styles, ownerDocument = document }: Props) => {
         previousStylesRef.current = styles;
     }, [ownerDocument, styles]);
 
-    return null;
-    // if (ownerDocument) return null;
-    // return <span ref={setRef} />;
+    if (ownerDocument) return null;
+
+    return <style ref={handleRef}>{styles}</style>;
 };
 
 export default Style;
