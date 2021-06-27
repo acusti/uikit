@@ -42,6 +42,8 @@ ${BODY_SELECTOR} {
     padding-top: var(--uktdropdown-body-pad-top);
     background-color: var(--uktdropdown-body-bg-color);
     box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.25);
+}
+${BODY_SELECTOR}.has-items {
     user-select: none;
 }
 ${BODY_SELECTOR} [data-ukt-active] {

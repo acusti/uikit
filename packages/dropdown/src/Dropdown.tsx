@@ -538,9 +538,11 @@ const Dropdown: React.FC<Props> = ({
                 {trigger}
                 {isOpen ? (
                     <div
-                        className={BODY_CLASS_NAME}
                         onMouseDown={handleDropdownBodyMouseDown}
                         onMouseUp={handleDropdownBodyMouseUp}
+                        className={classnames(BODY_CLASS_NAME, {
+                            'has-items': hasItems,
+                        })}
                         ref={handleBodyRef}
                     >
                         {children[1] || children[0] || children}
