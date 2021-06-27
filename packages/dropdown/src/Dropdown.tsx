@@ -450,7 +450,8 @@ const Dropdown: React.FC<Props> = ({
     ) : null;
 
     let trigger = childrenCount > 1 ? children[0] : null;
-    if (!React.isValidElement(trigger)) {
+    const isTriggerFromProps = React.isValidElement(trigger);
+    if (!isTriggerFromProps) {
         if (isSearchable) {
             trigger = (
                 <input
@@ -464,7 +465,11 @@ const Dropdown: React.FC<Props> = ({
                 />
             );
         } else {
-            trigger = <button className={TRIGGER_CLASS_NAME}>{trigger}</button>;
+            trigger = (
+                <button className={TRIGGER_CLASS_NAME} tabIndex={0}>
+                    {trigger}
+                </button>
+            );
         }
     }
 
@@ -485,7 +490,7 @@ const Dropdown: React.FC<Props> = ({
                 onMouseOver={handleMouseOver}
                 onMouseUp={handleMouseUp}
                 ref={handleRef}
-                tabIndex={isSearchable ? undefined : 0}
+                tabIndex={isSearchable || !isTriggerFromProps ? undefined : 0}
             >
                 {trigger}
                 {isOpen ? (
