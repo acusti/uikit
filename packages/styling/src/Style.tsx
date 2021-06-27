@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { unregisterStyles, updateStyles } from './style-registry';
+import { unregisterStyles, updateStyles } from './style-registry.js';
 
 const { useEffect, useRef } = React;
 
@@ -10,7 +10,6 @@ type Props = {
 };
 
 const Style = ({ children: styles, ownerDocument = document }: Props) => {
-    const previousStylesRef = useRef('');
     // const [ownerDocument, setOwnerDocument] = useState(ownerDocumentFromProps || document);
     // useEffect(() => {
     //     if (!ownerDocumentFromProps) return;
@@ -25,8 +24,10 @@ const Style = ({ children: styles, ownerDocument = document }: Props) => {
         () => () => {
             unregisterStyles({ ownerDocument, styles });
         },
-        [ownerDocument],
+        [ownerDocument], // eslint-disable-line react-hooks/exhaustive-deps
     );
+
+    const previousStylesRef = useRef<string>('');
 
     useEffect(() => {
         if (!ownerDocument) return;
