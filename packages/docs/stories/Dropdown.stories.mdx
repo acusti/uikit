@@ -79,6 +79,9 @@ of macOS.
     left: auto;
     right: 0px;
 }
+.dropdown-without-items .uktdropdown-body {
+    width: 300px;
+}
 `}</style>
 
 <Canvas>
@@ -158,6 +161,7 @@ of macOS.
                 <CSSValueInput
                     cssValueType="length"
                     label={null}
+                    onSubmitValue={() => {}}
                     placeholder="12px"
                     unit="px"
                 />
@@ -201,6 +205,41 @@ of macOS.
                         <li data-ukt-value="delete-item">Delete</li>
                     </ul>
                 </Fragment>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'dropdown-without-items',
+            hasItems: false,
+        }}
+        name="Dropdown with interactive contents"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                Open
+                <div>
+                    <p>
+                        Try interacting with the controls here. The dropdown should only
+                        close when you click outside of the entire dropdown or if you hit
+                        the escape key.
+                    </p>
+                    <CSSValueInput
+                        cssValueType="length"
+                        label="Width"
+                        onSubmitValue={() => {}}
+                        placeholder="100vw"
+                        unit="vw"
+                    />
+                    <CSSValueInput
+                        cssValueType="length"
+                        label="Rotation"
+                        onSubmitValue={() => {}}
+                        placeholder="0deg"
+                        step={5}
+                        unit="deg"
+                    />
+                </div>
             </Dropdown>
         )}
     </Story>
