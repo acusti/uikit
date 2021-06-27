@@ -52,7 +52,6 @@ const Dropdown: React.FC<Props> = ({
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
-    const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
     const [currentItem, setCurrentItem] = useState<Item | null>(null);
     const [dropdownBodyItems, setDropdownBodyItems] = useState<Array<HTMLElement> | null>(
         null,
@@ -387,9 +386,6 @@ const Dropdown: React.FC<Props> = ({
             dropdownElementRef.current = ref;
             if (!ref) return;
 
-            const { ownerDocument } = ref;
-            setOwnerDocument(ownerDocument);
-
             const handleMouseDown = (event: MouseEvent) => {
                 if (!ref) return;
 
@@ -400,6 +396,7 @@ const Dropdown: React.FC<Props> = ({
                 closeDropdown();
             };
 
+            const { ownerDocument } = ref;
             document.addEventListener('mousedown', handleMouseDown);
             if (ownerDocument !== document) {
                 ownerDocument.addEventListener('mousedown', handleMouseDown);
@@ -414,7 +411,6 @@ const Dropdown: React.FC<Props> = ({
                 if (ownerDocument !== document) {
                     ownerDocument.removeEventListener('mousedown', handleMouseDown);
                 }
-                setOwnerDocument(null);
             };
         },
         [closeDropdown],
@@ -460,10 +456,6 @@ const Dropdown: React.FC<Props> = ({
         [isOpen, openDropdown, setActiveItem],
     );
 
-    const styleElement = ownerDocument ? (
-        <Style ownerDocument={ownerDocument}>{STYLES}</Style>
-    ) : null;
-
     let trigger = childrenCount > 1 ? children[0] : null;
     const isTriggerFromProps = React.isValidElement(trigger);
     if (!isTriggerFromProps) {
@@ -490,7 +482,7 @@ const Dropdown: React.FC<Props> = ({
 
     return (
         <Fragment>
-            {styleElement}
+            <Style>{STYLES}</Style>
             <div
                 className={classnames(ROOT_CLASS_NAME, className, {
                     'is-open': isOpen,

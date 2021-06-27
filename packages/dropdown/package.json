@@ -28,7 +28,7 @@
     },
     "dependencies": {
         "@acusti/matchmaking": "^0.1.2",
-        "@acusti/styling": "^0.1.1"
+        "@acusti/styling": "^0.2.0"
     },
     "peerDependencies": {
         "classnames": "^2",
