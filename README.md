@@ -1,3 +1,5 @@
+![uikit wordmark](https://raw.githubusercontent.com/acusti/uikit/main/wordmark.svg)
+
 # UIKit
 
 ![npm (scoped)](https://img.shields.io/npm/v/@acusti/css-value-input?style=for-the-badge)
