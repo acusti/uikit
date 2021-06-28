@@ -135,6 +135,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/__virtual__/@acusti-dropdown-virtual-91419db2b7/1/packages/dropdown/",
           "packageDependencies": [
             ["@acusti/dropdown", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/dropdown"],
+            ["@acusti/input-text", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/input-text"],
             ["@acusti/matchmaking", "workspace:packages/matchmaking"],
             ["@acusti/styling", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/styling"],
             ["@types/classnames", "npm:2.2.11"],
@@ -158,6 +159,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/dropdown/",
           "packageDependencies": [
             ["@acusti/dropdown", "workspace:packages/dropdown"],
+            ["@acusti/input-text", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text"],
             ["@acusti/matchmaking", "workspace:packages/matchmaking"],
             ["@acusti/styling", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/styling"],
             ["@types/classnames", "npm:2.2.11"],

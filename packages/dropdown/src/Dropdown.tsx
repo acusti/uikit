@@ -1,3 +1,4 @@
+import InputText from '@acusti/input-text';
 import { getBestMatch } from '@acusti/matchmaking';
 import { Style } from '@acusti/styling';
 import classnames from 'classnames';
@@ -472,9 +473,9 @@ const Dropdown: React.FC<Props> = ({
     if (!isTriggerFromProps) {
         if (isSearchable) {
             trigger = (
-                <input
+                <InputText
                     className={TRIGGER_CLASS_NAME}
-                    defaultValue=""
+                    initialValue=""
                     onChange={handleChange}
                     onFocus={openDropdown}
                     placeholder={placeholder}
