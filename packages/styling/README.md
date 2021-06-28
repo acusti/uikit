@@ -1,5 +1,10 @@
 # @acusti/styling
 
+![latest version](https://img.shields.io/npm/v/@acusti/styling?style=for-the-badge)
+![dependencies status](https://img.shields.io/david/acusti/uikit?path=packages%2Fstyling&style=for-the-badge)
+![bundle size](https://img.shields.io/bundlephobia/min/@acusti/styling?style=for-the-badge)
+![downloads per month](https://img.shields.io/npm/dm/@acusti/styling?style=for-the-badge)
+
 Exports `Style`, which is a React component that renders a CSS style string
 as a `<style>` element in the `<head>` of the document optionally specified
 by `props.ownerDocument`. Keeps a per-document global registry of styles
