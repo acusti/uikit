@@ -7,6 +7,7 @@ import {
     getUnitFromCSSValue,
     roundToPrecision,
 } from '@acusti/css-values';
+import InputText from '@acusti/input-text';
 import classnames from 'classnames';
 import * as React from 'react';
 
@@ -33,7 +34,7 @@ export type Props = {
     value?: string;
 };
 
-const { useCallback, useEffect, useRef } = React;
+const { useCallback, useRef } = React;
 
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
@@ -59,15 +60,6 @@ const CSSValueInput: React.FC<Props> = ({
 }) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const submittedValueRef = useRef<string>(value || '');
-
-    // If props.value changes, override input value from it
-    useEffect(() => {
-        const updatedValue = value || '';
-        submittedValueRef.current = updatedValue;
-        if (inputRef.current) {
-            inputRef.current.value = updatedValue;
-        }
-    }, [value]);
 
     const handleSubmitValue = useCallback(() => {
         if (!inputRef.current) return;
@@ -95,11 +87,7 @@ const CSSValueInput: React.FC<Props> = ({
         onSubmitValue(currentValue);
     }, [allowEmpty, onSubmitValue, validator]);
 
-    const isInitialSelectionRef = useRef<boolean>(true);
-
     const handleBlur = useCallback(() => {
-        // When input loses focus, reset isInitialSelection to true for next onSelect event
-        isInitialSelectionRef.current = true;
         if (!inputRef.current) return;
 
         inputRef.current.value = getCSSValueWithUnit({
@@ -107,29 +95,7 @@ const CSSValueInput: React.FC<Props> = ({
             defaultUnit: unit,
             value: inputRef.current.value,
         });
-
-        handleSubmitValue();
-    }, [cssValueType, handleSubmitValue, unit]);
-
-    // NOTE Selecting the contents of the input onFocus makes for the best UX,
-    // but it doesn’t work in Safari, so we use the initial onSelect event instead
-    const handleSelect = useCallback(() => {
-        // Do nothing if this isn’t the initial select-on-focus event
-        if (!isInitialSelectionRef.current) return;
-        // This is the initial select-on-focus event, so reset isInitialSelection to false
-        isInitialSelectionRef.current = false;
-        const input = inputRef.current;
-        // Do nothing if input has no value
-        if (!input || !input.value) return;
-        // Do nothing if input is no longer the document’s activeElement
-        if (input.ownerDocument.activeElement !== input) return;
-        // Do nothing if input’s contents are already selected
-        const valueLength = input.value.length;
-        if (input.selectionStart === 0 && input.selectionEnd === valueLength) return;
-
-        input.selectionStart = 0;
-        input.selectionEnd = valueLength;
-    }, []);
+    }, [cssValueType, unit]);
 
     const getNextValue = useCallback(
         ({
@@ -209,17 +175,15 @@ const CSSValueInput: React.FC<Props> = ({
                 </div>
             )}
             <div className={`${ROOT_CLASS_NAME}-value`}>
-                <input
-                    defaultValue={value || placeholder || ''}
+                <InputText
                     disabled={disabled}
+                    initialValue={value}
                     onBlur={handleBlur}
                     onChange={onChange}
                     onKeyDown={handleKeyDown}
                     onKeyUp={onKeyUp}
-                    onSelect={handleSelect}
                     placeholder={placeholder}
                     ref={inputRef}
-                    type="text"
                 />
             </div>
         </label>
