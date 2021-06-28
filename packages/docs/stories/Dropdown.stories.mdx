@@ -20,6 +20,9 @@ of macOS.
 .innerZoomElementWrapper {
     margin-bottom: 140px;
 }
+.uktdropdown input {
+    width: 120px;
+}
 .uktdropdown-body {
     max-height: 150px;
 }
@@ -79,6 +82,11 @@ of macOS.
     left: auto;
     right: 0px;
 }
+
+.searchable-with-label input {
+    width: 76px;
+}
+
 .dropdown-without-items .uktdropdown-body {
     width: 300px;
 }
@@ -213,7 +221,7 @@ of macOS.
             className: 'dropdown-without-items',
             hasItems: false,
         }}
-        name="Dropdown with interactive contents"
+        name="Dropdown With Interactive Contents"
     >
         {(args) => (
             <Dropdown {...args}>
@@ -240,6 +248,31 @@ of macOS.
                         unit="deg"
                     />
                 </div>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'searchable-with-label',
+            isSearchable: true,
+            label: 'Font size',
+        }}
+        name="Searchable With Label"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li>0px</li>
+                    <li>4px</li>
+                    <li>9px</li>
+                    <li>18px</li>
+                    <li>36px</li>
+                    <li>54px</li>
+                    <li>72px</li>
+                    <li>144px</li>
+                    <li>167px</li>
+                    <li>198px</li>
+                </ul>
             </Dropdown>
         )}
     </Story>
