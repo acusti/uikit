@@ -153,7 +153,7 @@ const Dropdown: React.FC<Props> = ({
                 nextActiveItem.dataset.uktActive = '';
                 // If dropdown body element has at least 15px of overflow,
                 // verify that next active item is visible and scroll to it if it isn’t
-                const dropdownBody = dropdownBodyItems[0].closest('.' + BODY_CLASS_NAME);
+                const dropdownBody = dropdownBodyItems[0].closest(BODY_SELECTOR);
                 if (
                     dropdownBody &&
                     dropdownBody.scrollHeight >= dropdownBody.clientHeight + 15
