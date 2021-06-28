@@ -7,9 +7,11 @@ import * as React from 'react';
 import {
     BODY_CLASS_NAME,
     BODY_SELECTOR,
+    LABEL_CLASS_NAME,
+    LABEL_TEXT_CLASS_NAME,
     ROOT_CLASS_NAME,
-    TRIGGER_CLASS_NAME,
     STYLES,
+    TRIGGER_CLASS_NAME,
 } from './dropdown-styles.js';
 
 export type Props = {
@@ -19,6 +21,7 @@ export type Props = {
     hasItems?: boolean;
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
+    label?: string;
     onSubmitItem?: (payload: {
         element: HTMLElement | null;
         index: number;
@@ -42,6 +45,7 @@ const Dropdown: React.FC<Props> = ({
     hasItems = true,
     isOpenOnMount,
     isSearchable,
+    label,
     onSubmitItem,
     placeholder,
 }) => {
@@ -490,6 +494,15 @@ const Dropdown: React.FC<Props> = ({
                 </button>
             );
         }
+    }
+
+    if (label) {
+        trigger = (
+            <label className={LABEL_CLASS_NAME}>
+                <div className={LABEL_TEXT_CLASS_NAME}>{label}</div>
+                {trigger}
+            </label>
+        );
     }
 
     return (
