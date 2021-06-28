@@ -150,27 +150,38 @@ const Dropdown: React.FC<Props> = ({
 
             const nextActiveItem = dropdownBodyItems[nextActiveIndex];
             if (nextActiveItem) {
-                nextActiveItem.dataset.uktActive = '';
-                // If dropdown body element has at least 15px of overflow,
-                // verify that next active item is visible and scroll to it if it isn’t
-                const dropdownBody = dropdownBodyItems[0].closest(BODY_SELECTOR);
-                if (
-                    dropdownBody &&
-                    dropdownBody.scrollHeight >= dropdownBody.clientHeight + 15
+                nextActiveItem.setAttribute('data-ukt-active', '');
+                // Find closest scrollable parent and ensure that next active item is visible
+                let { parentElement } = nextActiveItem;
+                let scrollableParent = null;
+                while (
+                    !scrollableParent &&
+                    parentElement &&
+                    parentElement !== dropdownElementRef.current
                 ) {
-                    const dropdownBodyRect = dropdownBody.getBoundingClientRect();
+                    const isScrollable =
+                        parentElement.scrollHeight > parentElement.clientHeight + 15;
+                    if (isScrollable) {
+                        scrollableParent = parentElement;
+                    } else {
+                        parentElement = parentElement.parentElement;
+                    }
+                }
+
+                if (scrollableParent) {
+                    const parentRect = scrollableParent.getBoundingClientRect();
                     const itemRect = nextActiveItem.getBoundingClientRect();
-                    const isAboveTop = itemRect.top < dropdownBodyRect.top;
-                    const isBelowBottom = itemRect.bottom > dropdownBodyRect.bottom;
+                    const isAboveTop = itemRect.top < parentRect.top;
+                    const isBelowBottom = itemRect.bottom > parentRect.bottom;
                     if (isAboveTop || isBelowBottom) {
-                        let { scrollTop } = dropdownBody;
+                        let { scrollTop } = scrollableParent;
                         // Item isn’t fully visible; adjust scrollTop to put item within closest edge
                         if (isAboveTop) {
-                            scrollTop -= dropdownBodyRect.top - itemRect.top;
+                            scrollTop -= parentRect.top - itemRect.top;
                         } else {
-                            scrollTop += itemRect.bottom - dropdownBodyRect.bottom;
+                            scrollTop += itemRect.bottom - parentRect.bottom;
                         }
-                        dropdownBody.scrollTop = scrollTop;
+                        scrollableParent.scrollTop = scrollTop;
                     }
                 }
             }
