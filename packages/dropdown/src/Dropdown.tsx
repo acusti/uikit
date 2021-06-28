@@ -26,12 +26,14 @@ export type Props = {
     placeholder?: string;
 };
 
+type Item = { label: string; value: string };
+
 const { Children, Fragment, useCallback, useRef, useState } = React;
 
 const CHILDREN_ERROR =
     '@acusti/dropdown requires props.children to contain either one element, the dropdown body, or two elements: the dropdown trigger and the dropdown body. Received %s elements.';
 
-type Item = { label: string; value: string };
+const KEY_EVENT_ELEMENTS = new Set(['INPUT', 'TEXTAREA']);
 
 const Dropdown: React.FC<Props> = ({
     children,
@@ -203,6 +205,7 @@ const Dropdown: React.FC<Props> = ({
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLElement>) => {
             const { altKey, ctrlKey, key, metaKey } = event;
+            const eventTarget = event.target as HTMLElement;
 
             const onEventHandled = () => {
                 event.stopPropagation();
@@ -245,14 +248,11 @@ const Dropdown: React.FC<Props> = ({
             switch (key) {
                 case 'Escape':
                     if (!isOpen) return;
-                    // If there are no items & focus is in the dropdown body, don’t close it
+                    // If there are no items & event target element uses key events, don’t close it
                     if (!hasItems) {
-                        const dropdownElement = dropdownElementRef.current;
                         if (
-                            dropdownElement &&
-                            dropdownElement.contains(
-                                dropdownElement.ownerDocument.activeElement,
-                            )
+                            eventTarget.isContentEditable ||
+                            KEY_EVENT_ELEMENTS.has(eventTarget.tagName)
                         ) {
                             return;
                         }
