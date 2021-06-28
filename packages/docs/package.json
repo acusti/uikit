@@ -25,6 +25,7 @@
     "dependencies": {
         "@acusti/css-value-input": "*",
         "@acusti/dropdown": "*",
+        "@acusti/input-text": "*",
         "@acusti/styling": "*",
         "classnames": "^2.3.0"
     },

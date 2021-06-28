@@ -17,6 +17,7 @@ drag-and-drop library, and more
 | **[@acusti/css-values][]**      | Utilities for parsing different types of CSS values           |
 | **[@acusti/css-value-input][]** | React component that renders a CSS value input                |
 | **[@acusti/dropdown][]**        | React component that renders a dropdown UI element            |
+| **[@acusti/input-text][]**      | React component that renders an uncontrolled text input       |
 | **[@acusti/matchmaking][]**     | Utilities for approximate string matching (i.e. fuzzy search) |
 | **[@acusti/styling][]**         | React component that renders a CSS string to the `<head>`     |
 | **[@acusti/uikit-docs][]**      | Storybook instance illustrating all components                |
@@ -27,6 +28,8 @@ drag-and-drop library, and more
     https://github.com/acusti/uikit/tree/main/packages/css-value-input
 [@acusti/dropdown]:
     https://github.com/acusti/uikit/tree/main/packages/dropdown
+[@acusti/input-text]:
+    https://github.com/acusti/uikit/tree/main/packages/input-text
 [@acusti/matchmaking]:
     https://github.com/acusti/uikit/tree/main/packages/matchmaking
 [@acusti/styling]:
