@@ -1,6 +1,6 @@
 {
     "name": "@acusti/dropdown",
-    "version": "0.3.1",
+    "version": "0.3.2",
     "type": "module",
     "exports": "./dist/Dropdown.js",
     "main": "./dist/Dropdown.js",
