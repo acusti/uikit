@@ -2,8 +2,9 @@
 
 # UIKit
 
-![GitHub last commit](https://img.shields.io/github/last-commit/acusti/uikit?style=for-the-badge)
+![Build and Test results](https://img.shields.io/github/workflow/status/acusti/uikit/Build%20and%20Test?style=for-the-badge)
 ![GitHub top language](https://img.shields.io/github/languages/top/acusti/uikit?style=for-the-badge)
+![GitHub last commit](https://img.shields.io/github/last-commit/acusti/uikit?style=for-the-badge)
 
 _UI toolkit monorepo containing a React component library, UI utilities, a
 drag-and-drop library, and more_
