@@ -15,7 +15,7 @@ import {
 } from './dropdown-styles.js';
 
 export type Props = {
-    // Can take a single React element (e.g. ReactChild) or exactly two renderable children
+    /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
     children: React.ReactChild | [React.ReactNode, React.ReactNode];
     className?: string;
     hasItems?: boolean;
