@@ -24,7 +24,7 @@
         "typescript": "^4.2.3"
     },
     "dependencies": {
-        "@acusti/css-values": "^0.8.1",
+        "@acusti/css-values": "^0.8.2",
         "@acusti/input-text": "^0.1.0"
     },
     "peerDependencies": {
