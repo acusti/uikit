@@ -140,6 +140,9 @@ const CSSValueInput: React.FC<Props> = ({
             }
 
             if (event.key === 'Escape' || event.key === 'Enter') {
+                if (event.key === 'Enter') {
+                    handleSubmitValue();
+                }
                 input.blur();
                 return;
             }
