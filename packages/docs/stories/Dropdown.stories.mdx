@@ -83,6 +83,19 @@ of macOS.
     right: 0px;
 }
 
+.font-weight {
+    font-size: 13px;
+}
+.font-weight input {
+    width: 160px;
+}
+.font-weight .item-title {
+    color: #ababab;
+}
+.font-weight [data-ukt-active] .item-title {
+    color: #fff;
+}
+
 .searchable-with-label input {
     width: 76px;
 }
@@ -154,6 +167,41 @@ of macOS.
                     <li>West Virginia</li>
                     <li>Wisconsin</li>
                     <li>Wyoming</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'font-weight',
+            isSearchable: true,
+        }}
+        name="Font Weight Dropdown"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li data-ukt-value="100">
+                        <span className="item-title">Font Weight - </span>100
+                    </li>
+                    <li data-ukt-value="200">
+                        <span className="item-title">Font Weight - </span>200
+                    </li>
+                    <li data-ukt-value="300">
+                        <span className="item-title">Font Weight - </span>300
+                    </li>
+                    <li data-ukt-value="400">
+                        <span className="item-title">Font Weight - </span>400
+                    </li>
+                    <li data-ukt-value="500">
+                        <span className="item-title">Font Weight - </span>500
+                    </li>
+                    <li data-ukt-value="600">
+                        <span className="item-title">Font Weight - </span>600
+                    </li>
+                    <li data-ukt-value="700">
+                        <span className="item-title">Font Weight - </span>700
+                    </li>
                 </ul>
             </Dropdown>
         )}
