@@ -157,16 +157,23 @@ const CSSValueInput: React.FC<Props> = ({
                     });
 
                     input.value = nextValue;
-
-                    if (!event.repeat) {
-                        handleSubmitValue();
-                    }
                     return;
                 default:
                 // No default key handling
             }
         },
-        [getNextValue, handleSubmitValue, placeholder, unit],
+        [getNextValue, onKeyDown, placeholder, unit],
+    );
+
+    const handleKeyUp = useCallback(
+        (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (onKeyUp) onKeyUp(event);
+            // If this is the key up from ↑ or ↓ keys, time to handleSubmitValue
+            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                handleSubmitValue();
+            }
+        },
+        [handleSubmitValue, onKeyUp],
     );
 
     return (
@@ -187,7 +194,7 @@ const CSSValueInput: React.FC<Props> = ({
                     onBlur={handleBlur}
                     onChange={onChange}
                     onKeyDown={handleKeyDown}
-                    onKeyUp={onKeyUp}
+                    onKeyUp={handleKeyUp}
                     placeholder={placeholder}
                     ref={inputRef}
                 />
