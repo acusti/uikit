@@ -362,12 +362,14 @@ const Dropdown: React.FC<Props> = ({
     );
 
     const handleMouseOver = useCallback(
-        ({ target }: React.MouseEvent<HTMLElement>) => {
+        (event: React.MouseEvent<HTMLElement>) => {
             if (!dropdownBodyItems) return;
             // If user isn’t currently using the mouse to navigate the dropdown, do nothing
             if (currentInputMethodRef.current !== 'mouse') return;
 
-            const element = target as HTMLElement;
+            const eventTarget = event.target as HTMLElement;
+            const item = eventTarget.closest(ITEM_SELECTOR) as HTMLElement | null;
+            const element = item || eventTarget;
             if (dropdownBodyItems.includes(element)) {
                 setActiveItem({ element });
             }
