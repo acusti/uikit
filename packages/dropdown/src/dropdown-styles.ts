@@ -16,9 +16,9 @@ export const TRIGGER_SELECTOR = `.${TRIGGER_CLASS_NAME}`;
 export const STYLES = `
 :root {
     --uktdropdown-font-family: ${SYSTEM_UI_FONT};
-    --uktdropdown-body-bg-color: white;
+    --uktdropdown-body-bg-color: #fff;
     --uktdropdown-body-bg-color-hover: rgb(105, 162, 249);
-    --uktdropdown-body-color-hover: white;
+    --uktdropdown-body-color-hover: #fff;
     --uktdropdown-body-pad-bottom: 10px;
     --uktdropdown-body-pad-left: 12px;
     --uktdropdown-body-pad-right: 12px;
