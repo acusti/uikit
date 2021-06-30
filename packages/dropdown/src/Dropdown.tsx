@@ -28,6 +28,8 @@ export type Props = {
         value: string;
     }) => void;
     placeholder?: string;
+    /** Only usable in conjunction with isSearchable: true and is used as search input’s value */
+    value?: string;
 };
 
 type Item = { label: string; value: string };
@@ -50,6 +52,7 @@ const Dropdown: React.FC<Props> = ({
     label,
     onSubmitItem,
     placeholder,
+    value,
 }) => {
     const childrenCount = Children.count(children);
     if (childrenCount !== 1 && childrenCount !== 2) {
@@ -201,23 +204,23 @@ const Dropdown: React.FC<Props> = ({
         if (!dropdownBodyItems) return;
 
         let label = '';
-        let value = '';
+        let nextValue = '';
         const index = getCurrentActiveIndex();
         const element = dropdownBodyItems[index] || null;
         if (element) {
             label = element.innerText;
-            value = element.dataset.uktValue || label;
+            nextValue = element.dataset.uktValue || label;
             if (inputElementRef.current) {
                 inputElementRef.current.value = label;
             }
         }
 
-        if (currentItem?.value === value) return;
+        if (currentItem?.value === nextValue) return;
 
-        setCurrentItem({ label, value });
+        setCurrentItem({ label, value: nextValue });
         if (!onSubmitItem) return;
 
-        onSubmitItem({ element, index, value });
+        onSubmitItem({ element, index, value: nextValue });
     }, [currentItem, dropdownBodyItems, getCurrentActiveIndex, isOpen, onSubmitItem]);
 
     const handleKeyDown = useCallback(
@@ -483,7 +486,7 @@ const Dropdown: React.FC<Props> = ({
             trigger = (
                 <InputText
                     className={TRIGGER_CLASS_NAME}
-                    initialValue=""
+                    initialValue={value || ''}
                     onChange={handleChange}
                     onFocus={openDropdown}
                     placeholder={placeholder}
