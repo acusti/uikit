@@ -95,7 +95,8 @@ const CSSValueInput: React.FC<Props> = ({
             defaultUnit: unit,
             value: inputRef.current.value,
         });
-    }, [cssValueType, unit]);
+        handleSubmitValue();
+    }, [cssValueType, handleSubmitValue, unit]);
 
     const getNextValue = useCallback(
         ({
@@ -134,33 +135,35 @@ const CSSValueInput: React.FC<Props> = ({
             if (onKeyDown) onKeyDown(event);
 
             const input = event.currentTarget;
+            let nextValue = '';
 
-            if (event.key === 'Escape') {
-                input.value = submittedValueRef.current;
-            }
+            switch (event.key) {
+                case 'Escape':
+                case 'Enter':
+                    if (event.key === 'Escape') {
+                        input.value = submittedValueRef.current;
+                    }
+                    input.blur();
+                    return;
+                case 'ArrowUp':
+                case 'ArrowDown':
+                    event.preventDefault();
 
-            if (event.key === 'Escape' || event.key === 'Enter') {
-                if (event.key === 'Enter') {
-                    handleSubmitValue();
-                }
-                input.blur();
-                return;
-            }
+                    nextValue = getNextValue({
+                        currentValue:
+                            event.currentTarget.value || placeholder || `0${unit}`,
+                        multiplier: event.shiftKey ? 10 : 1,
+                        signum: event.key === 'ArrowUp' ? 1 : -1,
+                    });
 
-            if (event.key !== 'ArrowUp' && event.key !== 'ArrowDown') return;
+                    input.value = nextValue;
 
-            event.preventDefault();
-
-            const nextValue = getNextValue({
-                currentValue: event.currentTarget.value || placeholder || `0${unit}`,
-                multiplier: event.shiftKey ? 10 : 1,
-                signum: event.key === 'ArrowUp' ? 1 : -1,
-            });
-
-            input.value = nextValue;
-
-            if (!event.repeat) {
-                handleSubmitValue();
+                    if (!event.repeat) {
+                        handleSubmitValue();
+                    }
+                    return;
+                default:
+                // No default key handling
             }
         },
         [getNextValue, handleSubmitValue, placeholder, unit],
