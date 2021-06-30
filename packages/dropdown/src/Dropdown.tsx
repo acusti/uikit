@@ -39,6 +39,8 @@ const CHILDREN_ERROR =
 
 const KEY_EVENT_ELEMENTS = new Set(['INPUT', 'TEXTAREA']);
 
+const ITEM_SELECTOR = '[data-ukt-item], [data-ukt-value]';
+
 const Dropdown: React.FC<Props> = ({
     children,
     className,
@@ -440,7 +442,7 @@ const Dropdown: React.FC<Props> = ({
             }
             // If mounting the dropdown body, find the list items
             let items: NodeListOf<Element> | HTMLCollection = ref.querySelectorAll(
-                '[data-ukt-item], [data-ukt-value]:not([data-ukt-value=""])',
+                ITEM_SELECTOR,
             );
             // If no items found via [data-ukt-item] selector or non-empty [data-ukt-value] selector,
             // use first instance of multiple children found
