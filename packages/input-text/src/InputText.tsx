@@ -86,7 +86,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             <input
                 autoComplete={autoComplete}
                 className={className}
-                defaultValue={initialValue || placeholder || ''}
+                defaultValue={initialValue || ''}
                 disabled={disabled}
                 maxLength={maxLength}
                 minLength={minLength}
