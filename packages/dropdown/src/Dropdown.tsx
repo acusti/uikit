@@ -68,7 +68,6 @@ const Dropdown: React.FC<Props> = ({
     const [dropdownBodyItems, setDropdownBodyItems] = useState<Array<HTMLElement> | null>(
         null,
     );
-    const dropdownBodyItemsCount = dropdownBodyItems ? dropdownBodyItems.length : 0;
 
     const dropdownElementRef = useRef<HTMLElement | null>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
@@ -116,15 +115,15 @@ const Dropdown: React.FC<Props> = ({
             | { element?: null; index: number; indexAddend?: null; text?: null }
             | { element?: null; index?: null; indexAddend: number; text?: null }
             | { element?: null; index?: null; indexAddend?: null; text: string }) => {
-            if (!dropdownBodyItems || !dropdownBodyItemsCount) return;
+            if (!dropdownBodyItems) return;
 
-            const lastIndex = dropdownBodyItemsCount - 1;
+            const lastIndex = dropdownBodyItems.length - 1;
             const currentActiveIndex = getCurrentActiveIndex();
 
             let nextActiveIndex = currentActiveIndex;
             if (typeof index === 'number') {
                 // Negative index means count back from the end
-                nextActiveIndex = index < 0 ? dropdownBodyItemsCount + index : index;
+                nextActiveIndex = index < 0 ? dropdownBodyItems.length + index : index;
             }
 
             if (element) {
@@ -200,7 +199,7 @@ const Dropdown: React.FC<Props> = ({
                 }
             }
         },
-        [dropdownBodyItems, dropdownBodyItemsCount, getCurrentActiveIndex],
+        [dropdownBodyItems, getCurrentActiveIndex],
     );
 
     const handleSubmitItem = useCallback(() => {

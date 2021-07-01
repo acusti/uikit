@@ -1,0 +1,43 @@
+import InputText from '@acusti/input-text';
+import { SYSTEM_UI_FONT } from '@acusti/styling';
+import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
+
+<Meta component={InputText} title="UIKit/Controls/InputText" />
+
+# InputText
+
+`InputText` is a React component that renders a textual input (`type: 'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url'`) that is uncontrolled, but whose value is overwritten whenever `props.initialValue` changes. Also, it selects the entire contents of the input whenever the input is focused.
+
+<style>{`
+input.input-text {
+    width: 65px;
+    padding: 3px 6px;
+    font-family: ${SYSTEM_UI_FONT};
+    font-size: 13px;
+    line-height: 13px;
+}
+`}</style>
+
+<Canvas>
+    <Story
+        name="Empty Input"
+        args={{
+            className: 'input-text',
+            placeholder: 'enter text here…',
+        }}
+    >
+        {(args) => <InputText {...args} />}
+    </Story>
+    <Story
+        name="Input With Initial Value"
+        args={{
+            className: 'input-text',
+            initialValue: 'Venezuela'
+            placeholder: 'enter the country name',
+        }}
+    >
+        {(args) => <InputText {...args} />}
+    </Story>
+</Canvas>
+
+<Props story="Input With Initial Value" />
