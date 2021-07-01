@@ -1,6 +1,6 @@
 {
     "name": "@acusti/css-value-input",
-    "version": "0.8.4",
+    "version": "0.8.5",
     "type": "module",
     "exports": "./dist/CSSValueInput.js",
     "main": "./dist/CSSValueInput.js",
@@ -25,7 +25,7 @@
     },
     "dependencies": {
         "@acusti/css-values": "^0.8.4",
-        "@acusti/input-text": "^0.1.0"
+        "@acusti/input-text": "^0.1.1"
     },
     "peerDependencies": {
         "classnames": "^2",

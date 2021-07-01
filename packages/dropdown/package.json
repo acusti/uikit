@@ -1,6 +1,6 @@
 {
     "name": "@acusti/dropdown",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "type": "module",
     "exports": "./dist/Dropdown.js",
     "main": "./dist/Dropdown.js",
@@ -24,7 +24,7 @@
         "typescript": "^4.2.3"
     },
     "dependencies": {
-        "@acusti/input-text": "^0.1.0",
+        "@acusti/input-text": "^0.1.1",
         "@acusti/matchmaking": "^0.1.3",
         "@acusti/styling": "^0.2.1"
     },
