@@ -22,11 +22,7 @@ export type Props = {
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
     label?: string;
-    onSubmitItem?: (payload: {
-        element: HTMLElement | null;
-        index: number;
-        value: string;
-    }) => void;
+    onSubmitItem?: (payload: { element: HTMLElement | null; value: string }) => void;
     placeholder?: string;
     /** Only usable in conjunction with isSearchable: true and is used as search input’s value */
     value?: string;
@@ -41,7 +37,157 @@ const CHILDREN_ERROR =
 
 const KEY_EVENT_ELEMENTS = new Set(['INPUT', 'TEXTAREA']);
 
-const ITEM_SELECTOR = '[data-ukt-item], [data-ukt-value]';
+const ITEM_SELECTOR = `[data-ukt-item], [data-ukt-value]`;
+
+const getItemElements = (dropdownElement: HTMLElement | null) => {
+    if (!dropdownElement) return null;
+
+    const bodyElement = dropdownElement.querySelector(BODY_SELECTOR);
+    if (!bodyElement) return null;
+
+    let items: NodeListOf<Element> | HTMLCollection = bodyElement.querySelectorAll(
+        ITEM_SELECTOR,
+    );
+
+    if (items.length) return items;
+    // If no items found via [data-ukt-item] or [data-ukt-value] selector,
+    // use first instance of multiple children found
+    items = bodyElement.children;
+    while (items.length === 1) {
+        if (!items[0].children) break;
+        items = items[0].children;
+    }
+    // If unable to find an element with more than one child, treat direct child as items
+    if (items.length === 1) {
+        items = bodyElement.children;
+    }
+    return items;
+};
+
+const getActiveItemElement = (dropdownElement: HTMLElement | null) => {
+    if (!dropdownElement) return null;
+    return dropdownElement.querySelector('[data-ukt-active]') as HTMLElement | null;
+};
+
+const setActiveItem = ({
+    dropdownElement,
+    element,
+    index,
+    indexAddend,
+    text,
+}:
+    | {
+          dropdownElement: HTMLElement;
+          element: HTMLElement;
+          index?: null;
+          indexAddend?: null;
+          text?: null;
+      }
+    | {
+          dropdownElement: HTMLElement;
+          element?: null;
+          index: number;
+          indexAddend?: null;
+          text?: null;
+      }
+    | {
+          dropdownElement: HTMLElement;
+          element?: null;
+          index?: null;
+          indexAddend: number;
+          text?: null;
+      }
+    | {
+          dropdownElement: HTMLElement;
+          element?: null;
+          index?: null;
+          indexAddend?: null;
+          text: string;
+      }) => {
+    const items = getItemElements(dropdownElement);
+    if (!items) return;
+
+    const itemElements = Array.from(items) as Array<HTMLElement>;
+    if (!itemElements.length) return;
+
+    const lastIndex = itemElements.length - 1;
+    const currentActiveIndex = itemElements.findIndex((itemElement) =>
+        itemElement.hasAttribute('data-ukt-active'),
+    );
+
+    let nextActiveIndex = currentActiveIndex;
+    if (typeof index === 'number') {
+        // Negative index means count back from the end
+        nextActiveIndex = index < 0 ? itemElements.length + index : index;
+    }
+
+    if (element) {
+        nextActiveIndex = itemElements.findIndex(
+            (itemElement) => itemElement === element,
+        );
+    } else if (typeof indexAddend === 'number') {
+        // If there’s no currentActiveIndex and we are handling -1, start at lastIndex
+        if (currentActiveIndex === -1 && indexAddend === -1) {
+            nextActiveIndex = lastIndex;
+        } else {
+            nextActiveIndex += indexAddend;
+        }
+        // Keep it within the bounds of the items list
+        if (nextActiveIndex < 0) {
+            nextActiveIndex = 0;
+        } else if (nextActiveIndex > lastIndex) {
+            nextActiveIndex = lastIndex;
+        }
+    } else if (typeof text === 'string') {
+        const itemTexts = itemElements.map((itemElement) => itemElement.innerText);
+        const bestMatch = getBestMatch({ items: itemTexts, text });
+        nextActiveIndex = itemTexts.findIndex((text) => text === bestMatch);
+    }
+
+    if (nextActiveIndex === -1 || nextActiveIndex === currentActiveIndex) return;
+
+    // Clear any existing active dropdown body item state
+    itemElements.forEach((itemElement, index) => {
+        if (index === nextActiveIndex) return;
+        if (!itemElement.hasAttribute('data-ukt-active')) return;
+
+        delete itemElement.dataset.uktActive;
+    });
+
+    const nextActiveItem = items[nextActiveIndex];
+    if (nextActiveItem) {
+        nextActiveItem.setAttribute('data-ukt-active', '');
+        // Find closest scrollable parent and ensure that next active item is visible
+        let { parentElement } = nextActiveItem;
+        let scrollableParent = null;
+        while (!scrollableParent && parentElement && parentElement !== dropdownElement) {
+            const isScrollable =
+                parentElement.scrollHeight > parentElement.clientHeight + 15;
+            if (isScrollable) {
+                scrollableParent = parentElement;
+            } else {
+                parentElement = parentElement.parentElement;
+            }
+        }
+
+        if (scrollableParent) {
+            const parentRect = scrollableParent.getBoundingClientRect();
+            const itemRect = nextActiveItem.getBoundingClientRect();
+            const isAboveTop = itemRect.top < parentRect.top;
+            const isBelowBottom = itemRect.bottom > parentRect.bottom;
+            if (isAboveTop || isBelowBottom) {
+                let { scrollTop } = scrollableParent;
+                // Item isn’t fully visible; adjust scrollTop to put item within closest edge
+                if (isAboveTop) {
+                    scrollTop -= parentRect.top - itemRect.top;
+                } else {
+                    scrollTop += itemRect.bottom - parentRect.bottom;
+                }
+                scrollableParent.scrollTop = scrollTop;
+            }
+        }
+    }
+};
 
 const Dropdown: React.FC<Props> = ({
     children,
@@ -65,9 +211,6 @@ const Dropdown: React.FC<Props> = ({
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [currentItem, setCurrentItem] = useState<Item | null>(null);
-    const [dropdownBodyItems, setDropdownBodyItems] = useState<Array<HTMLElement> | null>(
-        null,
-    );
 
     const dropdownElementRef = useRef<HTMLElement | null>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
@@ -94,142 +237,33 @@ const Dropdown: React.FC<Props> = ({
         setIsOpen(true);
     }, []);
 
-    const getCurrentActiveIndex = useCallback(
-        () =>
-            dropdownBodyItems
-                ? dropdownBodyItems.findIndex((dropdownBodyItem) =>
-                      dropdownBodyItem.hasAttribute('data-ukt-active'),
-                  )
-                : -1,
-        [dropdownBodyItems],
-    );
-
-    const setActiveItem = useCallback(
-        ({
-            element,
-            index,
-            indexAddend,
-            text,
-        }:
-            | { element: HTMLElement; index?: null; indexAddend?: null; text?: null }
-            | { element?: null; index: number; indexAddend?: null; text?: null }
-            | { element?: null; index?: null; indexAddend: number; text?: null }
-            | { element?: null; index?: null; indexAddend?: null; text: string }) => {
-            if (!dropdownBodyItems) return;
-
-            const lastIndex = dropdownBodyItems.length - 1;
-            const currentActiveIndex = getCurrentActiveIndex();
-
-            let nextActiveIndex = currentActiveIndex;
-            if (typeof index === 'number') {
-                // Negative index means count back from the end
-                nextActiveIndex = index < 0 ? dropdownBodyItems.length + index : index;
-            }
-
-            if (element) {
-                nextActiveIndex = dropdownBodyItems.findIndex(
-                    (dropdownBodyItem) => dropdownBodyItem === element,
-                );
-            } else if (typeof indexAddend === 'number') {
-                // If there’s no currentActiveIndex and we are handling -1, start at lastIndex
-                if (currentActiveIndex === -1 && indexAddend === -1) {
-                    nextActiveIndex = lastIndex;
-                } else {
-                    nextActiveIndex += indexAddend;
-                }
-                // Keep it within the bounds of the items list
-                if (nextActiveIndex < 0) {
-                    nextActiveIndex = 0;
-                } else if (nextActiveIndex > lastIndex) {
-                    nextActiveIndex = lastIndex;
-                }
-            } else if (typeof text === 'string') {
-                const itemTexts = dropdownBodyItems.map(
-                    (dropdownBodyItem) => dropdownBodyItem.innerText,
-                );
-                const bestMatch = getBestMatch({ items: itemTexts, text });
-                nextActiveIndex = itemTexts.findIndex((text) => text === bestMatch);
-            }
-
-            if (nextActiveIndex === -1 || nextActiveIndex === currentActiveIndex) return;
-
-            // Clear any existing active dropdown body item state
-            dropdownBodyItems.forEach((dropdownBodyItem, index) => {
-                if (index === nextActiveIndex) return;
-                if (!dropdownBodyItem.hasAttribute('data-ukt-active')) return;
-
-                delete dropdownBodyItem.dataset.uktActive;
-            });
-
-            const nextActiveItem = dropdownBodyItems[nextActiveIndex];
-            if (nextActiveItem) {
-                nextActiveItem.setAttribute('data-ukt-active', '');
-                // Find closest scrollable parent and ensure that next active item is visible
-                let { parentElement } = nextActiveItem;
-                let scrollableParent = null;
-                while (
-                    !scrollableParent &&
-                    parentElement &&
-                    parentElement !== dropdownElementRef.current
-                ) {
-                    const isScrollable =
-                        parentElement.scrollHeight > parentElement.clientHeight + 15;
-                    if (isScrollable) {
-                        scrollableParent = parentElement;
-                    } else {
-                        parentElement = parentElement.parentElement;
-                    }
-                }
-
-                if (scrollableParent) {
-                    const parentRect = scrollableParent.getBoundingClientRect();
-                    const itemRect = nextActiveItem.getBoundingClientRect();
-                    const isAboveTop = itemRect.top < parentRect.top;
-                    const isBelowBottom = itemRect.bottom > parentRect.bottom;
-                    if (isAboveTop || isBelowBottom) {
-                        let { scrollTop } = scrollableParent;
-                        // Item isn’t fully visible; adjust scrollTop to put item within closest edge
-                        if (isAboveTop) {
-                            scrollTop -= parentRect.top - itemRect.top;
-                        } else {
-                            scrollTop += itemRect.bottom - parentRect.bottom;
-                        }
-                        scrollableParent.scrollTop = scrollTop;
-                    }
-                }
-            }
-        },
-        [dropdownBodyItems, getCurrentActiveIndex],
-    );
-
     const handleSubmitItem = useCallback(() => {
         if (isOpen) closeDropdown();
-        if (!dropdownBodyItems) return;
 
-        let label = '';
-        let nextValue = '';
-        const index = getCurrentActiveIndex();
-        const element = dropdownBodyItems[index] || null;
-        if (element) {
-            label = element.innerText;
-            nextValue = element.dataset.uktValue || label;
-            if (inputElementRef.current) {
-                inputElementRef.current.value = label;
-            }
+        const nextElement = getActiveItemElement(dropdownElementRef.current);
+        if (!nextElement) return;
+
+        const label = nextElement.innerText;
+        const nextValue = nextElement.dataset.uktValue || label;
+        if (inputElementRef.current) {
+            inputElementRef.current.value = label;
         }
 
         if (currentItem?.value === nextValue) return;
 
         setCurrentItem({ label, value: nextValue });
-        if (!onSubmitItem) return;
 
-        onSubmitItem({ element, index, value: nextValue });
-    }, [currentItem, dropdownBodyItems, getCurrentActiveIndex, isOpen, onSubmitItem]);
+        if (onSubmitItem) {
+            onSubmitItem({ element: nextElement, value: nextValue });
+        }
+    }, [currentItem, isOpen, onSubmitItem]);
 
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLElement>) => {
             const { altKey, ctrlKey, key, metaKey } = event;
             const eventTarget = event.target as HTMLElement;
+            const dropdownElement = dropdownElementRef.current;
+            if (!dropdownElement) return;
 
             const onEventHandled = () => {
                 event.stopPropagation();
@@ -255,7 +289,10 @@ const Dropdown: React.FC<Props> = ({
                     enteredCharactersRef.current += key;
                 }
 
-                setActiveItem({ text: enteredCharactersRef.current });
+                setActiveItem({
+                    dropdownElement,
+                    text: enteredCharactersRef.current,
+                });
 
                 if (clearEnteredCharactersTimerRef.current) {
                     clearTimeout(clearEnteredCharactersTimerRef.current);
@@ -308,9 +345,15 @@ const Dropdown: React.FC<Props> = ({
 
                     onEventHandled();
                     if (altKey || metaKey) {
-                        setActiveItem({ index: 0 });
+                        setActiveItem({
+                            dropdownElement,
+                            index: 0,
+                        });
                     } else {
-                        setActiveItem({ indexAddend: -1 });
+                        setActiveItem({
+                            dropdownElement,
+                            indexAddend: -1,
+                        });
                     }
                     return;
                 case 'ArrowDown':
@@ -319,14 +362,20 @@ const Dropdown: React.FC<Props> = ({
                     onEventHandled();
                     if (altKey || metaKey) {
                         // Using a negative index counts back from the end
-                        setActiveItem({ index: -1 });
+                        setActiveItem({
+                            dropdownElement,
+                            index: -1,
+                        });
                     } else {
-                        setActiveItem({ indexAddend: 1 });
+                        setActiveItem({
+                            dropdownElement,
+                            indexAddend: 1,
+                        });
                     }
                     return;
             }
         },
-        [closeDropdown, handleSubmitItem, hasItems, isOpen, isSearchable, setActiveItem],
+        [closeDropdown, handleSubmitItem, hasItems, isOpen, isSearchable],
     );
 
     const handleMouseDown = useCallback(
@@ -362,18 +411,30 @@ const Dropdown: React.FC<Props> = ({
 
     const handleMouseOver = useCallback(
         (event: React.MouseEvent<HTMLElement>) => {
-            if (!dropdownBodyItems) return;
+            if (!hasItems) return;
             // If user isn’t currently using the mouse to navigate the dropdown, do nothing
             if (currentInputMethodRef.current !== 'mouse') return;
+            // Ensure we have the dropdown root HTMLElement
+            const dropdownElement = dropdownElementRef.current;
+            if (!dropdownElement) return;
+
+            const itemElements = getItemElements(dropdownElement);
+            if (!itemElements) return;
 
             const eventTarget = event.target as HTMLElement;
             const item = eventTarget.closest(ITEM_SELECTOR) as HTMLElement | null;
             const element = item || eventTarget;
-            if (dropdownBodyItems.includes(element)) {
-                setActiveItem({ element });
+            for (let index = 0; index < itemElements.length; index++) {
+                if (itemElements[index] === element) {
+                    setActiveItem({
+                        dropdownElement,
+                        element,
+                    });
+                    return;
+                }
             }
         },
-        [dropdownBodyItems, setActiveItem],
+        [hasItems],
     );
 
     const handleMouseUp = useCallback(
@@ -435,44 +496,21 @@ const Dropdown: React.FC<Props> = ({
         [closeDropdown],
     );
 
-    const handleBodyRef = useCallback(
-        (ref: HTMLElement | null) => {
-            if (!ref || !hasItems) {
-                setDropdownBodyItems(null);
-                return;
-            }
-            // If mounting the dropdown body, find the list items
-            let items: NodeListOf<Element> | HTMLCollection = ref.querySelectorAll(
-                ITEM_SELECTOR,
-            );
-            // If no items found via [data-ukt-item] selector or non-empty [data-ukt-value] selector,
-            // use first instance of multiple children found
-            if (!items.length) {
-                items = ref.children;
-                while (items.length === 1) {
-                    if (!items[0].children) break;
-                    items = items[0].children;
-                }
-                // If unable to find an element with more than one child, treat direct child as items
-                if (items.length === 1) {
-                    items = ref.children;
-                }
-            }
-
-            setDropdownBodyItems(Array.from(items) as Array<HTMLElement>);
-        },
-        [hasItems],
-    );
-
     const handleChange = useCallback(
         (event: React.ChangeEvent<HTMLElement>) => {
+            const dropdownElement = dropdownElementRef.current;
+            if (!dropdownElement) return;
+
             if (!isOpen) openDropdown();
 
             const input = event.target as HTMLInputElement;
             enteredCharactersRef.current = input.value;
-            setActiveItem({ text: enteredCharactersRef.current });
+            setActiveItem({
+                dropdownElement,
+                text: enteredCharactersRef.current,
+            });
         },
-        [isOpen, openDropdown, setActiveItem],
+        [isOpen, openDropdown],
     );
 
     let trigger = childrenCount > 1 ? children[0] : null;
@@ -530,7 +568,6 @@ const Dropdown: React.FC<Props> = ({
                         className={classnames(BODY_CLASS_NAME, {
                             'has-items': hasItems,
                         })}
-                        ref={handleBodyRef}
                     >
                         {children[1] || children[0] || children}
                     </div>
