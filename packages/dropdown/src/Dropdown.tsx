@@ -121,7 +121,11 @@ const Dropdown: React.FC<Props> = ({
             const lastIndex = dropdownBodyItemsCount - 1;
             const currentActiveIndex = getCurrentActiveIndex();
 
-            let nextActiveIndex = typeof index === 'number' ? index : currentActiveIndex;
+            let nextActiveIndex = currentActiveIndex;
+            if (typeof index === 'number') {
+                // Negative index means count back from the end
+                nextActiveIndex = index < 0 ? dropdownBodyItemsCount + index : index;
+            }
 
             if (element) {
                 nextActiveIndex = dropdownBodyItems.findIndex(
@@ -315,22 +319,15 @@ const Dropdown: React.FC<Props> = ({
 
                     onEventHandled();
                     if (altKey || metaKey) {
-                        setActiveItem({ index: dropdownBodyItemsCount - 1 });
+                        // Using a negative index counts back from the end
+                        setActiveItem({ index: -1 });
                     } else {
                         setActiveItem({ indexAddend: 1 });
                     }
                     return;
             }
         },
-        [
-            closeDropdown,
-            dropdownBodyItemsCount,
-            handleSubmitItem,
-            hasItems,
-            isOpen,
-            isSearchable,
-            setActiveItem,
-        ],
+        [closeDropdown, handleSubmitItem, hasItems, isOpen, isSearchable, setActiveItem],
     );
 
     const handleMouseDown = useCallback(
