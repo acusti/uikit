@@ -26,7 +26,7 @@ export type Props = {
     label?: string;
     onSubmitItem?: (payload: Item) => void;
     placeholder?: string;
-    /** Only usable in conjunction with isSearchable: true and is used as search input’s value */
+    /** Only usable in conjunction with {isSearchable: true}; used as search input’s value */
     value?: string;
 };
 
