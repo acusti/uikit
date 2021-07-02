@@ -225,6 +225,10 @@ const Dropdown: React.FC<Props> = ({
 
     const isOpenRef = useRef(isOpen);
     isOpenRef.current = isOpen;
+    const hasItemsRef = useRef(hasItems);
+    hasItemsRef.current = hasItems;
+    const isSearchableRef = useRef(isSearchable);
+    isSearchableRef.current = isSearchable;
     const onSubmitItemRef = useRef(onSubmitItem);
     onSubmitItemRef.current = onSubmitItem;
 
@@ -243,8 +247,6 @@ const Dropdown: React.FC<Props> = ({
     }, []);
 
     const handleSubmitItem = useCallback(() => {
-        if (isOpenRef.current) closeDropdown();
-
         const nextElement = getActiveItemElement(dropdownElementRef.current);
         if (!nextElement) return;
 
@@ -261,127 +263,123 @@ const Dropdown: React.FC<Props> = ({
         if (onSubmitItemRef.current) {
             onSubmitItemRef.current(nextItem);
         }
+
+        if (isOpenRef.current) closeDropdown();
     }, []);
 
-    const handleKeyDown = useCallback(
-        (event: React.KeyboardEvent<HTMLElement>) => {
-            const { altKey, ctrlKey, key, metaKey } = event;
-            const eventTarget = event.target as HTMLElement;
-            const dropdownElement = dropdownElementRef.current;
-            if (!dropdownElement) return;
+    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLElement>) => {
+        const { altKey, ctrlKey, key, metaKey } = event;
+        const eventTarget = event.target as HTMLElement;
+        const dropdownElement = dropdownElementRef.current;
+        if (!dropdownElement) return;
 
-            const onEventHandled = () => {
-                event.stopPropagation();
-                event.preventDefault();
-                currentInputMethodRef.current = 'keyboard';
-            };
+        const onEventHandled = () => {
+            event.stopPropagation();
+            event.preventDefault();
+            currentInputMethodRef.current = 'keyboard';
+        };
 
-            let isEditingCharacters = !ctrlKey && !metaKey && /^[A-Za-z0-9]$/.test(key);
-            // User could also be editing characters if there are already characters entered
-            // and they are hitting delete or spacebar
-            if (!isEditingCharacters && enteredCharactersRef.current) {
-                isEditingCharacters = key === ' ' || key === 'Backspace';
+        let isEditingCharacters = !ctrlKey && !metaKey && /^[A-Za-z0-9]$/.test(key);
+        // User could also be editing characters if there are already characters entered
+        // and they are hitting delete or spacebar
+        if (!isEditingCharacters && enteredCharactersRef.current) {
+            isEditingCharacters = key === ' ' || key === 'Backspace';
+        }
+
+        if (isEditingCharacters && hasItemsRef.current && !isSearchableRef.current) {
+            onEventHandled();
+            if (key === 'Backspace') {
+                enteredCharactersRef.current = enteredCharactersRef.current.slice(0, -1);
+            } else {
+                enteredCharactersRef.current += key;
             }
 
-            if (isEditingCharacters && hasItems && !isSearchable) {
+            setActiveItem({
+                dropdownElement,
+                text: enteredCharactersRef.current,
+            });
+
+            if (clearEnteredCharactersTimerRef.current) {
+                clearTimeout(clearEnteredCharactersTimerRef.current);
+            }
+
+            clearEnteredCharactersTimerRef.current = setTimeout(() => {
+                enteredCharactersRef.current = '';
+                clearEnteredCharactersTimerRef.current = null;
+            }, 1500);
+
+            return;
+        }
+
+        switch (key) {
+            case 'Escape':
+                if (!isOpenRef.current) return;
+                // If there are no items & event target element uses key events, don’t close it
+                if (!hasItemsRef.current) {
+                    if (
+                        eventTarget.isContentEditable ||
+                        KEY_EVENT_ELEMENTS.has(eventTarget.tagName)
+                    ) {
+                        return;
+                    }
+                }
+
                 onEventHandled();
-                if (key === 'Backspace') {
-                    enteredCharactersRef.current = enteredCharactersRef.current.slice(
-                        0,
-                        -1,
-                    );
-                } else {
-                    enteredCharactersRef.current += key;
-                }
-
-                setActiveItem({
-                    dropdownElement,
-                    text: enteredCharactersRef.current,
-                });
-
-                if (clearEnteredCharactersTimerRef.current) {
-                    clearTimeout(clearEnteredCharactersTimerRef.current);
-                }
-
-                clearEnteredCharactersTimerRef.current = setTimeout(() => {
-                    enteredCharactersRef.current = '';
-                    clearEnteredCharactersTimerRef.current = null;
-                }, 1500);
-
+                closeDropdown();
                 return;
-            }
+            case ' ':
+            case 'Enter':
+                // Only treat spacebar as toggle and select if no search input
+                if (key === ' ' && isSearchableRef.current) return;
+                // Do not close dropdown on spacebar or enter if there are no items
+                if (isOpenRef.current && !hasItemsRef.current) return;
 
-            switch (key) {
-                case 'Escape':
-                    if (!isOpen) return;
-                    // If there are no items & event target element uses key events, don’t close it
-                    if (!hasItems) {
-                        if (
-                            eventTarget.isContentEditable ||
-                            KEY_EVENT_ELEMENTS.has(eventTarget.tagName)
-                        ) {
-                            return;
-                        }
+                onEventHandled();
+                if (isOpenRef.current) {
+                    if (hasItemsRef.current) {
+                        handleSubmitItem();
+                    } else if (key === ' ') {
+                        closeDropdown();
                     }
+                } else {
+                    openDropdown();
+                }
+                return;
+            case 'ArrowUp':
+                if (!hasItemsRef.current) return;
 
-                    onEventHandled();
-                    closeDropdown();
-                    return;
-                case ' ':
-                case 'Enter':
-                    // Only treat spacebar as toggle and select if no search input
-                    if (key === ' ' && isSearchable) return;
-                    // Do not close dropdown on spacebar or enter if there are no items
-                    if (isOpen && !hasItems) return;
+                onEventHandled();
+                if (altKey || metaKey) {
+                    setActiveItem({
+                        dropdownElement,
+                        index: 0,
+                    });
+                } else {
+                    setActiveItem({
+                        dropdownElement,
+                        indexAddend: -1,
+                    });
+                }
+                return;
+            case 'ArrowDown':
+                if (!hasItemsRef.current) return;
 
-                    onEventHandled();
-                    if (isOpen) {
-                        if (hasItems) {
-                            handleSubmitItem();
-                        } else if (key === ' ') {
-                            closeDropdown();
-                        }
-                    } else {
-                        openDropdown();
-                    }
-                    return;
-                case 'ArrowUp':
-                    if (!hasItems) return;
-
-                    onEventHandled();
-                    if (altKey || metaKey) {
-                        setActiveItem({
-                            dropdownElement,
-                            index: 0,
-                        });
-                    } else {
-                        setActiveItem({
-                            dropdownElement,
-                            indexAddend: -1,
-                        });
-                    }
-                    return;
-                case 'ArrowDown':
-                    if (!hasItems) return;
-
-                    onEventHandled();
-                    if (altKey || metaKey) {
-                        // Using a negative index counts back from the end
-                        setActiveItem({
-                            dropdownElement,
-                            index: -1,
-                        });
-                    } else {
-                        setActiveItem({
-                            dropdownElement,
-                            indexAddend: 1,
-                        });
-                    }
-                    return;
-            }
-        },
-        [closeDropdown, handleSubmitItem, hasItems, isOpen, isSearchable],
-    );
+                onEventHandled();
+                if (altKey || metaKey) {
+                    // Using a negative index counts back from the end
+                    setActiveItem({
+                        dropdownElement,
+                        index: -1,
+                    });
+                } else {
+                    setActiveItem({
+                        dropdownElement,
+                        indexAddend: 1,
+                    });
+                }
+                return;
+        }
+    }, []);
 
     const handleMouseDown = useCallback(
         ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
