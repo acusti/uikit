@@ -210,7 +210,6 @@ const Dropdown: React.FC<Props> = ({
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
-    const [currentItem, setCurrentItem] = useState<Item | null>(null);
 
     const dropdownElementRef = useRef<HTMLElement | null>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
@@ -222,6 +221,7 @@ const Dropdown: React.FC<Props> = ({
         null,
     );
     const enteredCharactersRef = useRef<string>('');
+    const currentItemRef = useRef<Item | null>(null);
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
@@ -249,14 +249,13 @@ const Dropdown: React.FC<Props> = ({
             inputElementRef.current.value = label;
         }
 
-        if (currentItem?.value === nextValue) return;
+        if (currentItemRef.current?.value === nextValue) return;
 
-        setCurrentItem({ label, value: nextValue });
-
+        currentItemRef.current = { label, value: nextValue };
         if (onSubmitItem) {
             onSubmitItem({ element: nextElement, value: nextValue });
         }
-    }, [currentItem, isOpen, onSubmitItem]);
+    }, [isOpen, onSubmitItem]);
 
     const handleKeyDown = useCallback(
         (event: React.KeyboardEvent<HTMLElement>) => {
