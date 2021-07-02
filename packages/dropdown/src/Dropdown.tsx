@@ -14,6 +14,8 @@ import {
     TRIGGER_CLASS_NAME,
 } from './dropdown-styles.js';
 
+type Item = { element: HTMLElement; value: string };
+
 export type Props = {
     /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
     children: React.ReactChild | [React.ReactNode, React.ReactNode];
@@ -22,13 +24,12 @@ export type Props = {
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
     label?: string;
-    onSubmitItem?: (payload: { element: HTMLElement | null; value: string }) => void;
+    onSubmitItem?: (payload: Item) => void;
     placeholder?: string;
     /** Only usable in conjunction with isSearchable: true and is used as search input’s value */
     value?: string;
 };
 
-type Item = { label: string; value: string };
 type MousePosition = { clientX: number; clientY: number };
 
 const { Children, Fragment, useCallback, useRef, useState } = React;
@@ -244,15 +245,16 @@ const Dropdown: React.FC<Props> = ({
 
         const label = nextElement.innerText;
         const nextValue = nextElement.dataset.uktValue || label;
+        const nextItem = { element: nextElement, value: nextValue };
         if (inputElementRef.current) {
             inputElementRef.current.value = label;
         }
 
         if (currentItemRef.current?.value === nextValue) return;
 
-        currentItemRef.current = { label, value: nextValue };
+        currentItemRef.current = nextItem;
         if (onSubmitItem) {
-            onSubmitItem({ element: nextElement, value: nextValue });
+            onSubmitItem(nextItem);
         }
     }, [isOpen, onSubmitItem]);
 
