@@ -29,6 +29,7 @@ export type Props = {
 };
 
 type Item = { label: string; value: string };
+type MousePosition = { clientX: number; clientY: number };
 
 const { Children, Fragment, useCallback, useRef, useState } = React;
 
@@ -217,10 +218,8 @@ const Dropdown: React.FC<Props> = ({
     const isOpeningTimerRef = useRef<number | null>(null);
     const currentInputMethodRef = useRef<'mouse' | 'keyboard'>('mouse');
     const clearEnteredCharactersTimerRef = useRef<number | null>(null);
-    const mouseDownPositionRef = useRef<{ clientX: number; clientY: number } | null>(
-        null,
-    );
     const enteredCharactersRef = useRef<string>('');
+    const mouseDownPositionRef = useRef<MousePosition | null>(null);
     const currentItemRef = useRef<Item | null>(null);
 
     const closeDropdown = useCallback(() => {
