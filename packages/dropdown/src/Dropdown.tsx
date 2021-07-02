@@ -12,7 +12,7 @@ import {
     ROOT_CLASS_NAME,
     STYLES,
     TRIGGER_CLASS_NAME,
-} from './dropdown-styles.js';
+} from './styles.js';
 
 type Item = { element: HTMLElement; value: string };
 
