@@ -26,6 +26,8 @@ export type Props = {
     /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
     children: React.ReactChild | [React.ReactNode, React.ReactNode];
     className?: string;
+    /** Group identifier string links dropdowns together into a menu (like macOS top menubar) */
+    group?: string;
     hasItems?: boolean;
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
@@ -117,120 +119,6 @@ const Dropdown: React.FC<Props> = ({
         }
 
         if (isOpenRef.current) closeDropdown();
-    }, []);
-
-    const handleKeyDown = useCallback((event: React.KeyboardEvent<HTMLElement>) => {
-        const { altKey, ctrlKey, key, metaKey } = event;
-        const eventTarget = event.target as HTMLElement;
-        const dropdownElement = dropdownElementRef.current;
-        if (!dropdownElement) return;
-
-        const onEventHandled = () => {
-            event.stopPropagation();
-            event.preventDefault();
-            currentInputMethodRef.current = 'keyboard';
-        };
-
-        let isEditingCharacters = !ctrlKey && !metaKey && /^[A-Za-z0-9]$/.test(key);
-        // User could also be editing characters if there are already characters entered
-        // and they are hitting delete or spacebar
-        if (!isEditingCharacters && enteredCharactersRef.current) {
-            isEditingCharacters = key === ' ' || key === 'Backspace';
-        }
-
-        if (isEditingCharacters && hasItemsRef.current && !isSearchableRef.current) {
-            onEventHandled();
-            if (key === 'Backspace') {
-                enteredCharactersRef.current = enteredCharactersRef.current.slice(0, -1);
-            } else {
-                enteredCharactersRef.current += key;
-            }
-
-            setActiveItem({
-                dropdownElement,
-                text: enteredCharactersRef.current,
-            });
-
-            if (clearEnteredCharactersTimerRef.current) {
-                clearTimeout(clearEnteredCharactersTimerRef.current);
-            }
-
-            clearEnteredCharactersTimerRef.current = setTimeout(() => {
-                enteredCharactersRef.current = '';
-                clearEnteredCharactersTimerRef.current = null;
-            }, 1500);
-
-            return;
-        }
-
-        switch (key) {
-            case 'Escape':
-                if (!isOpenRef.current) return;
-                // If there are no items & event target element uses key events, don’t close it
-                if (!hasItemsRef.current) {
-                    if (
-                        eventTarget.isContentEditable ||
-                        KEY_EVENT_ELEMENTS.has(eventTarget.tagName)
-                    ) {
-                        return;
-                    }
-                }
-
-                onEventHandled();
-                closeDropdown();
-                return;
-            case ' ':
-            case 'Enter':
-                // Only treat spacebar as toggle and select if no search input
-                if (key === ' ' && isSearchableRef.current) return;
-                // Do not close dropdown on spacebar or enter if there are no items
-                if (isOpenRef.current && !hasItemsRef.current) return;
-
-                onEventHandled();
-                if (isOpenRef.current) {
-                    if (hasItemsRef.current) {
-                        handleSubmitItem();
-                    } else if (key === ' ') {
-                        closeDropdown();
-                    }
-                } else {
-                    openDropdown();
-                }
-                return;
-            case 'ArrowUp':
-                if (!hasItemsRef.current) return;
-
-                onEventHandled();
-                if (altKey || metaKey) {
-                    setActiveItem({
-                        dropdownElement,
-                        index: 0,
-                    });
-                } else {
-                    setActiveItem({
-                        dropdownElement,
-                        indexAddend: -1,
-                    });
-                }
-                return;
-            case 'ArrowDown':
-                if (!hasItemsRef.current) return;
-
-                onEventHandled();
-                if (altKey || metaKey) {
-                    // Using a negative index counts back from the end
-                    setActiveItem({
-                        dropdownElement,
-                        index: -1,
-                    });
-                } else {
-                    setActiveItem({
-                        dropdownElement,
-                        indexAddend: 1,
-                    });
-                }
-                return;
-        }
     }, []);
 
     const handleMouseDown = useCallback(
@@ -331,10 +219,140 @@ const Dropdown: React.FC<Props> = ({
                 closeDropdown();
             };
 
+            const handleKeyDown = (event: KeyboardEvent) => {
+                const { altKey, ctrlKey, key, metaKey } = event;
+                const eventTarget = event.target as HTMLElement;
+                const dropdownElement = dropdownElementRef.current;
+                if (!dropdownElement) return;
+
+                const onEventHandled = () => {
+                    event.stopPropagation();
+                    event.preventDefault();
+                    currentInputMethodRef.current = 'keyboard';
+                };
+
+                const isEventTargetingDropdown = dropdownElement.contains(eventTarget);
+
+                if (!isOpenRef.current) {
+                    // If dropdown is closed, don’t handle key events if event target isn’t within dropdown
+                    if (!isEventTargetingDropdown) return;
+                    // Open the dropdown on spacebar, enter, or if isSearchable and user hits the up/down arrows
+                    if (
+                        key === ' ' ||
+                        key === 'Enter' ||
+                        (hasItemsRef.current &&
+                            (key === 'ArrowUp' || key === 'ArrowDown'))
+                    ) {
+                        onEventHandled();
+                        openDropdown();
+                        return;
+                    }
+
+                    return;
+                }
+
+                // If dropdown isOpen, hasItems, and not isSearchable, handle entering characters
+                if (hasItemsRef.current && !isSearchableRef.current) {
+                    let isEditingCharacters =
+                        !ctrlKey && !metaKey && /^[A-Za-z0-9]$/.test(key);
+                    // User could also be editing characters if there are already characters entered
+                    // and they are hitting delete or spacebar
+                    if (!isEditingCharacters && enteredCharactersRef.current) {
+                        isEditingCharacters = key === ' ' || key === 'Backspace';
+                    }
+
+                    if (isEditingCharacters) {
+                        onEventHandled();
+                        if (key === 'Backspace') {
+                            enteredCharactersRef.current = enteredCharactersRef.current.slice(
+                                0,
+                                -1,
+                            );
+                        } else {
+                            enteredCharactersRef.current += key;
+                        }
+
+                        setActiveItem({
+                            dropdownElement,
+                            text: enteredCharactersRef.current,
+                        });
+
+                        if (clearEnteredCharactersTimerRef.current) {
+                            clearTimeout(clearEnteredCharactersTimerRef.current);
+                        }
+
+                        clearEnteredCharactersTimerRef.current = setTimeout(() => {
+                            enteredCharactersRef.current = '';
+                            clearEnteredCharactersTimerRef.current = null;
+                        }, 1500);
+
+                        return;
+                    }
+                }
+                // If dropdown isOpen, handle submitting the value
+                if (key === 'Enter' || (key === ' ' && !isSearchableRef.current)) {
+                    onEventHandled();
+                    handleSubmitItem();
+                    return;
+                }
+                // If dropdown isOpen, handle closing it on escape or spacebar if !hasItems
+                if (
+                    key === 'Escape' ||
+                    (isEventTargetingDropdown && key === ' ' && !hasItemsRef.current)
+                ) {
+                    // If there are no items & event target element uses key events, don’t close it
+                    if (
+                        !hasItemsRef.current &&
+                        (eventTarget.isContentEditable ||
+                            KEY_EVENT_ELEMENTS.has(eventTarget.tagName))
+                    ) {
+                        return;
+                    }
+                    closeDropdown();
+                    return;
+                }
+                // Handle ↑/↓ arrows
+                if (hasItemsRef.current) {
+                    if (key === 'ArrowUp') {
+                        onEventHandled();
+                        if (altKey || metaKey) {
+                            setActiveItem({
+                                dropdownElement,
+                                index: 0,
+                            });
+                        } else {
+                            setActiveItem({
+                                dropdownElement,
+                                indexAddend: -1,
+                            });
+                        }
+                        return;
+                    }
+                    if (key === 'ArrowDown') {
+                        onEventHandled();
+                        if (altKey || metaKey) {
+                            // Using a negative index counts back from the end
+                            setActiveItem({
+                                dropdownElement,
+                                index: -1,
+                            });
+                        } else {
+                            setActiveItem({
+                                dropdownElement,
+                                indexAddend: 1,
+                            });
+                        }
+                        return;
+                    }
+                }
+            };
+
             const { ownerDocument } = ref;
             document.addEventListener('mousedown', handleMouseDown);
+            document.addEventListener('keydown', handleKeyDown);
             if (ownerDocument !== document) {
                 ownerDocument.addEventListener('mousedown', handleMouseDown);
+                ownerDocument.addEventListener('keydown', handleKeyDown);
             }
             // If dropdown should be open on mount, focus it
             if (isOpenOnMount) {
@@ -343,8 +361,10 @@ const Dropdown: React.FC<Props> = ({
 
             return () => {
                 document.removeEventListener('mousedown', handleMouseDown);
+                document.removeEventListener('keydown', handleKeyDown);
                 if (ownerDocument !== document) {
                     ownerDocument.removeEventListener('mousedown', handleMouseDown);
+                    ownerDocument.removeEventListener('keydown', handleKeyDown);
                 }
             };
         },
@@ -409,7 +429,6 @@ const Dropdown: React.FC<Props> = ({
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
                 })}
-                onKeyDown={handleKeyDown}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseOver={handleMouseOver}
