@@ -48,6 +48,7 @@ ${BODY_SELECTOR} {
     top: 100%;
     max-height: calc(100vh - 50px);
     overflow: auto;
+    z-index: 2;
     padding-bottom: var(--uktdropdown-body-pad-bottom);
     padding-left: var(--uktdropdown-body-pad-left);
     padding-right: var(--uktdropdown-body-pad-right);
