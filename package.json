@@ -12,6 +12,8 @@
         "clean:flowtypes": "find . -type f -regex '.*/dist/[^/]*.flow' -delete",
         "clean": "run-p 'clean:*'",
         "format": "prettier --write package.json README.md tsconfig.json ./packages/",
+        "lint": "eslint ./packages/*/src/**",
+        "lintfix": "eslint ./packages/*/src/** --fix",
         "publish": "run-s build publish:all",
         "publish:all": "yarn workspaces foreach --parallel --exclude '@acusti/uikit' npm publish --access public",
         "start:stories": "yarn workspace @acusti/uikit-docs storybook",
@@ -37,6 +39,18 @@
     "devDependencies": {
         "@babel/core": "^7.13.14",
         "@types/jest": "^26.0.22",
+        "@typescript-eslint/eslint-plugin": "^4.0.0",
+        "@typescript-eslint/parser": "^4.0.0",
+        "babel-eslint": "^10.0.0",
+        "eslint": "^7.5.0",
+        "eslint-config-react-app": "^6.0.0",
+        "eslint-plugin-flowtype": "^5.2.0",
+        "eslint-plugin-import": "^2.22.0",
+        "eslint-plugin-jest": "^24.0.0",
+        "eslint-plugin-jsx-a11y": "^6.3.1",
+        "eslint-plugin-react": "^7.20.3",
+        "eslint-plugin-react-hooks": "^4.0.8",
+        "eslint-plugin-testing-library": "^3.9.0",
         "flowgen": "^1.13.0",
         "jest": "^27.0.4",
         "jest-runner": "^27.0.4",
@@ -44,6 +58,12 @@
         "prettier": "^2.2.1",
         "ts-jest": "^27.0.3",
         "typescript": "^4.2.3"
+    },
+    "eslintConfig": {
+        "extends": [
+            "react-app",
+            "react-app/jest"
+        ]
     },
     "jest": {
         "preset": "ts-jest/presets/default-esm",
