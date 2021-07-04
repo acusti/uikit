@@ -119,7 +119,7 @@ const Dropdown: React.FC<Props> = ({
         }
 
         if (isOpenRef.current) closeDropdown();
-    }, []);
+    }, [closeDropdown]);
 
     const handleMouseDown = useCallback(
         ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
@@ -133,7 +133,7 @@ const Dropdown: React.FC<Props> = ({
                 isOpeningTimerRef.current = null;
             }, 1000);
         },
-        [isOpen],
+        [isOpen, openDropdown],
     );
 
     const handleMouseMove = useCallback(
@@ -368,7 +368,7 @@ const Dropdown: React.FC<Props> = ({
                 }
             };
         },
-        [closeDropdown],
+        [closeDropdown, handleSubmitItem, isOpenOnMount, openDropdown],
     );
 
     const handleChange = useCallback(
