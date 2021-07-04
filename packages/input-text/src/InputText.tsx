@@ -56,11 +56,14 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
 
         const isInitialSelectionRef = useRef<boolean>(true);
 
-        const handleBlur = useCallback((event: React.FocusEvent<HTMLInputElement>) => {
-            if (onBlur) onBlur(event);
-            // When input loses focus, reset isInitialSelection to true for next onSelect event
-            isInitialSelectionRef.current = true;
-        }, []);
+        const handleBlur = useCallback(
+            (event: React.FocusEvent<HTMLInputElement>) => {
+                if (onBlur) onBlur(event);
+                // When input loses focus, reset isInitialSelection to true for next onSelect event
+                isInitialSelectionRef.current = true;
+            },
+            [onBlur],
+        );
 
         // NOTE Selecting the contents of the input onFocus makes for the best UX,
         // but it doesn’t work in Safari, so we use the initial onSelect event instead
