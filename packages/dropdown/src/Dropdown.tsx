@@ -123,21 +123,6 @@ const Dropdown: React.FC<Props> = ({
         if (isOpenRef.current) closeDropdown();
     }, [closeDropdown]);
 
-    const handleMouseDown = useCallback(
-        ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
-            if (isOpenRef.current) return;
-
-            openDropdown();
-            setIsOpening(true);
-            mouseDownPositionRef.current = { clientX, clientY };
-            isOpeningTimerRef.current = setTimeout(() => {
-                setIsOpening(false);
-                isOpeningTimerRef.current = null;
-            }, 1000);
-        },
-        [openDropdown],
-    );
-
     const handleMouseMove = useCallback(
         ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
             currentInputMethodRef.current = 'mouse';
@@ -210,14 +195,25 @@ const Dropdown: React.FC<Props> = ({
             dropdownElementRef.current = ref;
             if (!ref) return;
 
-            const handleMouseDown = (event: MouseEvent) => {
+            const handleMouseDown = ({ clientX, clientY, target }: MouseEvent) => {
                 if (!ref) return;
 
-                const eventTarget = event.target as HTMLElement;
-                if (ref.contains(eventTarget)) return;
+                const eventTarget = target as HTMLElement;
+                if (!ref.contains(eventTarget)) {
+                    // Close dropdown on an outside click
+                    closeDropdown();
+                    return;
+                }
 
-                // Close dropdown on an outside click
-                closeDropdown();
+                if (isOpenRef.current) return;
+
+                openDropdown();
+                setIsOpening(true);
+                mouseDownPositionRef.current = { clientX, clientY };
+                isOpeningTimerRef.current = setTimeout(() => {
+                    setIsOpening(false);
+                    isOpeningTimerRef.current = null;
+                }, 1000);
             };
 
             const handleKeyDown = (event: KeyboardEvent) => {
@@ -430,7 +426,6 @@ const Dropdown: React.FC<Props> = ({
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
                 })}
-                onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
                 onMouseOver={handleMouseOver}
                 onMouseUp={handleMouseUp}
