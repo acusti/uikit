@@ -79,6 +79,8 @@ const Dropdown: React.FC<Props> = ({
 
     const isOpenRef = useRef(isOpen);
     isOpenRef.current = isOpen;
+    const isOpeningRef = useRef(isOpening);
+    isOpeningRef.current = isOpening;
     const hasItemsRef = useRef(hasItems);
     hasItemsRef.current = hasItems;
     const isSearchableRef = useRef(isSearchable);
@@ -123,7 +125,7 @@ const Dropdown: React.FC<Props> = ({
 
     const handleMouseDown = useCallback(
         ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
-            if (isOpen) return;
+            if (isOpenRef.current) return;
 
             openDropdown();
             setIsOpening(true);
@@ -133,7 +135,7 @@ const Dropdown: React.FC<Props> = ({
                 isOpeningTimerRef.current = null;
             }, 1000);
         },
-        [isOpen, openDropdown],
+        [openDropdown],
     );
 
     const handleMouseMove = useCallback(
@@ -152,39 +154,38 @@ const Dropdown: React.FC<Props> = ({
         [],
     );
 
-    const handleMouseOver = useCallback(
-        (event: React.MouseEvent<HTMLElement>) => {
-            if (!hasItems) return;
-            // If user isn’t currently using the mouse to navigate the dropdown, do nothing
-            if (currentInputMethodRef.current !== 'mouse') return;
-            // Ensure we have the dropdown root HTMLElement
-            const dropdownElement = dropdownElementRef.current;
-            if (!dropdownElement) return;
+    const handleMouseOver = useCallback((event: React.MouseEvent<HTMLElement>) => {
+        if (!hasItemsRef.current) return;
 
-            const itemElements = getItemElements(dropdownElement);
-            if (!itemElements) return;
+        // If user isn’t currently using the mouse to navigate the dropdown, do nothing
+        if (currentInputMethodRef.current !== 'mouse') return;
 
-            const eventTarget = event.target as HTMLElement;
-            const item = eventTarget.closest(ITEM_SELECTOR) as HTMLElement | null;
-            const element = item || eventTarget;
-            for (let index = 0; index < itemElements.length; index++) {
-                if (itemElements[index] === element) {
-                    setActiveItem({
-                        dropdownElement,
-                        element,
-                    });
-                    return;
-                }
+        // Ensure we have the dropdown root HTMLElement
+        const dropdownElement = dropdownElementRef.current;
+        if (!dropdownElement) return;
+
+        const itemElements = getItemElements(dropdownElement);
+        if (!itemElements) return;
+
+        const eventTarget = event.target as HTMLElement;
+        const item = eventTarget.closest(ITEM_SELECTOR) as HTMLElement | null;
+        const element = item || eventTarget;
+        for (let index = 0; index < itemElements.length; index++) {
+            if (itemElements[index] === element) {
+                setActiveItem({
+                    dropdownElement,
+                    element,
+                });
+                return;
             }
-        },
-        [hasItems],
-    );
+        }
+    }, []);
 
     const handleMouseUp = useCallback(
         ({ target }: React.MouseEvent<HTMLElement>) => {
-            if (!isOpen || closingTimerRef.current) return;
+            if (!isOpenRef.current || closingTimerRef.current) return;
             // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
-            if (isOpening) {
+            if (isOpeningRef.current) {
                 setIsOpening(false);
                 if (isOpeningTimerRef.current) {
                     clearTimeout(isOpeningTimerRef.current);
@@ -194,14 +195,14 @@ const Dropdown: React.FC<Props> = ({
             }
             // If mouseup is on dropdown body and there are no items, don’t close the dropdown
             const targetElement = target as HTMLElement;
-            if (!hasItems && targetElement.closest(BODY_SELECTOR)) {
+            if (!hasItemsRef.current && targetElement.closest(BODY_SELECTOR)) {
                 return;
             }
             // A short timeout before closing is better UX when user selects an item so that dropdown
             // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
             closingTimerRef.current = setTimeout(handleSubmitItem, 90);
         },
-        [handleSubmitItem, hasItems, isOpen, isOpening],
+        [handleSubmitItem],
     );
 
     const handleRef = useCallback(
@@ -376,7 +377,7 @@ const Dropdown: React.FC<Props> = ({
             const dropdownElement = dropdownElementRef.current;
             if (!dropdownElement) return;
 
-            if (!isOpen) openDropdown();
+            if (!isOpenRef.current) openDropdown();
 
             const input = event.target as HTMLInputElement;
             enteredCharactersRef.current = input.value;
@@ -385,7 +386,7 @@ const Dropdown: React.FC<Props> = ({
                 text: enteredCharactersRef.current,
             });
         },
-        [isOpen, openDropdown],
+        [openDropdown],
     );
 
     let trigger = childrenCount > 1 ? children[0] : null;
