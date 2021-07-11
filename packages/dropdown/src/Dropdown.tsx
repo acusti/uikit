@@ -43,7 +43,7 @@ type MousePosition = { clientX: number; clientY: number };
 const { Children, Fragment, useCallback, useRef, useState } = React;
 
 const CHILDREN_ERROR =
-    '@acusti/dropdown requires props.children to contain either one element, the dropdown body, or two elements: the dropdown trigger and the dropdown body. Received %s elements.';
+    '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 
 const Dropdown: React.FC<Props> = ({
     children,
@@ -59,9 +59,9 @@ const Dropdown: React.FC<Props> = ({
     const childrenCount = Children.count(children);
     if (childrenCount !== 1 && childrenCount !== 2) {
         if (childrenCount === 0) {
-            throw new Error(CHILDREN_ERROR.replace('%s', childrenCount.toString()));
+            throw new Error(CHILDREN_ERROR + ' Received no children.');
         }
-        console.error(CHILDREN_ERROR, childrenCount);
+        console.error(`${CHILDREN_ERROR} Received ${childrenCount} children.`);
     }
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
