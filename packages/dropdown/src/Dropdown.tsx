@@ -169,6 +169,7 @@ const Dropdown: React.FC<Props> = ({
     const handleMouseUp = useCallback(
         ({ target }: React.MouseEvent<HTMLElement>) => {
             if (!isOpenRef.current || closingTimerRef.current) return;
+
             // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
             if (isOpeningRef.current) {
                 setIsOpening(false);
@@ -179,8 +180,7 @@ const Dropdown: React.FC<Props> = ({
                 return;
             }
             // If mouseup is on dropdown body and there are no items, don’t close the dropdown
-            const targetElement = target as HTMLElement;
-            if (!hasItemsRef.current && targetElement.closest(BODY_SELECTOR)) {
+            if (!hasItemsRef.current && (target as HTMLElement).closest(BODY_SELECTOR)) {
                 return;
             }
             // A short timeout before closing is better UX when user selects an item so that dropdown
