@@ -170,29 +170,6 @@ const Dropdown: React.FC<Props> = ({
         }
     }, []);
 
-    const handleMouseUp = useCallback(
-        ({ target }: React.MouseEvent<HTMLElement>) => {
-            if (!isOpenRef.current || closingTimerRef.current) return;
-
-            // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
-            if (isOpeningRef.current) {
-                setIsOpening(false);
-                if (isOpeningTimerRef.current) {
-                    clearTimeout(isOpeningTimerRef.current);
-                    isOpeningTimerRef.current = null;
-                }
-                return;
-            }
-            // If mouseup is on dropdown body and there are no items, don’t close the dropdown
-            if (!hasItemsRef.current && (target as HTMLElement).closest(BODY_SELECTOR)) {
-                return;
-            }
-
-            handleSubmitItem();
-        },
-        [handleSubmitItem],
-    );
-
     const handleRef = useCallback(
         (ref: HTMLElement | null) => {
             dropdownElementRef.current = ref;
@@ -217,6 +194,29 @@ const Dropdown: React.FC<Props> = ({
                     setIsOpening(false);
                     isOpeningTimerRef.current = null;
                 }, 1000);
+            };
+
+            const handleMouseUp = ({ target }: MouseEvent) => {
+                if (!isOpenRef.current || closingTimerRef.current) return;
+
+                // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
+                if (isOpeningRef.current) {
+                    setIsOpening(false);
+                    if (isOpeningTimerRef.current) {
+                        clearTimeout(isOpeningTimerRef.current);
+                        isOpeningTimerRef.current = null;
+                    }
+                    return;
+                }
+                // If mouseup is on dropdown body and there are no items, don’t close the dropdown
+                if (
+                    !hasItemsRef.current &&
+                    (target as HTMLElement).closest(BODY_SELECTOR)
+                ) {
+                    return;
+                }
+
+                handleSubmitItem();
             };
 
             const handleKeyDown = (event: KeyboardEvent) => {
@@ -349,9 +349,11 @@ const Dropdown: React.FC<Props> = ({
 
             const { ownerDocument } = ref;
             document.addEventListener('mousedown', handleMouseDown);
+            document.addEventListener('mouseup', handleMouseUp);
             document.addEventListener('keydown', handleKeyDown);
             if (ownerDocument !== document) {
                 ownerDocument.addEventListener('mousedown', handleMouseDown);
+                ownerDocument.addEventListener('mouseup', handleMouseUp);
                 ownerDocument.addEventListener('keydown', handleKeyDown);
             }
             // If dropdown should be open on mount, focus it
@@ -361,9 +363,11 @@ const Dropdown: React.FC<Props> = ({
 
             return () => {
                 document.removeEventListener('mousedown', handleMouseDown);
+                document.removeEventListener('mouseup', handleMouseUp);
                 document.removeEventListener('keydown', handleKeyDown);
                 if (ownerDocument !== document) {
                     ownerDocument.removeEventListener('mousedown', handleMouseDown);
+                    ownerDocument.removeEventListener('mouseup', handleMouseUp);
                     ownerDocument.removeEventListener('keydown', handleKeyDown);
                 }
             };
@@ -431,7 +435,6 @@ const Dropdown: React.FC<Props> = ({
                 })}
                 onMouseMove={handleMouseMove}
                 onMouseOver={handleMouseOver}
-                onMouseUp={handleMouseUp}
                 ref={handleRef}
                 tabIndex={isSearchable || !isTriggerFromProps ? undefined : 0}
             >
