@@ -103,6 +103,12 @@ const Dropdown: React.FC<Props> = ({
     }, []);
 
     const handleSubmitItem = useCallback(() => {
+        if (isOpenRef.current) {
+            // A short timeout before closing is better UX when user selects an item so dropdown
+            // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
+            closingTimerRef.current = setTimeout(closeDropdown, 90);
+        }
+
         const nextElement = getActiveItemElement(dropdownElementRef.current);
         if (!nextElement) return;
 
@@ -119,8 +125,6 @@ const Dropdown: React.FC<Props> = ({
         if (onSubmitItemRef.current) {
             onSubmitItemRef.current(nextItem);
         }
-
-        if (isOpenRef.current) closeDropdown();
     }, [closeDropdown]);
 
     const handleMouseMove = useCallback(
@@ -183,9 +187,8 @@ const Dropdown: React.FC<Props> = ({
             if (!hasItemsRef.current && (target as HTMLElement).closest(BODY_SELECTOR)) {
                 return;
             }
-            // A short timeout before closing is better UX when user selects an item so that dropdown
-            // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
-            closingTimerRef.current = setTimeout(handleSubmitItem, 90);
+
+            handleSubmitItem();
         },
         [handleSubmitItem],
     );
