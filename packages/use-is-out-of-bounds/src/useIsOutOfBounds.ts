@@ -27,6 +27,8 @@ const INITIAL_OUT_OF_BOUNDS_HAS_LAYOUT: OutOfBounds = Object.freeze({
 
 const getOverflowHiddenParent = (element: MaybeHTMLElement): MaybeHTMLElement => {
     while (element?.parentElement) {
+        // If we’ve reached the body, use that as offsetParent
+        if (element.parentElement.tagName === 'BODY') return element.parentElement;
         // Only need to check one overflow direction, because if either direction
         // is not visible, neither can be visible
         if (getComputedStyle(element.parentElement).overflowX !== 'visible') {
