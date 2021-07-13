@@ -4,5 +4,9 @@
         "outDir": "dist",
         "rootDir": "src"
     },
-    "references": [{ "path": "../matchmaking" }, { "path": "../styling" }]
+    "references": [
+        { "path": "../matchmaking" },
+        { "path": "../styling" },
+        { "path": "../use-is-out-of-bounds" }
+    ]
 }

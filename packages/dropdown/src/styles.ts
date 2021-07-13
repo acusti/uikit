@@ -47,6 +47,7 @@ ${BODY_SELECTOR} {
     left: 0px;
     top: 100%;
     max-height: calc(100vh - 50px);
+    min-height: 50px;
     overflow: auto;
     z-index: 2;
     padding-bottom: var(--uktdropdown-body-pad-bottom);
@@ -55,6 +56,13 @@ ${BODY_SELECTOR} {
     padding-top: var(--uktdropdown-body-pad-top);
     background-color: var(--uktdropdown-body-bg-color);
     box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.25);
+}
+${BODY_SELECTOR}.calculating-position {
+    visibility: hidden;
+}
+${BODY_SELECTOR}.out-of-bounds-bottom:not(.out-of-bounds-top) {
+    top: auto;
+    bottom: 100%;
 }
 ${LABEL_SELECTOR} + ${BODY_SELECTOR} {
     left: auto;

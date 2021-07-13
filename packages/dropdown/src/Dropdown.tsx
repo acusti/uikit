@@ -1,5 +1,6 @@
 import InputText from '@acusti/input-text';
 import { Style } from '@acusti/styling';
+import useIsOutOfBounds from '@acusti/use-is-out-of-bounds';
 import classnames from 'classnames';
 import * as React from 'react';
 
@@ -66,8 +67,11 @@ const Dropdown: React.FC<Props> = ({
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
+    const [dropdownBodyElement, setDropdownBodyElement] = useState<HTMLDivElement | null>(
+        null,
+    );
 
-    const dropdownElementRef = useRef<HTMLElement | null>(null);
+    const dropdownElementRef = useRef<HTMLDivElement | null>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
     const closingTimerRef = useRef<number | null>(null);
     const isOpeningTimerRef = useRef<number | null>(null);
@@ -76,6 +80,7 @@ const Dropdown: React.FC<Props> = ({
     const enteredCharactersRef = useRef<string>('');
     const mouseDownPositionRef = useRef<MousePosition | null>(null);
     const currentItemRef = useRef<Item | null>(null);
+    const outOfBounds = useIsOutOfBounds(dropdownBodyElement);
 
     const isOpenRef = useRef(isOpen);
     isOpenRef.current = isOpen;
@@ -171,7 +176,7 @@ const Dropdown: React.FC<Props> = ({
     }, []);
 
     const handleRef = useCallback(
-        (ref: HTMLElement | null) => {
+        (ref: HTMLDivElement | null) => {
             dropdownElementRef.current = ref;
             if (!ref) return;
 
@@ -442,8 +447,14 @@ const Dropdown: React.FC<Props> = ({
                 {isOpen ? (
                     <div
                         className={classnames(BODY_CLASS_NAME, {
+                            'calculating-position': !outOfBounds.hasLayout,
                             'has-items': hasItems,
+                            'out-of-bounds-bottom': outOfBounds.bottom,
+                            'out-of-bounds-left': outOfBounds.left,
+                            'out-of-bounds-right': outOfBounds.right,
+                            'out-of-bounds-top': outOfBounds.top,
                         })}
+                        ref={setDropdownBodyElement}
                     >
                         {children[1] || children[0] || children}
                     </div>
