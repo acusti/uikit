@@ -18,7 +18,7 @@ of macOS.
 
 <style>{`
 .innerZoomElementWrapper {
-    margin-bottom: 140px;
+    min-height: 210px;
 }
 .uktdropdown input {
     width: 120px;
@@ -102,6 +102,13 @@ of macOS.
 
 .dropdown-without-items .uktdropdown-body {
     width: 300px;
+}
+
+#story--uikit-controls-dropdown--out-of-bounds-at-bottom {
+    margin-top: 150px;
+}
+.out-of-bounds-at-bottom .uktdropdown-body {
+    height: 150px;
 }
 `}</style>
 
@@ -306,6 +313,31 @@ of macOS.
             label: 'Font size',
         }}
         name="Searchable With Label"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li>0px</li>
+                    <li>4px</li>
+                    <li>9px</li>
+                    <li>18px</li>
+                    <li>36px</li>
+                    <li>54px</li>
+                    <li>72px</li>
+                    <li>144px</li>
+                    <li>167px</li>
+                    <li>198px</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'out-of-bounds-at-bottom',
+            isSearchable: true,
+            label: 'Should show above',
+        }}
+        name="Out Of Bounds At Bottom"
     >
         {(args) => (
             <Dropdown {...args}>
