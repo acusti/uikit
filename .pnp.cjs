@@ -49,6 +49,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       {
         "name": "@acusti/styling",
         "reference": "workspace:packages/styling"
+      },
+      {
+        "name": "@acusti/use-bounding-client-rect",
+        "reference": "workspace:packages/use-bounding-client-rect"
       }
     ],
     "enableTopLevelFallback": true,
@@ -61,7 +65,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@acusti/matchmaking", ["workspace:packages/matchmaking"]],
       ["@acusti/styling", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/styling", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/styling", "workspace:packages/styling"]],
       ["@acusti/uikit", ["workspace:."]],
-      ["@acusti/uikit-docs", ["workspace:packages/docs"]]
+      ["@acusti/uikit-docs", ["workspace:packages/docs"]],
+      ["@acusti/use-bounding-client-rect", ["workspace:packages/use-bounding-client-rect"]]
     ],
     "fallbackPool": [
     ],
@@ -340,6 +345,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["core-js", "npm:3.9.1"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@acusti/use-bounding-client-rect", [
+        ["workspace:packages/use-bounding-client-rect", {
+          "packageLocation": "./packages/use-bounding-client-rect/",
+          "packageDependencies": [
+            ["@acusti/use-bounding-client-rect", "workspace:packages/use-bounding-client-rect"],
+            ["@types/classnames", "npm:2.2.11"],
+            ["@types/react", "npm:17.0.3"],
             ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
           ],
           "linkType": "SOFT",

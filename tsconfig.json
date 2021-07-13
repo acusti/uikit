@@ -37,6 +37,7 @@
         { "path": "packages/dropdown" },
         { "path": "packages/input-text" },
         { "path": "packages/matchmaking" },
-        { "path": "packages/styling" }
+        { "path": "packages/styling" },
+        { "path": "packages/use-bounding-client-rect" }
     ]
 }
