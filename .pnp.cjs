@@ -53,6 +53,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       {
         "name": "@acusti/use-bounding-client-rect",
         "reference": "workspace:packages/use-bounding-client-rect"
+      },
+      {
+        "name": "@acusti/use-is-out-of-bounds",
+        "reference": "workspace:packages/use-is-out-of-bounds"
       }
     ],
     "enableTopLevelFallback": true,
@@ -66,7 +70,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@acusti/styling", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/styling", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/styling", "workspace:packages/styling"]],
       ["@acusti/uikit", ["workspace:."]],
       ["@acusti/uikit-docs", ["workspace:packages/docs"]],
-      ["@acusti/use-bounding-client-rect", ["workspace:packages/use-bounding-client-rect"]]
+      ["@acusti/use-bounding-client-rect", ["virtual:81e97206dda937498e28a11fdd8e794ffd26182d89cb917f599baa60de89d77d2b56631bc6da095b3eecc05a929f88381e49c0f30a878e50601b13cc4aa8f1cd#workspace:packages/use-bounding-client-rect", "workspace:packages/use-bounding-client-rect"]],
+      ["@acusti/use-is-out-of-bounds", ["workspace:packages/use-is-out-of-bounds"]]
     ],
     "fallbackPool": [
     ],
@@ -351,10 +356,42 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]
       ]],
       ["@acusti/use-bounding-client-rect", [
+        ["virtual:81e97206dda937498e28a11fdd8e794ffd26182d89cb917f599baa60de89d77d2b56631bc6da095b3eecc05a929f88381e49c0f30a878e50601b13cc4aa8f1cd#workspace:packages/use-bounding-client-rect", {
+          "packageLocation": "./.yarn/__virtual__/@acusti-use-bounding-client-rect-virtual-69d0e785b5/1/packages/use-bounding-client-rect/",
+          "packageDependencies": [
+            ["@acusti/use-bounding-client-rect", "virtual:81e97206dda937498e28a11fdd8e794ffd26182d89cb917f599baa60de89d77d2b56631bc6da095b3eecc05a929f88381e49c0f30a878e50601b13cc4aa8f1cd#workspace:packages/use-bounding-client-rect"],
+            ["@types/classnames", "npm:2.2.11"],
+            ["@types/react", "npm:17.0.3"],
+            ["@types/react-dom", null],
+            ["react", null],
+            ["react-dom", null],
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+          ],
+          "packagePeers": [
+            "@types/react-dom",
+            "@types/react",
+            "react-dom",
+            "react"
+          ],
+          "linkType": "SOFT",
+        }],
         ["workspace:packages/use-bounding-client-rect", {
           "packageLocation": "./packages/use-bounding-client-rect/",
           "packageDependencies": [
             ["@acusti/use-bounding-client-rect", "workspace:packages/use-bounding-client-rect"],
+            ["@types/classnames", "npm:2.2.11"],
+            ["@types/react", "npm:17.0.3"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@acusti/use-is-out-of-bounds", [
+        ["workspace:packages/use-is-out-of-bounds", {
+          "packageLocation": "./packages/use-is-out-of-bounds/",
+          "packageDependencies": [
+            ["@acusti/use-is-out-of-bounds", "workspace:packages/use-is-out-of-bounds"],
+            ["@acusti/use-bounding-client-rect", "virtual:81e97206dda937498e28a11fdd8e794ffd26182d89cb917f599baa60de89d77d2b56631bc6da095b3eecc05a929f88381e49c0f30a878e50601b13cc4aa8f1cd#workspace:packages/use-bounding-client-rect"],
             ["@types/classnames", "npm:2.2.11"],
             ["@types/react", "npm:17.0.3"],
             ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]

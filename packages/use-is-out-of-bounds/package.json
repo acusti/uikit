@@ -1,0 +1,33 @@
+{
+    "name": "@acusti/use-is-out-of-bounds",
+    "version": "0.1.0",
+    "type": "module",
+    "exports": "./dist/useIsOutOfBounds.js",
+    "main": "./dist/useIsOutOfBounds.js",
+    "types": "./dist/useIsOutOfBounds.d.ts",
+    "files": [
+        "dist"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/acusti/uikit.git"
+    },
+    "author": "andrew patton <andrew@acusti.ca> (http://acusti.ca)",
+    "license": "Unlicense",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
+    },
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/use-is-out-of-bounds#readme",
+    "devDependencies": {
+        "@types/classnames": "^2.2.11",
+        "@types/react": "^17.0.3",
+        "typescript": "^4.2.3"
+    },
+    "dependencies": {
+        "@acusti/use-bounding-client-rect": "^0.1.0"
+    },
+    "peerDependencies": {
+        "react": "^16.8 || ^17",
+        "react-dom": "^16.8 || ^17"
+    }
+}

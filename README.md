@@ -21,6 +21,7 @@ drag-and-drop library, and more_
 | **[@acusti/styling][]**                  | React component that renders a CSS string to the `<head>`     |
 | **[@acusti/uikit-docs][]**               | Storybook instance illustrating all components                |
 | **[@acusti/use-bounding-client-rect][]** | React hook for getting an element’s `boundingClientRect`      |
+| **[@acusti/use-is-out-of-bounds][]**     | React hook to check if an element overlaps its bounds         |
 
 [@acusti/css-values]:
     https://github.com/acusti/uikit/tree/main/packages/css-values
@@ -38,6 +39,8 @@ drag-and-drop library, and more_
     https://github.com/acusti/uikit/tree/main/packages/docs
 [@acusti/use-bounding-client-rect]:
     https://github.com/acusti/uikit/tree/main/packages/use-bounding-client-rect
+[@acusti/use-is-out-of-bounds]:
+    https://github.com/acusti/uikit/tree/main/packages/use-is-out-of-bounds
 
 ## Tests
 

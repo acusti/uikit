@@ -38,6 +38,7 @@
         { "path": "packages/input-text" },
         { "path": "packages/matchmaking" },
         { "path": "packages/styling" },
-        { "path": "packages/use-bounding-client-rect" }
+        { "path": "packages/use-bounding-client-rect" },
+        { "path": "packages/use-is-out-of-bounds" }
     ]
 }
