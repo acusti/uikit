@@ -113,6 +113,12 @@ export const setActiveItem = ({
             nextActiveIndex = lastIndex;
         }
     } else if (typeof text === 'string') {
+        // If text is empty, clear existing active items and early return
+        if (!text) {
+            clearItemElementsState(itemElements);
+            return;
+        }
+
         const itemTexts = itemElements.map((itemElement) => itemElement.innerText);
         const bestMatch = getBestMatch({ items: itemTexts, text });
         nextActiveIndex = itemTexts.findIndex((text) => text === bestMatch);
