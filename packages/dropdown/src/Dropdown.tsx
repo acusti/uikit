@@ -21,7 +21,7 @@ import {
     setActiveItem,
 } from './helpers.js';
 
-type Item = { element: HTMLElement; value: string };
+export type Item = { element: HTMLElement; value: string };
 
 export type Props = {
     /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
