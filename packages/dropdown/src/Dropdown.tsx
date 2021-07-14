@@ -125,6 +125,12 @@ const Dropdown: React.FC<Props> = ({
         const nextItem = { element: nextElement, value: nextValue };
         if (inputElementRef.current) {
             inputElementRef.current.value = label;
+            if (
+                inputElementRef.current ===
+                inputElementRef.current.ownerDocument.activeElement
+            ) {
+                inputElementRef.current.blur();
+            }
         }
 
         if (currentItemRef.current?.value === nextValue) return;
