@@ -103,10 +103,6 @@ const Dropdown: React.FC<Props> = ({
         }
     }, []);
 
-    const openDropdown = useCallback(() => {
-        setIsOpen(true);
-    }, []);
-
     const handleSubmitItem = useCallback(() => {
         if (isOpenRef.current) {
             // A short timeout before closing is better UX when user selects an item so dropdown
@@ -201,7 +197,7 @@ const Dropdown: React.FC<Props> = ({
 
                 if (isOpenRef.current) return;
 
-                openDropdown();
+                setIsOpen(true);
                 setIsOpening(true);
                 mouseDownPositionRef.current = { clientX, clientY };
                 isOpeningTimerRef.current = setTimeout(() => {
@@ -258,7 +254,7 @@ const Dropdown: React.FC<Props> = ({
                             (key === 'ArrowUp' || key === 'ArrowDown'))
                     ) {
                         onEventHandled();
-                        openDropdown();
+                        setIsOpen(true);
                         return;
                     }
 
@@ -386,29 +382,30 @@ const Dropdown: React.FC<Props> = ({
                 }
             };
         },
-        [closeDropdown, handleSubmitItem, isOpenOnMount, openDropdown],
+        [closeDropdown, handleSubmitItem, isOpenOnMount],
     );
 
-    const handleChange = useCallback(
-        (event: React.ChangeEvent<HTMLElement>) => {
-            const dropdownElement = dropdownElementRef.current;
-            if (!dropdownElement) return;
+    const handleChange = useCallback((event: React.ChangeEvent<HTMLElement>) => {
+        const dropdownElement = dropdownElementRef.current;
+        if (!dropdownElement) return;
 
-            if (!isOpenRef.current) openDropdown();
+        if (!isOpenRef.current) setIsOpen(true);
 
-            const input = event.target as HTMLInputElement;
-            const isDeleting = enteredCharactersRef.current.length > input.value.length;
-            enteredCharactersRef.current = input.value;
-            // Don’t set a new active item if user is deleting text unless text is now empty
-            if (isDeleting && input.value.length) return;
+        const input = event.target as HTMLInputElement;
+        const isDeleting = enteredCharactersRef.current.length > input.value.length;
+        enteredCharactersRef.current = input.value;
+        // Don’t set a new active item if user is deleting text unless text is now empty
+        if (isDeleting && input.value.length) return;
 
-            setActiveItem({
-                dropdownElement,
-                text: enteredCharactersRef.current,
-            });
-        },
-        [openDropdown],
-    );
+        setActiveItem({
+            dropdownElement,
+            text: enteredCharactersRef.current,
+        });
+    }, []);
+
+    const handleTriggerFocus = useCallback(() => {
+        setIsOpen(true);
+    }, []);
 
     let trigger = childrenCount > 1 ? children[0] : null;
     const isTriggerFromProps = React.isValidElement(trigger);
@@ -419,7 +416,7 @@ const Dropdown: React.FC<Props> = ({
                     className={TRIGGER_CLASS_NAME}
                     initialValue={value || ''}
                     onChange={handleChange}
-                    onFocus={openDropdown}
+                    onFocus={handleTriggerFocus}
                     placeholder={placeholder}
                     ref={inputElementRef}
                     type="text"
