@@ -35,6 +35,14 @@ export const getActiveItemElement = (dropdownElement: HTMLElement | null) => {
     return dropdownElement.querySelector('[data-ukt-active]') as HTMLElement | null;
 };
 
+const clearItemElementsState = (itemElements: Array<HTMLElement>) => {
+    itemElements.forEach((itemElement) => {
+        if (itemElement.hasAttribute('data-ukt-active')) {
+            delete itemElement.dataset.uktActive;
+        }
+    });
+};
+
 export const setActiveItem = ({
     dropdownElement,
     element,
@@ -113,12 +121,7 @@ export const setActiveItem = ({
     if (nextActiveIndex === -1 || nextActiveIndex === currentActiveIndex) return;
 
     // Clear any existing active dropdown body item state
-    itemElements.forEach((itemElement, index) => {
-        if (index === nextActiveIndex) return;
-        if (!itemElement.hasAttribute('data-ukt-active')) return;
-
-        delete itemElement.dataset.uktActive;
-    });
+    clearItemElementsState(itemElements);
 
     const nextActiveItem = items[nextActiveIndex];
     if (nextActiveItem) {
