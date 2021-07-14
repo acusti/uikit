@@ -21,7 +21,7 @@ import {
     setActiveItem,
 } from './helpers.js';
 
-export type Item = { element: HTMLElement; value: string };
+export type Item = { element: HTMLElement | null; value: string };
 
 export type Props = {
     /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
@@ -115,10 +115,11 @@ const Dropdown: React.FC<Props> = ({
         }
 
         const nextElement = getActiveItemElement(dropdownElementRef.current);
-        if (!nextElement) return;
+        // If not searchable, don’t allow submitting an empty item
+        if (!nextElement && !isSearchableRef.current) return;
 
-        const label = nextElement.innerText;
-        const nextValue = nextElement.dataset.uktValue || label;
+        const label = nextElement?.innerText || '';
+        const nextValue = nextElement?.dataset.uktValue || label;
         const nextItem = { element: nextElement, value: nextValue };
         if (inputElementRef.current) {
             inputElementRef.current.value = label;
