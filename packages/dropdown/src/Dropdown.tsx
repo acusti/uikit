@@ -391,7 +391,11 @@ const Dropdown: React.FC<Props> = ({
             if (!isOpenRef.current) openDropdown();
 
             const input = event.target as HTMLInputElement;
+            const isDeleting = enteredCharactersRef.current.length > input.value.length;
             enteredCharactersRef.current = input.value;
+            // Don’t set a new active item if user is deleting text unless text is now empty
+            if (isDeleting && input.value.length) return;
+
             setActiveItem({
                 dropdownElement,
                 text: enteredCharactersRef.current,
