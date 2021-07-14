@@ -43,9 +43,13 @@ const getOverflowHiddenParent = (element: MaybeHTMLElement): MaybeHTMLElement =>
 
 const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
     const [outOfBounds, setOutOfBounds] = useState<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
+    const elementRect = useBoundingClientRect(element);
     const offsetParent = getOverflowHiddenParent(element);
     const offsetParentRect = useBoundingClientRect(offsetParent);
-    const elementRect = useBoundingClientRect(element);
+    // If offsetParent is a collapsed <body> element, use viewport height as bottom
+    if (offsetParent?.tagName === 'BODY' && !offsetParentRect.bottom) {
+        offsetParentRect.bottom = offsetParent.ownerDocument.documentElement.clientHeight;
+    }
 
     useEffect(() => {
         if (elementRect.top === undefined) {
