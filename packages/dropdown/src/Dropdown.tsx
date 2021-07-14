@@ -114,6 +114,8 @@ const Dropdown: React.FC<Props> = ({
             closingTimerRef.current = setTimeout(closeDropdown, 90);
         }
 
+        if (!hasItemsRef.current) return;
+
         const nextElement = getActiveItemElement(dropdownElementRef.current);
         // If not searchable, don’t allow submitting an empty item
         if (!nextElement && !isSearchableRef.current) return;
