@@ -19,7 +19,6 @@ drag-and-drop library, and more_
 | **[@acusti/input-text][]**               | React component that renders an uncontrolled text input       |
 | **[@acusti/matchmaking][]**              | Utilities for approximate string matching (i.e. fuzzy search) |
 | **[@acusti/styling][]**                  | React component that renders a CSS string to the `<head>`     |
-| **[@acusti/uikit-docs][]**               | Storybook instance illustrating all components                |
 | **[@acusti/use-bounding-client-rect][]** | React hook for getting an element’s `boundingClientRect`      |
 | **[@acusti/use-is-out-of-bounds][]**     | React hook to check if an element overlaps its bounds         |
 
@@ -35,12 +34,17 @@ drag-and-drop library, and more_
     https://github.com/acusti/uikit/tree/main/packages/matchmaking
 [@acusti/styling]:
     https://github.com/acusti/uikit/tree/main/packages/styling
-[@acusti/uikit-docs]:
-    https://github.com/acusti/uikit/tree/main/packages/docs
 [@acusti/use-bounding-client-rect]:
     https://github.com/acusti/uikit/tree/main/packages/use-bounding-client-rect
 [@acusti/use-is-out-of-bounds]:
     https://github.com/acusti/uikit/tree/main/packages/use-is-out-of-bounds
+
+All components are documented and illustrated in the [storybook
+instance][], which is located at [`packages/docs/`][packages/docs] in the
+repository.
+
+[storybook instance]: https://acusti-uikit.netlify.app
+[packages/docs]: https://github.com/acusti/uikit/tree/main/packages/docs
 
 ## Tests
 
