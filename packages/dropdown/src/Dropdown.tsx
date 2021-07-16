@@ -118,8 +118,12 @@ const Dropdown: React.FC<Props> = ({
         if (!hasItemsRef.current) return;
 
         const nextElement = getActiveItemElement(dropdownElementRef.current);
-        // If not allowEmpty, don’t allow submitting an empty item
-        if (!nextElement && !allowEmptyRef.current) return;
+        if (!nextElement) {
+            // If not allowEmpty, don’t allow submitting an empty item
+            if (!allowEmptyRef.current) return;
+            // For a searchable dropdown, if the user didn’t clear the text, do nothing
+            if (isSearchableRef.current && inputElementRef.current?.value) return;
+        }
 
         const label = nextElement?.innerText || '';
         const nextValue = nextElement?.dataset.uktValue || label;
