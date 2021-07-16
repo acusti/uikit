@@ -227,15 +227,18 @@ const Dropdown: React.FC<Props> = ({
                     }
                     return;
                 }
+
+                const isTargetInBody = (target as HTMLElement).closest(BODY_SELECTOR);
                 // If mouseup is on dropdown body and there are no items, don’t close the dropdown
-                if (
-                    !hasItemsRef.current &&
-                    (target as HTMLElement).closest(BODY_SELECTOR)
-                ) {
+                if (!hasItemsRef.current && isTargetInBody) {
                     return;
                 }
-
-                handleSubmitItem();
+                // If mouseup is on an item, trigger submit item, else close the dropdown
+                if (isTargetInBody) {
+                    handleSubmitItem();
+                } else {
+                    closeDropdown();
+                }
             };
 
             const handleKeyDown = (event: KeyboardEvent) => {
