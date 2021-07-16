@@ -2,6 +2,7 @@
     "name": "@acusti/css-value-input",
     "version": "0.8.6",
     "type": "module",
+    "sideEffects": false,
     "exports": "./dist/CSSValueInput.js",
     "main": "./dist/CSSValueInput.js",
     "types": "./dist/CSSValueInput.d.ts",

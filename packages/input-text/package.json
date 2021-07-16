@@ -2,6 +2,7 @@
     "name": "@acusti/input-text",
     "version": "0.1.1",
     "type": "module",
+    "sideEffects": false,
     "exports": "./dist/InputText.js",
     "main": "./dist/InputText.js",
     "types": "./dist/InputText.d.ts",

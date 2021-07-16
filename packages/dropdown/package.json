@@ -2,6 +2,7 @@
     "name": "@acusti/dropdown",
     "version": "0.8.0",
     "type": "module",
+    "sideEffects": false,
     "exports": "./dist/Dropdown.js",
     "main": "./dist/Dropdown.js",
     "types": "./dist/Dropdown.d.ts",

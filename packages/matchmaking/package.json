@@ -2,6 +2,7 @@
     "name": "@acusti/matchmaking",
     "version": "0.1.3",
     "type": "module",
+    "sideEffects": false,
     "exports": "./dist/index.js",
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
