@@ -2,7 +2,7 @@
 
 ![latest version](https://img.shields.io/npm/v/@acusti/use-bounding-client-rect?style=for-the-badge)
 ![dependencies status](https://img.shields.io/david/acusti/uikit?path=packages%2Fuse-bounding-client-rect&style=for-the-badge)
-![bundle size](https://img.shields.io/bundlephobia/min/@acusti/use-bounding-client-rect?style=for-the-badge)
+![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/use-bounding-client-rect?style=for-the-badge)
 ![downloads per month](https://img.shields.io/npm/dm/@acusti/use-bounding-client-rect?style=for-the-badge)
 
 `useBoundingClientRect` is a React hook that returns the

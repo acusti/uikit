@@ -2,7 +2,7 @@
 
 ![latest version](https://img.shields.io/npm/v/@acusti/css-value-input?style=for-the-badge)
 ![dependencies status](https://img.shields.io/david/acusti/uikit?path=packages%2Fcss-value-input&style=for-the-badge)
-![bundle size](https://img.shields.io/bundlephobia/min/@acusti/css-value-input?style=for-the-badge)
+![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/css-value-input?style=for-the-badge)
 ![downloads per month](https://img.shields.io/npm/dm/@acusti/css-value-input?style=for-the-badge)
 
 `CSSValueInput` is a React component that renders a text input that can
