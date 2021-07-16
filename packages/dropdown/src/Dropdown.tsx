@@ -24,6 +24,8 @@ import {
 export type Item = { element: HTMLElement | null; value: string };
 
 export type Props = {
+    /** Boolean indicating if the user can submit an empty value (i.e. clear the value); defaults to true */
+    allowEmpty?: boolean;
     /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
     children: React.ReactChild | [React.ReactNode, React.ReactNode];
     className?: string;
@@ -47,6 +49,7 @@ const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 
 const Dropdown: React.FC<Props> = ({
+    allowEmpty = true,
     children,
     className,
     hasItems = true,
@@ -82,12 +85,14 @@ const Dropdown: React.FC<Props> = ({
     const currentItemRef = useRef<Item | null>(null);
     const outOfBounds = useIsOutOfBounds(dropdownBodyElement);
 
+    const allowEmptyRef = useRef(allowEmpty);
+    allowEmptyRef.current = allowEmpty;
+    const hasItemsRef = useRef(hasItems);
+    hasItemsRef.current = hasItems;
     const isOpenRef = useRef(isOpen);
     isOpenRef.current = isOpen;
     const isOpeningRef = useRef(isOpening);
     isOpeningRef.current = isOpening;
-    const hasItemsRef = useRef(hasItems);
-    hasItemsRef.current = hasItems;
     const isSearchableRef = useRef(isSearchable);
     isSearchableRef.current = isSearchable;
     const onSubmitItemRef = useRef(onSubmitItem);
@@ -113,8 +118,8 @@ const Dropdown: React.FC<Props> = ({
         if (!hasItemsRef.current) return;
 
         const nextElement = getActiveItemElement(dropdownElementRef.current);
-        // If not searchable, don’t allow submitting an empty item
-        if (!nextElement && !isSearchableRef.current) return;
+        // If not allowEmpty, don’t allow submitting an empty item
+        if (!nextElement && !allowEmptyRef.current) return;
 
         const label = nextElement?.innerText || '';
         const nextValue = nextElement?.dataset.uktValue || label;
