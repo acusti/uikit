@@ -34,173 +34,182 @@ export type Props = {
     value?: string;
 };
 
-const { useCallback, useRef } = React;
+type InputRef = HTMLInputElement | null;
+
+const { useCallback, useImperativeHandle, useRef } = React;
 
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
-const CSSValueInput: React.FC<Props> = ({
-    allowEmpty = true,
-    className,
-    cssValueType = DEFAULT_CSS_VALUE_TYPE,
-    disabled,
-    icon,
-    label,
-    max,
-    min,
-    onChange,
-    onKeyDown,
-    onKeyUp,
-    onSubmitValue,
-    placeholder,
-    step = 1,
-    title,
-    unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
-    validator,
-    value,
-}) => {
-    const inputRef = useRef<HTMLInputElement | null>(null);
-    const submittedValueRef = useRef<string>(value || '');
+const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>(
+    (
+        {
+            allowEmpty = true,
+            className,
+            cssValueType = DEFAULT_CSS_VALUE_TYPE,
+            disabled,
+            icon,
+            label,
+            max,
+            min,
+            onChange,
+            onKeyDown,
+            onKeyUp,
+            onSubmitValue,
+            placeholder,
+            step = 1,
+            title,
+            unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
+            validator,
+            value,
+        },
+        ref,
+    ) => {
+        const inputRef = useRef<InputRef>(null);
+        useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
 
-    const handleSubmitValue = useCallback(() => {
-        if (!inputRef.current) return;
-        // If value hasn’t changed, do not trigger onSubmitValue
-        const currentValue = inputRef.current.value;
-        if (currentValue === submittedValueRef.current) return;
+        const submittedValueRef = useRef<string>(value || '');
 
-        let isValid =
-            (allowEmpty && !currentValue) ||
-            Number.isFinite(getCSSValueAsNumber(currentValue));
+        const handleSubmitValue = useCallback(() => {
+            if (!inputRef.current) return;
+            // If value hasn’t changed, do not trigger onSubmitValue
+            const currentValue = inputRef.current.value;
+            if (currentValue === submittedValueRef.current) return;
 
-        if (!isValid && validator) {
-            isValid =
-                validator instanceof RegExp
-                    ? validator.test(currentValue)
-                    : validator(currentValue);
-        }
-        // If current value isn’t valid, revert to last submitted value
-        if (!isValid) {
-            inputRef.current.value = submittedValueRef.current;
-            return;
-        }
+            let isValid =
+                (allowEmpty && !currentValue) ||
+                Number.isFinite(getCSSValueAsNumber(currentValue));
 
-        submittedValueRef.current = currentValue;
-        onSubmitValue(currentValue);
-    }, [allowEmpty, onSubmitValue, validator]);
-
-    const handleBlur = useCallback(() => {
-        if (!inputRef.current) return;
-
-        inputRef.current.value = getCSSValueWithUnit({
-            cssValueType,
-            defaultUnit: unit,
-            value: inputRef.current.value,
-        });
-        handleSubmitValue();
-    }, [cssValueType, handleSubmitValue, unit]);
-
-    const getNextValue = useCallback(
-        ({
-            currentValue,
-            multiplier = 1,
-            signum = 1,
-        }: {
-            currentValue: string | number;
-            multiplier?: number;
-            signum?: number;
-        }) => {
-            const modifier = multiplier * step * signum;
-            let nextValue = roundToPrecision(
-                getCSSValueAsNumber(currentValue) + modifier,
-                5,
-            );
-            if (typeof max === 'number' && Number.isFinite(max)) {
-                nextValue = Math.min(max, nextValue);
+            if (!isValid && validator) {
+                isValid =
+                    validator instanceof RegExp
+                        ? validator.test(currentValue)
+                        : validator(currentValue);
             }
-            if (typeof min === 'number' && Number.isFinite(min)) {
-                nextValue = Math.max(min, nextValue);
+            // If current value isn’t valid, revert to last submitted value
+            if (!isValid) {
+                inputRef.current.value = submittedValueRef.current;
+                return;
             }
 
-            const nextUnit = getUnitFromCSSValue({
+            submittedValueRef.current = currentValue;
+            onSubmitValue(currentValue);
+        }, [allowEmpty, onSubmitValue, validator]);
+
+        const handleBlur = useCallback(() => {
+            if (!inputRef.current) return;
+
+            inputRef.current.value = getCSSValueWithUnit({
                 cssValueType,
                 defaultUnit: unit,
-                value: currentValue,
+                value: inputRef.current.value,
             });
-            return `${nextValue}${nextUnit}`;
-        },
-        [cssValueType, max, min, step, unit],
-    );
+            handleSubmitValue();
+        }, [cssValueType, handleSubmitValue, unit]);
 
-    const handleKeyDown = useCallback(
-        (event: React.KeyboardEvent<HTMLInputElement>) => {
-            if (onKeyDown) onKeyDown(event);
+        const getNextValue = useCallback(
+            ({
+                currentValue,
+                multiplier = 1,
+                signum = 1,
+            }: {
+                currentValue: string | number;
+                multiplier?: number;
+                signum?: number;
+            }) => {
+                const modifier = multiplier * step * signum;
+                let nextValue = roundToPrecision(
+                    getCSSValueAsNumber(currentValue) + modifier,
+                    5,
+                );
+                if (typeof max === 'number' && Number.isFinite(max)) {
+                    nextValue = Math.min(max, nextValue);
+                }
+                if (typeof min === 'number' && Number.isFinite(min)) {
+                    nextValue = Math.max(min, nextValue);
+                }
 
-            const input = event.currentTarget;
-            let nextValue = '';
+                const nextUnit = getUnitFromCSSValue({
+                    cssValueType,
+                    defaultUnit: unit,
+                    value: currentValue,
+                });
+                return `${nextValue}${nextUnit}`;
+            },
+            [cssValueType, max, min, step, unit],
+        );
 
-            switch (event.key) {
-                case 'Escape':
-                case 'Enter':
-                    if (event.key === 'Escape') {
-                        input.value = submittedValueRef.current;
-                    }
-                    input.blur();
-                    return;
-                case 'ArrowUp':
-                case 'ArrowDown':
-                    event.preventDefault();
+        const handleKeyDown = useCallback(
+            (event: React.KeyboardEvent<HTMLInputElement>) => {
+                if (onKeyDown) onKeyDown(event);
 
-                    nextValue = getNextValue({
-                        currentValue:
-                            event.currentTarget.value || placeholder || `0${unit}`,
-                        multiplier: event.shiftKey ? 10 : 1,
-                        signum: event.key === 'ArrowUp' ? 1 : -1,
-                    });
+                const input = event.currentTarget;
+                let nextValue = '';
 
-                    input.value = nextValue;
-                    return;
-                default:
-                // No default key handling
-            }
-        },
-        [getNextValue, onKeyDown, placeholder, unit],
-    );
+                switch (event.key) {
+                    case 'Escape':
+                    case 'Enter':
+                        if (event.key === 'Escape') {
+                            input.value = submittedValueRef.current;
+                        }
+                        input.blur();
+                        return;
+                    case 'ArrowUp':
+                    case 'ArrowDown':
+                        event.preventDefault();
 
-    const handleKeyUp = useCallback(
-        (event: React.KeyboardEvent<HTMLInputElement>) => {
-            if (onKeyUp) onKeyUp(event);
-            // If this is the key up from ↑ or ↓ keys, time to handleSubmitValue
-            if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                handleSubmitValue();
-            }
-        },
-        [handleSubmitValue, onKeyUp],
-    );
+                        nextValue = getNextValue({
+                            currentValue:
+                                event.currentTarget.value || placeholder || `0${unit}`,
+                            multiplier: event.shiftKey ? 10 : 1,
+                            signum: event.key === 'ArrowUp' ? 1 : -1,
+                        });
 
-    return (
-        <label
-            className={classnames(ROOT_CLASS_NAME, className, { disabled })}
-            title={title}
-        >
-            {icon && <div className={`${ROOT_CLASS_NAME}-icon`}>{icon}</div>}
-            {label && (
-                <div className={`${ROOT_CLASS_NAME}-label`}>
-                    <p className={`${ROOT_CLASS_NAME}-label-text`}>{label}</p>
+                        input.value = nextValue;
+                        return;
+                    default:
+                    // No default key handling
+                }
+            },
+            [getNextValue, onKeyDown, placeholder, unit],
+        );
+
+        const handleKeyUp = useCallback(
+            (event: React.KeyboardEvent<HTMLInputElement>) => {
+                if (onKeyUp) onKeyUp(event);
+                // If this is the key up from ↑ or ↓ keys, time to handleSubmitValue
+                if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
+                    handleSubmitValue();
+                }
+            },
+            [handleSubmitValue, onKeyUp],
+        );
+
+        return (
+            <label
+                className={classnames(ROOT_CLASS_NAME, className, { disabled })}
+                title={title}
+            >
+                {icon && <div className={`${ROOT_CLASS_NAME}-icon`}>{icon}</div>}
+                {label && (
+                    <div className={`${ROOT_CLASS_NAME}-label`}>
+                        <p className={`${ROOT_CLASS_NAME}-label-text`}>{label}</p>
+                    </div>
+                )}
+                <div className={`${ROOT_CLASS_NAME}-value`}>
+                    <InputText
+                        disabled={disabled}
+                        initialValue={value}
+                        onBlur={handleBlur}
+                        onChange={onChange}
+                        onKeyDown={handleKeyDown}
+                        onKeyUp={handleKeyUp}
+                        placeholder={placeholder}
+                        ref={inputRef}
+                    />
                 </div>
-            )}
-            <div className={`${ROOT_CLASS_NAME}-value`}>
-                <InputText
-                    disabled={disabled}
-                    initialValue={value}
-                    onBlur={handleBlur}
-                    onChange={onChange}
-                    onKeyDown={handleKeyDown}
-                    onKeyUp={handleKeyUp}
-                    placeholder={placeholder}
-                    ref={inputRef}
-                />
-            </div>
-        </label>
-    );
-};
+            </label>
+        );
+    },
+);
 
 export default CSSValueInput;
