@@ -195,12 +195,13 @@ const Dropdown: React.FC<Props> = ({
             if (!ref) return;
 
             const { ownerDocument } = ref;
-
+            let inputElement = inputElementRef.current;
             // Check if trigger from props is an input or textarea element
-            if (isTriggerFromProps && !inputElementRef.current && ref.firstElementChild) {
-                inputElementRef.current = ref.firstElementChild.querySelector(
+            if (isTriggerFromProps && !inputElement && ref.firstElementChild) {
+                inputElement = ref.firstElementChild.querySelector(
                     'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea',
                 );
+                inputElementRef.current = inputElement;
             }
 
             const handleMouseDown = ({ clientX, clientY, target }: MouseEvent) => {
@@ -395,6 +396,29 @@ const Dropdown: React.FC<Props> = ({
                 ref.focus();
             }
 
+            const handleInput = (event: Event) => {
+                const dropdownElement = dropdownElementRef.current;
+                if (!dropdownElement) return;
+
+                if (!isOpenRef.current) setIsOpen(true);
+
+                const input = event.target as HTMLInputElement;
+                const isDeleting =
+                    enteredCharactersRef.current.length > input.value.length;
+                enteredCharactersRef.current = input.value;
+                // Don’t set a new active item if user is deleting text unless text is now empty
+                if (isDeleting && input.value.length) return;
+
+                setActiveItem({
+                    dropdownElement,
+                    text: enteredCharactersRef.current,
+                });
+            };
+
+            if (inputElement) {
+                inputElement.addEventListener('input', handleInput);
+            }
+
             return () => {
                 document.removeEventListener('mousedown', handleMouseDown);
                 document.removeEventListener('mouseup', handleMouseUp);
@@ -404,28 +428,14 @@ const Dropdown: React.FC<Props> = ({
                     ownerDocument.removeEventListener('mouseup', handleMouseUp);
                     ownerDocument.removeEventListener('keydown', handleKeyDown);
                 }
+
+                if (inputElement) {
+                    inputElement.removeEventListener('input', handleInput);
+                }
             };
         },
         [closeDropdown, handleSubmitItem, isOpenOnMount],
     );
-
-    const handleChange = useCallback((event: React.ChangeEvent<HTMLElement>) => {
-        const dropdownElement = dropdownElementRef.current;
-        if (!dropdownElement) return;
-
-        if (!isOpenRef.current) setIsOpen(true);
-
-        const input = event.target as HTMLInputElement;
-        const isDeleting = enteredCharactersRef.current.length > input.value.length;
-        enteredCharactersRef.current = input.value;
-        // Don’t set a new active item if user is deleting text unless text is now empty
-        if (isDeleting && input.value.length) return;
-
-        setActiveItem({
-            dropdownElement,
-            text: enteredCharactersRef.current,
-        });
-    }, []);
 
     const handleTriggerFocus = useCallback(() => {
         setIsOpen(true);
@@ -437,7 +447,6 @@ const Dropdown: React.FC<Props> = ({
                 <InputText
                     className={TRIGGER_CLASS_NAME}
                     initialValue={value || ''}
-                    onChange={handleChange}
                     onFocus={handleTriggerFocus}
                     placeholder={placeholder}
                     ref={inputElementRef}
