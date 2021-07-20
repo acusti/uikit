@@ -155,6 +155,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                         return;
                     case 'ArrowUp':
                     case 'ArrowDown':
+                        event.stopPropagation();
                         event.preventDefault();
 
                         nextValue = getNextValue({
