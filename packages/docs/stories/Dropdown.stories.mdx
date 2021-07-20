@@ -21,7 +21,8 @@ of macOS.
     min-height: 210px;
 }
 .uktdropdown input {
-    width: 120px;
+    box-sizing: border-box;
+    width: 110px;
 }
 .uktdropdown-body {
     max-height: 150px;
@@ -44,9 +45,6 @@ of macOS.
     font-weight: 700;
 }
 
-.css-lengths-wrapper {
-    display: flex;
-}
 .css-lengths .uktdropdown-trigger {
     position: relative;
     margin-left: 3px;
@@ -78,10 +76,6 @@ of macOS.
     background-color: #666;
     transform: rotateZ(-38deg);
 }
-.css-lengths .uktdropdown-body {
-    left: auto;
-    right: 0px;
-}
 
 .font-weight {
     font-size: 13px;
@@ -96,8 +90,10 @@ of macOS.
     color: #fff;
 }
 
-.searchable-with-label input {
-    width: 76px;
+.searchable-with-label input,
+.searchable-with-label .uktdropdown-body {
+    min-width: 0px;
+    width: 85px;
 }
 
 .dropdown-without-items .uktdropdown-body {
@@ -106,13 +102,42 @@ of macOS.
 
 #story--uikit-controls-dropdown--out-of-bounds-at-bottom {
     margin-top: 150px;
+    width: 100vw;
 }
-.out-of-bounds-at-bottom .uktdropdown-body {
+.out-of-bounds-example input,
+.out-of-bounds-example .uktdropdown-body {
+    width: 90px;
+}
+.out-of-bounds-example .uktdropdown-body {
     height: 150px;
+    min-width: 0px;
 }
 `}</style>
 
 <Canvas>
+    <Story
+        args={{
+            className: 'css-lengths',
+        }}
+        name="CSS Lengths Dropdown"
+    >
+        {(args) => (
+                <Dropdown {...args}>
+                    <ul>
+                        <li>0px</li>
+                        <li>4px</li>
+                        <li>9px</li>
+                        <li>18px</li>
+                        <li>36px</li>
+                        <li>54px</li>
+                        <li>72px</li>
+                        <li>144px</li>
+                        <li>167px</li>
+                        <li>198px</li>
+                    </ul>
+                </Dropdown>
+        )}
+    </Story>
     <Story
         args={{
             className: 'states-dropdown',
@@ -215,38 +240,6 @@ of macOS.
     </Story>
     <Story
         args={{
-            className: 'css-lengths',
-        }}
-        name="CSS Lengths Dropdown"
-    >
-        {(args) => (
-            <div className="css-lengths-wrapper">
-                <CSSValueInput
-                    cssValueType="length"
-                    label={null}
-                    onSubmitValue={() => {}}
-                    placeholder="12px"
-                    unit="px"
-                />
-                <Dropdown {...args}>
-                    <ul>
-                        <li>0px</li>
-                        <li>4px</li>
-                        <li>9px</li>
-                        <li>18px</li>
-                        <li>36px</li>
-                        <li>54px</li>
-                        <li>72px</li>
-                        <li>144px</li>
-                        <li>167px</li>
-                        <li>198px</li>
-                    </ul>
-                </Dropdown>
-            </div>
-        )}
-    </Story>
-    <Story
-        args={{
             className: 'my-open-on-mount-context-menu',
             isOpenOnMount: true,
         }}
@@ -333,7 +326,7 @@ of macOS.
     </Story>
     <Story
         args={{
-            className: 'out-of-bounds-at-bottom',
+            className: 'out-of-bounds-example',
             isSearchable: true,
             label: 'Should show above',
         }}
