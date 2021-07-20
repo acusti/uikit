@@ -383,10 +383,19 @@ const Dropdown: React.FC<Props> = ({
                 }
             };
 
+            // Close dropdown if any element is focused outside of this dropdown
+            const handleFocusIn = (event: Event) => {
+                if (!isOpenRef.current) return;
+                if (ref.contains(event.target as HTMLElement)) return;
+                closeDropdown();
+            };
+
+            document.addEventListener('focusin', handleFocusIn);
             document.addEventListener('keydown', handleKeyDown);
             document.addEventListener('mousedown', handleMouseDown);
             document.addEventListener('mouseup', handleMouseUp);
             if (ownerDocument !== document) {
+                ownerDocument.addEventListener('focusin', handleFocusIn);
                 ownerDocument.addEventListener('keydown', handleKeyDown);
                 ownerDocument.addEventListener('mousedown', handleMouseDown);
                 ownerDocument.addEventListener('mouseup', handleMouseUp);
@@ -420,10 +429,12 @@ const Dropdown: React.FC<Props> = ({
             }
 
             return () => {
+                document.removeEventListener('focusin', handleFocusIn);
                 document.removeEventListener('keydown', handleKeyDown);
                 document.removeEventListener('mousedown', handleMouseDown);
                 document.removeEventListener('mouseup', handleMouseUp);
                 if (ownerDocument !== document) {
+                    ownerDocument.removeEventListener('focusin', handleFocusIn);
                     ownerDocument.removeEventListener('keydown', handleKeyDown);
                     ownerDocument.removeEventListener('mousedown', handleMouseDown);
                     ownerDocument.removeEventListener('mouseup', handleMouseUp);
