@@ -31,6 +31,7 @@ ${TRIGGER_SELECTOR} {
 }
 ${ROOT_SELECTOR} {
     position: relative;
+    display: inline-block;
 }
 ${ROOT_SELECTOR} > * {
     cursor: default;
@@ -44,10 +45,10 @@ ${LABEL_TEXT_SELECTOR} {
 ${BODY_SELECTOR} {
     box-sizing: border-box;
     position: absolute;
-    left: 0px;
     top: 100%;
     max-height: calc(100vh - 50px);
     min-height: 50px;
+    min-width: 100%;
     overflow: auto;
     z-index: 2;
     padding-bottom: var(--uktdropdown-body-pad-bottom);
