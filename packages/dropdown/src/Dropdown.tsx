@@ -195,8 +195,6 @@ const Dropdown: React.FC<Props> = ({
             if (!ref) return;
 
             const handleMouseDown = ({ clientX, clientY, target }: MouseEvent) => {
-                if (!ref) return;
-
                 const eventTarget = target as HTMLElement;
                 if (!ref.contains(eventTarget)) {
                     // Close dropdown on an outside click
