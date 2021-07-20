@@ -1,6 +1,6 @@
 {
     "name": "@acusti/use-is-out-of-bounds",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/useIsOutOfBounds.js",
@@ -25,7 +25,7 @@
         "typescript": "^4.2.3"
     },
     "dependencies": {
-        "@acusti/use-bounding-client-rect": "^0.1.0"
+        "@acusti/use-bounding-client-rect": "^0.2.0"
     },
     "peerDependencies": {
         "react": "^16.8 || ^17",

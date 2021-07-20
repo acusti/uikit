@@ -9,8 +9,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/css-value-input@workspace:packages/css-value-input"
   dependencies:
-    "@acusti/css-values": ^0.8.6
-    "@acusti/input-text": ^0.1.1
+    "@acusti/css-values": ^0.9.0
+    "@acusti/input-text": ^0.2.0
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
     typescript: ^4.2.3
@@ -21,7 +21,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/css-values@^0.8.6, @acusti/css-values@workspace:packages/css-values":
+"@acusti/css-values@^0.9.0, @acusti/css-values@workspace:packages/css-values":
   version: 0.0.0-use.local
   resolution: "@acusti/css-values@workspace:packages/css-values"
   dependencies:
@@ -33,10 +33,10 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
-    "@acusti/input-text": ^0.1.1
-    "@acusti/matchmaking": ^0.1.3
-    "@acusti/styling": ^0.2.1
-    "@acusti/use-is-out-of-bounds": ^0.2.0
+    "@acusti/input-text": ^0.2.0
+    "@acusti/matchmaking": ^0.2.0
+    "@acusti/styling": ^0.3.0
+    "@acusti/use-is-out-of-bounds": ^0.3.0
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
     typescript: ^4.2.3
@@ -47,7 +47,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/input-text@*, @acusti/input-text@^0.1.1, @acusti/input-text@workspace:packages/input-text":
+"@acusti/input-text@*, @acusti/input-text@^0.2.0, @acusti/input-text@workspace:packages/input-text":
   version: 0.0.0-use.local
   resolution: "@acusti/input-text@workspace:packages/input-text"
   dependencies:
@@ -59,7 +59,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/matchmaking@^0.1.3, @acusti/matchmaking@workspace:packages/matchmaking":
+"@acusti/matchmaking@^0.2.0, @acusti/matchmaking@workspace:packages/matchmaking":
   version: 0.0.0-use.local
   resolution: "@acusti/matchmaking@workspace:packages/matchmaking"
   dependencies:
@@ -67,7 +67,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/styling@*, @acusti/styling@^0.2.1, @acusti/styling@workspace:packages/styling":
+"@acusti/styling@*, @acusti/styling@^0.3.0, @acusti/styling@workspace:packages/styling":
   version: 0.0.0-use.local
   resolution: "@acusti/styling@workspace:packages/styling"
   dependencies:
@@ -135,7 +135,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-bounding-client-rect@^0.1.0, @acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect":
+"@acusti/use-bounding-client-rect@^0.2.0, @acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect":
   version: 0.0.0-use.local
   resolution: "@acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect"
   dependencies:
@@ -148,11 +148,11 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-is-out-of-bounds@^0.2.0, @acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds":
+"@acusti/use-is-out-of-bounds@^0.3.0, @acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds":
   version: 0.0.0-use.local
   resolution: "@acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds"
   dependencies:
-    "@acusti/use-bounding-client-rect": ^0.1.0
+    "@acusti/use-bounding-client-rect": ^0.2.0
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
     typescript: ^4.2.3
