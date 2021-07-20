@@ -93,8 +93,6 @@ const Dropdown: React.FC<Props> = ({
     isOpenRef.current = isOpen;
     const isOpeningRef = useRef(isOpening);
     isOpeningRef.current = isOpening;
-    const isSearchableRef = useRef(isSearchable);
-    isSearchableRef.current = isSearchable;
     const onSubmitItemRef = useRef(onSubmitItem);
     onSubmitItemRef.current = onSubmitItem;
 
@@ -121,8 +119,8 @@ const Dropdown: React.FC<Props> = ({
         if (!nextElement) {
             // If not allowEmpty, don’t allow submitting an empty item
             if (!allowEmptyRef.current) return;
-            // For a searchable dropdown, if the user didn’t clear the text, do nothing
-            if (isSearchableRef.current && inputElementRef.current?.value) return;
+            // If we have an input element as trigger & the user didn’t clear the text, do nothing
+            if (inputElementRef.current?.value) return;
         }
 
         const label = nextElement?.innerText || '';
@@ -278,7 +276,7 @@ const Dropdown: React.FC<Props> = ({
                 }
 
                 // If dropdown isOpen, hasItems, and not isSearchable, handle entering characters
-                if (hasItemsRef.current && !isSearchableRef.current) {
+                if (hasItemsRef.current && !inputElementRef.current) {
                     let isEditingCharacters =
                         !ctrlKey && !metaKey && /^[A-Za-z0-9]$/.test(key);
                     // User could also be editing characters if there are already characters entered
@@ -316,7 +314,7 @@ const Dropdown: React.FC<Props> = ({
                     }
                 }
                 // If dropdown isOpen, handle submitting the value
-                if (key === 'Enter' || (key === ' ' && !isSearchableRef.current)) {
+                if (key === 'Enter' || (key === ' ' && !inputElementRef.current)) {
                     onEventHandled();
                     handleSubmitItem();
                     return;
