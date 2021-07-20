@@ -237,7 +237,13 @@ const Dropdown: React.FC<Props> = ({
                 if (isTargetInBody) {
                     handleSubmitItem();
                 } else {
-                    closeDropdown();
+                    // If dropdown is searchable and ref is still focused, do nothing
+                    if (
+                        !inputElementRef.current ||
+                        !ref.contains(ownerDocument.activeElement)
+                    ) {
+                        closeDropdown();
+                    }
                 }
             };
 
