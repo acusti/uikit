@@ -68,6 +68,8 @@ const Dropdown: React.FC<Props> = ({
         console.error(`${CHILDREN_ERROR} Received ${childrenCount} children.`);
     }
 
+    let trigger = childrenCount > 1 ? children[0] : null;
+    const isTriggerFromProps = React.isValidElement(trigger);
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [dropdownBodyElement, setDropdownBodyElement] = useState<HTMLDivElement | null>(
@@ -191,6 +193,15 @@ const Dropdown: React.FC<Props> = ({
         (ref: HTMLDivElement | null) => {
             dropdownElementRef.current = ref;
             if (!ref) return;
+
+            const { ownerDocument } = ref;
+
+            // Check if trigger from props is an input or textarea element
+            if (isTriggerFromProps && !inputElementRef.current && ref.firstElementChild) {
+                inputElementRef.current = ref.firstElementChild.querySelector(
+                    'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea',
+                );
+            }
 
             const handleMouseDown = ({ clientX, clientY, target }: MouseEvent) => {
                 const eventTarget = target as HTMLElement;
@@ -371,7 +382,6 @@ const Dropdown: React.FC<Props> = ({
                 }
             };
 
-            const { ownerDocument } = ref;
             document.addEventListener('mousedown', handleMouseDown);
             document.addEventListener('mouseup', handleMouseUp);
             document.addEventListener('keydown', handleKeyDown);
@@ -421,8 +431,6 @@ const Dropdown: React.FC<Props> = ({
         setIsOpen(true);
     }, []);
 
-    let trigger = childrenCount > 1 ? children[0] : null;
-    const isTriggerFromProps = React.isValidElement(trigger);
     if (!isTriggerFromProps) {
         if (isSearchable) {
             trigger = (
@@ -465,7 +473,11 @@ const Dropdown: React.FC<Props> = ({
                 onMouseMove={handleMouseMove}
                 onMouseOver={handleMouseOver}
                 ref={handleRef}
-                tabIndex={isSearchable || !isTriggerFromProps ? undefined : 0}
+                tabIndex={
+                    isSearchable || inputElementRef.current || !isTriggerFromProps
+                        ? undefined
+                        : 0
+                }
             >
                 {trigger}
                 {isOpen ? (
