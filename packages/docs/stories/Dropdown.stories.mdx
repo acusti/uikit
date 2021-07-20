@@ -122,20 +122,20 @@ of macOS.
         name="CSS Lengths Dropdown"
     >
         {(args) => (
-                <Dropdown {...args}>
-                    <ul>
-                        <li>0px</li>
-                        <li>4px</li>
-                        <li>9px</li>
-                        <li>18px</li>
-                        <li>36px</li>
-                        <li>54px</li>
-                        <li>72px</li>
-                        <li>144px</li>
-                        <li>167px</li>
-                        <li>198px</li>
-                    </ul>
-                </Dropdown>
+            <Dropdown {...args}>
+                <ul>
+                    <li>0px</li>
+                    <li>4px</li>
+                    <li>9px</li>
+                    <li>18px</li>
+                    <li>36px</li>
+                    <li>54px</li>
+                    <li>72px</li>
+                    <li>144px</li>
+                    <li>167px</li>
+                    <li>198px</li>
+                </ul>
+            </Dropdown>
         )}
     </Story>
     <Story
@@ -320,6 +320,37 @@ of macOS.
                     <li>144px</li>
                     <li>167px</li>
                     <li>198px</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'css-value-input-trigger',
+            hasItems: true,
+        }}
+        name="CSSValueInput Trigger"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <CSSValueInput
+                    cssValueType="length"
+                    label={null}
+                    onSubmitValue={() => {}}
+                    placeholder="12px"
+                    unit="px"
+                />
+                <ul>
+                    <li>0px</li>
+                    <li>8px</li>
+                    <li>12px</li>
+                    <li>20px</li>
+                    <li>30px</li>
+                    <li>42px</li>
+                    <li>58px</li>
+                    <li>81px</li>
+                    <li>102px</li>
+                    <li>148px</li>
                 </ul>
             </Dropdown>
         )}
