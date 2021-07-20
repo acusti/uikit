@@ -15,65 +15,62 @@ export const TRIGGER_SELECTOR = `.${TRIGGER_CLASS_NAME}`;
 
 export const STYLES = `
 :root {
-    --uktdropdown-font-family: ${SYSTEM_UI_FONT};
-    --uktdropdown-body-bg-color: #fff;
-    --uktdropdown-body-bg-color-hover: rgb(105, 162, 249);
-    --uktdropdown-body-color-hover: #fff;
-    --uktdropdown-body-pad-bottom: 10px;
-    --uktdropdown-body-pad-left: 12px;
-    --uktdropdown-body-pad-right: 12px;
-    --uktdropdown-body-pad-top: 10px;
-    --uktdropdown-label-pad-right: 10px;
+  --uktdd-font-family: ${SYSTEM_UI_FONT};
+  --uktdd-body-bg-color: #fff;
+  --uktdd-body-bg-color-hover: rgb(105,162,249);
+  --uktdd-body-color-hover: #fff;
+  --uktdd-body-pad-bottom: 10px;
+  --uktdd-body-pad-left: 12px;
+  --uktdd-body-pad-right: 12px;
+  --uktdd-body-pad-top: 10px;
+  --uktdd-label-pad-right: 10px;
 }
 ${ROOT_SELECTOR},
 ${TRIGGER_SELECTOR} {
-    font-family: var(--uktdropdown-font-family);
+  font-family: var(--uktdd-font-family);
 }
 ${ROOT_SELECTOR} {
-    position: relative;
-    display: inline-block;
+  position: relative;
+  display: inline-block;
 }
 ${ROOT_SELECTOR} > * {
-    cursor: default;
+  cursor: default;
 }
 ${LABEL_SELECTOR} {
-    display: flex;
+  display: flex;
 }
 ${LABEL_TEXT_SELECTOR} {
-    padding-right: var(--uktdropdown-label-pad-right);
+  padding-right: var(--uktdd-label-pad-right);
 }
 ${BODY_SELECTOR} {
-    box-sizing: border-box;
-    position: absolute;
-    top: 100%;
-    max-height: calc(100vh - 50px);
-    min-height: 50px;
-    min-width: 100%;
-    overflow: auto;
-    z-index: 2;
-    padding-bottom: var(--uktdropdown-body-pad-bottom);
-    padding-left: var(--uktdropdown-body-pad-left);
-    padding-right: var(--uktdropdown-body-pad-right);
-    padding-top: var(--uktdropdown-body-pad-top);
-    background-color: var(--uktdropdown-body-bg-color);
-    box-shadow: 0px 8px 18px rgba(0, 0, 0, 0.25);
+  box-sizing: border-box;
+  position: absolute;
+  top: 100%;
+  max-height: calc(100vh - 50px);
+  min-height: 50px;
+  min-width: 100%;
+  overflow: auto;
+  z-index: 2;
+  padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right) var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
+  background-color: var(--uktdd-body-bg-color);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.25);
 }
 ${BODY_SELECTOR}.calculating-position {
-    visibility: hidden;
+  visibility: hidden;
 }
 ${BODY_SELECTOR}.out-of-bounds-bottom:not(.out-of-bounds-top) {
-    top: auto;
-    bottom: 100%;
+  top: auto;
+  bottom: 100%;
 }
 ${LABEL_SELECTOR} + ${BODY_SELECTOR} {
-    left: auto;
-    right: 0px;
+  left: auto;
+  right: 0;
 }
 ${BODY_SELECTOR}.has-items {
-    user-select: none;
+  user-select: none;
 }
 ${BODY_SELECTOR} [data-ukt-active] {
-    background-color: var(--uktdropdown-body-bg-color-hover);
-    color: var(--uktdropdown-body-color-hover);
+  background-color: var(--uktdd-body-bg-color-hover);
+  color: var(--uktdd-body-color-hover);
 }
 `;
