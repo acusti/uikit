@@ -383,13 +383,13 @@ const Dropdown: React.FC<Props> = ({
                 }
             };
 
+            document.addEventListener('keydown', handleKeyDown);
             document.addEventListener('mousedown', handleMouseDown);
             document.addEventListener('mouseup', handleMouseUp);
-            document.addEventListener('keydown', handleKeyDown);
             if (ownerDocument !== document) {
+                ownerDocument.addEventListener('keydown', handleKeyDown);
                 ownerDocument.addEventListener('mousedown', handleMouseDown);
                 ownerDocument.addEventListener('mouseup', handleMouseUp);
-                ownerDocument.addEventListener('keydown', handleKeyDown);
             }
             // If dropdown should be open on mount, focus it
             if (isOpenOnMount) {
@@ -420,13 +420,13 @@ const Dropdown: React.FC<Props> = ({
             }
 
             return () => {
+                document.removeEventListener('keydown', handleKeyDown);
                 document.removeEventListener('mousedown', handleMouseDown);
                 document.removeEventListener('mouseup', handleMouseUp);
-                document.removeEventListener('keydown', handleKeyDown);
                 if (ownerDocument !== document) {
+                    ownerDocument.removeEventListener('keydown', handleKeyDown);
                     ownerDocument.removeEventListener('mousedown', handleMouseDown);
                     ownerDocument.removeEventListener('mouseup', handleMouseUp);
-                    ownerDocument.removeEventListener('keydown', handleKeyDown);
                 }
 
                 if (inputElement) {
