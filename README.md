@@ -11,16 +11,16 @@ drag-and-drop library, and more_
 
 ## Packages
 
-| NPM Package Name                         | Description                                                   |
-| ---------------------------------------- | ------------------------------------------------------------- |
-| **[@acusti/css-values][]**               | Utilities for parsing different types of CSS values           |
-| **[@acusti/css-value-input][]**          | React component that renders a CSS value input                |
-| **[@acusti/dropdown][]**                 | React component that renders a dropdown UI element            |
-| **[@acusti/input-text][]**               | React component that renders an uncontrolled text input       |
-| **[@acusti/matchmaking][]**              | Utilities for approximate string matching (i.e. fuzzy search) |
-| **[@acusti/styling][]**                  | React component that renders a CSS string to the `<head>`     |
-| **[@acusti/use-bounding-client-rect][]** | React hook for getting an element’s `boundingClientRect`      |
-| **[@acusti/use-is-out-of-bounds][]**     | React hook to check if an element overlaps its bounds         |
+| NPM Package Name                         | Version                                                                                                                                                              | Description                                                   |
+| ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **[@acusti/css-values][]**               | [![latest version](https://img.shields.io/npm/v/@acusti/css-values?style=flat-square)](https://www.npmjs.com/package/@acusti/css-values)                             | Utilities for parsing different types of CSS values           |
+| **[@acusti/css-value-input][]**          | [![latest version](https://img.shields.io/npm/v/@acusti/css-value-input?style=flat-square)](https://www.npmjs.com/package/@acusti/css-value-input)                   | React component that renders a CSS value input                |
+| **[@acusti/dropdown][]**                 | [![latest version](https://img.shields.io/npm/v/@acusti/dropdown?style=flat-square)](https://www.npmjs.com/package/@acusti/dropdown)                                 | React component that renders a dropdown UI element            |
+| **[@acusti/input-text][]**               | [![latest version](https://img.shields.io/npm/v/@acusti/input-text?style=flat-square)](https://www.npmjs.com/package/@acusti/input-text)                             | React component that renders an uncontrolled text input       |
+| **[@acusti/matchmaking][]**              | [![latest version](https://img.shields.io/npm/v/@acusti/matchmaking?style=flat-square)](https://www.npmjs.com/package/@acusti/matchmaking)                           | Utilities for approximate string matching (i.e. fuzzy search) |
+| **[@acusti/styling][]**                  | [![latest version](https://img.shields.io/npm/v/@acusti/styling?style=flat-square)](https://www.npmjs.com/package/@acusti/styling)                                   | React component that renders a CSS string to the `<head>`     |
+| **[@acusti/use-bounding-client-rect][]** | [![latest version](https://img.shields.io/npm/v/@acusti/use-bounding-client-rect?style=flat-square)](https://www.npmjs.com/package/@acusti/use-bounding-client-rect) | React hook for getting an element’s `boundingClientRect`      |
+| **[@acusti/use-is-out-of-bounds][]**     | [![latest version](https://img.shields.io/npm/v/@acusti/use-is-out-of-bounds?style=flat-square)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)         | React hook to check if an element overlaps its bounds         |
 
 [@acusti/css-values]:
     https://github.com/acusti/uikit/tree/main/packages/css-values
