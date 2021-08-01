@@ -1,9 +1,9 @@
 # @acusti/use-is-out-of-bounds
 
-![latest version](https://img.shields.io/npm/v/@acusti/use-is-out-of-bounds?style=for-the-badge)
-![dependencies status](https://img.shields.io/david/acusti/uikit?path=packages%2Fuse-is-out-of-bounds&style=for-the-badge)
-![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/use-is-out-of-bounds?style=for-the-badge)
-![downloads per month](https://img.shields.io/npm/dm/@acusti/use-is-out-of-bounds?style=for-the-badge)
+[![latest version](https://img.shields.io/npm/v/@acusti/use-is-out-of-bounds?style=for-the-badge)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)
+[![dependencies status](https://img.shields.io/david/acusti/uikit?path=packages%2Fuse-is-out-of-bounds&style=for-the-badge)](https://david-dm.org/acusti/uikit?path=packages%2Fuse-is-out-of-bounds)
+[![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/use-is-out-of-bounds?style=for-the-badge)](https://bundlephobia.com/package/@acusti/use-is-out-of-bounds)
+[![downloads per month](https://img.shields.io/npm/dm/@acusti/use-is-out-of-bounds?style=for-the-badge)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)
 
 `useIsOutOfBounds` is a React hook that returns a
 `{ bottom: boolean, left: boolean, right: boolean, top: boolean, hasLayout: boolean }`
