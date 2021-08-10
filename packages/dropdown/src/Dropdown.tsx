@@ -386,7 +386,11 @@ const Dropdown: React.FC<Props> = ({
             // Close dropdown if any element is focused outside of this dropdown
             const handleFocusIn = (event: Event) => {
                 if (!isOpenRef.current) return;
-                if (ref.contains(event.target as HTMLElement)) return;
+
+                const eventTarget = event.target as HTMLElement;
+                // If focused element is a descendant or a parent of the dropdown, do nothing
+                if (ref.contains(eventTarget) || eventTarget.contains(ref)) return;
+
                 closeDropdown();
             };
 
