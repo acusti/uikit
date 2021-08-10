@@ -449,7 +449,7 @@ const Dropdown: React.FC<Props> = ({
                 }
             };
         },
-        [closeDropdown, handleSubmitItem, isOpenOnMount],
+        [closeDropdown, handleSubmitItem, isOpenOnMount, isTriggerFromProps],
     );
 
     const handleTriggerFocus = useCallback(() => {
