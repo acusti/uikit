@@ -43,7 +43,7 @@ export type Props = {
 
 type MousePosition = { clientX: number; clientY: number };
 
-const { Children, Fragment, useCallback, useRef, useState } = React;
+const { Children, Fragment, useCallback, useLayoutEffect, useRef, useState } = React;
 
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
@@ -88,15 +88,18 @@ const Dropdown: React.FC<Props> = ({
     const outOfBounds = useIsOutOfBounds(dropdownBodyElement);
 
     const allowEmptyRef = useRef(allowEmpty);
-    allowEmptyRef.current = allowEmpty;
     const hasItemsRef = useRef(hasItems);
-    hasItemsRef.current = hasItems;
     const isOpenRef = useRef(isOpen);
-    isOpenRef.current = isOpen;
     const isOpeningRef = useRef(isOpening);
-    isOpeningRef.current = isOpening;
     const onSubmitItemRef = useRef(onSubmitItem);
-    onSubmitItemRef.current = onSubmitItem;
+
+    useLayoutEffect(() => {
+        allowEmptyRef.current = allowEmpty;
+        hasItemsRef.current = hasItems;
+        isOpenRef.current = isOpen;
+        isOpeningRef.current = isOpening;
+        onSubmitItemRef.current = onSubmitItem;
+    }, [allowEmpty, hasItems, isOpen, isOpening, onSubmitItem]);
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
