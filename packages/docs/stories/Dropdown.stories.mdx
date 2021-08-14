@@ -2,6 +2,8 @@ import CSSValueInput from '@acusti/css-value-input';
 import Dropdown from '@acusti/dropdown';
 import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
 
+import './Dropdown.css';
+
 <Meta
     argTypes={{ onSubmitItem: { action: 'submitted' } }}
     component={Dropdown}
@@ -16,111 +18,8 @@ The body of the dropdown can include any DOM, and many dropdowns can be
 combined to form a multi-item menu, like the system menu in the top toolbar
 of macOS.
 
-<style>{`
-.innerZoomElementWrapper {
-    min-height: 210px;
-}
-.uktdropdown input {
-    box-sizing: border-box;
-    width: 110px;
-}
-.uktdropdown-body {
-    max-height: 150px;
-}
-.uktdropdown-body ul {
-    text-align: left;
-    list-style-type: none;
-    padding-left: 0px;
-    margin: 0px;
-}
-.uktdropdown-body li {
-    padding: 4px 8px;
-    margin: 4px 0;
-}
-.uktdropdown-body .heading {
-    color: #aaa;
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-weight: 700;
-}
-
-.css-lengths .uktdropdown-trigger {
-    position: relative;
-    margin-left: 3px;
-    width: 27px;
-    height: 21px;
-    vertical-align: top;
-}
-.css-lengths .uktdropdown-trigger:before {
-    content: "";
-    display: block;
-    position: absolute;
-    width: 9px;
-    height: 2px;
-    top: 8px;
-    left: 4px;
-    border-radius: 2px 0 0 3px;
-    background-color: #666;
-    transform: rotateZ(38deg);
-}
-.css-lengths .uktdropdown-trigger:after {
-    content: "";
-    display: block;
-    position: absolute;
-    width: 9px;
-    height: 2px;
-    top: 8px;
-    right: 4px;
-    border-radius: 0 2px 2px 0;
-    background-color: #666;
-    transform: rotateZ(-38deg);
-}
-
-.font-weight {
-    font-size: 13px;
-}
-.font-weight input {
-    width: 160px;
-}
-.font-weight .item-title {
-    color: #ababab;
-}
-.font-weight [data-ukt-active] .item-title {
-    color: #fff;
-}
-
-.searchable-with-label input,
-.searchable-with-label .uktdropdown-body {
-    min-width: 0px;
-    width: 85px;
-}
-
-.dropdown-without-items .uktdropdown-body {
-    width: 300px;
-}
-
-#story--uikit-controls-dropdown--out-of-bounds-at-bottom {
-    margin-top: 150px;
-    width: 100vw;
-}
-.out-of-bounds-example input,
-.out-of-bounds-example .uktdropdown-body {
-    width: 90px;
-}
-.out-of-bounds-example .uktdropdown-body {
-    height: 150px;
-    min-width: 0px;
-}
-`}</style>
-
 <Canvas>
-    <Story
-        args={{
-            className: 'css-lengths',
-        }}
-        name="CSS Lengths Dropdown"
-    >
+    <Story args={{ className: 'css-lengths' }} name="CSS Lengths Dropdown">
         {(args) => (
             <Dropdown {...args}>
                 <ul>
