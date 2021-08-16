@@ -33,6 +33,9 @@ ${ROOT_SELECTOR} {
   position: relative;
   display: inline-block;
 }
+${ROOT_SELECTOR}.disabled {
+  pointer-events: none;
+}
 ${ROOT_SELECTOR} > * {
   cursor: default;
 }

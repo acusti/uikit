@@ -29,6 +29,7 @@ export type Props = {
     /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
     children: React.ReactChild | [React.ReactNode, React.ReactNode];
     className?: string;
+    disabled?: boolean;
     /** Group identifier string links dropdowns together into a menu (like macOS top menubar) */
     group?: string;
     hasItems?: boolean;
@@ -53,6 +54,7 @@ const Dropdown: React.FC<Props> = ({
     allowEmpty = true,
     children,
     className,
+    disabled,
     hasItems = true,
     isOpenOnMount,
     isSearchable,
@@ -467,6 +469,7 @@ const Dropdown: React.FC<Props> = ({
             trigger = (
                 <InputText
                     className={TRIGGER_CLASS_NAME}
+                    disabled={disabled}
                     initialValue={value || ''}
                     onFocus={handleTriggerFocus}
                     placeholder={placeholder}
@@ -497,6 +500,7 @@ const Dropdown: React.FC<Props> = ({
             <Style>{STYLES}</Style>
             <div
                 className={classnames(ROOT_CLASS_NAME, className, {
+                    disabled,
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
                 })}
