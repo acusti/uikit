@@ -7,6 +7,9 @@ module.exports = {
         '@storybook/addon-essentials',
         '@storybook/addon-links',
     ],
+    typescript: {
+        reactDocgen: 'react-docgen',
+    },
     webpackFinal: (config, { configType }) => {
         config.resolve.alias['core-js'] = path.dirname(require.resolve('core-js'));
         return config;
