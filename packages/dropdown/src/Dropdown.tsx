@@ -39,7 +39,10 @@ export type Props = {
     onSubmitItem?: (payload: Item) => void;
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s placeholder */
     placeholder?: string;
-    /** Only usable in conjunction with {isSearchable: true}; used as search input’s value */
+    /**
+     * Used as search input’s value if props.isSearchable === true
+     * Resets internal currentItemRef if it no longer matches value to keep state in sync
+     */
     value?: string;
 };
 
@@ -103,6 +106,12 @@ const Dropdown: React.FC<Props> = ({
         isOpeningRef.current = isOpening;
         onSubmitItemRef.current = onSubmitItem;
     }, [allowEmpty, hasItems, isOpen, isOpening, onSubmitItem]);
+
+    useLayoutEffect(() => {
+        if (currentItemRef.current?.value !== value) {
+            currentItemRef.current = null;
+        }
+    }, [value]);
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
