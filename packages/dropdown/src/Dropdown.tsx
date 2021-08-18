@@ -98,6 +98,7 @@ const Dropdown: React.FC<Props> = ({
     const isOpenRef = useRef(isOpen);
     const isOpeningRef = useRef(isOpening);
     const onSubmitItemRef = useRef(onSubmitItem);
+    const valueRef = useRef(value);
 
     useLayoutEffect(() => {
         allowEmptyRef.current = allowEmpty;
@@ -105,13 +106,8 @@ const Dropdown: React.FC<Props> = ({
         isOpenRef.current = isOpen;
         isOpeningRef.current = isOpening;
         onSubmitItemRef.current = onSubmitItem;
-    }, [allowEmpty, hasItems, isOpen, isOpening, onSubmitItem]);
-
-    useLayoutEffect(() => {
-        if (currentItemRef.current?.value !== value) {
-            currentItemRef.current = null;
-        }
-    }, [value]);
+        valueRef.current = value;
+    }, [allowEmpty, hasItems, isOpen, isOpening, onSubmitItem, value]);
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
@@ -153,7 +149,11 @@ const Dropdown: React.FC<Props> = ({
             }
         }
 
-        if (currentItemRef.current?.value === nextValue) return;
+        let currentValue = valueRef.current;
+        if (typeof currentValue !== 'string' && currentItemRef.current) {
+            currentValue = currentItemRef.current.value;
+        }
+        if (currentValue === nextValue) return;
 
         currentItemRef.current = nextItem;
         if (onSubmitItemRef.current) {
