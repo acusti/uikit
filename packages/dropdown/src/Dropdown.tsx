@@ -212,7 +212,10 @@ const Dropdown: React.FC<Props> = ({
 
             const handleMouseDown = ({ clientX, clientY, target }: MouseEvent) => {
                 const eventTarget = target as HTMLElement;
-                if (!ref.contains(eventTarget)) {
+                if (
+                    dropdownElementRef.current &&
+                    !dropdownElementRef.current.contains(eventTarget)
+                ) {
                     // Close dropdown on an outside click
                     closeDropdown();
                     return;
@@ -250,14 +253,13 @@ const Dropdown: React.FC<Props> = ({
                 // If mouseup is on an item, trigger submit item, else close the dropdown
                 if (isTargetInBody) {
                     handleSubmitItem();
-                } else {
-                    // If dropdown is searchable and ref is still focused, do nothing
-                    if (
-                        !inputElementRef.current ||
-                        !ref.contains(ownerDocument.activeElement)
-                    ) {
-                        closeDropdown();
-                    }
+                } else if (
+                    !inputElementRef.current ||
+                    (dropdownElementRef.current &&
+                        dropdownElementRef.current.contains(ownerDocument.activeElement))
+                ) {
+                    // If dropdown is searchable and ref is still focused, this won’t be invoked
+                    closeDropdown();
                 }
             };
 
@@ -395,7 +397,13 @@ const Dropdown: React.FC<Props> = ({
 
                 const eventTarget = event.target as HTMLElement;
                 // If focused element is a descendant or a parent of the dropdown, do nothing
-                if (ref.contains(eventTarget) || eventTarget.contains(ref)) return;
+                if (
+                    !dropdownElementRef.current ||
+                    dropdownElementRef.current.contains(eventTarget) ||
+                    eventTarget.contains(dropdownElementRef.current)
+                ) {
+                    return;
+                }
 
                 closeDropdown();
             };
