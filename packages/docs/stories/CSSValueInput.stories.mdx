@@ -106,6 +106,17 @@ Illustrator or XD.
     >
         {(args) => <CSSValueInput {...args} />}
     </Story>
+    <Story
+        name="Background Size"
+        args={{
+            className: 'background-size',
+            label: 'Background Size',
+            validator: /^(auto|contain|cover)$/,
+            value: 'cover',
+        }}
+    >
+        {(args) => <CSSValueInput {...args} />}
+    </Story>
 </Canvas>
 
 <Props story="Length" />
