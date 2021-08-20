@@ -117,13 +117,21 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 signum?: number;
             }) => {
                 const modifier = multiplier * step * signum;
-                let nextValue = roundToPrecision(
-                    getCSSValueAsNumber(currentValue) + modifier,
-                    5,
-                );
+                const currentValueAsNumber = getCSSValueAsNumber(currentValue);
+                // If currentValue isn’t numeric, don’t try to increment/decrement it
+                if (
+                    typeof currentValue === 'string' &&
+                    Number.isNaN(currentValueAsNumber)
+                ) {
+                    return currentValue;
+                }
+
+                let nextValue = roundToPrecision(currentValueAsNumber + modifier, 5);
+
                 if (typeof max === 'number' && Number.isFinite(max)) {
                     nextValue = Math.min(max, nextValue);
                 }
+
                 if (typeof min === 'number' && Number.isFinite(min)) {
                     nextValue = Math.max(min, nextValue);
                 }
