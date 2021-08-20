@@ -81,6 +81,11 @@
     width: 300px;
 }
 
+.css-value-input-trigger .uktdropdown-label-text {
+    display: flex;
+    align-self: center;
+}
+
 #story--uikit-controls-dropdown--out-of-bounds-at-bottom {
     margin-top: 150px;
     width: 100vw;
