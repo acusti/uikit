@@ -151,6 +151,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 if (onKeyDown) onKeyDown(event);
 
                 const input = event.currentTarget;
+                const currentValue = input.value || placeholder || `0${unit}`;
                 let nextValue = '';
 
                 switch (event.key) {
@@ -163,15 +164,16 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                         return;
                     case 'ArrowUp':
                     case 'ArrowDown':
-                        event.stopPropagation();
-                        event.preventDefault();
-
                         nextValue = getNextValue({
-                            currentValue:
-                                event.currentTarget.value || placeholder || `0${unit}`,
+                            currentValue,
                             multiplier: event.shiftKey ? 10 : 1,
                             signum: event.key === 'ArrowUp' ? 1 : -1,
                         });
+
+                        if (nextValue === currentValue) return;
+
+                        event.stopPropagation();
+                        event.preventDefault();
 
                         input.value = nextValue;
                         return;
