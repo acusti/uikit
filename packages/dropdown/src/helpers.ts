@@ -48,6 +48,7 @@ export const setActiveItem = ({
     element,
     index,
     indexAddend,
+    isExactMatch,
     text,
 }:
     | {
@@ -55,6 +56,7 @@ export const setActiveItem = ({
           element: HTMLElement;
           index?: null;
           indexAddend?: null;
+          isExactMatch?: null;
           text?: null;
       }
     | {
@@ -62,6 +64,7 @@ export const setActiveItem = ({
           element?: null;
           index: number;
           indexAddend?: null;
+          isExactMatch?: null;
           text?: null;
       }
     | {
@@ -69,6 +72,7 @@ export const setActiveItem = ({
           element?: null;
           index?: null;
           indexAddend: number;
+          isExactMatch?: null;
           text?: null;
       }
     | {
@@ -76,6 +80,7 @@ export const setActiveItem = ({
           element?: null;
           index?: null;
           indexAddend?: null;
+          isExactMatch?: boolean;
           text: string;
       }) => {
     const items = getItemElements(dropdownElement);
@@ -120,8 +125,19 @@ export const setActiveItem = ({
         }
 
         const itemTexts = itemElements.map((itemElement) => itemElement.innerText);
-        const bestMatch = getBestMatch({ items: itemTexts, text });
-        nextActiveIndex = itemTexts.findIndex((text) => text === bestMatch);
+        if (isExactMatch) {
+            const textToCompare = text.toLowerCase();
+            nextActiveIndex = itemTexts.findIndex((itemText) =>
+                itemText.toLowerCase().startsWith(textToCompare),
+            );
+            // If isExactMatch is required and no exact match was found, clear active items
+            if (nextActiveIndex === -1) {
+                clearItemElementsState(itemElements);
+            }
+        } else {
+            const bestMatch = getBestMatch({ items: itemTexts, text });
+            nextActiveIndex = itemTexts.findIndex((text) => text === bestMatch);
+        }
     }
 
     if (nextActiveIndex === -1 || nextActiveIndex === currentActiveIndex) return;
