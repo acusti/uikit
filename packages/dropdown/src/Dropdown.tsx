@@ -97,6 +97,7 @@ const Dropdown: React.FC<Props> = ({
     const hasItemsRef = useRef(hasItems);
     const isOpenRef = useRef(isOpen);
     const isOpeningRef = useRef(isOpening);
+    const isTriggerFromPropsRef = useRef(isOpening);
     const onSubmitItemRef = useRef(onSubmitItem);
     const valueRef = useRef(value);
 
@@ -105,9 +106,18 @@ const Dropdown: React.FC<Props> = ({
         hasItemsRef.current = hasItems;
         isOpenRef.current = isOpen;
         isOpeningRef.current = isOpening;
+        isTriggerFromPropsRef.current = isTriggerFromProps;
         onSubmitItemRef.current = onSubmitItem;
         valueRef.current = value;
-    }, [allowEmpty, hasItems, isOpen, isOpening, onSubmitItem, value]);
+    }, [
+        allowEmpty,
+        hasItems,
+        isOpen,
+        isOpening,
+        isTriggerFromProps,
+        onSubmitItem,
+        value,
+    ]);
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
@@ -327,6 +337,9 @@ const Dropdown: React.FC<Props> = ({
 
                         setActiveItem({
                             dropdownElement,
+                            // If input element came from props, only override the input’s value
+                            // with an exact text match so user can enter a value not in items
+                            isExactMatch: isTriggerFromPropsRef.current,
                             text: enteredCharactersRef.current,
                         });
 
@@ -449,6 +462,9 @@ const Dropdown: React.FC<Props> = ({
 
                 setActiveItem({
                     dropdownElement,
+                    // If input element came from props, only override the input’s value
+                    // with an exact text match so user can enter a value not in items
+                    isExactMatch: isTriggerFromPropsRef.current,
                     text: enteredCharactersRef.current,
                 });
             };
