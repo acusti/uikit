@@ -65,6 +65,10 @@ ${BODY_SELECTOR}.out-of-bounds-bottom:not(.out-of-bounds-top) {
   top: auto;
   bottom: 100%;
 }
+${BODY_SELECTOR}.out-of-bounds-right:not(.out-of-bounds-left) {
+  left: auto;
+  right: 0px;
+}
 ${LABEL_SELECTOR} + ${BODY_SELECTOR} {
   left: auto;
   right: 0;
