@@ -86,13 +86,15 @@
     align-self: center;
 }
 
-#story--uikit-controls-dropdown--out-of-bounds-at-bottom {
-    margin-top: 150px;
-    width: 100vw;
+.out-of-bounds-example.uktdropdown {
+    position: absolute;
+    bottom: 30px;
 }
-.out-of-bounds-example input,
+.out-of-bounds-example input {
+    width: 150px;
+}
 .out-of-bounds-example .uktdropdown-body {
-    width: 90px;
+    width: 250px;
 }
 .out-of-bounds-example .uktdropdown-body {
     height: 150px;
