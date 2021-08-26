@@ -1,27 +1,26 @@
 {
     "compilerOptions": {
+        "allowJs": false,
         "baseUrl": ".",
         "composite": true,
         "declaration": true,
         "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
         "jsx": "react",
         "lib": ["dom", "dom.iterable", "esnext"],
         "module": "esnext",
         "moduleResolution": "node",
-        "outDir": "dist",
-        "paths": { "@acusti/*": ["packages/*/src"] },
-        "sourceMap": true,
-        "target": "es2017",
-
-        "allowJs": false,
-        "forceConsistentCasingInFileNames": true,
         "noImplicitAny": true,
         "noImplicitReturns": true,
         "noImplicitThis": true,
         "noUnusedLocals": true,
         "noUnusedParameters": true,
+        "outDir": "dist",
+        "paths": { "@acusti/*": ["packages/*/src"] },
+        "sourceMap": true,
         "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true
+        "suppressImplicitAnyIndexErrors": true,
+        "target": "es2017"
     },
     "exclude": [
         "node_modules",
