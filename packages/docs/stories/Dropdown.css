@@ -100,3 +100,8 @@
     height: 150px;
     min-width: 0px;
 }
+
+.position-right.uktdropdown {
+    position: absolute;
+    right: 30px;
+}
