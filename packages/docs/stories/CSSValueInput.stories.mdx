@@ -107,6 +107,24 @@ Illustrator or XD.
         {(args) => <CSSValueInput {...args} />}
     </Story>
     <Story
+        name="Custom getValueAsNumber"
+        args={{
+            className: 'placeholder-only',
+            getValueAsNumber: (value) => {
+                if (typeof value === 'number') return value;
+                // “normal” for letter-spacing is effectively equivalent to 0
+                if (typeof value === 'string' && value.toLowerCase() === 'normal') {
+                    return 0;
+                }
+                return parseFloat(value);
+            },
+            label: 'Letter spacing',
+            placeholder: 'normal',
+        }}
+    >
+        {(args) => <CSSValueInput {...args} />}
+    </Story>
+    <Story
         name="Background Size"
         args={{
             className: 'background-size',
