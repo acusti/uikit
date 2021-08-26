@@ -17,6 +17,7 @@ export type Props = {
     className?: string;
     cssValueType?: CSSValueType;
     disabled?: boolean;
+    getValueAsNumber?: (value: string | number) => number;
     icon?: React.ReactNode;
     label?: string;
     max?: number;
@@ -47,6 +48,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
             className,
             cssValueType = DEFAULT_CSS_VALUE_TYPE,
             disabled,
+            getValueAsNumber = getCSSValueAsNumber,
             icon,
             label,
             max,
@@ -77,7 +79,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
             let isValid =
                 (allowEmpty && !currentValue) ||
-                Number.isFinite(getCSSValueAsNumber(currentValue));
+                Number.isFinite(getValueAsNumber(currentValue));
 
             if (!isValid && validator) {
                 isValid =
@@ -117,7 +119,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 signum?: number;
             }) => {
                 const modifier = multiplier * step * signum;
-                const currentValueAsNumber = getCSSValueAsNumber(currentValue);
+                const currentValueAsNumber = getValueAsNumber(currentValue);
                 // If currentValue isn’t numeric, don’t try to increment/decrement it
                 if (
                     typeof currentValue === 'string' &&
