@@ -39,6 +39,8 @@ export type Props = {
     onSubmitItem?: (payload: Item) => void;
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s placeholder */
     placeholder?: string;
+    /** Only usable in conjunction with {isSearchable: true}; used as search input’s tabIndex */
+    tabIndex?: number;
     /**
      * Used as search input’s value if props.isSearchable === true
      * Resets internal currentItemRef if it no longer matches value to keep state in sync
@@ -64,6 +66,7 @@ const Dropdown: React.FC<Props> = ({
     label,
     onSubmitItem,
     placeholder,
+    tabIndex,
     value,
 }) => {
     const childrenCount = Children.count(children);
@@ -507,6 +510,7 @@ const Dropdown: React.FC<Props> = ({
                     onFocus={handleTriggerFocus}
                     placeholder={placeholder}
                     ref={inputElementRef}
+                    tabIndex={tabIndex}
                     type="text"
                 />
             );
