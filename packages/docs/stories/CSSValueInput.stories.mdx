@@ -14,7 +14,9 @@ import './CSSValueInput.css';
 `CSSValueInput` is a React component that renders a text input that can take
 and update a CSS value of a particular type with a default unit. The
 input’s behavior is similar to those in design applications such as Adobe
-Illustrator or XD.
+Illustrator or XD. Note that to illustrate custom tab indeces, tabbing through
+the inputs below should go from “Font size” to “Letter spacing” then through
+the rest.
 
 <Canvas>
     <Story
@@ -24,6 +26,7 @@ Illustrator or XD.
             cssValueType: 'length',
             label: 'Font size',
             placeholder: '1rem',
+            tabIndex: 1,
             unit: 'rem',
             validator: /^(xx-small|x-small|small|medium|large|x-large|xx-large|xxx-large|inherit)$/,
             value: '24px',
@@ -109,7 +112,7 @@ Illustrator or XD.
     <Story
         name="Custom getValueAsNumber"
         args={{
-            className: 'placeholder-only',
+            className: 'letter-spacing',
             getValueAsNumber: (value) => {
                 if (typeof value === 'number') return value;
                 // “normal” for letter-spacing is effectively equivalent to 0
@@ -120,6 +123,7 @@ Illustrator or XD.
             },
             label: 'Letter spacing',
             placeholder: 'normal',
+            tabIndex: 2,
         }}
     >
         {(args) => <CSSValueInput {...args} />}
