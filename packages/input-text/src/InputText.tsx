@@ -15,6 +15,7 @@ export type Props = {
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
+    tabIndex?: number;
     title?: string;
     type?: 'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url';
 };
@@ -40,6 +41,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             pattern,
             placeholder,
             readOnly,
+            tabIndex,
             title,
             type = 'text',
         }: Props,
@@ -103,6 +105,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 placeholder={placeholder}
                 readOnly={readOnly}
                 ref={inputRef}
+                tabIndex={tabIndex}
                 title={title}
                 type={type}
             />
