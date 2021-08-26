@@ -28,6 +28,7 @@ export type Props = {
     onSubmitValue: (value: string) => unknown;
     placeholder?: string;
     step?: number;
+    tabIndex?: number;
     title?: string;
     unit?: string;
     /** Regex or validator function to validate non-numeric values */
@@ -59,6 +60,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
             onSubmitValue,
             placeholder,
             step = 1,
+            tabIndex,
             title,
             unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
             validator,
@@ -218,6 +220,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                         onKeyUp={handleKeyUp}
                         placeholder={placeholder}
                         ref={inputRef}
+                        tabIndex={tabIndex}
                     />
                 </div>
             </label>
