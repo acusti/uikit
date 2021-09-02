@@ -19,6 +19,7 @@ drag-and-drop library, and more_
 | **[@acusti/input-text][]**               | [![latest version](https://img.shields.io/npm/v/@acusti/input-text?style=flat-square)](https://www.npmjs.com/package/@acusti/input-text)                             | React component that renders an uncontrolled text input       |
 | **[@acusti/matchmaking][]**              | [![latest version](https://img.shields.io/npm/v/@acusti/matchmaking?style=flat-square)](https://www.npmjs.com/package/@acusti/matchmaking)                           | Utilities for approximate string matching (i.e. fuzzy search) |
 | **[@acusti/styling][]**                  | [![latest version](https://img.shields.io/npm/v/@acusti/styling?style=flat-square)](https://www.npmjs.com/package/@acusti/styling)                                   | React component that renders a CSS string to the `<head>`     |
+| **[@acusti/textual][]**                  | [![latest version](https://img.shields.io/npm/v/@acusti/textual?style=flat-square)](https://www.npmjs.com/package/@acusti/textual)                                   | Utilities for transforming and formatting text                |
 | **[@acusti/use-bounding-client-rect][]** | [![latest version](https://img.shields.io/npm/v/@acusti/use-bounding-client-rect?style=flat-square)](https://www.npmjs.com/package/@acusti/use-bounding-client-rect) | React hook for getting an element’s `boundingClientRect`      |
 | **[@acusti/use-is-out-of-bounds][]**     | [![latest version](https://img.shields.io/npm/v/@acusti/use-is-out-of-bounds?style=flat-square)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)         | React hook to check if an element overlaps its bounds         |
 
@@ -34,6 +35,8 @@ drag-and-drop library, and more_
     https://github.com/acusti/uikit/tree/main/packages/matchmaking
 [@acusti/styling]:
     https://github.com/acusti/uikit/tree/main/packages/styling
+[@acusti/textual]:
+    https://github.com/acusti/uikit/tree/main/packages/textual
 [@acusti/use-bounding-client-rect]:
     https://github.com/acusti/uikit/tree/main/packages/use-bounding-client-rect
 [@acusti/use-is-out-of-bounds]:

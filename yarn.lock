@@ -79,6 +79,14 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@acusti/textual@workspace:packages/textual":
+  version: 0.0.0-use.local
+  resolution: "@acusti/textual@workspace:packages/textual"
+  dependencies:
+    typescript: ^4.2.3
+  languageName: unknown
+  linkType: soft
+
 "@acusti/uikit-docs@workspace:packages/docs":
   version: 0.0.0-use.local
   resolution: "@acusti/uikit-docs@workspace:packages/docs"
