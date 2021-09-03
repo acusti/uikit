@@ -1,6 +1,8 @@
 const CSS_UNIT_REGEX = Object.freeze({
     // https://developer.mozilla.org/en-US/docs/Web/CSS/angle
     angle: /(deg|grad|rad|turn)\s*$/i,
+    // https://developer.mozilla.org/en-US/docs/Web/CSS/integer
+    integer: /$/i,
     // https://developer.mozilla.org/en-US/docs/Web/CSS/length with addition of %
     length: /(em|rem|ch|ex|vh|vw|vmin|vmax|px|cm|mm|in|pc|pt|%)\s*$/i,
     // custom (non-spec-defined) value type that only allows percentages
@@ -10,7 +12,7 @@ const CSS_UNIT_REGEX = Object.freeze({
 });
 
 // CSS value types https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Values_and_Units#Dimensions
-export type CSSValueType = 'angle' | 'time' | 'length' | 'percent';
+export type CSSValueType = 'angle' | 'integer' | 'length' | 'percent' | 'time';
 
 export type Payload = {
     cssValueType: CSSValueType;
@@ -26,7 +28,7 @@ export const getUnitFromCSSValue = ({ cssValueType, defaultUnit, value }: Payloa
     if (typeof value === 'number') return defaultUnit;
 
     const matchedUnit = CSS_UNIT_REGEX[cssValueType].exec(value);
-    return matchedUnit === null ? defaultUnit : matchedUnit[1];
+    return matchedUnit === null || !matchedUnit[1] ? defaultUnit : matchedUnit[1];
 };
 
 export const getCSSValueAsNumber = (value: string | number): number =>
@@ -56,6 +58,7 @@ export const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';
 
 export const DEFAULT_UNIT_BY_CSS_VALUE_TYPE = Object.freeze({
     angle: 'deg',
+    integer: '',
     length: 'px',
     percent: '%',
     time: 's',

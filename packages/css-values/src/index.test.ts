@@ -31,6 +31,14 @@ describe('@acusti/css-values', () => {
                 }),
             ).toBe('s');
 
+            expect(
+                getUnitFromCSSValue({
+                    cssValueType: 'integer',
+                    defaultUnit: '',
+                    value: '42',
+                }),
+            ).toBe('');
+
             // Percent is a simpler case because there is only one valid unit
             // Though passing defaultUnit as an empty string would mean empty unit if no match
             expect(
