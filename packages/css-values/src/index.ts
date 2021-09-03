@@ -14,16 +14,30 @@ const CSS_UNIT_REGEX = Object.freeze({
 // CSS value types https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Values_and_Units#Dimensions
 export type CSSValueType = 'angle' | 'integer' | 'length' | 'percent' | 'time';
 
+export const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';
+
+export const DEFAULT_UNIT_BY_CSS_VALUE_TYPE = Object.freeze({
+    angle: 'deg',
+    integer: '',
+    length: 'px',
+    percent: '%',
+    time: 's',
+});
+
 export type Payload = {
     cssValueType: CSSValueType;
-    defaultUnit: string;
+    defaultUnit?: string;
     value: string | number;
 };
 
 export const roundToPrecision = (value: number, precision: number): number =>
     parseFloat(value.toFixed(precision));
 
-export const getUnitFromCSSValue = ({ cssValueType, defaultUnit, value }: Payload) => {
+export const getUnitFromCSSValue = ({
+    cssValueType,
+    defaultUnit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
+    value,
+}: Payload) => {
     // If value is a number, return the defaultUnit
     if (typeof value === 'number') return defaultUnit;
 
@@ -53,13 +67,3 @@ export const getMillisecondsFromCSSValue = (value: string | number): number => {
     const multiplier = /[^m]s/i.test(value) ? 1000 : 1;
     return valueAsNumber * multiplier;
 };
-
-export const DEFAULT_CSS_VALUE_TYPE: CSSValueType = 'length';
-
-export const DEFAULT_UNIT_BY_CSS_VALUE_TYPE = Object.freeze({
-    angle: 'deg',
-    integer: '',
-    length: 'px',
-    percent: '%',
-    time: 's',
-});
