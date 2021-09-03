@@ -76,12 +76,19 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
         const handleSubmitValue = useCallback(() => {
             if (!inputRef.current) return;
             // If value hasn’t changed, do not trigger onSubmitValue
-            const currentValue = inputRef.current.value;
+            let currentValue = inputRef.current.value;
+            let currentValueAsNumber = getValueAsNumber(currentValue);
+            const isCurrentValueFinite = Number.isFinite(currentValueAsNumber);
+
+            if (cssValueType === 'integer' && isCurrentValueFinite) {
+                currentValueAsNumber = Math.floor(currentValueAsNumber);
+                currentValue = currentValueAsNumber.toString();
+                inputRef.current.value = currentValue;
+            }
+
             if (currentValue === submittedValueRef.current) return;
 
-            let isValid =
-                (allowEmpty && !currentValue) ||
-                Number.isFinite(getValueAsNumber(currentValue));
+            let isValid = (allowEmpty && !currentValue) || isCurrentValueFinite;
 
             if (!isValid && validator) {
                 isValid =
@@ -89,6 +96,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                         ? validator.test(currentValue)
                         : validator(currentValue);
             }
+
             // If current value isn’t valid, revert to last submitted value
             if (!isValid) {
                 inputRef.current.value = submittedValueRef.current;
@@ -97,7 +105,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
             submittedValueRef.current = currentValue;
             onSubmitValue(currentValue);
-        }, [allowEmpty, getValueAsNumber, onSubmitValue, validator]);
+        }, [allowEmpty, cssValueType, getValueAsNumber, onSubmitValue, validator]);
 
         const handleBlur = useCallback(() => {
             if (!inputRef.current) return;
@@ -130,7 +138,12 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                     return currentValue;
                 }
 
-                let nextValue = roundToPrecision(currentValueAsNumber + modifier, 5);
+                let nextValue = currentValueAsNumber + modifier;
+                if (cssValueType === 'integer') {
+                    nextValue = Math.floor(nextValue);
+                } else {
+                    nextValue = roundToPrecision(nextValue, 5);
+                }
 
                 if (typeof max === 'number' && Number.isFinite(max)) {
                     nextValue = Math.min(max, nextValue);
