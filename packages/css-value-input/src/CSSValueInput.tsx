@@ -97,7 +97,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
             submittedValueRef.current = currentValue;
             onSubmitValue(currentValue);
-        }, [allowEmpty, onSubmitValue, validator]);
+        }, [allowEmpty, getValueAsNumber, onSubmitValue, validator]);
 
         const handleBlur = useCallback(() => {
             if (!inputRef.current) return;
@@ -147,7 +147,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 });
                 return `${nextValue}${nextUnit}`;
             },
-            [cssValueType, max, min, step, unit],
+            [cssValueType, getValueAsNumber, max, min, step, unit],
         );
 
         const handleKeyDown = useCallback(
