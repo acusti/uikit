@@ -510,6 +510,7 @@ const Dropdown: React.FC<Props> = ({
                     onFocus={handleTriggerFocus}
                     placeholder={placeholder}
                     ref={inputElementRef}
+                    selectTextOnFocus
                     tabIndex={tabIndex}
                     type="text"
                 />

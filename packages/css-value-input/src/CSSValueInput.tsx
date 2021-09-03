@@ -220,6 +220,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                         onKeyUp={handleKeyUp}
                         placeholder={placeholder}
                         ref={inputRef}
+                        selectTextOnFocus
                         tabIndex={tabIndex}
                     />
                 </div>

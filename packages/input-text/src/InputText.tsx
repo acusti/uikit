@@ -15,6 +15,7 @@ export type Props = {
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
+    selectTextOnFocus?: boolean;
     tabIndex?: number;
     title?: string;
     type?: 'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url';
@@ -41,6 +42,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             pattern,
             placeholder,
             readOnly,
+            selectTextOnFocus,
             tabIndex,
             title,
             type = 'text',
@@ -95,12 +97,12 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 disabled={disabled}
                 maxLength={maxLength}
                 minLength={minLength}
-                onBlur={handleBlur}
+                onBlur={selectTextOnFocus ? handleBlur : onBlur}
                 onChange={onChange}
                 onFocus={onFocus}
                 onKeyDown={onKeyDown}
                 onKeyUp={onKeyUp}
-                onSelect={handleSelect}
+                onSelect={selectTextOnFocus ? handleSelect : undefined}
                 pattern={pattern}
                 placeholder={placeholder}
                 readOnly={readOnly}

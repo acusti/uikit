@@ -6,5 +6,6 @@
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/input-text?style=for-the-badge)](https://www.npmjs.com/package/@acusti/input-text)
 
 `InputText` is a React component that renders an uncontrolled input whose
-value is overwritten whenever props.initialValue changes and that selects
-the contents of the input whenever it is focused.
+value is overwritten whenever props.initialValue changes. Also, if
+props.selectTextOnFocus is true, it selects the entire contents of the
+input whenever the input is focused.
