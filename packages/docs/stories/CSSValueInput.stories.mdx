@@ -140,6 +140,16 @@ the rest.
     >
         {(args) => <CSSValueInput {...args} />}
     </Story>
+    <Story
+        name="Z-Index"
+        args={{
+            cssValueType: 'integer',
+            label: 'z-index',
+            value: '0',
+        }}
+    >
+        {(args) => <CSSValueInput {...args} />}
+    </Story>
 </Canvas>
 
 <Props story="Length" />
