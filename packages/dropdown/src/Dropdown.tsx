@@ -52,6 +52,8 @@ type MousePosition = { clientX: number; clientY: number };
 
 const { Children, Fragment, useCallback, useLayoutEffect, useRef, useState } = React;
 
+const noop = () => {};
+
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 
@@ -212,10 +214,17 @@ const Dropdown: React.FC<Props> = ({
         }
     }, []);
 
+    const cleanupEventListenersRef = useRef<() => void>(noop);
+
     const handleRef = useCallback(
         (ref: HTMLDivElement | null) => {
             dropdownElementRef.current = ref;
-            if (!ref) return;
+            if (!ref) {
+                // If component was unmounted, cleanup handlers
+                cleanupEventListenersRef.current();
+                cleanupEventListenersRef.current = noop;
+                return;
+            }
 
             const { ownerDocument } = ref;
             let inputElement = inputElementRef.current;
@@ -471,11 +480,12 @@ const Dropdown: React.FC<Props> = ({
                 inputElement.addEventListener('input', handleInput);
             }
 
-            return () => {
+            cleanupEventListenersRef.current = () => {
                 document.removeEventListener('focusin', handleFocusIn);
                 document.removeEventListener('keydown', handleKeyDown);
                 document.removeEventListener('mousedown', handleMouseDown);
                 document.removeEventListener('mouseup', handleMouseUp);
+
                 if (ownerDocument !== document) {
                     ownerDocument.removeEventListener('focusin', handleFocusIn);
                     ownerDocument.removeEventListener('keydown', handleKeyDown);
