@@ -43,7 +43,7 @@ export type Props = {
     tabIndex?: number;
     /**
      * Used as search input’s value if props.isSearchable === true
-     * Resets internal currentItemRef if it no longer matches value to keep state in sync
+     * Used to determine if value has changed to avoid triggering onSubmitItem if not
      */
     value?: string;
 };
@@ -93,7 +93,6 @@ const Dropdown: React.FC<Props> = ({
     const clearEnteredCharactersTimerRef = useRef<number | null>(null);
     const enteredCharactersRef = useRef<string>('');
     const mouseDownPositionRef = useRef<MousePosition | null>(null);
-    const currentItemRef = useRef<Item | null>(null);
     const outOfBounds = useIsOutOfBounds(dropdownBodyElement);
 
     const allowEmptyRef = useRef(allowEmpty);
@@ -162,13 +161,9 @@ const Dropdown: React.FC<Props> = ({
             }
         }
 
-        let currentValue = valueRef.current;
-        if (typeof currentValue !== 'string' && currentItemRef.current) {
-            currentValue = currentItemRef.current.value;
-        }
-        if (currentValue === nextValue) return;
+        // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
+        if (valueRef.current && valueRef.current === nextValue) return;
 
-        currentItemRef.current = nextItem;
         if (onSubmitItemRef.current) {
             onSubmitItemRef.current(nextItem);
         }
