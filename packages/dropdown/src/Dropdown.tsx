@@ -36,6 +36,8 @@ export type Props = {
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
     label?: string;
+    /** Only usable in conjunction with {isSearchable: true}; used as search input’s name */
+    name?: string;
     onSubmitItem?: (payload: Item) => void;
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s placeholder */
     placeholder?: string;
@@ -66,6 +68,7 @@ const Dropdown: React.FC<Props> = ({
     isOpenOnMount,
     isSearchable,
     label,
+    name,
     onSubmitItem,
     placeholder,
     tabIndex,
@@ -512,6 +515,7 @@ const Dropdown: React.FC<Props> = ({
                     className={TRIGGER_CLASS_NAME}
                     disabled={disabled}
                     initialValue={value || ''}
+                    name={name}
                     onFocus={handleTriggerFocus}
                     placeholder={placeholder}
                     ref={inputElementRef}

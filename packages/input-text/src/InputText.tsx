@@ -7,6 +7,7 @@ export type Props = {
     initialValue?: string;
     maxLength?: number;
     minLength?: number;
+    name?: string;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => unknown;
     onFocus?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
@@ -34,6 +35,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             initialValue,
             maxLength,
             minLength,
+            name,
             onBlur,
             onChange,
             onFocus,
@@ -97,6 +99,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 disabled={disabled}
                 maxLength={maxLength}
                 minLength={minLength}
+                name={name}
                 onBlur={selectTextOnFocus ? handleBlur : onBlur}
                 onChange={onChange}
                 onFocus={onFocus}

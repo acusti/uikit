@@ -22,6 +22,7 @@ export type Props = {
     label?: string;
     max?: number;
     min?: number;
+    name?: string;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => unknown;
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
     onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
@@ -54,6 +55,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
             label,
             max,
             min,
+            name,
             onChange,
             onKeyDown,
             onKeyUp,
@@ -227,6 +229,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                     <InputText
                         disabled={disabled}
                         initialValue={value}
+                        name={name}
                         onBlur={handleBlur}
                         onChange={onChange}
                         onKeyDown={handleKeyDown}
