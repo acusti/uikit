@@ -25,6 +25,7 @@ the rest.
             className: 'my-special-input',
             cssValueType: 'length',
             label: 'Font size',
+            name: 'fontsize',
             placeholder: '1rem',
             tabIndex: 1,
             unit: 'rem',
@@ -42,6 +43,7 @@ the rest.
             label: 'Duration',
             max: 20,
             min: 0,
+            name: 'duration',
             placeholder: '0.25s',
             step: 0.1,
             unit: 's',
@@ -74,6 +76,7 @@ the rest.
                 </svg>
             ),
             label: 'Rotate Z',
+            name: 'rotatez',
             placeholder: '0deg',
             step: 45,
             unit: 'deg',
@@ -88,6 +91,7 @@ the rest.
             cssValueType: 'percent',
             label: 'Width',
             min: 0,
+            name: 'width',
             placeholder: '100%',
             step: 10,
             unit: '%',
@@ -101,6 +105,7 @@ the rest.
         args={{
             className: 'my-special-input',
             cssValueType: 'length',
+            name: 'labelless',
             placeholder: '1rem',
             title: 'No label',
             unit: 'rem',
@@ -122,6 +127,7 @@ the rest.
                 return parseFloat(value);
             },
             label: 'Letter spacing',
+            name: 'letterspacing',
             placeholder: 'normal',
             tabIndex: 2,
         }}
@@ -133,6 +139,7 @@ the rest.
         args={{
             className: 'background-size',
             label: 'Background Size',
+            name: 'backgroundsize',
             unit: '%',
             validator: /^(auto|contain|cover)$/,
             value: 'cover',
@@ -145,6 +152,7 @@ the rest.
         args={{
             cssValueType: 'integer',
             label: 'z-index',
+            name: 'zindex',
             value: '0',
         }}
     >

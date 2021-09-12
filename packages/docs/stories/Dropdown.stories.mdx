@@ -41,6 +41,7 @@ of macOS.
         args={{
             className: 'states-dropdown',
             isSearchable: true,
+            name: 'states',
             placeholder: 'Choose a state…',
         }}
         name="States Dropdown"
@@ -106,6 +107,7 @@ of macOS.
         args={{
             className: 'font-weight',
             isSearchable: true,
+            name: 'fontweight',
         }}
         name="Font Weight Dropdown"
     >
@@ -203,6 +205,7 @@ of macOS.
             className: 'searchable-with-label',
             isSearchable: true,
             label: 'Font size',
+            name: 'fontsize',
         }}
         name="Searchable With Label"
     >
@@ -235,6 +238,7 @@ of macOS.
             <Dropdown {...args}>
                 <CSSValueInput
                     onSubmitValue={() => {}}
+                    name="cssinputbackgroundsize"
                     placeholder="cover"
                     validator={/^(auto|contain|cover)$/}
                 />
@@ -256,6 +260,7 @@ of macOS.
             disabled: true,
             isSearchable: true,
             label: 'Disabled',
+            name: 'disabledexample',
             value: '167px',
         }}
         name="Disabled Dropdown"
@@ -281,6 +286,7 @@ of macOS.
         args={{
             className: 'out-of-bounds-example',
             isSearchable: true,
+            name: 'outofboundsatbottom',
             placeholder: 'Show above',
         }}
         name="Out Of Bounds At Bottom"
@@ -306,6 +312,7 @@ of macOS.
         args={{
             className: 'out-of-bounds-example position-right',
             isSearchable: true,
+            name: 'outofboundsatright',
             placeholder: 'Show above & to the left',
         }}
         name="Out Of Bounds At Right"
