@@ -1,6 +1,6 @@
 {
     "name": "@acusti/dropdown",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/Dropdown.js",
@@ -27,7 +27,7 @@
     "dependencies": {
         "@acusti/input-text": "^0.5.0",
         "@acusti/matchmaking": "^0.2.0",
-        "@acusti/styling": "^0.3.0",
+        "@acusti/styling": "^0.3.1",
         "@acusti/use-is-out-of-bounds": "^0.3.0"
     },
     "peerDependencies": {
