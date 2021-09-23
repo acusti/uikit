@@ -38,6 +38,7 @@
         { "path": "packages/matchmaking" },
         { "path": "packages/styling" },
         { "path": "packages/textual" },
+        { "path": "packages/uniquify" },
         { "path": "packages/use-bounding-client-rect" },
         { "path": "packages/use-is-out-of-bounds" }
     ]

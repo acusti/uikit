@@ -144,6 +144,16 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@acusti/uniquify@workspace:packages/uniquify":
+  version: 0.0.0-use.local
+  resolution: "@acusti/uniquify@workspace:packages/uniquify"
+  dependencies:
+    "@types/lodash.escaperegexp": ^4.1.6
+    lodash.escaperegexp: ^4.1.2
+    typescript: ^4.2.3
+  languageName: unknown
+  linkType: soft
+
 "@acusti/use-bounding-client-rect@^0.2.0, @acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect":
   version: 0.0.0-use.local
   resolution: "@acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect"
@@ -6014,6 +6024,22 @@ __metadata:
   version: 0.0.29
   resolution: "@types/json5@npm:0.0.29"
   checksum: e60b153664572116dfea673c5bda7778dbff150498f44f998e34b5886d8afc47f16799280e4b6e241c0472aef1bc36add771c569c68fc5125fc2ae519a3eb9ac
+  languageName: node
+  linkType: hard
+
+"@types/lodash.escaperegexp@npm:^4.1.6":
+  version: 4.1.6
+  resolution: "@types/lodash.escaperegexp@npm:4.1.6"
+  dependencies:
+    "@types/lodash": "*"
+  checksum: 64715fdc204419a9807bc5c6a5a76557b35c55ac033988fe0568ddc29bca4f3afe269ea5ac9517f27a904938eb356b7f221e816db662c405408797cb2980310d
+  languageName: node
+  linkType: hard
+
+"@types/lodash@npm:*":
+  version: 4.14.173
+  resolution: "@types/lodash@npm:4.14.173"
+  checksum: 9e97ef5816299e5470db1cb32a93e981af60f74f18a35d045ed4caf224a065df96bfae6e444ec96aa392fc01258592b965d840ae042eef77ef719a578c7daef8
   languageName: node
   linkType: hard
 
@@ -14404,6 +14430,13 @@ fsevents@^1.2.7:
   version: 4.0.8
   resolution: "lodash.debounce@npm:4.0.8"
   checksum: a3f527d22c548f43ae31c861ada88b2637eb48ac6aa3eb56e82d44917971b8aa96fbb37aa60efea674dc4ee8c42074f90f7b1f772e9db375435f6c83a19b3bc6
+  languageName: node
+  linkType: hard
+
+"lodash.escaperegexp@npm:^4.1.2":
+  version: 4.1.2
+  resolution: "lodash.escaperegexp@npm:4.1.2"
+  checksum: 6d99452b1cfd6073175a9b741a9b09ece159eac463f86f02ea3bee2e2092923fce812c8d2bf446309cc52d1d61bf9af51c8118b0d7421388e6cead7bd3798f0f
   languageName: node
   linkType: hard
 

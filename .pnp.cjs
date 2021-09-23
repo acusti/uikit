@@ -55,6 +55,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/textual"
       },
       {
+        "name": "@acusti/uniquify",
+        "reference": "workspace:packages/uniquify"
+      },
+      {
         "name": "@acusti/use-bounding-client-rect",
         "reference": "workspace:packages/use-bounding-client-rect"
       },
@@ -75,6 +79,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@acusti/textual", ["workspace:packages/textual"]],
       ["@acusti/uikit", ["workspace:."]],
       ["@acusti/uikit-docs", ["workspace:packages/docs"]],
+      ["@acusti/uniquify", ["workspace:packages/uniquify"]],
       ["@acusti/use-bounding-client-rect", ["virtual:837d6eaa9e0cf2083d1c41eea7dd7d01ca3a2a3067aaf9336d4ad072e8b9825f1596626b65b0662b2ed096411185ff505111c47daf24d8301a090efcfd29533e#workspace:packages/use-bounding-client-rect", "virtual:cf250536aa5bef8816901e30429995a332849368f737d2c8d19dcfb85de375bcec479981fff07648ab66b22f311ed6eb76033f9ecea3747bddf6101e5cd9dc3b#workspace:packages/use-bounding-client-rect", "workspace:packages/use-bounding-client-rect"]],
       ["@acusti/use-is-out-of-bounds", ["virtual:91419db2b75dba6373d1dcd664037a13a50cb8ad0c3c817040cf1c87f08000928f92bda28196eef227b714886c83c7008b731e73f3b4af88dcf66eb213a28434#workspace:packages/use-is-out-of-bounds", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/use-is-out-of-bounds", "workspace:packages/use-is-out-of-bounds"]]
     ],
@@ -368,6 +373,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:17.0.2"],
             ["react-docgen", "npm:6.0.0-alpha.0"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+          ],
+          "linkType": "SOFT",
+        }]
+      ]],
+      ["@acusti/uniquify", [
+        ["workspace:packages/uniquify", {
+          "packageLocation": "./packages/uniquify/",
+          "packageDependencies": [
+            ["@acusti/uniquify", "workspace:packages/uniquify"],
+            ["@types/lodash.escaperegexp", "npm:4.1.6"],
+            ["lodash.escaperegexp", "npm:4.1.2"],
             ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
           ],
           "linkType": "SOFT",
@@ -13818,6 +13835,25 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@types/lodash", [
+        ["npm:4.14.173", {
+          "packageLocation": "./.yarn/cache/@types-lodash-npm-4.14.173-6fc2954d52-9e97ef5816.zip/node_modules/@types/lodash/",
+          "packageDependencies": [
+            ["@types/lodash", "npm:4.14.173"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/lodash.escaperegexp", [
+        ["npm:4.1.6", {
+          "packageLocation": "./.yarn/cache/@types-lodash.escaperegexp-npm-4.1.6-9c17cbcd79-64715fdc20.zip/node_modules/@types/lodash.escaperegexp/",
+          "packageDependencies": [
+            ["@types/lodash.escaperegexp", "npm:4.1.6"],
+            ["@types/lodash", "npm:4.14.173"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@types/markdown-to-jsx", [
         ["npm:6.11.3", {
           "packageLocation": "./.yarn/cache/@types-markdown-to-jsx-npm-6.11.3-9dcfa14b22-9775a5a86c.zip/node_modules/@types/markdown-to-jsx/",
@@ -24188,6 +24224,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/lodash.debounce-npm-4.0.8-f1d6e09799-a3f527d22c.zip/node_modules/lodash.debounce/",
           "packageDependencies": [
             ["lodash.debounce", "npm:4.0.8"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["lodash.escaperegexp", [
+        ["npm:4.1.2", {
+          "packageLocation": "./.yarn/cache/lodash.escaperegexp-npm-4.1.2-c5b90e0e9c-6d99452b1c.zip/node_modules/lodash.escaperegexp/",
+          "packageDependencies": [
+            ["lodash.escaperegexp", "npm:4.1.2"]
           ],
           "linkType": "HARD",
         }]
