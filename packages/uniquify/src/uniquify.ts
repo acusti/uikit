@@ -18,13 +18,13 @@ const propertyValueExists = ({
     value,
 }: {
     caseSensitive: boolean;
-    items: Array<string | object>;
+    items: Array<string> | Array<object>;
     propertyPath: StringKeyPath | undefined;
     propertyPathAlternate: StringKeyPath | undefined;
     value: string;
 }) => {
     value = caseSensitive ? value : value.toLowerCase();
-    return items.some((item) => {
+    return items.some((item: string | object) => {
         if (item == null) return false;
 
         let itemPropertyValue = propertyPath ? getIn(item, propertyPath) : item;
@@ -59,7 +59,7 @@ const otherInstanceExists = ({
     valueStem,
 }: {
     caseSensitive: boolean;
-    items: Array<string | object>;
+    items: Array<string> | Array<object>;
     propertyPath: StringKeyPath | undefined;
     propertyPathAlternate: StringKeyPath | undefined;
     separator: string;
@@ -73,7 +73,7 @@ const otherInstanceExists = ({
         ? new RegExp(existingRegexString)
         : new RegExp(existingRegexString, 'i');
 
-    return items.some((item) => {
+    return items.some((item: string | object) => {
         if (!item) return false;
 
         let itemPropertyValue = propertyPath ? getIn(item, propertyPath) : item;
@@ -109,7 +109,7 @@ const uniquify = ({
     caseSensitive?: boolean;
     identify1AsCounter?: boolean;
     isSuffixOptional?: boolean;
-    items: Array<string | object>;
+    items: Array<string> | Array<object>;
     propertyPath?: StringKeyPath;
     propertyPathAlternate?: StringKeyPath;
     separator?: string;
