@@ -10,45 +10,52 @@ describe('uniquify', () => {
                 items: baseItems,
                 value: 'bear',
             }),
-        ).toBe('bear-2');
+        ).toBe('bear 2');
 
         expect(
             uniquify({
-                items: baseItems.concat('coyote-2'),
+                items: baseItems.concat('coyote 2'),
                 value: 'coyote',
             }),
-        ).toBe('coyote-3');
+        ).toBe('coyote 3');
 
         expect(
             uniquify({
                 items: baseItems
                     .slice(0, 1)
                     .concat(baseItems.slice(2))
-                    .concat('chickaree-2'),
+                    .concat('chickaree 2'),
                 value: 'chickaree',
             }),
         ).toBe('chickaree');
 
         expect(
             uniquify({
-                items: baseItems.concat('marmot_2'),
+                items: baseItems.concat('marmot-2'),
                 value: 'marmot',
             }),
-        ).toBe('marmot-2');
+        ).toBe('marmot 2');
 
         expect(
             uniquify({
-                items: baseItems.concat('bear-2', 'bear-2-14'),
-                value: 'bear-2',
+                items: baseItems.concat('bear 2', 'bear 2 14'),
+                value: 'bear 2',
             }),
-        ).toBe('bear-3');
+        ).toBe('bear 3');
 
         expect(
             uniquify({
-                items: baseItems.concat('chickaree-2-14'),
-                value: 'chickaree-2-13',
+                items: baseItems.concat('chickaree 2 2', 'chickaree 2 13'),
+                value: 'chickaree 2 13',
             }),
-        ).toBe('chickaree-2-13');
+        ).toBe('chickaree 2 14');
+
+        expect(
+            uniquify({
+                items: baseItems.concat('chickaree 2 2', 'chickaree 2 13'),
+                value: 'chickaree 2 12',
+            }),
+        ).toBe('chickaree 2 12');
     });
 
     it('handles arrays of objects as items when passed a propertyPath', () => {
@@ -56,6 +63,7 @@ describe('uniquify', () => {
             uniquify({
                 items: baseItemObjects,
                 propertyPath: ['slug'],
+                separator: '-',
                 value: 'about',
             }),
         ).toBe('about-2');
@@ -64,6 +72,7 @@ describe('uniquify', () => {
             uniquify({
                 items: baseItemObjects.concat({ slug: 'about-2' }),
                 propertyPath: ['slug'],
+                separator: '-',
                 value: 'about',
             }),
         ).toBe('about-3');
@@ -87,7 +96,6 @@ describe('uniquify', () => {
             uniquify({
                 items: nestedItems,
                 propertyPath: ['content', 'name'],
-                separator: ' ',
                 value: 'I ❤️ the Smell of Napalm in the Morning',
             }),
         ).toBe('I ❤️ the Smell of Napalm in the Morning 3');
@@ -97,7 +105,6 @@ describe('uniquify', () => {
             uniquify({
                 items: baseItemObjects,
                 propertyPath: ['content', 'name'],
-                separator: ' ',
                 value: 'I ❤️ the Smell of Napalm in the Morning',
             }),
         ).toBe('I ❤️ the Smell of Napalm in the Morning');
@@ -109,6 +116,7 @@ describe('uniquify', () => {
             expect(
                 uniquify({
                     items: baseItems.concat(name),
+                    separator: '-',
                     value: name,
                 }),
             ).toBe('keeping-it-real-since-1949-2');
@@ -118,6 +126,7 @@ describe('uniquify', () => {
                 uniquify({
                     items: baseItemObjects.concat({ slug }),
                     propertyPath: ['slug'],
+                    separator: '-',
                     value: slug,
                 }),
             ).toBe('the-highest-percent-is-100-2');
@@ -130,6 +139,7 @@ describe('uniquify', () => {
                 uniquify({
                     items: baseItemObjects.concat({ slug }),
                     propertyPath: ['slug'],
+                    separator: '-',
                     value: slug,
                 }),
             ).toBe('but-this-one-goes-to-11-2');
@@ -141,40 +151,41 @@ describe('uniquify', () => {
                         { slug: 'but-this-one-goes-to-2' },
                     ),
                     propertyPath: ['slug'],
+                    separator: '-',
                     value: slug,
                 }),
             ).toBe('but-this-one-goes-to-12');
 
-            const name = 'testing-the-limits-99';
+            const name = 'testing the limits 99';
 
             expect(
                 uniquify({
-                    items: baseItems.concat(name, 'testing-the-limits'),
+                    items: baseItems.concat(name, 'testing the limits'),
                     value: name,
                 }),
-            ).toBe('testing-the-limits-100');
+            ).toBe('testing the limits 100');
 
             expect(
                 uniquify({
-                    items: baseItems.concat(name, 'testing-the-limits-2'),
+                    items: baseItems.concat(name, 'testing the limits 2'),
                     value: name,
                 }),
-            ).toBe('testing-the-limits-100');
+            ).toBe('testing the limits 100');
 
             expect(
                 uniquify({
-                    items: baseItems.concat(name, 'testing-the-limits-98'),
+                    items: baseItems.concat(name, 'testing the limits 98'),
                     value: name,
                 }),
-            ).toBe('testing-the-limits-100');
+            ).toBe('testing the limits 100');
 
             // Check should ignore 1 as a counter
             expect(
                 uniquify({
-                    items: baseItems.concat(name, 'testing-the-limits-1'),
+                    items: baseItems.concat(name, 'testing the limits 1'),
                     value: name,
                 }),
-            ).toBe('testing-the-limits-99-2');
+            ).toBe('testing the limits 99 2');
         });
 
         it('disregards 1 when determining if number at end of string is counter or content', () => {
@@ -187,6 +198,7 @@ describe('uniquify', () => {
                         { slug: `${slugBase}-7` },
                     ),
                     propertyPath: ['slug'],
+                    separator: '-',
                     value: `${slugBase}-7`,
                 }),
             ).toBe('things-that-are-divisible-by-8');
@@ -198,6 +210,7 @@ describe('uniquify', () => {
                         { slug: `${slugBase}-7` },
                     ),
                     propertyPath: ['slug'],
+                    separator: '-',
                     value: `${slugBase}-7`,
                 }),
             ).toBe('things-that-are-divisible-by-7-2');
@@ -205,6 +218,15 @@ describe('uniquify', () => {
     });
 
     it('handles a custom separator string of any length', () => {
+        expect(
+            uniquify({
+                items: baseItemObjects.concat({ slug: 'about-2' }),
+                propertyPath: ['slug'],
+                separator: '-',
+                value: 'about',
+            }),
+        ).toBe('about-3');
+
         expect(
             uniquify({
                 items: baseItemObjects.concat({ slug: 'about-2' }),
@@ -255,7 +277,6 @@ describe('uniquify', () => {
                 items,
                 propertyPath: ['content', 'name'],
                 propertyPathAlternate: ['title'],
-                separator: ' ',
                 value: 'I ❤️ the Smell of Napalm in the Morning',
             }),
         ).toBe('I ❤️ the Smell of Napalm in the Morning 3');
@@ -265,7 +286,6 @@ describe('uniquify', () => {
         expect(
             uniquify({
                 items: baseItems,
-                separator: ' ',
                 suffix: 'copy',
                 value: 'marmot',
             }),
@@ -274,7 +294,6 @@ describe('uniquify', () => {
         expect(
             uniquify({
                 items: baseItems.concat('marmot copy'),
-                separator: ' ',
                 suffix: 'copy',
                 value: 'marmot copy',
             }),
@@ -284,7 +303,6 @@ describe('uniquify', () => {
         expect(
             uniquify({
                 items: baseItems.concat('marmot Copy', 'marmot Copy 2', 'marmot copy 3'),
-                separator: ' ',
                 suffix: 'copy',
                 value: 'marmot',
             }),
@@ -295,7 +313,6 @@ describe('uniquify', () => {
             uniquify({
                 caseSensitive: true,
                 items: baseItems.concat('marmot Copy', 'marmot Copy 2', 'marmot copy 3'),
-                separator: ' ',
                 suffix: 'copy',
                 value: 'marmot',
             }),
@@ -304,7 +321,6 @@ describe('uniquify', () => {
         expect(
             uniquify({
                 items: baseItems.concat('copy me'),
-                separator: ' ',
                 suffix: 'copy',
                 value: 'copy me',
             }),
@@ -317,7 +333,6 @@ describe('uniquify', () => {
                 isSuffixOptional: true,
                 items: baseItemObjects,
                 propertyPath: ['slug'],
-                separator: ' ',
                 suffix: 'copy',
                 value: 'contact',
             }),
@@ -328,7 +343,6 @@ describe('uniquify', () => {
                 isSuffixOptional: false,
                 items: baseItemObjects,
                 propertyPath: ['slug'],
-                separator: ' ',
                 suffix: 'copy',
                 value: 'contact',
             }),
@@ -339,7 +353,6 @@ describe('uniquify', () => {
                 isSuffixOptional: true,
                 items: baseItemObjects,
                 propertyPath: ['slug'],
-                separator: ' ',
                 suffix: 'copy',
                 value: 'about',
             }),
@@ -355,6 +368,7 @@ describe('uniquify', () => {
                     .concat(baseItemObjects.slice(2))
                     .concat({ slug: 'about-1' }),
                 propertyPath: ['slug'],
+                separator: '-',
                 value: 'about-1',
             }),
         ).toBe('about-2');
@@ -373,7 +387,7 @@ describe('uniquify', () => {
                 items: baseItems.concat(''),
                 value: '',
             }),
-        ).toBe('-2');
+        ).toBe(' 2');
     });
 
     it('handles sibling lists with null or undefined values', () => {
@@ -386,13 +400,14 @@ describe('uniquify', () => {
                     .concat(baseItems.slice(1)),
                 value: 'chickaree',
             }),
-        ).toBe('chickaree-2');
+        ).toBe('chickaree 2');
 
         expect(
             uniquify({
                 // @ts-expect-error
                 items: [undefined].concat(baseItemObjects),
                 propertyPath: ['slug'],
+                separator: '-',
                 value: 'about',
             }),
         ).toBe('about-2');
@@ -406,7 +421,7 @@ describe('uniquify', () => {
                     propertyPath: ['slug'],
                     value: 'Home',
                 }),
-            ).toBe('Home-2');
+            ).toBe('Home 2');
 
             expect(
                 uniquify({
@@ -424,7 +439,6 @@ describe('uniquify', () => {
             expect(
                 uniquify({
                     items: baseItems.concat(name),
-                    separator: ' ',
                     value: 'état «Œil»',
                 }),
             ).toBe('état «Œil» 2');
@@ -433,7 +447,6 @@ describe('uniquify', () => {
                 uniquify({
                     caseSensitive: true,
                     items: baseItems.concat(name),
-                    separator: ' ',
                     value: 'état «Œil»',
                 }),
             ).toBe('état «Œil»');

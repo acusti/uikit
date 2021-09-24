@@ -102,7 +102,7 @@ const uniquify = ({
     items,
     propertyPath,
     propertyPathAlternate,
-    separator = '-',
+    separator = ' ',
     suffix = '',
     value,
 }: {
