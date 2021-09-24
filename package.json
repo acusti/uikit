@@ -9,7 +9,7 @@
         "build:tsc": "tsc --build",
         "build": "run-s format clean build:tsc build:flowtypes",
         "clean:tsc": "tsc --build --clean",
-        "clean:flowtypes": "find . -type f -regex '.*/dist/[^/]*.flow' -delete",
+        "clean:flowtypes": "find . -type f -regex './packages/[^/]+/dist/[^/]+.flow' -delete",
         "clean": "run-p 'clean:*'",
         "format": "prettier --write package.json README.md tsconfig.json ./packages/",
         "lint": "eslint ./packages/*/src/**",
