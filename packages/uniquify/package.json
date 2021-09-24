@@ -3,9 +3,9 @@
     "version": "0.1.0",
     "type": "module",
     "sideEffects": false,
-    "exports": "./dist/useBoundingClientRect.js",
-    "main": "./dist/useBoundingClientRect.js",
-    "types": "./dist/useBoundingClientRect.d.ts",
+    "exports": "./dist/uniquify.js",
+    "main": "./dist/uniquify.js",
+    "types": "./dist/uniquify.d.ts",
     "files": [
         "dist"
     ],
