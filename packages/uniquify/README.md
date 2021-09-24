@@ -29,14 +29,14 @@ let items = ['bear', 'chickaree', 'coyote', 'marmot', 'pika'];
 console.log(uniquify({ items, value: 'chipmunk' }));
 //=> 'chipmunk'
 console.log(uniquify({ items, value: 'bear' }));
-//=> 'bear-2'
+//=> 'bear 2'
 
-items = [...items, 'bear-2'];
+items = [...items, 'bear 2'];
 
 console.log(uniquify({ items, value: 'bear' }));
-//=> 'bear-3'
-console.log(uniquify({ items, value: 'bear-2' }));
-//=> 'bear-3'
+//=> 'bear 3'
+console.log(uniquify({ items, value: 'bear 2' }));
+//=> 'bear 3'
 ```
 
 ### Payload Options
@@ -46,11 +46,14 @@ This is the type signature for the payload you pass to `uniquify`. Only
 
 ```ts
 type Payload = {
-    caseSensitive?: boolean;
-    items: Array<string | object>;
-    propertyPath?: Array<string>;
-    separator?: string; // defaults to '-'
+    items: Array<string> | Array<object>; // for Array<object>, pass propertyPath also
     value: string;
+    // Options:
+    caseSensitive?: boolean;
+    propertyPath?: Array<string>; // the path of the property to compare
+    separator?: string; // defaults to ' '
+    suffix?: string; // add a suffix to the value (prepended with separator)
+    isSuffixOptional?: boolean;
 };
 ```
 
@@ -58,6 +61,17 @@ They can be used like so:
 
 ```ts
 import uniquify from '@acusti/uniquify';
+
+let routes = ['home', 'about', 'contact'];
+
+console.log(
+    uniquify({
+        items: routes,
+        separator: '-',
+        value: 'about',
+    }),
+);
+//=> 'about-2'
 
 let files = [
     { file: { name: 'Ticket Receipt' } },
@@ -68,7 +82,6 @@ console.log(
     uniquify({
         items: files,
         propertyPath: ['file', 'name'],
-        separator: ' ',
         value: 'Ticket Receipt',
     }),
 );
@@ -77,7 +90,6 @@ console.log(
     uniquify({
         items: files,
         propertyPath: ['file', 'name'],
-        separator: ' ',
         value: 'ticket receipt',
     }),
 );
@@ -87,9 +99,36 @@ console.log(
         caseSensitive: true,
         items: files,
         propertyPath: ['file', 'name'],
-        separator: ' ',
         value: 'ticket receipt',
     }),
 );
 //=> 'ticket receipt'
+console.log(
+    uniquify({
+        items: files,
+        propertyPath: ['file', 'name'],
+        suffix: 'copy',
+        value: 'Ticket Receipt',
+    }),
+);
+//=> 'Ticket Receipt copy'
+console.log(
+    uniquify({
+        items: files,
+        propertyPath: ['file', 'name'],
+        suffix: 'copy',
+        value: 'Ticket Receipt 2',
+    }),
+);
+//=> 'Ticket Receipt 2 copy'
+console.log(
+    uniquify({
+        items: files,
+        propertyPath: ['file', 'name'],
+        isSuffixOptional: true, // <= changed
+        suffix: 'copy',
+        value: 'Ticket Receipt 2',
+    }),
+);
+//=> 'Ticket Receipt 2'
 ```
