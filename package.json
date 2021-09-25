@@ -106,5 +106,5 @@
             }
         ]
     },
-    "packageManager": "yarn@3.0.1"
+    "packageManager": "yarn@3.0.2"
 }

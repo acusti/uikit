@@ -110,7 +110,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["npm-run-all", "npm:4.1.5"],
             ["prettier", "npm:2.2.1"],
             ["ts-jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -128,7 +128,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["classnames", "npm:2.3.0"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -147,7 +147,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/input-text", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text"],
             ["@types/classnames", "npm:2.2.11"],
             ["@types/react", "npm:17.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -157,7 +157,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/css-values/",
           "packageDependencies": [
             ["@acusti/css-values", "workspace:packages/css-values"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -177,7 +177,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["classnames", "npm:2.3.0"],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -198,7 +198,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/use-is-out-of-bounds", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/use-is-out-of-bounds"],
             ["@types/classnames", "npm:2.2.11"],
             ["@types/react", "npm:17.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -212,7 +212,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", null],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -230,7 +230,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", null],
             ["react", null],
             ["react-dom", null],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -245,7 +245,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@acusti/input-text", "workspace:packages/input-text"],
             ["@types/react", "npm:17.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -255,7 +255,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/matchmaking/",
           "packageDependencies": [
             ["@acusti/matchmaking", "workspace:packages/matchmaking"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -269,7 +269,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", null],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -287,7 +287,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", null],
             ["react", null],
             ["react-dom", null],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -302,7 +302,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["@acusti/styling", "workspace:packages/styling"],
             ["@types/react", "npm:17.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -312,7 +312,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/textual/",
           "packageDependencies": [
             ["@acusti/textual", "workspace:packages/textual"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -342,7 +342,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["npm-run-all", "npm:4.1.5"],
             ["prettier", "npm:2.2.1"],
             ["ts-jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -373,7 +373,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:17.0.2"],
             ["react-docgen", "npm:6.0.0-alpha.0"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -385,7 +385,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/uniquify", "workspace:packages/uniquify"],
             ["@types/lodash.escaperegexp", "npm:4.1.6"],
             ["lodash.escaperegexp", "npm:4.1.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -400,7 +400,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", null],
             ["react", null],
             ["react-dom", null],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -419,7 +419,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", null],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -435,7 +435,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/use-bounding-client-rect", "workspace:packages/use-bounding-client-rect"],
             ["@types/classnames", "npm:2.2.11"],
             ["@types/react", "npm:17.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
@@ -451,7 +451,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", null],
             ["react", "npm:17.0.2"],
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:17.0.2"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -471,7 +471,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/react-dom", null],
             ["react", null],
             ["react-dom", null],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -488,7 +488,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/use-bounding-client-rect", "virtual:837d6eaa9e0cf2083d1c41eea7dd7d01ca3a2a3067aaf9336d4ad072e8b9825f1596626b65b0662b2ed096411185ff505111c47daf24d8301a090efcfd29533e#workspace:packages/use-bounding-client-rect"],
             ["@types/classnames", "npm:2.2.11"],
             ["@types/react", "npm:17.0.3"],
-            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=d8b4e7"]
+            ["typescript", "patch:typescript@npm%3A4.2.3#~builtin<compat/typescript>::version=4.2.3&hash=32657b"]
           ],
           "linkType": "SOFT",
         }]
