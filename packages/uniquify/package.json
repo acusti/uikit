@@ -13,6 +13,12 @@
         "type": "git",
         "url": "git+https://github.com/acusti/uikit.git"
     },
+    "keywords": [
+        "unique",
+        "name",
+        "filename",
+        "slug"
+    ],
     "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "license": "Unlicense",
     "bugs": {
