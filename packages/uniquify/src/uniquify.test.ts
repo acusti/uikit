@@ -1,4 +1,4 @@
-import uniquify from './uniquify';
+import uniquify from './uniquify.js';
 
 describe('uniquify', () => {
     const baseItems = ['bear', 'chickaree', 'coyote', 'marmot', 'pika'];

@@ -73,7 +73,8 @@
             }
         },
         "moduleNameMapper": {
-            "@acusti/(.*)$": "<rootDir>/packages/$1"
+            "@acusti/(.*)$": "<rootDir>/packages/$1",
+            "^(\\.{1,2}/.*)\\.js$": "$1"
         }
     },
     "prettier": {

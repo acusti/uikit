@@ -1,4 +1,4 @@
-import { capitalize, getInitials, getNameFromEmail } from './index';
+import { capitalize, getInitials, getNameFromEmail } from './index.js';
 
 describe('@acusti/text-transform', () => {
     describe('capitalize', () => {

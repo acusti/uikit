@@ -1,4 +1,4 @@
-import { getBestMatch, sortByBestMatch } from './index';
+import { getBestMatch, sortByBestMatch } from './index.js';
 
 const STATES = [
     'Alabama',
