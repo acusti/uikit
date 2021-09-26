@@ -41,8 +41,26 @@ const appSyncFetch = async (
         awsOptions as AWSOptions,
     );
 
-    const response = await executeFetch(resource, request);
-    return await response.json();
+    let response = null;
+
+    try {
+        response = await executeFetch(resource, request);
+        return await response.json();
+    } catch (error) {
+        // If response was a 204 No content or just empty, error is from parsing non-existent JSON
+        if (response?.status === 204) return response;
+        if (response?.headers.get('content-length') === '0' && response?.status === 200) {
+            return response;
+        }
+
+        // If error came from JSON parsing, use response.statusText as message and throw
+        if (error instanceof SyntaxError && error.message.indexOf('JSON') !== -1) {
+            throw new Error(response?.statusText);
+        }
+
+        // Else rethrow the error as is
+        throw error;
+    }
 };
 
 export { appSyncFetch, getHeadersWithAuthorization };
