@@ -3,12 +3,7 @@ import nodeFetch from 'node-fetch';
 
 import { getHeadersWithAuthorization } from './utils.js';
 
-import {
-    AWSOptions,
-    FetchOptions,
-    FetchOptionsWithBody,
-    OptionalAWSOptions,
-} from './types.js';
+import { AWSOptions, FetchOptions, FetchOptionsWithBody } from './types.js';
 
 const executeFetch = typeof fetch === 'undefined' ? nodeFetch : fetch;
 
@@ -17,7 +12,7 @@ const trimQuery = (query: string) => query.trim().replace(/\n +/g, ' ');
 const appSyncFetch = async (
     resource: string,
     fetchOptions: FetchOptions,
-    awsOptions: AWSOptions | OptionalAWSOptions = {},
+    awsOptions: Partial<AWSOptions> = {},
 ) => {
     let request: FetchOptionsWithBody;
 

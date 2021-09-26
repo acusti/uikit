@@ -19,11 +19,3 @@ export type AWSOptions = {
     service?: string;
     sessionToken?: string;
 };
-
-export type OptionalAWSOptions = {
-    accessKeyId?: string;
-    region?: string;
-    secretAccessKey?: string;
-    service?: string;
-    sessionToken?: string;
-};
