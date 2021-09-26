@@ -17,12 +17,14 @@
         "noUnusedParameters": true,
         "outDir": "dist",
         "paths": { "@acusti/*": ["packages/*/src"] },
+        "skipLibCheck": true,
         "sourceMap": true,
         "strictNullChecks": true,
         "suppressImplicitAnyIndexErrors": true,
         "target": "es2017"
     },
     "exclude": [
+        ".yarn/cache",
         "node_modules",
         "packages/docs",
         "**/dist/*",
@@ -31,6 +33,7 @@
         "**/*.spec*"
     ],
     "references": [
+        { "path": "packages/appsync-fetch" },
         { "path": "packages/css-value-input" },
         { "path": "packages/css-values" },
         { "path": "packages/dropdown" },

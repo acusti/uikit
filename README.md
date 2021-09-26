@@ -7,12 +7,14 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/acusti/uikit?style=for-the-badge)
 
 _UI toolkit monorepo containing a React component library, UI utilities, a
-drag-and-drop library, and more_
+drag-and-drop library, an [AWS AppSync](https://aws.amazon.com/appsync/)
+fetch utility, and more_
 
 ## Packages
 
 | NPM Package Name                         | Version                                                                                                                                                              | Description                                                   |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| **[@acusti/appsync-fetch][]**            | [![latest version](https://img.shields.io/npm/v/@acusti/appsync-fetch?style=flat-square)](https://www.npmjs.com/package/@acusti/appsync-fetch)                       | A fetch wrapper for making AWS AppSync API graphql requests   |
 | **[@acusti/css-values][]**               | [![latest version](https://img.shields.io/npm/v/@acusti/css-values?style=flat-square)](https://www.npmjs.com/package/@acusti/css-values)                             | Utilities for parsing different types of CSS values           |
 | **[@acusti/css-value-input][]**          | [![latest version](https://img.shields.io/npm/v/@acusti/css-value-input?style=flat-square)](https://www.npmjs.com/package/@acusti/css-value-input)                   | React component that renders a CSS value input                |
 | **[@acusti/dropdown][]**                 | [![latest version](https://img.shields.io/npm/v/@acusti/dropdown?style=flat-square)](https://www.npmjs.com/package/@acusti/dropdown)                                 | React component that renders a dropdown UI element            |
@@ -24,6 +26,8 @@ drag-and-drop library, and more_
 | **[@acusti/use-bounding-client-rect][]** | [![latest version](https://img.shields.io/npm/v/@acusti/use-bounding-client-rect?style=flat-square)](https://www.npmjs.com/package/@acusti/use-bounding-client-rect) | React hook for getting an element’s `boundingClientRect`      |
 | **[@acusti/use-is-out-of-bounds][]**     | [![latest version](https://img.shields.io/npm/v/@acusti/use-is-out-of-bounds?style=flat-square)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)         | React hook to check if an element overlaps its bounds         |
 
+[@acusti/appsync-fetch]:
+    https://github.com/acusti/uikit/tree/main/packages/appsync-fetch
 [@acusti/css-values]:
     https://github.com/acusti/uikit/tree/main/packages/css-values
 [@acusti/css-value-input]:
