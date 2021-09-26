@@ -177,7 +177,7 @@ const getAuthorizationHeader = ({
     signedHeaders: string;
 }) =>
     [
-        algorithm + ' ' + 'Credential=' + secretAccessKey + '/' + scope,
+        algorithm + ' Credential=' + secretAccessKey + '/' + scope,
         'SignedHeaders=' + signedHeaders,
         'Signature=' + signature,
     ].join(', ');
