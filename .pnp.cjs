@@ -112,6 +112,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["flowgen", "npm:1.13.0"],
             ["jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.2.2"],
             ["jest-runner", "npm:27.2.2"],
+            ["jest-watch-typeahead", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:0.6.4"],
             ["npm-run-all", "npm:4.1.5"],
             ["prettier", "npm:2.2.1"],
             ["ts-jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.0.5"],
@@ -360,6 +361,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["flowgen", "npm:1.13.0"],
             ["jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.2.2"],
             ["jest-runner", "npm:27.2.2"],
+            ["jest-watch-typeahead", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:0.6.4"],
             ["npm-run-all", "npm:4.1.5"],
             ["prettier", "npm:2.2.1"],
             ["ts-jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.0.5"],
@@ -24490,6 +24492,35 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest-get-type", "npm:27.0.6"],
             ["leven", "npm:3.1.0"],
             ["pretty-format", "npm:27.2.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["jest-watch-typeahead", [
+        ["npm:0.6.4", {
+          "packageLocation": "./.yarn/cache/jest-watch-typeahead-npm-0.6.4-d0de96de8d-15a42b0593.zip/node_modules/jest-watch-typeahead/",
+          "packageDependencies": [
+            ["jest-watch-typeahead", "npm:0.6.4"]
+          ],
+          "linkType": "SOFT",
+        }],
+        ["virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:0.6.4", {
+          "packageLocation": "./.yarn/__virtual__/jest-watch-typeahead-virtual-8b1b389420/0/cache/jest-watch-typeahead-npm-0.6.4-d0de96de8d-15a42b0593.zip/node_modules/jest-watch-typeahead/",
+          "packageDependencies": [
+            ["jest-watch-typeahead", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:0.6.4"],
+            ["@types/jest", "npm:27.0.2"],
+            ["ansi-escapes", "npm:4.3.2"],
+            ["chalk", "npm:4.1.0"],
+            ["jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:27.2.2"],
+            ["jest-regex-util", "npm:27.0.6"],
+            ["jest-watcher", "npm:27.2.2"],
+            ["slash", "npm:3.0.0"],
+            ["string-length", "npm:4.0.2"],
+            ["strip-ansi", "npm:6.0.0"]
+          ],
+          "packagePeers": [
+            "@types/jest",
+            "jest"
           ],
           "linkType": "HARD",
         }]
