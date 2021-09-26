@@ -85,11 +85,13 @@ CanonicalRequest =
 */
 const getCanonicalRequest = (resource: string, fetchOptions: FetchOptionsWithBody) => {
     const url = new URL(resource);
+    // Canonical query string parameter names must be sorted
+    url.searchParams.sort();
 
     return [
         fetchOptions.method,
         url.pathname,
-        url.search,
+        url.searchParams.toString(),
         getCanonicalHeaders(fetchOptions.headers),
         getSignedHeaders(fetchOptions.headers),
         getHash(fetchOptions.body || ''),
