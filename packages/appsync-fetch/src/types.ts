@@ -5,6 +5,7 @@ export type FetchOptionsWithBody = RequestInit & {
     headers?: FetchHeaders;
 };
 export type FetchOptionsWithQuery = RequestInit & {
+    body?: never;
     headers?: FetchHeaders;
     query: string;
     variables?: object;

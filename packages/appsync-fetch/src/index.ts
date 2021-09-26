@@ -19,17 +19,12 @@ const appSyncFetch = async (
     if ('query' in fetchOptions) {
         let { query, variables, ...restOfRequest } = fetchOptions;
         query = trimQuery(query);
-        restOfRequest.body = JSON.stringify(
-            variables
-                ? {
-                      query,
-                      variables,
-                  }
-                : { query },
-        );
-        request = restOfRequest as FetchOptionsWithBody;
+        request = {
+            ...restOfRequest,
+            body: JSON.stringify(variables ? { query, variables } : { query }),
+        };
     } else {
-        request = fetchOptions as FetchOptionsWithBody;
+        request = fetchOptions;
     }
 
     request.method = 'POST';
