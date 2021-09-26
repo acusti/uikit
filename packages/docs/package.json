@@ -2,7 +2,7 @@
     "name": "@acusti/uikit-docs",
     "version": "0.1.0",
     "engines": {
-        "node": ">=12"
+        "node": ">=14"
     },
     "devDependencies": {
         "@babel/core": "^7.13.13",
