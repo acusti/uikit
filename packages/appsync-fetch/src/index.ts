@@ -9,6 +9,8 @@ const executeFetch = typeof fetch === 'undefined' ? nodeFetch : fetch;
 
 const trimQuery = (query: string) => query.trim().replace(/\n +/g, ' ');
 
+type NetworkError = Error & { response?: ResponseInit };
+
 const appSyncFetch = async (
     resource: string,
     fetchOptions: FetchOptions,
@@ -41,21 +43,30 @@ const appSyncFetch = async (
         awsOptions as AWSOptions,
     );
 
-    let response = null;
+    // Allow fetch to throw in case of pre-request error
+    const response = await executeFetch(resource, request);
+
+    // Check for 4xx and 5xx responses and throw with the response
+    if (response.status >= 400) {
+        const error: NetworkError = new Error(
+            `Received ${response.status} ${response.statusText} response from request to ${resource}`,
+        );
+        error.response = response;
+        throw error;
+    }
 
     try {
-        response = await executeFetch(resource, request);
         return await response.json();
     } catch (error) {
         // If response was a 204 No content or just empty, error is from parsing non-existent JSON
-        if (response?.status === 204) return response;
-        if (response?.headers.get('content-length') === '0' && response?.status === 200) {
+        if (response.status === 204) return response;
+        if (response.headers.get('content-length') === '0' && response.status === 200) {
             return response;
         }
 
         // If error came from JSON parsing, use response.statusText as message and throw
         if (error instanceof SyntaxError && error.message.indexOf('JSON') !== -1) {
-            throw new Error(response?.statusText);
+            throw new Error(response.statusText);
         }
 
         // Else rethrow the error as is
