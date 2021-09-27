@@ -204,8 +204,8 @@ const getHeadersWithAuthorization = (
 
     let headers: FetchHeaders = fetchOptions.headers || {};
 
-    headers['Content-Type'] = 'application/json; charset=UTF-8';
     headers.Accept = '*/*';
+    headers['Content-Type'] = 'application/json; charset=UTF-8';
     headers.Date = dateTimeString;
     headers.Host = host;
     if (sessionToken) {
