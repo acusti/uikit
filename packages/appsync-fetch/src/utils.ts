@@ -26,6 +26,14 @@ const getHash = (src: string) => {
     return toHex(hash.digestSync());
 };
 
+const getNormalizedHeaders = (headers: FetchHeaders | undefined) => {
+    if (!headers) return [];
+
+    return Object.keys(headers)
+        .map((key) => ({ key: key.toLowerCase(), value: headers[key] }))
+        .sort((a, b) => (a.key < b.key ? -1 : 1));
+};
+
 /**
 * @private
 * Create canonical headers
@@ -38,20 +46,13 @@ CanonicalHeadersEntry =
 </pre>
 */
 const getCanonicalHeaders = (headers: FetchHeaders | undefined) => {
-    if (!headers) return '';
-    const headerKeys = Object.keys(headers);
-    if (!headerKeys.length) return '';
+    const normalizedHeaders = getNormalizedHeaders(headers);
+    if (!headers || !normalizedHeaders.length) return '';
 
-    return (
-        headerKeys
-            .map((key) => ({
-                key: key.toLowerCase(),
-                value: headers[key] ? headers[key].trim().replace(/\s+/g, ' ') : '',
-            }))
-            .sort((a, b) => (a.key < b.key ? -1 : 1))
-            .map((item) => item.key + ':' + item.value)
-            .join('\n') + '\n'
-    );
+    return normalizedHeaders.reduce((acc, { key, value }) => {
+        value = value ? value.trim().replace(/\s{2,}/g, ' ') : '';
+        return acc + key + ':' + value + '\n';
+    }, '');
 };
 
 /**
@@ -63,9 +64,8 @@ const getCanonicalHeaders = (headers: FetchHeaders | undefined) => {
  * x-amz-date header, you must also include that header in the list of signed headers.
  */
 const getSignedHeaders = (headers: FetchHeaders | undefined) =>
-    Object.keys(headers || {})
-        .map((key) => key.toLowerCase())
-        .sort()
+    getNormalizedHeaders(headers)
+        .map(({ key }) => key)
         .join(';');
 
 /**
