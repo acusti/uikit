@@ -7,7 +7,7 @@ import {
 const REGION = 'us-west-2';
 const HOST = `abcdefghijklmnopqrstuvwxyz.appsync-api.${REGION}.amazonaws.com`;
 const RESOURCE = `https://${HOST}/graphql`;
-const ACCESS_KEY_ID = 'wJalrXUtnFEMI';
+const ACCESS_KEY_ID = 'ASIA1ABCDEF2GHIJKLMO';
 const SECRET_ACCESS_KEY = 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY';
 const SESSION_TOKEN = 'thisisafakesessiontoken';
 
@@ -57,7 +57,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
     });
 
     describe('getHeadersWithAuthorization', () => {
-        const authorizationStart = `AWS4-HMAC-SHA256 Credential=${SECRET_ACCESS_KEY}/20150830/${REGION}/appsync/aws4_request`;
+        const authorizationStart = `AWS4-HMAC-SHA256 Credential=${ACCESS_KEY_ID}/20150830/${REGION}/appsync/aws4_request`;
 
         it('adds authorization headers to request headers based on passed in values', () => {
             expect(
@@ -71,8 +71,9 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                     },
                 ),
             ).toEqual({
-                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host;x-amz-security-token, Signature=0a8ae009fdf02c44719ad0aa1024c6a006b66ef120b8b5a42b7f7437ae445115`,
-                'Content-Type': 'application/json',
+                Accept: '*/*',
+                Authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=99f2ac2a74fa33011166210f034c7f0d269be635907d1237af3f8aaff30d5972`,
+                'Content-Type': 'application/json; charset=UTF-8',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
                 'X-Amz-Security-Token': SESSION_TOKEN,
@@ -99,9 +100,10 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                     },
                 ),
             ).toEqual({
+                Accept: '*/*',
+                Authorization: `${authorizationStart}, SignedHeaders=accept;cache-control;content-type;date;host;x-amz-security-token, Signature=f9ecd859d516f85e2f0575bfa874e8d5e50083b275d26cf558558e7eee9ebc09`,
                 'Cache-Control': 'only-if-cached', // host and authorization are overwritten
-                Authorization: `${authorizationStart}, SignedHeaders=cache-control;content-type;date;host;x-amz-security-token, Signature=a6e03224f029fb31e20c1209ab1d5425c1b550f8fe922d4d58b2e1d961d16250`,
-                'Content-Type': 'application/json',
+                'Content-Type': 'application/json; charset=UTF-8',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
                 'X-Amz-Security-Token': SESSION_TOKEN,

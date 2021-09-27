@@ -3,7 +3,7 @@ import { jest } from '@jest/globals';
 const REGION = 'us-west-2';
 const HOST = `abcdefghijklmnopqrstuvwxyz.appsync-api.${REGION}.amazonaws.com`;
 const RESOURCE = `https://${HOST}/graphql`;
-const ACCESS_KEY_ID = 'wJalrXUtnFEMI';
+const ACCESS_KEY_ID = 'ASIA1ABCDEF2GHIJKLMO';
 const SECRET_ACCESS_KEY = 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY';
 const SESSION_TOKEN = 'thisisafakesessiontoken';
 
@@ -42,7 +42,7 @@ const nodeFetch = await import('node-fetch');
 const { appSyncFetch } = await import('./index.js');
 
 describe('appSyncFetch', () => {
-    const authorizationStart = `AWS4-HMAC-SHA256 Credential=${SECRET_ACCESS_KEY}/20150830/${REGION}/appsync/aws4_request`;
+    const authorizationStart = `AWS4-HMAC-SHA256 Credential=${ACCESS_KEY_ID}/20150830/${REGION}/appsync/aws4_request`;
 
     it('converts passed in query to a trimmed JSON string body', async () => {
         await appSyncFetch(
@@ -55,11 +55,14 @@ describe('appSyncFetch', () => {
             },
         );
 
+        expect(nodeFetch.default).toHaveBeenCalledTimes(1);
+
         expect(nodeFetch.default).toBeCalledWith(RESOURCE, {
             body: QUERY_AS_JSON_STRING,
             headers: {
-                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host;x-amz-security-token, Signature=9f08f1304f330f7d48d978a7943abbddfb70904a17f9ec7201abeae43e73ad52`,
-                'Content-Type': 'application/json',
+                Accept: '*/*',
+                Authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=bbd38033904ba60eb9258f440a245deb31fb63a4134363bedab304627a562c09`,
+                'Content-Type': 'application/json; charset=UTF-8',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
                 'X-Amz-Security-Token': SESSION_TOKEN,
@@ -87,8 +90,9 @@ describe('appSyncFetch', () => {
                 QUERY_AS_JSON_STRING.slice(0, -1) +
                 ',"variables":{"userID":"6ac4e0ad-0268-4c5f-a559-92f1f1bf4586"}}',
             headers: {
-                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host;x-amz-security-token, Signature=9f08f1304f330f7d48d978a7943abbddfb70904a17f9ec7201abeae43e73ad52`,
-                'Content-Type': 'application/json',
+                Accept: '*/*',
+                Authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=bbd38033904ba60eb9258f440a245deb31fb63a4134363bedab304627a562c09`,
+                'Content-Type': 'application/json; charset=UTF-8',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
                 'X-Amz-Security-Token': SESSION_TOKEN,
@@ -111,8 +115,9 @@ describe('appSyncFetch', () => {
         expect(nodeFetch.default).toBeCalledWith(RESOURCE, {
             body: QUERY_AS_JSON_STRING,
             headers: {
-                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host;x-amz-security-token, Signature=9f08f1304f330f7d48d978a7943abbddfb70904a17f9ec7201abeae43e73ad52`,
-                'Content-Type': 'application/json',
+                Accept: '*/*',
+                Authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=7d0bd4196565fc4e5fff92312c6e27989bee79d2b403cd82296837d7ae1e7e09`,
+                'Content-Type': 'application/json; charset=UTF-8',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
                 'X-Amz-Security-Token': SESSION_TOKEN,
