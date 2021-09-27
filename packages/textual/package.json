@@ -20,6 +20,6 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/textual#readme",
     "devDependencies": {
-        "typescript": "^4.2.3"
+        "typescript": "^4.4.3"
     }
 }
