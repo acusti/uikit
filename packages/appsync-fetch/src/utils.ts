@@ -83,7 +83,7 @@ CanonicalRequest =
     HexEncode(Hash(RequestPayload))
 </pre>
 */
-const getCanonicalRequest = (resource: string, fetchOptions: FetchOptionsWithBody) => {
+const getCanonicalString = (resource: string, fetchOptions: FetchOptionsWithBody) => {
     const url = new URL(resource);
     // Canonical query string parameter names must be sorted
     url.searchParams.sort();
@@ -124,15 +124,15 @@ const getCredentialScope = ({
  */
 const getStringToSign = ({
     algorithm,
-    canonicalRequest,
+    canonicalString,
     dateTimeString,
     scope,
 }: {
     algorithm: string;
-    canonicalRequest: string;
+    canonicalString: string;
     dateTimeString: string;
     scope: string;
-}) => [algorithm, dateTimeString, scope, getHash(canonicalRequest)].join('\n');
+}) => [algorithm, dateTimeString, scope, getHash(canonicalString)].join('\n');
 
 /**
  * @private
@@ -225,10 +225,10 @@ const getHeadersWithAuthorization = (
 
     const scope = getCredentialScope({ dateString, region, service });
     const signingKey = getSigningKey({ dateString, region, secretAccessKey, service });
-    const canonicalRequest = getCanonicalRequest(resource, { ...fetchOptions, headers });
+    const canonicalString = getCanonicalString(resource, { ...fetchOptions, headers });
     const stringToSign = getStringToSign({
         algorithm,
-        canonicalRequest,
+        canonicalString,
         dateTimeString,
         scope,
     });
@@ -249,7 +249,7 @@ const getHeadersWithAuthorization = (
 export {
     getAuthorizationHeader,
     getCanonicalHeaders,
-    getCanonicalRequest,
+    getCanonicalString,
     getCredentialScope,
     getHeadersWithAuthorization,
     getRegionFromResource,

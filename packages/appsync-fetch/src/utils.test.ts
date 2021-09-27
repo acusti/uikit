@@ -1,5 +1,5 @@
 import {
-    getCanonicalRequest,
+    getCanonicalString,
     getHeadersWithAuthorization,
     getRegionFromResource,
 } from './utils.js';
@@ -27,7 +27,7 @@ describe('utils', () => {
         });
     });
 
-    describe('getCanonicalRequest', () => {
+    describe('getCanonicalString', () => {
         it('builds an AWS SigV4 canonical request string from request object', () => {
             // Example request from docs
             const requestURL =
@@ -42,7 +42,7 @@ describe('utils', () => {
                 },
             };
 
-            const canonicalRequest = `GET
+            const canonicalString = `GET
 /
 Action=ListUsers&Version=2010-05-08
 content-type:application/x-www-form-urlencoded; charset=utf-8
@@ -52,7 +52,7 @@ x-amz-date:${DATE_TIME_STRING}
 content-type;host;x-amz-date
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
 
-            expect(getCanonicalRequest(requestURL, fetchOptions)).toBe(canonicalRequest);
+            expect(getCanonicalString(requestURL, fetchOptions)).toBe(canonicalString);
         });
     });
 
