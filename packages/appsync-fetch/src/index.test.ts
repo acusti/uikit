@@ -32,13 +32,14 @@ global.Date = class _Date {
     }
 };
 
-jest.unstable_mockModule('node-fetch', async () => ({
-    default: jest.fn(async () => ({
-        json: async () => RESPONSE_AS_JSON,
-    })),
+const mockNodeFetch = jest.fn(async () => ({
+    json: async () => RESPONSE_AS_JSON,
 }));
 
-const nodeFetch = await import('node-fetch');
+jest.unstable_mockModule('node-fetch', () => ({
+    default: mockNodeFetch,
+}));
+
 const { appSyncFetch } = await import('./index.js');
 
 describe('appSyncFetch', () => {
@@ -55,9 +56,9 @@ describe('appSyncFetch', () => {
             },
         );
 
-        expect(nodeFetch.default).toHaveBeenCalledTimes(1);
+        expect(mockNodeFetch).toHaveBeenCalledTimes(1);
 
-        expect(nodeFetch.default).toBeCalledWith(RESOURCE, {
+        expect(mockNodeFetch).toBeCalledWith(RESOURCE, {
             body: QUERY_AS_JSON_STRING,
             headers: {
                 Accept: '*/*',
@@ -85,7 +86,7 @@ describe('appSyncFetch', () => {
             },
         );
 
-        expect(nodeFetch.default).toBeCalledWith(RESOURCE, {
+        expect(mockNodeFetch).toBeCalledWith(RESOURCE, {
             body:
                 QUERY_AS_JSON_STRING.slice(0, -1) +
                 ',"variables":{"userID":"6ac4e0ad-0268-4c5f-a559-92f1f1bf4586"}}',
@@ -112,7 +113,7 @@ describe('appSyncFetch', () => {
             },
         );
 
-        expect(nodeFetch.default).toBeCalledWith(RESOURCE, {
+        expect(mockNodeFetch).toBeCalledWith(RESOURCE, {
             body: QUERY_AS_JSON_STRING,
             headers: {
                 Accept: '*/*',
