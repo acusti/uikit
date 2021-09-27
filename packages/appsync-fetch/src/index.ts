@@ -48,10 +48,23 @@ const appSyncFetch = async (
 
     // Check for 4xx and 5xx responses and throw with the response
     if (response.status >= 400) {
-        const responseText = await response.text();
-        const error: NetworkError = new Error(
-            `Received ${response.status} from request to ${resource}: ${responseText}`,
-        );
+        let errorMessage = `Received ${response.status} response`;
+
+        try {
+            const responseJSON = await response.json();
+            errorMessage +=
+                ': ' +
+                responseJSON.errors.reduce(
+                    (acc: string, err: { errorType?: string; message: string }) =>
+                        acc + acc ? '\n' : '' + err.message,
+                    '',
+                );
+        } catch (err) {
+            const responseText = await response.text();
+            errorMessage += ': ' + responseText;
+        }
+
+        const error: NetworkError = new Error(errorMessage);
         error.response = response;
         throw error;
     }
