@@ -61,7 +61,7 @@ describe('appSyncFetch', () => {
             body: QUERY_AS_JSON_STRING,
             headers: {
                 Accept: '*/*',
-                Authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=bbd38033904ba60eb9258f440a245deb31fb63a4134363bedab304627a562c09`,
+                Authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=7d0bd4196565fc4e5fff92312c6e27989bee79d2b403cd82296837d7ae1e7e09`,
                 'Content-Type': 'application/json; charset=UTF-8',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
@@ -91,7 +91,7 @@ describe('appSyncFetch', () => {
                 ',"variables":{"userID":"6ac4e0ad-0268-4c5f-a559-92f1f1bf4586"}}',
             headers: {
                 Accept: '*/*',
-                Authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=bbd38033904ba60eb9258f440a245deb31fb63a4134363bedab304627a562c09`,
+                Authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=4b0f6d6dcbd0f859a3fddacecb636f591a968841ae99895ca58c9fe3dfb3107b`,
                 'Content-Type': 'application/json; charset=UTF-8',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
