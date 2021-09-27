@@ -11,6 +11,10 @@ const trimQuery = (query: string) => query.trim().replace(/\n +/g, ' ');
 
 type NetworkError = Error & { response?: ResponseInit };
 
+type GQLErrorResponse = {
+    errors: Array<{ errorType?: string; message: string }>;
+};
+
 const appSyncFetch = async (
     resource: string,
     fetchOptions: FetchOptions,
@@ -51,12 +55,11 @@ const appSyncFetch = async (
         let errorMessage = `Received ${response.status} response`;
 
         try {
-            const responseJSON = await response.json();
+            const responseJSON = (await response.json()) as GQLErrorResponse;
             errorMessage +=
                 ': ' +
                 responseJSON.errors.reduce(
-                    (acc: string, err: { errorType?: string; message: string }) =>
-                        acc + acc ? '\n' : '' + err.message,
+                    (acc: string, { message }) => (acc + acc ? '\n' : '' + message),
                     '',
                 );
         } catch (err) {
