@@ -71,7 +71,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                     },
                 ),
             ).toEqual({
-                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host, Signature=92ba632438d73ad88fd51a046857033d6ed5ccd5220b70d241a5d382f583fee3`,
+                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host;x-amz-security-token, Signature=0a8ae009fdf02c44719ad0aa1024c6a006b66ef120b8b5a42b7f7437ae445115`,
                 'Content-Type': 'application/json',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
@@ -100,7 +100,7 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                 ),
             ).toEqual({
                 'Cache-Control': 'only-if-cached', // host and authorization are overwritten
-                Authorization: `${authorizationStart}, SignedHeaders=cache-control;content-type;date;host, Signature=001f381ce1a1bc77637429707359d2ad4c37e3ead3e2215edcf5b158709f0a33`,
+                Authorization: `${authorizationStart}, SignedHeaders=cache-control;content-type;date;host;x-amz-security-token, Signature=a6e03224f029fb31e20c1209ab1d5425c1b550f8fe922d4d58b2e1d961d16250`,
                 'Content-Type': 'application/json',
                 Date: DATE_TIME_STRING,
                 Host: HOST,

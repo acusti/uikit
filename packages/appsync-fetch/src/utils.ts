@@ -207,6 +207,9 @@ const getHeadersWithAuthorization = (
     headers['Content-Type'] = 'application/json';
     headers.Date = dateTimeString;
     headers.Host = host;
+    if (sessionToken) {
+        headers['X-Amz-Security-Token'] = sessionToken;
+    }
 
     delete headers.authorization;
     delete headers.Authorization;
@@ -216,7 +219,6 @@ const getHeadersWithAuthorization = (
     delete headers['x-amz-date'];
     delete headers['X-Amz-Date'];
     delete headers['x-amz-security-token'];
-    delete headers['X-Amz-Security-Token'];
 
     const scope = getCredentialScope({ dateString, region, service });
     const signingKey = getSigningKey({ accessKeyId, dateString, region, service });
@@ -237,9 +239,6 @@ const getHeadersWithAuthorization = (
     });
 
     headers['Authorization'] = authorizationHeader;
-    if (sessionToken) {
-        headers['X-Amz-Security-Token'] = sessionToken;
-    }
 
     return headers;
 };

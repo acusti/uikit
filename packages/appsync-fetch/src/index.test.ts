@@ -58,7 +58,7 @@ describe('appSyncFetch', () => {
         expect(nodeFetch.default).toBeCalledWith(RESOURCE, {
             body: QUERY_AS_JSON_STRING,
             headers: {
-                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host, Signature=e5fbde76d239a74dd590f5afeef2661532d743b7cac789ad4b86072767270b58`,
+                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host;x-amz-security-token, Signature=9f08f1304f330f7d48d978a7943abbddfb70904a17f9ec7201abeae43e73ad52`,
                 'Content-Type': 'application/json',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
@@ -87,7 +87,7 @@ describe('appSyncFetch', () => {
                 QUERY_AS_JSON_STRING.slice(0, -1) +
                 ',"variables":{"userID":"6ac4e0ad-0268-4c5f-a559-92f1f1bf4586"}}',
             headers: {
-                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host, Signature=e5fbde76d239a74dd590f5afeef2661532d743b7cac789ad4b86072767270b58`,
+                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host;x-amz-security-token, Signature=9f08f1304f330f7d48d978a7943abbddfb70904a17f9ec7201abeae43e73ad52`,
                 'Content-Type': 'application/json',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
@@ -111,7 +111,7 @@ describe('appSyncFetch', () => {
         expect(nodeFetch.default).toBeCalledWith(RESOURCE, {
             body: QUERY_AS_JSON_STRING,
             headers: {
-                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host, Signature=e5fbde76d239a74dd590f5afeef2661532d743b7cac789ad4b86072767270b58`,
+                Authorization: `${authorizationStart}, SignedHeaders=content-type;date;host;x-amz-security-token, Signature=9f08f1304f330f7d48d978a7943abbddfb70904a17f9ec7201abeae43e73ad52`,
                 'Content-Type': 'application/json',
                 Date: DATE_TIME_STRING,
                 Host: HOST,
