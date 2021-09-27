@@ -16,12 +16,12 @@ type SetRenderTime = (time: number) => void;
 type Refs = {
     boundingClientRect: Rect | EmptyRect;
     maybeCleanupElement: () => void;
-    maybeCleanupTimer: null | number;
+    maybeCleanupTimer: ReturnType<typeof setTimeout> | null;
     renderTimeSetters: Set<SetRenderTime>;
     retryCount: number;
     scheduleUpdate: () => void;
     updateBoundingClientRect: () => void;
-    updaterFrameID: null | number;
+    updaterFrameID: number | null;
 };
 
 const EMPTY_RECT: EmptyRect = Object.freeze({

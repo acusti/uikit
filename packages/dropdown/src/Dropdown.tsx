@@ -50,6 +50,8 @@ export type Props = {
     value?: string;
 };
 
+type TimeoutID = ReturnType<typeof setTimeout>;
+
 type MousePosition = { clientX: number; clientY: number };
 
 const { Children, Fragment, useCallback, useLayoutEffect, useRef, useState } = React;
@@ -92,10 +94,10 @@ const Dropdown: React.FC<Props> = ({
 
     const dropdownElementRef = useRef<HTMLDivElement | null>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
-    const closingTimerRef = useRef<number | null>(null);
-    const isOpeningTimerRef = useRef<number | null>(null);
+    const closingTimerRef = useRef<TimeoutID | null>(null);
+    const isOpeningTimerRef = useRef<TimeoutID | null>(null);
     const currentInputMethodRef = useRef<'mouse' | 'keyboard'>('mouse');
-    const clearEnteredCharactersTimerRef = useRef<number | null>(null);
+    const clearEnteredCharactersTimerRef = useRef<TimeoutID | null>(null);
     const enteredCharactersRef = useRef<string>('');
     const mouseDownPositionRef = useRef<MousePosition | null>(null);
     const outOfBounds = useIsOutOfBounds(dropdownBodyElement);
