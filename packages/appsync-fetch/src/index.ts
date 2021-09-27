@@ -1,4 +1,4 @@
-import { fromEnv } from '@aws-sdk/credential-providers';
+import { fromEnv } from '@aws-sdk/credential-provider-env';
 import nodeFetch from 'node-fetch';
 
 import { getHeadersWithAuthorization } from './utils.js';
