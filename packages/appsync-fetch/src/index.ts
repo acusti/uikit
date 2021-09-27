@@ -39,7 +39,7 @@ const appSyncFetch = async (
 
     request.headers = getHeadersWithAuthorization(
         resource,
-        fetchOptions as FetchOptionsWithBody,
+        request as FetchOptionsWithBody,
         awsOptions as AWSOptions,
     );
 
