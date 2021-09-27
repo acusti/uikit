@@ -140,17 +140,17 @@ const getStringToSign = ({
  * Refer to {@link http://docs.aws.amazon.com/general/latest/gr/sigv4-calculate-signature.html|Calculate Signature}
  */
 const getSigningKey = ({
-    accessKeyId = '',
     dateString,
     region,
+    secretAccessKey,
     service,
 }: {
-    accessKeyId?: string;
     dateString: string;
     region: string;
+    secretAccessKey: string;
     service: string;
 }) => {
-    const key = 'AWS4' + accessKeyId;
+    const key = 'AWS4' + secretAccessKey;
     const keyDate = encrypt(key, dateString);
     const keyRegion = encrypt(keyDate, region);
     const keyService = encrypt(keyRegion, service);
@@ -166,20 +166,20 @@ const getSignature = (signingKey: string | Uint8Array, stringToSign: string) =>
  * Refer to {@link http://docs.aws.amazon.com/general/latest/gr/sigv4-add-signature-to-request.html|Add signature to request}
  */
 const getAuthorizationHeader = ({
+    accessKeyId,
     algorithm,
     scope,
-    secretAccessKey,
     signature,
     signedHeaders,
 }: {
+    accessKeyId: string;
     algorithm: string;
     scope: string;
-    secretAccessKey: string;
     signature: string | Uint8Array;
     signedHeaders: string;
 }) =>
     [
-        algorithm + ' Credential=' + secretAccessKey + '/' + scope,
+        algorithm + ' Credential=' + accessKeyId + '/' + scope,
         'SignedHeaders=' + signedHeaders,
         'Signature=' + signature,
     ].join(', ');
@@ -189,8 +189,8 @@ const getHeadersWithAuthorization = (
     fetchOptions: FetchOptionsWithBody,
     {
         accessKeyId,
-        secretAccessKey,
         region = REGION || getRegionFromResource(resource),
+        secretAccessKey,
         service = SERVICE,
         sessionToken,
     }: AWSOptions,
@@ -224,7 +224,7 @@ const getHeadersWithAuthorization = (
     delete headers['x-amz-security-token'];
 
     const scope = getCredentialScope({ dateString, region, service });
-    const signingKey = getSigningKey({ accessKeyId, dateString, region, service });
+    const signingKey = getSigningKey({ dateString, region, secretAccessKey, service });
     const canonicalRequest = getCanonicalRequest(resource, { ...fetchOptions, headers });
     const stringToSign = getStringToSign({
         algorithm,
@@ -234,8 +234,8 @@ const getHeadersWithAuthorization = (
     });
 
     const authorizationHeader = getAuthorizationHeader({
+        accessKeyId,
         algorithm,
-        secretAccessKey,
         scope,
         signature: getSignature(signingKey, stringToSign),
         signedHeaders: getSignedHeaders(headers),
