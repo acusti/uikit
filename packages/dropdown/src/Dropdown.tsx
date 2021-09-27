@@ -339,10 +339,8 @@ const Dropdown: React.FC<Props> = ({
                     if (isEditingCharacters) {
                         onEventHandled();
                         if (key === 'Backspace') {
-                            enteredCharactersRef.current = enteredCharactersRef.current.slice(
-                                0,
-                                -1,
-                            );
+                            enteredCharactersRef.current =
+                                enteredCharactersRef.current.slice(0, -1);
                         } else {
                             enteredCharactersRef.current += key;
                         }

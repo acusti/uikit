@@ -11,9 +11,8 @@ export const getItemElements = (dropdownElement: HTMLElement | null) => {
     const bodyElement = dropdownElement.querySelector(BODY_SELECTOR);
     if (!bodyElement) return null;
 
-    let items: NodeListOf<Element> | HTMLCollection = bodyElement.querySelectorAll(
-        ITEM_SELECTOR,
-    );
+    let items: NodeListOf<Element> | HTMLCollection =
+        bodyElement.querySelectorAll(ITEM_SELECTOR);
 
     if (items.length) return items;
     // If no items found via [data-ukt-item] or [data-ukt-value] selector,
