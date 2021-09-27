@@ -204,13 +204,16 @@ const getHeadersWithAuthorization = (
 
     let headers: FetchHeaders = fetchOptions.headers || {};
 
-    headers['Content-Type'] = 'application/json';
+    headers['Content-Type'] = 'application/json; charset=UTF-8';
+    headers.Accept = '*/*';
     headers.Date = dateTimeString;
     headers.Host = host;
     if (sessionToken) {
         headers['X-Amz-Security-Token'] = sessionToken;
     }
 
+    // Prevent any duplicate headers due to inconsistent casing (or redundant X-Amz-Date)
+    delete headers.accept;
     delete headers.authorization;
     delete headers.Authorization;
     delete headers.date;
