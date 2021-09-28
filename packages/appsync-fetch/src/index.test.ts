@@ -58,7 +58,7 @@ describe('appSyncFetch', () => {
 
         expect(mockNodeFetch).toHaveBeenCalledTimes(1);
 
-        expect(mockNodeFetch).toBeCalledWith(RESOURCE, {
+        expect(mockNodeFetch).toHaveBeenCalledWith(RESOURCE, {
             body: QUERY_AS_JSON_STRING,
             headers: {
                 Accept: '*/*',
@@ -86,7 +86,7 @@ describe('appSyncFetch', () => {
             },
         );
 
-        expect(mockNodeFetch).toBeCalledWith(RESOURCE, {
+        expect(mockNodeFetch).toHaveBeenCalledWith(RESOURCE, {
             body:
                 QUERY_AS_JSON_STRING.slice(0, -1) +
                 ',"variables":{"userID":"6ac4e0ad-0268-4c5f-a559-92f1f1bf4586"}}',
@@ -113,7 +113,7 @@ describe('appSyncFetch', () => {
             },
         );
 
-        expect(mockNodeFetch).toBeCalledWith(RESOURCE, {
+        expect(mockNodeFetch).toHaveBeenCalledWith(RESOURCE, {
             body: QUERY_AS_JSON_STRING,
             headers: {
                 Accept: '*/*',
