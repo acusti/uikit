@@ -1,6 +1,6 @@
 import escapeRegExp from 'lodash.escaperegexp';
 
-type Items = Array<string> | Array<object>;
+type Items = Array<string | null | undefined> | Array<object | null | undefined>;
 type StringKeyPath = Array<string>;
 
 const getIn = (item: unknown, path: Array<string>) => {
@@ -25,7 +25,7 @@ const propertyValueExists = ({
     value: string;
 }) => {
     value = caseSensitive ? value : value.toLowerCase();
-    return items.some((item: string | object) => {
+    return items.some((item) => {
         if (item == null) return false;
 
         let itemPropertyValue = propertyPath ? getIn(item, propertyPath) : item;
@@ -74,7 +74,7 @@ const otherInstanceExists = ({
         ? new RegExp(existingRegexString)
         : new RegExp(existingRegexString, 'i');
 
-    return items.some((item: string | object) => {
+    return items.some((item) => {
         if (!item) return false;
 
         let itemPropertyValue = propertyPath ? getIn(item, propertyPath) : item;
