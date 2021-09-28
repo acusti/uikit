@@ -393,19 +393,14 @@ describe('uniquify', () => {
     it('handles sibling lists with null or undefined values', () => {
         expect(
             uniquify({
-                items: baseItems
-                    .slice(0, 1)
-                    // @ts-expect-error
-                    .concat(null)
-                    .concat(baseItems.slice(1)),
+                items: [baseItems[0], null, baseItems[1], baseItems[2]],
                 value: 'chickaree',
             }),
         ).toBe('chickaree 2');
 
         expect(
             uniquify({
-                // @ts-expect-error
-                items: [undefined].concat(baseItemObjects),
+                items: [undefined, baseItemObjects[0], baseItemObjects[1]],
                 propertyPath: ['slug'],
                 separator: '-',
                 value: 'about',
