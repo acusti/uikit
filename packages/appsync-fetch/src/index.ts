@@ -14,7 +14,7 @@ type GQLResponse = {
     errors?: Array<{ errorType: string; message: string; path: Array<string> }>;
 };
 
-export type NetworkError = Error & {
+export type ResponseError = Error & {
     response?: ResponseInit;
     responseJSON?: GQLResponse;
     responseText?: string;
@@ -58,7 +58,7 @@ const appSyncFetch = async (
     // Check for 4xx and 5xx responses and throw with the response
     if (response.status >= 400) {
         const messageBase = `Received ${response.status} response`;
-        const error: NetworkError = new Error(messageBase);
+        const error: ResponseError = new Error(messageBase);
         error.response = response;
         error.responseText = await response.text();
         if (error.responseText) {
