@@ -9,10 +9,15 @@ const executeFetch = typeof fetch === 'undefined' ? nodeFetch : fetch;
 
 const trimQuery = (query: string) => query.trim().replace(/\n +/g, ' ');
 
-type NetworkError = Error & { response?: ResponseInit };
+type GQLResponse = {
+    data?: object;
+    errors?: Array<{ errorType: string; message: string; path: Array<string> }>;
+};
 
-type GQLErrorResponse = {
-    errors: Array<{ errorType?: string; message: string }>;
+export type NetworkError = Error & {
+    response?: ResponseInit;
+    responseJSON?: GQLResponse;
+    responseText?: string;
 };
 
 const appSyncFetch = async (
@@ -52,23 +57,28 @@ const appSyncFetch = async (
 
     // Check for 4xx and 5xx responses and throw with the response
     if (response.status >= 400) {
-        let errorMessage = `Received ${response.status} response`;
+        const error: NetworkError = new Error(`Received ${response.status} response`);
+        error.response = response;
 
         try {
-            const responseJSON = (await response.json()) as GQLErrorResponse;
-            errorMessage +=
-                ': ' +
-                responseJSON.errors.reduce(
-                    (acc: string, { message }) => (acc + acc ? '\n' : '' + message),
-                    '',
-                );
+            error.responseJSON = (await response.json()) as GQLResponse;
+            const { errors } = error.responseJSON;
+            if (errors) {
+                error.message +=
+                    ': ' +
+                    errors.reduce(
+                        (acc: string, { message }) => (acc + acc ? '\n' : '' + message),
+                        '',
+                    );
+            } else {
+                // If response body has no errors field, use generic response text
+                throw new Error('');
+            }
         } catch (err) {
-            const responseText = await response.text();
-            errorMessage += ': ' + responseText;
+            error.responseText = await response.text();
+            error.message += ': ' + error.responseText;
         }
 
-        const error: NetworkError = new Error(errorMessage);
-        error.response = response;
         throw error;
     }
 
