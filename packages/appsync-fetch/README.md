@@ -30,10 +30,10 @@ yarn add @acusti/uniquify
 ```
 
 The package exports `appSyncFetch`, which takes the same arguments as
-[`window.fetch`][fetch], but with a few conveniences built-in. To start
-with, `appSyncFetch` will set all required headers, including AWS
-authorization headers, a Date header, and Content-Type. It will also set
-`method: 'POST'` (required for all GraphQL requests).
+[`window.fetch`][fetch], but with a few conveniences for better ergonomics
+built-in. To start with, `appSyncFetch` will set all required headers,
+including AWS authorization headers, a Date header, and Content-Type. It
+will also set `method: 'POST'` (required for all GraphQL requests).
 
 In addition, the second argument (named `init` in the window.fetch docs)
 can take a `query: string` property and a `variables: object` property,
@@ -48,8 +48,18 @@ credentials handling, which will extract credentials from environment
 variables via `process.env`. Usage is illustrated in the code example
 below.
 
-And lastly, `appSyncFetch` calls `await response.json()` and returns the
+In addition, `appSyncFetch` calls `await response.json()` and returns the
 result, because that’s what you wanted anyways.
+
+And lastly, if the response is an error (4xx or 5xx), `appSyncFetch` will
+throw an Error object with the response HTTP error and message as the Error
+object message and with the following additional properties:
+
+-   `Error.response`: the fetch `Response` object
+-   `Error.responseJSON`: if the response body can be parsed as JSON, the
+    JSON representation returned from calling `await response.json()`
+-   `Error.responseText`: the response body as text (e.g. the result of
+    `await response.text()`)
 
 ```js
 import { appSyncFetch } from '@acusti/appsync-fetch';
@@ -98,8 +108,4 @@ const manualAuthenticationResult = await appSyncFetch(
         sessionToken,
     },
 );
-
-// By default, appSyncFetch will extract the amazon region from the AppSync URL
-// You can override that by passing in a region via the optional 3rd argument
-// The full type for the
 ```
