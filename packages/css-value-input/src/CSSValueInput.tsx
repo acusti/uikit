@@ -23,7 +23,9 @@ export type Props = {
     max?: number;
     min?: number;
     name?: string;
+    onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => unknown;
+    onFocus?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
     onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
     onSubmitValue: (value: string) => unknown;
@@ -56,7 +58,9 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
             max,
             min,
             name,
+            onBlur,
             onChange,
+            onFocus,
             onKeyDown,
             onKeyUp,
             onSubmitValue,
@@ -109,16 +113,20 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
             onSubmitValue(currentValue);
         }, [allowEmpty, cssValueType, getValueAsNumber, onSubmitValue, validator]);
 
-        const handleBlur = useCallback(() => {
-            if (!inputRef.current) return;
+        const handleBlur = useCallback(
+            (event: React.FocusEvent<HTMLInputElement>) => {
+                if (onBlur) onBlur(event);
+                if (!inputRef.current) return;
 
-            inputRef.current.value = getCSSValueWithUnit({
-                cssValueType,
-                defaultUnit: unit,
-                value: inputRef.current.value,
-            });
-            handleSubmitValue();
-        }, [cssValueType, handleSubmitValue, unit]);
+                inputRef.current.value = getCSSValueWithUnit({
+                    cssValueType,
+                    defaultUnit: unit,
+                    value: inputRef.current.value,
+                });
+                handleSubmitValue();
+            },
+            [cssValueType, handleSubmitValue, onBlur, unit],
+        );
 
         const getNextValue = useCallback(
             ({
@@ -232,6 +240,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                         name={name}
                         onBlur={handleBlur}
                         onChange={onChange}
+                        onFocus={onFocus}
                         onKeyDown={handleKeyDown}
                         onKeyUp={handleKeyUp}
                         placeholder={placeholder}
