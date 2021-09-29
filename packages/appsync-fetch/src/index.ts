@@ -57,27 +57,26 @@ const appSyncFetch = async (
 
     // Check for 4xx and 5xx responses and throw with the response
     if (response.status >= 400) {
-        const error: NetworkError = new Error(`Received ${response.status} response`);
+        const messageBase = `Received ${response.status} response`;
+        const error: NetworkError = new Error(messageBase);
         error.response = response;
+        error.responseText = await response.text();
+        if (error.responseText) {
+            error.message += ': ' + error.responseText;
+        }
 
         try {
             error.responseJSON = (await response.json()) as GQLResponse;
             const { errors } = error.responseJSON;
             if (errors) {
-                error.message +=
-                    ': ' +
+                error.message =
+                    `: ${messageBase}` +
                     errors.reduce(
                         (acc: string, { message }) => (acc + acc ? '\n' : '' + message),
                         '',
                     );
-            } else {
-                // If response body has no errors field, use generic response text
-                throw new Error('');
             }
-        } catch (err) {
-            error.responseText = await response.text();
-            error.message += ': ' + error.responseText;
-        }
+        } catch (innerError) {}
 
         throw error;
     }
