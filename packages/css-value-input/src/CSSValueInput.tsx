@@ -106,6 +106,24 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 let currentValueAsNumber = getValueAsNumber(currentValue);
                 const isCurrentValueFinite = Number.isFinite(currentValueAsNumber);
 
+                if (!isCurrentValueFinite) {
+                    let isValid = false;
+                    if (validator instanceof RegExp) {
+                        isValid = validator.test(currentValue);
+                    } else if (validator) {
+                        isValid = validator(currentValue);
+                    }
+
+                    if (isValid) {
+                        handleSubmitValue();
+                    } else {
+                        // If current value isn’t valid, revert to last submitted value
+                        inputRef.current.value = submittedValueRef.current;
+                    }
+
+                    return;
+                }
+
                 if (cssValueType === 'integer' && isCurrentValueFinite) {
                     currentValueAsNumber = Math.floor(currentValueAsNumber);
                     currentValue = currentValueAsNumber.toString();
@@ -116,21 +134,6 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                         defaultUnit: unit,
                         value: inputRef.current.value,
                     });
-                }
-
-                let isValid = isCurrentValueFinite;
-
-                if (!isValid && validator) {
-                    isValid =
-                        validator instanceof RegExp
-                            ? validator.test(currentValue)
-                            : validator(currentValue);
-                }
-
-                // If current value isn’t valid, revert to last submitted value
-                if (!isValid) {
-                    inputRef.current.value = submittedValueRef.current;
-                    return;
                 }
 
                 handleSubmitValue();
