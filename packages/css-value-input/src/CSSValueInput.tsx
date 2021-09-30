@@ -95,7 +95,14 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 if (onBlur) onBlur(event);
                 if (!inputRef.current) return;
 
-                let currentValue = inputRef.current.value;
+                let currentValue = inputRef.current.value.trim();
+
+                // If allowEmpty and value is empty, skip all the validation and normalization
+                if (allowEmpty && !currentValue) {
+                    handleSubmitValue();
+                    return;
+                }
+
                 let currentValueAsNumber = getValueAsNumber(currentValue);
                 const isCurrentValueFinite = Number.isFinite(currentValueAsNumber);
 
@@ -111,7 +118,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                     });
                 }
 
-                let isValid = (allowEmpty && !currentValue) || isCurrentValueFinite;
+                let isValid = isCurrentValueFinite;
 
                 if (!isValid && validator) {
                     isValid =
