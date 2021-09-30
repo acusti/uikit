@@ -81,51 +81,62 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
         const handleSubmitValue = useCallback(() => {
             if (!inputRef.current) return;
-            let currentValue = inputRef.current.value;
-            let currentValueAsNumber = getValueAsNumber(currentValue);
-            const isCurrentValueFinite = Number.isFinite(currentValueAsNumber);
 
-            if (cssValueType === 'integer' && isCurrentValueFinite) {
-                currentValueAsNumber = Math.floor(currentValueAsNumber);
-                currentValue = currentValueAsNumber.toString();
-                inputRef.current.value = currentValue;
-            }
-
+            const currentValue = inputRef.current.value;
             // If value hasn’t changed, do not trigger onSubmitValue
             if (currentValue === submittedValueRef.current) return;
 
-            let isValid = (allowEmpty && !currentValue) || isCurrentValueFinite;
-
-            if (!isValid && validator) {
-                isValid =
-                    validator instanceof RegExp
-                        ? validator.test(currentValue)
-                        : validator(currentValue);
-            }
-
-            // If current value isn’t valid, revert to last submitted value
-            if (!isValid) {
-                inputRef.current.value = submittedValueRef.current;
-                return;
-            }
-
             submittedValueRef.current = currentValue;
             onSubmitValue(currentValue);
-        }, [allowEmpty, cssValueType, getValueAsNumber, onSubmitValue, validator]);
+        }, [onSubmitValue]);
 
         const handleBlur = useCallback(
             (event: React.FocusEvent<HTMLInputElement>) => {
                 if (onBlur) onBlur(event);
                 if (!inputRef.current) return;
 
-                inputRef.current.value = getCSSValueWithUnit({
-                    cssValueType,
-                    defaultUnit: unit,
-                    value: inputRef.current.value,
-                });
+                let currentValue = inputRef.current.value;
+                let currentValueAsNumber = getValueAsNumber(currentValue);
+                const isCurrentValueFinite = Number.isFinite(currentValueAsNumber);
+
+                if (cssValueType === 'integer' && isCurrentValueFinite) {
+                    currentValueAsNumber = Math.floor(currentValueAsNumber);
+                    currentValue = currentValueAsNumber.toString();
+                    inputRef.current.value = currentValue;
+                } else {
+                    inputRef.current.value = getCSSValueWithUnit({
+                        cssValueType,
+                        defaultUnit: unit,
+                        value: inputRef.current.value,
+                    });
+                }
+
+                let isValid = (allowEmpty && !currentValue) || isCurrentValueFinite;
+
+                if (!isValid && validator) {
+                    isValid =
+                        validator instanceof RegExp
+                            ? validator.test(currentValue)
+                            : validator(currentValue);
+                }
+
+                // If current value isn’t valid, revert to last submitted value
+                if (!isValid) {
+                    inputRef.current.value = submittedValueRef.current;
+                    return;
+                }
+
                 handleSubmitValue();
             },
-            [cssValueType, handleSubmitValue, onBlur, unit],
+            [
+                allowEmpty,
+                cssValueType,
+                getValueAsNumber,
+                handleSubmitValue,
+                onBlur,
+                unit,
+                validator,
+            ],
         );
 
         const getNextValue = useCallback(
