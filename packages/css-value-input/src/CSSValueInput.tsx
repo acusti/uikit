@@ -95,7 +95,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 if (onBlur) onBlur(event);
                 if (!inputRef.current) return;
 
-                let currentValue = inputRef.current.value.trim();
+                const currentValue = inputRef.current.value.trim();
 
                 // If allowEmpty and value is empty, skip all the validation and normalization
                 if (allowEmpty && !currentValue) {
@@ -103,7 +103,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                     return;
                 }
 
-                let currentValueAsNumber = getValueAsNumber(currentValue);
+                const currentValueAsNumber = getValueAsNumber(currentValue);
                 const isCurrentValueFinite = Number.isFinite(currentValueAsNumber);
 
                 if (!isCurrentValueFinite) {
@@ -124,15 +124,31 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                     return;
                 }
 
-                if (cssValueType === 'integer' && isCurrentValueFinite) {
-                    currentValueAsNumber = Math.floor(currentValueAsNumber);
-                    currentValue = currentValueAsNumber.toString();
-                    inputRef.current.value = currentValue;
+                // Normalize value by applying min/max and integer constraints
+                let normalizedValueAsNumber = currentValueAsNumber;
+
+                if (isCurrentValueFinite) {
+                    if (min != null && currentValueAsNumber < min) {
+                        normalizedValueAsNumber = min;
+                    } else if (max != null && currentValueAsNumber > max) {
+                        normalizedValueAsNumber = max;
+                    } else if (cssValueType === 'integer') {
+                        normalizedValueAsNumber = Math.floor(currentValueAsNumber);
+                    }
+                }
+
+                if (normalizedValueAsNumber !== currentValueAsNumber) {
+                    const currentUnit = getUnitFromCSSValue({
+                        cssValueType,
+                        defaultUnit: unit,
+                        value: currentValue,
+                    });
+                    inputRef.current.value = normalizedValueAsNumber + currentUnit;
                 } else {
                     inputRef.current.value = getCSSValueWithUnit({
                         cssValueType,
                         defaultUnit: unit,
-                        value: inputRef.current.value,
+                        value: currentValue,
                     });
                 }
 
@@ -143,6 +159,8 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 cssValueType,
                 getValueAsNumber,
                 handleSubmitValue,
+                max,
+                min,
                 onBlur,
                 unit,
                 validator,
