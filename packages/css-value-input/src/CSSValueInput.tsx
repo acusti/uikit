@@ -81,7 +81,6 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
         const handleSubmitValue = useCallback(() => {
             if (!inputRef.current) return;
-            // If value hasn’t changed, do not trigger onSubmitValue
             let currentValue = inputRef.current.value;
             let currentValueAsNumber = getValueAsNumber(currentValue);
             const isCurrentValueFinite = Number.isFinite(currentValueAsNumber);
@@ -92,6 +91,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 inputRef.current.value = currentValue;
             }
 
+            // If value hasn’t changed, do not trigger onSubmitValue
             if (currentValue === submittedValueRef.current) return;
 
             let isValid = (allowEmpty && !currentValue) || isCurrentValueFinite;
