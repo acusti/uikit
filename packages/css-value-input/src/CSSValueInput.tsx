@@ -83,9 +83,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
             if (!inputRef.current) return;
 
             const currentValue = inputRef.current.value;
-            // If value hasn’t changed, do not trigger onSubmitValue
-            if (currentValue === submittedValueRef.current) return;
-
+            // Store last submittedValue (used to reset value on invalid input)
             submittedValueRef.current = currentValue;
             onSubmitValue(currentValue);
         }, [onSubmitValue]);
@@ -97,7 +95,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
                 const currentValue = inputRef.current.value.trim();
 
-                // If allowEmpty and value is empty, skip all the validation and normalization
+                // If allowEmpty and value is empty, skip all validation + normalization
                 if (allowEmpty && !currentValue) {
                     handleSubmitValue();
                     return;
