@@ -7,7 +7,8 @@
     "main": "./dist/InputText.js",
     "types": "./dist/InputText.d.ts",
     "files": [
-        "dist"
+        "dist",
+        "src"
     ],
     "repository": {
         "type": "git",

@@ -7,7 +7,8 @@
     "main": "./dist/useIsOutOfBounds.js",
     "types": "./dist/useIsOutOfBounds.d.ts",
     "files": [
-        "dist"
+        "dist",
+        "src"
     ],
     "repository": {
         "type": "git",

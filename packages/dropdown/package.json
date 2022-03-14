@@ -7,7 +7,8 @@
     "main": "./dist/Dropdown.js",
     "types": "./dist/Dropdown.d.ts",
     "files": [
-        "dist"
+        "dist",
+        "src"
     ],
     "repository": {
         "type": "git",
