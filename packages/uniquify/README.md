@@ -1,7 +1,7 @@
 # @acusti/uniquify
 
 [![latest version](https://img.shields.io/npm/v/@acusti/uniquify?style=for-the-badge)](https://www.npmjs.com/package/@acusti/uniquify)
-[![dependencies status](https://img.shields.io/david/acusti/uikit?path=packages%2Funiquify&style=for-the-badge)](https://david-dm.org/acusti/uikit?path=packages%2Funiquify)
+[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/uniquify?style=for-the-badge)](https://libraries.io/npm/@acusti%2Funiquify/sourcerank)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/uniquify?style=for-the-badge)](https://bundlephobia.com/package/@acusti/uniquify)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/uniquify?style=for-the-badge)](https://www.npmjs.com/package/@acusti/uniquify)
 

@@ -1,7 +1,7 @@
 # @acusti/input-text
 
 [![latest version](https://img.shields.io/npm/v/@acusti/input-text?style=for-the-badge)](https://www.npmjs.com/package/@acusti/input-text)
-[![dependencies status](https://img.shields.io/david/acusti/uikit?path=packages%2Finput-text&style=for-the-badge)](https://david-dm.org/acusti/uikit?path=packages%2Finput-text)
+[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/input-text?style=for-the-badge)](https://libraries.io/npm/@acusti%2Finput-text/sourcerank)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/input-text?style=for-the-badge)](https://bundlephobia.com/package/@acusti/input-text)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/input-text?style=for-the-badge)](https://www.npmjs.com/package/@acusti/input-text)
 

@@ -1,7 +1,7 @@
 # @acusti/styling
 
 [![latest version](https://img.shields.io/npm/v/@acusti/styling?style=for-the-badge)](https://www.npmjs.com/package/@acusti/styling)
-[![dependencies status](https://img.shields.io/david/acusti/uikit?path=packages%2Fstyling&style=for-the-badge)](https://david-dm.org/acusti/uikit?path=packages%2Fstyling)
+[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/styling?style=for-the-badge)](https://libraries.io/npm/@acusti%2Fstyling/sourcerank)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/styling?style=for-the-badge)](https://bundlephobia.com/package/@acusti/styling)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/styling?style=for-the-badge)](https://www.npmjs.com/package/@acusti/styling)
 
