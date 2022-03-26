@@ -35,16 +35,16 @@ const getNormalizedHeaders = (headers: FetchHeaders | undefined) => {
 };
 
 /**
-* @private
-* Create canonical headers
-*
+ * @private
+ * Create canonical headers
+ *
 <pre>
 CanonicalHeaders =
     CanonicalHeadersEntry0 + CanonicalHeadersEntry1 + ... + CanonicalHeadersEntryN
 CanonicalHeadersEntry =
     Lowercase(HeaderName) + ':' + Trimall(HeaderValue) + '\n'
 </pre>
-*/
+ */
 const getCanonicalHeaders = (headers: FetchHeaders | undefined) => {
     const normalizedHeaders = getNormalizedHeaders(headers);
     if (!headers || !normalizedHeaders.length) return '';
@@ -69,10 +69,10 @@ const getSignedHeaders = (headers: FetchHeaders | undefined) =>
         .join(';');
 
 /**
-* @private
-* Create a canonical request
-* Refer to {@link http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html|Create a Canonical Request}
-*
+ * @private
+ * Create a canonical request
+ * Refer to {@link http://docs.aws.amazon.com/general/latest/gr/sigv4-create-canonical-request.html|Create a Canonical Request}
+ *
 <pre>
 CanonicalRequest =
     HTTPRequestMethod + '\n' +
@@ -82,7 +82,7 @@ CanonicalRequest =
     SignedHeaders + '\n' +
     HexEncode(Hash(RequestPayload))
 </pre>
-*/
+ */
 const getCanonicalString = (resource: string, fetchOptions: FetchOptionsWithBody) => {
     const url = new URL(resource);
     // Canonical query string parameter names must be sorted
