@@ -36,7 +36,9 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             className,
             disabled,
             initialValue,
+            max,
             maxLength,
+            min,
             minLength,
             name,
             onBlur,
@@ -48,6 +50,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             placeholder,
             readOnly,
             selectTextOnFocus,
+            step,
             tabIndex,
             title,
             type = 'text',
@@ -100,7 +103,9 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 className={className}
                 defaultValue={initialValue || ''}
                 disabled={disabled}
+                max={max}
                 maxLength={maxLength}
+                min={min}
                 minLength={minLength}
                 name={name}
                 onBlur={selectTextOnFocus ? handleBlur : onBlur}
@@ -113,6 +118,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 placeholder={placeholder}
                 readOnly={readOnly}
                 ref={inputRef}
+                step={step}
                 tabIndex={tabIndex}
                 title={title}
                 type={type}
