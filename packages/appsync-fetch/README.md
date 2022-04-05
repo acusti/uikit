@@ -4,16 +4,17 @@
 [![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/appsync-fetch?style=for-the-badge)](https://libraries.io/npm/@acusti%2Fappsync-fetch/sourcerank)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
 
-`appsync-fetch` is a simple node and browser-compatible package with
-minimal dependencies that exports an `appSyncFetch` function that wraps
-[fetch][] to make requests to an AWS AppSync graphql API. It takes an
+`appsync-fetch` is a simple node.js module with minimal dependencies that
+exports an `appsyncFetch` function that wraps [fetch][] (via
+[node-fetch][]) to make requests to an AWS AppSync graphql API. It takes an
 optional third argument for passing in AWS credentials, as well as the
-region. If AWS credentials aren’t provided, it uses
+region. If AWS credentials aren’t provided, it uses the same algorithm as
 `@aws-sdk/credential-providers`’s [`fromEnv` helper][fromenv] to get
 credentials from the standard AWS environment variables made available in
 lambdas. It then uses those credentials to construct the appropriate [AWS
 SigV4][] authorization headers for IAM-based authorization.
 
+[node-fetch]: https://www.npmjs.com/package/node-fetch
 [aws sigv4]:
     https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
 [fetch]:
@@ -29,9 +30,9 @@ npm install @acusti/appsync-fetch
 yarn add @acusti/uniquify
 ```
 
-The package exports `appSyncFetch`, which takes the same arguments as
+The package exports `appsyncFetch`, which takes the same arguments as
 [`window.fetch`][fetch], but with a few conveniences for better ergonomics
-built-in. To start with, `appSyncFetch` will set all required headers,
+built-in. To start with, `appsyncFetch` will set all required headers,
 including AWS authorization headers, a Date header, and Content-Type. It
 will also set `method: 'POST'` (required for all GraphQL requests).
 
@@ -48,10 +49,10 @@ credentials handling, which will extract credentials from environment
 variables via `process.env`. Usage is illustrated in the code example
 below.
 
-In addition, `appSyncFetch` calls `await response.json()` and returns the
+In addition, `appsyncFetch` calls `await response.json()` and returns the
 result, because that’s what you wanted anyways.
 
-And lastly, if the response is an error (4xx or 5xx), `appSyncFetch` will
+And lastly, if the response is an error (4xx or 5xx), `appsyncFetch` will
 throw an Error object with the response HTTP error and message as the Error
 object message and with the following additional properties:
 
@@ -62,13 +63,13 @@ object message and with the following additional properties:
     `await response.text()`)
 
 ```js
-import { appSyncFetch } from '@acusti/appsync-fetch';
+import { appsyncFetch } from '@acusti/appsync-fetch';
 
-const appSyncURL =
+const appsyncURL =
     'https://abcdefghijklmnopqrstuvwxyz.appsync-api.us-west-2.amazonaws.com/graphql';
 
 // In its simplest usage, environment variables are used for authorization
-const itemsResult = await appSyncFetch(appSyncURL, {
+const itemsResult = await appsyncFetch(appsyncURL, {
     query: `
         query ListItems {
             listItems {
@@ -84,7 +85,7 @@ const itemsResult = await appSyncFetch(appSyncURL, {
 // const itemsResult = await response.json();
 
 // You can also pass in variables
-const createdItemResult = await appSyncFetch(appSyncURL, {
+const createdItemResult = await appsyncFetch(appsyncURL, {
     query: `
         mutation CreateItem($input: CreateItemInput!) {
             createItem(input: $input) {
@@ -99,8 +100,8 @@ const createdItemResult = await appSyncFetch(appSyncURL, {
 });
 
 // You can also provide the authentication variables manually
-const manualAuthenticationResult = await appSyncFetch(
-    appSyncURL,
+const manualAuthenticationResult = await appsyncFetch(
+    appsyncURL,
     { query: 'query {...}' },
     {
         accessKeyId,
@@ -109,3 +110,28 @@ const manualAuthenticationResult = await appSyncFetch(
     },
 );
 ```
+
+### With TypeScript
+
+You can pass in the expected data result from the GraphQL query as a generic to `appsyncFetch`. This works very well with the [codegen GraphQL API types][] provided by AWS amplify:
+
+```ts
+import { ListItemsQuery } from 'API';
+
+const itemsResult = await appsyncFetch<ListItemsQuery>(appsyncURL, {
+    query: `
+        query ListItems {
+            listItems {
+                items {
+                    id
+                    text
+                }
+            }
+        }`,
+});
+```
+
+The type of `itemsResult` will be `{ data? ListItemsQuery, errors?: GraphQLResponseError[] }`, where `GraphQLResponseError` is the shape of GraphQL errors returned by appsync as illustrated [in the docs][].
+
+[codegen GraphQL API types]: https://docs.amplify.aws/cli/graphql/client-code-generation/
+[in the docs]: https://docs.aws.amazon.com/appsync/latest/devguide/troubleshooting-and-common-mistakes.html
