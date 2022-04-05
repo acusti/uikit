@@ -21,7 +21,6 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/appsync-fetch#readme",
     "dependencies": {
-        "@aws-crypto/sha256-js": "^2.0.1",
         "node-fetch": "^3.0.0"
     },
     "devDependencies": {

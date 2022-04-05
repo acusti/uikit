@@ -1,4 +1,4 @@
-import sha256 from '@aws-crypto/sha256-js';
+import { BinaryToTextEncoding, createHash, createHmac } from 'crypto';
 
 import { AWSOptions, FetchHeaders, FetchOptionsWithBody } from './types.js';
 
@@ -6,47 +6,20 @@ const SERVICE = 'appsync';
 // @ts-ignore expected type error from this simple browser/node-agnostic check
 const REGION: string = typeof process === 'undefined' ? '' : process.env.REGION;
 
-const { Sha256 } = sha256;
-
-// BEGIN https://github.com/aws/aws-sdk-js-v3/blob/main/packages/util-hex-encoding/src/index.ts
-const SHORT_TO_HEX: { [key: number]: string } = {};
-const HEX_TO_SHORT: { [key: string]: number } = {};
-
-for (let i = 0; i < 256; i++) {
-    let encodedByte = i.toString(16).toLowerCase();
-    if (encodedByte.length === 1) {
-        encodedByte = `0${encodedByte}`;
-    }
-
-    SHORT_TO_HEX[i] = encodedByte;
-    HEX_TO_SHORT[encodedByte] = i;
-}
-
-const toHex = (bytes: Uint8Array): string => {
-    let out = '';
-    for (let i = 0; i < bytes.byteLength; i++) {
-        out += SHORT_TO_HEX[bytes[i]];
-    }
-
-    return out;
-};
-// END https://github.com/aws/aws-sdk-js-v3/blob/main/packages/util-hex-encoding/src/index.ts
-
-const encrypt = (key: string | Uint8Array, src: string, encoding: string = '') => {
-    const hash = new Sha256(key);
-    hash.update(src);
-    const result = hash.digestSync();
-    if (encoding === 'hex') {
-        return toHex(result);
-    }
-    return result;
+const encrypt = (
+    key: string | Uint8Array,
+    src: string,
+    encoding?: BinaryToTextEncoding,
+) => {
+    const hmac = createHmac('sha256', key);
+    const data = hmac.update(src);
+    return encoding ? data.digest(encoding) : data.digest();
 };
 
-const getHash = (src: string) => {
-    const arg = src || '';
-    const hash = new Sha256();
-    hash.update(arg);
-    return toHex(hash.digestSync());
+const getHash = (src: string = '') => {
+    const hash = createHash('sha256');
+    const data = hash.update(src);
+    return data.digest('hex');
 };
 
 const getNormalizedHeaders = (headers: FetchHeaders | undefined) => {

@@ -1,22 +1,17 @@
-import nodeFetch from 'node-fetch';
+import fetch from 'node-fetch';
 
 import { getHeadersWithAuthorization } from './utils.js';
 
 import { AWSOptions, FetchOptions, FetchOptionsWithBody } from './types.js';
 
-const executeFetch = typeof fetch === 'undefined' ? nodeFetch : fetch;
-
 const trimQuery = (query: string) => query.trim().replace(/\n +/g, ' ');
 
-type GQLResponse = {
-    data?: object;
-    errors?: Array<{ errorType: string; message: string; path: Array<string> }>;
-};
-
-export type ResponseError = Error & {
-    response?: ResponseInit;
-    responseJSON?: GQLResponse;
-    responseText?: string;
+// Reference: https://docs.aws.amazon.com/appsync/latest/devguide/troubleshooting-and-common-mistakes.html
+export type GraphQLResponseError = {
+    errorType: string;
+    locations: Array<{ column: number; line: number }>;
+    message: string;
+    path: Array<string>;
 };
 
 const ENV_KEY = 'AWS_ACCESS_KEY_ID';
@@ -24,11 +19,12 @@ const ENV_SECRET = 'AWS_SECRET_ACCESS_KEY';
 const ENV_SESSION = 'AWS_SESSION_TOKEN';
 const ENV_EXPIRATION = 'AWS_CREDENTIAL_EXPIRATION';
 
-const appSyncFetch = async (
+const appsyncFetch = async <Result extends unknown>(
     resource: string,
     fetchOptions: FetchOptions,
     awsOptions: Partial<AWSOptions> = {},
-) => {
+): Promise<{ data?: Result; errors?: Array<GraphQLResponseError> }> => {
+    type ResponseJSON = { data?: Result; errors?: Array<GraphQLResponseError> };
     let request: FetchOptionsWithBody;
 
     if ('query' in fetchOptions) {
@@ -71,12 +67,16 @@ const appSyncFetch = async (
     );
 
     // Allow fetch to throw in case of pre-request error
-    const response = await executeFetch(resource, request);
+    const response = await fetch(resource, request);
 
     // Check for 4xx and 5xx responses and throw with the response
     if (response.status >= 400) {
         const messageBase = `Received ${response.status} response`;
-        const error: ResponseError = new Error(messageBase);
+        const error: Error & {
+            response?: ResponseInit;
+            responseJSON?: ResponseJSON;
+            responseText?: string;
+        } = new Error(messageBase);
         error.response = response;
         error.responseText = await response.text();
         if (error.responseText) {
@@ -84,7 +84,7 @@ const appSyncFetch = async (
         }
 
         try {
-            error.responseJSON = (await response.json()) as GQLResponse;
+            error.responseJSON = (await response.json()) as ResponseJSON;
             const { errors } = error.responseJSON;
             if (errors) {
                 error.message =
@@ -100,12 +100,12 @@ const appSyncFetch = async (
     }
 
     try {
-        return await response.json();
+        return (await response.json()) as ResponseJSON;
     } catch (error) {
         // If response was a 204 No content or just empty, error is from parsing non-existent JSON
-        if (response.status === 204) return response;
+        if (response.status === 204) return {};
         if (response.headers.get('content-length') === '0' && response.status === 200) {
-            return response;
+            return {};
         }
 
         // If error came from JSON parsing, use response.statusText as message and throw
@@ -118,4 +118,4 @@ const appSyncFetch = async (
     }
 };
 
-export { appSyncFetch, getHeadersWithAuthorization };
+export { appsyncFetch, getHeadersWithAuthorization };

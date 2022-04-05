@@ -40,13 +40,13 @@ jest.unstable_mockModule('node-fetch', () => ({
     default: mockNodeFetch,
 }));
 
-const { appSyncFetch } = await import('./index.js');
+const { appsyncFetch } = await import('./index.js');
 
-describe('appSyncFetch', () => {
+describe('appsyncFetch', () => {
     const authorizationStart = `AWS4-HMAC-SHA256 Credential=${ACCESS_KEY_ID}/20150830/${REGION}/appsync/aws4_request`;
 
     it('converts passed in query to a trimmed JSON string body', async () => {
-        await appSyncFetch(
+        await appsyncFetch(
             RESOURCE,
             { query: QUERY },
             {
@@ -73,7 +73,7 @@ describe('appSyncFetch', () => {
     });
 
     it('supports converting both a query and variables to a trimmed JSON string body', async () => {
-        await appSyncFetch(
+        await appsyncFetch(
             RESOURCE,
             {
                 query: QUERY,
@@ -103,7 +103,7 @@ describe('appSyncFetch', () => {
     });
 
     it('supports directly passing the request body as a string', async () => {
-        await appSyncFetch(
+        await appsyncFetch(
             RESOURCE,
             { body: QUERY_AS_JSON_STRING },
             {
@@ -126,7 +126,7 @@ describe('appSyncFetch', () => {
             method: 'POST',
         });
 
-        await appSyncFetch(
+        await appsyncFetch(
             RESOURCE,
             // @ts-expect-error you can only pass a body OR a query, never both
             { body: QUERY_AS_JSON_STRING, query: QUERY },
@@ -139,7 +139,7 @@ describe('appSyncFetch', () => {
     });
 
     it('directly returns the resolved result of calling response.json()', async () => {
-        const result = await appSyncFetch(
+        const result = await appsyncFetch(
             RESOURCE,
             { query: QUERY },
             {
