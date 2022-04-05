@@ -124,7 +124,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/appsync-fetch/",\
           "packageDependencies": [\
             ["@acusti/appsync-fetch", "workspace:packages/appsync-fetch"],\
-            ["@aws-crypto/sha256-js", "npm:1.2.1"],\
+            ["@aws-crypto/sha256-js", "npm:2.0.1"],\
             ["@jest/globals", "npm:27.2.2"],\
             ["@types/node", "npm:17.0.23"],\
             ["node-fetch", "npm:3.0.0"],\
@@ -513,11 +513,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@aws-crypto/sha256-js", [\
-        ["npm:1.2.1", {\
-          "packageLocation": "./.yarn/cache/@aws-crypto-sha256-js-npm-1.2.1-b4ce5e5bee-15ea6da486.zip/node_modules/@aws-crypto/sha256-js/",\
+        ["npm:2.0.1", {\
+          "packageLocation": "./.yarn/cache/@aws-crypto-sha256-js-npm-2.0.1-ae3bc9d02c-d5f07a5dde.zip/node_modules/@aws-crypto/sha256-js/",\
           "packageDependencies": [\
-            ["@aws-crypto/sha256-js", "npm:1.2.1"],\
-            ["@aws-crypto/util", "npm:1.2.1"],\
+            ["@aws-crypto/sha256-js", "npm:2.0.1"],\
+            ["@aws-crypto/util", "npm:2.0.1"],\
             ["@aws-sdk/types", "npm:3.34.0"],\
             ["tslib", "npm:1.14.1"]\
           ],\
@@ -525,10 +525,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@aws-crypto/util", [\
-        ["npm:1.2.1", {\
-          "packageLocation": "./.yarn/cache/@aws-crypto-util-npm-1.2.1-3f591f2583-1b14ca51bf.zip/node_modules/@aws-crypto/util/",\
+        ["npm:2.0.1", {\
+          "packageLocation": "./.yarn/cache/@aws-crypto-util-npm-2.0.1-ccb599b0f8-83d7edea95.zip/node_modules/@aws-crypto/util/",\
           "packageDependencies": [\
-            ["@aws-crypto/util", "npm:1.2.1"],\
+            ["@aws-crypto/util", "npm:2.0.1"],\
             ["@aws-sdk/types", "npm:3.34.0"],\
             ["@aws-sdk/util-utf8-browser", "npm:3.34.0"],\
             ["tslib", "npm:1.14.1"]\
