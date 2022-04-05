@@ -5,7 +5,9 @@ export type Props = {
     className?: string;
     disabled?: boolean;
     initialValue?: string;
+    max?: number;
     maxLength?: number;
+    min?: number;
     minLength?: number;
     name?: string;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
@@ -17,6 +19,7 @@ export type Props = {
     placeholder?: string;
     readOnly?: boolean;
     selectTextOnFocus?: boolean;
+    step?: number;
     tabIndex?: number;
     title?: string;
     type?: 'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url';
