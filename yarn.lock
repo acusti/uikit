@@ -9,7 +9,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/appsync-fetch@workspace:packages/appsync-fetch"
   dependencies:
-    "@aws-crypto/sha256-js": ^2.0.1
     "@jest/globals": ^27.2.2
     "@types/node": ^17.0.23
     node-fetch: ^3.0.0
@@ -135,6 +134,7 @@ __metadata:
     "@babel/core": ^7.13.14
     "@jest/globals": ^27.2.2
     "@types/jest": ^27.0.2
+    "@types/node": ^17.0.23
     "@typescript-eslint/eslint-plugin": ^4.0.0
     "@typescript-eslint/parser": ^4.0.0
     babel-eslint: ^10.0.0
@@ -193,44 +193,6 @@ __metadata:
     react-dom: ^16.8 || ^17
   languageName: unknown
   linkType: soft
-
-"@aws-crypto/sha256-js@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@aws-crypto/sha256-js@npm:2.0.1"
-  dependencies:
-    "@aws-crypto/util": ^2.0.1
-    "@aws-sdk/types": ^3.1.0
-    tslib: ^1.11.1
-  checksum: d5f07a5dde2cde277b63e781adc3fb0d04e202f56d159b50089f3bfd8bf657db1c35e18813e2ec6c3771dfdf0d0d6eb13f36a8ad021b5db7d2bb8fdc9f06dce3
-  languageName: node
-  linkType: hard
-
-"@aws-crypto/util@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "@aws-crypto/util@npm:2.0.1"
-  dependencies:
-    "@aws-sdk/types": ^3.1.0
-    "@aws-sdk/util-utf8-browser": ^3.0.0
-    tslib: ^1.11.1
-  checksum: 83d7edea95336869854eb98bf53416a70ee824a03c8858779abcef7b7f35813ba3ba0aaa571d87c416bdcec78b620e825fe9e65769a15d2009af0ccb279ef981
-  languageName: node
-  linkType: hard
-
-"@aws-sdk/types@npm:^3.1.0":
-  version: 3.34.0
-  resolution: "@aws-sdk/types@npm:3.34.0"
-  checksum: 7d343e9b641534d6aa10f5c96610d16f2756829db8fcd6631b2b4a6a31e55ad76f3fce3bcb73c4337842078831f3d5843a7007d934b2a63d439bc65423af012f
-  languageName: node
-  linkType: hard
-
-"@aws-sdk/util-utf8-browser@npm:^3.0.0":
-  version: 3.34.0
-  resolution: "@aws-sdk/util-utf8-browser@npm:3.34.0"
-  dependencies:
-    tslib: ^2.3.0
-  checksum: 2b56eb0655f3abb92d9db2b51446115c2289f612390325039ddf4051d5b85b9b792398e4013a4de67766571d7c5d8fb8b6bef1d1b3807b78fa045410cdb8f61f
-  languageName: node
-  linkType: hard
 
 "@babel/code-frame@npm:7.10.4":
   version: 7.10.4
@@ -19684,7 +19646,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"tslib@npm:^1.11.1, tslib@npm:^1.8.1, tslib@npm:^1.9.0, tslib@npm:^1.9.3":
+"tslib@npm:^1.8.1, tslib@npm:^1.9.0, tslib@npm:^1.9.3":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
   checksum: dbe628ef87f66691d5d2959b3e41b9ca0045c3ee3c7c7b906cc1e328b39f199bb1ad9e671c39025bd56122ac57dfbf7385a94843b1cc07c60a4db74795829acd
@@ -19695,13 +19657,6 @@ resolve@^2.0.0-next.3:
   version: 2.1.0
   resolution: "tslib@npm:2.1.0"
   checksum: aa189c8179de0427b0906da30926fd53c59d96ec239dff87d6e6bc831f608df0cbd6f77c61dabc074408bd0aa0b9ae4ec35cb2c15f729e32f37274db5730cb78
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.3.0":
-  version: 2.3.1
-  resolution: "tslib@npm:2.3.1"
-  checksum: de17a98d4614481f7fcb5cd53ffc1aaf8654313be0291e1bfaee4b4bb31a20494b7d218ff2e15017883e8ea9626599b3b0e0229c18383ba9dce89da2adf15cb9
   languageName: node
   linkType: hard
 

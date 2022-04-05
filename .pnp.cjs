@@ -96,6 +96,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.13.14"],\
             ["@jest/globals", "npm:27.2.2"],\
             ["@types/jest", "npm:27.0.2"],\
+            ["@types/node", "npm:17.0.23"],\
             ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.28.1"],\
             ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.28.1"],\
             ["babel-eslint", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:10.1.0"],\
@@ -124,7 +125,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/appsync-fetch/",\
           "packageDependencies": [\
             ["@acusti/appsync-fetch", "workspace:packages/appsync-fetch"],\
-            ["@aws-crypto/sha256-js", "npm:2.0.1"],\
             ["@jest/globals", "npm:27.2.2"],\
             ["@types/node", "npm:17.0.23"],\
             ["node-fetch", "npm:3.0.0"],\
@@ -343,6 +343,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@babel/core", "npm:7.13.14"],\
             ["@jest/globals", "npm:27.2.2"],\
             ["@types/jest", "npm:27.0.2"],\
+            ["@types/node", "npm:17.0.23"],\
             ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.28.1"],\
             ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.28.1"],\
             ["babel-eslint", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:10.1.0"],\
@@ -510,49 +511,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["typescript", "patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=bda367"]\
           ],\
           "linkType": "SOFT"\
-        }]\
-      ]],\
-      ["@aws-crypto/sha256-js", [\
-        ["npm:2.0.1", {\
-          "packageLocation": "./.yarn/cache/@aws-crypto-sha256-js-npm-2.0.1-ae3bc9d02c-d5f07a5dde.zip/node_modules/@aws-crypto/sha256-js/",\
-          "packageDependencies": [\
-            ["@aws-crypto/sha256-js", "npm:2.0.1"],\
-            ["@aws-crypto/util", "npm:2.0.1"],\
-            ["@aws-sdk/types", "npm:3.34.0"],\
-            ["tslib", "npm:1.14.1"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["@aws-crypto/util", [\
-        ["npm:2.0.1", {\
-          "packageLocation": "./.yarn/cache/@aws-crypto-util-npm-2.0.1-ccb599b0f8-83d7edea95.zip/node_modules/@aws-crypto/util/",\
-          "packageDependencies": [\
-            ["@aws-crypto/util", "npm:2.0.1"],\
-            ["@aws-sdk/types", "npm:3.34.0"],\
-            ["@aws-sdk/util-utf8-browser", "npm:3.34.0"],\
-            ["tslib", "npm:1.14.1"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["@aws-sdk/types", [\
-        ["npm:3.34.0", {\
-          "packageLocation": "./.yarn/cache/@aws-sdk-types-npm-3.34.0-a474d4ad47-7d343e9b64.zip/node_modules/@aws-sdk/types/",\
-          "packageDependencies": [\
-            ["@aws-sdk/types", "npm:3.34.0"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["@aws-sdk/util-utf8-browser", [\
-        ["npm:3.34.0", {\
-          "packageLocation": "./.yarn/cache/@aws-sdk-util-utf8-browser-npm-3.34.0-0145238563-2b56eb0655.zip/node_modules/@aws-sdk/util-utf8-browser/",\
-          "packageDependencies": [\
-            ["@aws-sdk/util-utf8-browser", "npm:3.34.0"],\
-            ["tslib", "npm:2.3.1"]\
-          ],\
-          "linkType": "HARD"\
         }]\
       ]],\
       ["@babel/code-frame", [\
@@ -30744,13 +30702,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/tslib-npm-2.1.0-81c9ac9b82-aa189c8179.zip/node_modules/tslib/",\
           "packageDependencies": [\
             ["tslib", "npm:2.1.0"]\
-          ],\
-          "linkType": "HARD"\
-        }],\
-        ["npm:2.3.1", {\
-          "packageLocation": "./.yarn/cache/tslib-npm-2.3.1-0e21e18015-de17a98d46.zip/node_modules/tslib/",\
-          "packageDependencies": [\
-            ["tslib", "npm:2.3.1"]\
           ],\
           "linkType": "HARD"\
         }]\
