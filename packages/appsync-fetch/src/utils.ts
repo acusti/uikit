@@ -1,5 +1,4 @@
 import sha256 from '@aws-crypto/sha256-js';
-import { toHex } from '@aws-sdk/util-hex-encoding';
 
 import { AWSOptions, FetchHeaders, FetchOptionsWithBody } from './types.js';
 
@@ -8,6 +7,30 @@ const SERVICE = 'appsync';
 const REGION: string = typeof process === 'undefined' ? '' : process.env.REGION;
 
 const { Sha256 } = sha256;
+
+// BEGIN https://github.com/aws/aws-sdk-js-v3/blob/main/packages/util-hex-encoding/src/index.ts
+const SHORT_TO_HEX: { [key: number]: string } = {};
+const HEX_TO_SHORT: { [key: string]: number } = {};
+
+for (let i = 0; i < 256; i++) {
+    let encodedByte = i.toString(16).toLowerCase();
+    if (encodedByte.length === 1) {
+        encodedByte = `0${encodedByte}`;
+    }
+
+    SHORT_TO_HEX[i] = encodedByte;
+    HEX_TO_SHORT[encodedByte] = i;
+}
+
+const toHex = (bytes: Uint8Array): string => {
+    let out = '';
+    for (let i = 0; i < bytes.byteLength; i++) {
+        out += SHORT_TO_HEX[bytes[i]];
+    }
+
+    return out;
+};
+// END https://github.com/aws/aws-sdk-js-v3/blob/main/packages/util-hex-encoding/src/index.ts
 
 const encrypt = (key: string | Uint8Array, src: string, encoding: string = '') => {
     const hash = new Sha256(key);
