@@ -27,7 +27,7 @@ SigV4][] authorization headers for IAM-based authorization.
 ```
 npm install @acusti/appsync-fetch
 # or
-yarn add @acusti/uniquify
+yarn add @acusti/appsync-fetch
 ```
 
 The package exports `appsyncFetch`, which takes the same arguments as
