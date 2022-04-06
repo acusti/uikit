@@ -3,6 +3,7 @@
 [![latest version](https://img.shields.io/npm/v/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
 [![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/appsync-fetch?style=for-the-badge)](https://libraries.io/npm/@acusti%2Fappsync-fetch/sourcerank)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
+[![install size](https://packagephobia.com/badge?p=@acusti/appsync-fetch&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/appsync-fetch)
 
 `appsync-fetch` is a simple node.js module with minimal dependencies that
 exports an `appsyncFetch` function that wraps [fetch][] (via
