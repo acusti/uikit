@@ -49,6 +49,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/matchmaking"\
       },\
       {\
+        "name": "@acusti/post",\
+        "reference": "workspace:packages/post"\
+      },\
+      {\
         "name": "@acusti/styling",\
         "reference": "workspace:packages/styling"\
       },\
@@ -78,6 +82,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@acusti/dropdown", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/dropdown", "workspace:packages/dropdown"]],\
       ["@acusti/input-text", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/input-text", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text", "workspace:packages/input-text"]],\
       ["@acusti/matchmaking", ["workspace:packages/matchmaking"]],\
+      ["@acusti/post", ["workspace:packages/post"]],\
       ["@acusti/styling", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/styling", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/styling", "workspace:packages/styling"]],\
       ["@acusti/textual", ["workspace:packages/textual"]],\
       ["@acusti/uikit", ["workspace:."]],\
@@ -125,9 +130,9 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/appsync-fetch/",\
           "packageDependencies": [\
             ["@acusti/appsync-fetch", "workspace:packages/appsync-fetch"],\
+            ["@acusti/post", "workspace:packages/post"],\
             ["@jest/globals", "npm:27.2.2"],\
             ["@types/node", "npm:17.0.23"],\
-            ["node-fetch", "npm:3.0.0"],\
             ["typescript", "patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=bda367"]\
           ],\
           "linkType": "SOFT"\
@@ -273,6 +278,18 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/matchmaking/",\
           "packageDependencies": [\
             ["@acusti/matchmaking", "workspace:packages/matchmaking"],\
+            ["typescript", "patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=bda367"]\
+          ],\
+          "linkType": "SOFT"\
+        }]\
+      ]],\
+      ["@acusti/post", [\
+        ["workspace:packages/post", {\
+          "packageLocation": "./packages/post/",\
+          "packageDependencies": [\
+            ["@acusti/post", "workspace:packages/post"],\
+            ["@jest/globals", "npm:27.2.2"],\
+            ["@types/node", "npm:17.0.23"],\
             ["typescript", "patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=bda367"]\
           ],\
           "linkType": "SOFT"\
@@ -18458,15 +18475,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD"\
         }]\
       ]],\
-      ["data-uri-to-buffer", [\
-        ["npm:3.0.1", {\
-          "packageLocation": "./.yarn/cache/data-uri-to-buffer-npm-3.0.1-830646f9ee-c59c300968.zip/node_modules/data-uri-to-buffer/",\
-          "packageDependencies": [\
-            ["data-uri-to-buffer", "npm:3.0.1"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
       ["data-urls", [\
         ["npm:2.0.0", {\
           "packageLocation": "./.yarn/cache/data-urls-npm-2.0.0-2b80c32b82-97caf828aa.zip/node_modules/data-urls/",\
@@ -20421,16 +20429,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["fb-watchman", "npm:2.0.1"],\
             ["bser", "npm:2.1.1"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["fetch-blob", [\
-        ["npm:3.1.2", {\
-          "packageLocation": "./.yarn/cache/fetch-blob-npm-3.1.2-6076d01b9c-3e3717cf30.zip/node_modules/fetch-blob/",\
-          "packageDependencies": [\
-            ["fetch-blob", "npm:3.1.2"],\
-            ["web-streams-polyfill", "npm:3.1.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -25352,15 +25350,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/node-fetch-npm-2.6.1-46c670dbc1-91075bedd5.zip/node_modules/node-fetch/",\
           "packageDependencies": [\
             ["node-fetch", "npm:2.6.1"]\
-          ],\
-          "linkType": "HARD"\
-        }],\
-        ["npm:3.0.0", {\
-          "packageLocation": "./.yarn/cache/node-fetch-npm-3.0.0-6aa31e95cd-50224bf682.zip/node_modules/node-fetch/",\
-          "packageDependencies": [\
-            ["node-fetch", "npm:3.0.0"],\
-            ["data-uri-to-buffer", "npm:3.0.1"],\
-            ["fetch-blob", "npm:3.1.2"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -31685,15 +31674,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/web-namespaces-npm-1.1.4-a6dfacb865-5149842ccb.zip/node_modules/web-namespaces/",\
           "packageDependencies": [\
             ["web-namespaces", "npm:1.1.4"]\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["web-streams-polyfill", [\
-        ["npm:3.1.1", {\
-          "packageLocation": "./.yarn/cache/web-streams-polyfill-npm-3.1.1-ba7b0e5b2d-dac85f0a99.zip/node_modules/web-streams-polyfill/",\
-          "packageDependencies": [\
-            ["web-streams-polyfill", "npm:3.1.1"]\
           ],\
           "linkType": "HARD"\
         }]\

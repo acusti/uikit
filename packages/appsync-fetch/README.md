@@ -114,7 +114,9 @@ const manualAuthenticationResult = await appsyncFetch(
 
 ### With TypeScript
 
-You can pass in the expected data result from the GraphQL query as a generic to `appsyncFetch`. This works very well with the [codegen GraphQL API types][] provided by AWS amplify:
+You can pass in the expected data result from the GraphQL query as a
+generic to `appsyncFetch`. This works very well with the [codegen GraphQL
+API types][] provided by AWS amplify:
 
 ```ts
 import { ListItemsQuery } from 'API';
@@ -132,7 +134,12 @@ const itemsResult = await appsyncFetch<ListItemsQuery>(appsyncURL, {
 });
 ```
 
-The type of `itemsResult` will be `{ data? ListItemsQuery, errors?: GraphQLResponseError[] }`, where `GraphQLResponseError` is the shape of GraphQL errors returned by appsync as illustrated [in the docs][].
+The type of `itemsResult` will be
+`{ data? ListItemsQuery, errors?: GraphQLResponseError[] }`, where
+`GraphQLResponseError` is the shape of GraphQL errors returned by appsync
+as illustrated [in the docs][].
 
-[codegen GraphQL API types]: https://docs.amplify.aws/cli/graphql/client-code-generation/
-[in the docs]: https://docs.aws.amazon.com/appsync/latest/devguide/troubleshooting-and-common-mistakes.html
+[codegen graphql api types]:
+    https://docs.amplify.aws/cli/graphql/client-code-generation/
+[in the docs]:
+    https://docs.aws.amazon.com/appsync/latest/devguide/troubleshooting-and-common-mistakes.html

@@ -36,9 +36,9 @@ describe('utils', () => {
                 body: '',
                 method: 'GET',
                 headers: {
-                    Host: 'iam.amazonaws.com',
-                    'Content-Type': 'application/x-www-form-urlencoded; charset=utf-8',
-                    'X-Amz-Date': DATE_TIME_STRING,
+                    host: 'iam.amazonaws.com',
+                    'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+                    'x-amz-date': DATE_TIME_STRING,
                 },
             };
 
@@ -71,12 +71,12 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                     },
                 ),
             ).toEqual({
-                Accept: '*/*',
-                Authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=99f2ac2a74fa33011166210f034c7f0d269be635907d1237af3f8aaff30d5972`,
-                'Content-Type': 'application/json; charset=UTF-8',
-                Date: DATE_TIME_STRING,
-                Host: HOST,
-                'X-Amz-Security-Token': SESSION_TOKEN,
+                accept: '*/*',
+                authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=99f2ac2a74fa33011166210f034c7f0d269be635907d1237af3f8aaff30d5972`,
+                'content-type': 'application/json; charset=UTF-8',
+                date: DATE_TIME_STRING,
+                host: HOST,
+                'x-amz-security-token': SESSION_TOKEN,
             });
         });
 
@@ -87,9 +87,9 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                     {
                         body: '{"query": "query listItems{}"}',
                         headers: {
-                            Authorization: 'open sesame',
+                            authorization: 'open sesame',
+                            'cache-control': 'only-if-cached',
                             host: 'foo.bar',
-                            'Cache-Control': 'only-if-cached',
                         },
                         method: 'POST',
                     },
@@ -100,13 +100,13 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                     },
                 ),
             ).toEqual({
-                Accept: '*/*',
-                Authorization: `${authorizationStart}, SignedHeaders=accept;cache-control;content-type;date;host;x-amz-security-token, Signature=f9ecd859d516f85e2f0575bfa874e8d5e50083b275d26cf558558e7eee9ebc09`,
-                'Cache-Control': 'only-if-cached', // host and authorization are overwritten
-                'Content-Type': 'application/json; charset=UTF-8',
-                Date: DATE_TIME_STRING,
-                Host: HOST,
-                'X-Amz-Security-Token': SESSION_TOKEN,
+                accept: '*/*',
+                authorization: `${authorizationStart}, SignedHeaders=accept;cache-control;content-type;date;host;x-amz-security-token, Signature=f9ecd859d516f85e2f0575bfa874e8d5e50083b275d26cf558558e7eee9ebc09`,
+                'cache-control': 'only-if-cached', // host and authorization are overwritten
+                'content-type': 'application/json; charset=UTF-8',
+                date: DATE_TIME_STRING,
+                host: HOST,
+                'x-amz-security-token': SESSION_TOKEN,
             });
         });
     });

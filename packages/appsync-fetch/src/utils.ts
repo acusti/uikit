@@ -1,6 +1,7 @@
 import { BinaryToTextEncoding, createHash, createHmac } from 'crypto';
+import type { FetchHeaders, FetchOptionsWithBody } from '@acusti/post';
 
-import { AWSOptions, FetchHeaders, FetchOptionsWithBody } from './types.js';
+import type { AWSOptions } from './types.js';
 
 const SERVICE = 'appsync';
 // @ts-ignore expected type error from this simple browser/node-agnostic check
@@ -200,24 +201,19 @@ const getHeadersWithAuthorization = (
 
     let headers: FetchHeaders = fetchOptions.headers || {};
 
-    headers.Accept = '*/*';
-    headers['Content-Type'] = 'application/json; charset=UTF-8';
-    headers.Date = dateTimeString;
-    headers.Host = host;
+    headers.accept = '*/*';
+    if (!headers['content-type']) {
+        headers['content-type'] = 'application/json; charset=UTF-8';
+    }
+    headers.date = dateTimeString;
+    headers.host = host;
     if (sessionToken) {
-        headers['X-Amz-Security-Token'] = sessionToken;
+        headers['x-amz-security-token'] = sessionToken;
     }
 
-    // Prevent any duplicate headers due to inconsistent casing (or redundant X-Amz-Date)
-    delete headers.accept;
+    // Ensure there is no redundant authorization or x-amz-date header
     delete headers.authorization;
-    delete headers.Authorization;
-    delete headers.date;
-    delete headers.host;
-    delete headers['content-type'];
     delete headers['x-amz-date'];
-    delete headers['X-Amz-Date'];
-    delete headers['x-amz-security-token'];
 
     const scope = getCredentialScope({ dateString, region, service });
     const signingKey = getSigningKey({ dateString, region, secretAccessKey, service });
@@ -237,7 +233,7 @@ const getHeadersWithAuthorization = (
         signedHeaders: getSignedHeaders(headers),
     });
 
-    headers['Authorization'] = authorizationHeader;
+    headers.authorization = authorizationHeader;
 
     return headers;
 };
