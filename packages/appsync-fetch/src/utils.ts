@@ -193,7 +193,7 @@ const getHeadersWithAuthorization = (
 ) => {
     const date = new Date();
     const dateTimeString = date.toISOString().replace(/[:-]|\.\d{3}/g, '');
-    const dateString = dateTimeString.substr(0, 8);
+    const dateString = dateTimeString.substring(0, 8);
     const algorithm = 'AWS4-HMAC-SHA256';
 
     const { host } = new URL(resource);
