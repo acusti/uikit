@@ -18,12 +18,11 @@ export const getRequestOptionsAndBody = (
     }
 
     // Lowercase all headers to make them consistent
-    const headers = options.headers
-        ? Object.keys(options.headers).reduce((acc, key) => {
-              acc[key.toLowerCase()] = headers[key];
-              return acc;
-          }, {})
-        : {};
+    let headers = options.headers || {};
+    headers = Object.keys(headers).reduce((acc, key) => {
+        acc[key.toLowerCase()] = headers[key];
+        return acc;
+    }, {});
 
     if (!headers['content-length']) {
         headers['content-length'] = String(body.length);
