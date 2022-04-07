@@ -39,6 +39,7 @@
         { "path": "packages/dropdown" },
         { "path": "packages/input-text" },
         { "path": "packages/matchmaking" },
+        { "path": "packages/post" },
         { "path": "packages/styling" },
         { "path": "packages/textual" },
         { "path": "packages/uniquify" },
