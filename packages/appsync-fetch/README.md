@@ -37,12 +37,11 @@ built-in. To start with, `appsyncFetch` will set all required headers,
 including AWS authorization headers, a Date header, and Content-Type. It
 will also set `method: 'POST'` (required for all GraphQL requests).
 
-In addition, the second argument (named `init` in the window.fetch docs)
-can take a `query: string` property and a `variables: object` property,
-which it will JSON.stringify into a valid GraphQL request body. You can
-also pass in `body` as a string directly, but if you pass in a `query`, the
-`body` will be overwritten (you will get a type error in typescript if you
-try to pass both).
+In addition, the second argument can take a `query` property (string) and a
+`variables` property (object), which it will JSON.stringify into a valid
+GraphQL request body. You can also pass in `body` as a string directly, but
+if you pass in a `query`, the `body` will be overwritten (you will get a
+type error in typescript if you try to pass both).
 
 The function also takes an optional third argument where you can manually
 pass in AWS credentials if you don’t wish to rely on the built-in
@@ -57,11 +56,10 @@ And lastly, if the response is an error (4xx or 5xx), `appsyncFetch` will
 throw an Error object with the response HTTP error and message as the Error
 object message and with the following additional properties:
 
--   `Error.response`: the fetch `Response` object
+-   `Error.response`: the node.js response `IncomingMessage` object
 -   `Error.responseJSON`: if the response body can be parsed as JSON, the
-    JSON representation returned from calling `await response.json()`
--   `Error.responseText`: the response body as text (e.g. the result of
-    `await response.text()`)
+    JSON representation returned from calling `JSON.parse()` on it
+-   `Error.responseText`: the response body as text
 
 ```js
 import { appsyncFetch } from '@acusti/appsync-fetch';
