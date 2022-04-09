@@ -1,5 +1,7 @@
 import { post } from './index.js';
 
+// To find open GraphQL APIs for testing:
+// https://www.apollographql.com/blog/community/backend/8-free-to-use-graphql-apis-for-your-projects-and-demos/
 describe('post', () => {
     it('performs a POST request to a GraphQL API for a List query and returns the response as JSON', async () => {
         const url = 'https://swapi-graphql.netlify.app/.netlify/functions/index';
@@ -63,5 +65,3 @@ describe('post', () => {
         expect(country.languages[0].code).toBe('es');
     });
 });
-
-// Default content-type? i.e. content-type: application/json; charset=UTF-8?
