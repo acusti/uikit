@@ -22,11 +22,12 @@ npm install @acusti/post
 yarn add @acusti/post
 ```
 
-The default export is a function that takes similar arguments to
-[`window.fetch`][] (`method` defaults to `'POST'`) and returns a promise.
-The promise is resolved with the parsed JSON version of the request’s
-response (i.e. `return await response.json()` when using the Fetch API),
-because that’s what you wanted anyways.
+The package exports `post`, a function that takes similar arguments to
+[`window.fetch`][] (note that `method` defaults to `POST` and
+`headers.content-type` defaults to `application/json; charset=UTF-8`) and
+returns a promise. The promise is resolved with the parsed JSON version of
+the request’s response (i.e. `return await response.json()` when using the
+Fetch API), because that’s what you wanted anyways.
 
 In addition, the second argument can take a `query` property (string) and a
 `variables` property (object), which it will JSON.stringify into a valid
