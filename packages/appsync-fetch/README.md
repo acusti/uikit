@@ -5,17 +5,26 @@
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
 [![install size](https://packagephobia.com/badge?p=@acusti/appsync-fetch&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/appsync-fetch)
 
-`appsync-fetch` is a simple node.js module with minimal dependencies that
-exports an `appsyncFetch` function that wraps [fetch][] (via
-[node-fetch][]) to make requests to an AWS AppSync graphql API. It takes an
-optional third argument for passing in AWS credentials, as well as the
-region. If AWS credentials aren’t provided, it uses the same algorithm as
-`@aws-sdk/credential-providers`’s [`fromEnv` helper][fromenv] to get
-credentials from the standard AWS environment variables made available in
-lambdas. It then uses those credentials to construct the appropriate [AWS
-SigV4][] authorization headers for IAM-based authorization.
+`appsync-fetch` is a lightweight node.js module that uses [@acusti/post][]
+to make requests to an AWS AppSync graphql API. It expands on
+@acusti/post’s API with an optional third argument for passing in AWS
+credentials, as well as the region. If AWS credentials aren’t provided, it
+uses the same algorithm as `@aws-sdk/credential-providers`’s [`fromEnv`
+helper][fromenv] to get credentials from the standard AWS environment
+variables made available in lambdas. It then uses those credentials to
+construct the appropriate [AWS SigV4][] authorization headers for IAM-based
+authorization.
 
-[node-fetch]: https://www.npmjs.com/package/node-fetch
+There are two primary reasons it’s worth using:
+
+1. it relies on the native node.js `http(s)` modules for fetching (via
+   @acusti/post) and on the native node.js `crypto` module for it’s
+   cryptographic logic, making it way lighter weight than alternatives so
+   that your lambda’s can benefit from faster start times
+2. its DX ergonomics are carefully tuned for interacting with AppSync
+   GraphQL APIs
+
+[@acusti/post]: https://github.com/acusti/uikit/tree/main/packages/post
 [aws sigv4]:
     https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
 [fetch]:
@@ -31,11 +40,13 @@ npm install @acusti/appsync-fetch
 yarn add @acusti/appsync-fetch
 ```
 
-The package exports `appsyncFetch`, which takes the same arguments as
-[`window.fetch`][fetch], but with a few conveniences for better ergonomics
-built-in. To start with, `appsyncFetch` will set all required headers,
-including AWS authorization headers, a Date header, and Content-Type. It
-will also set `method: 'POST'` (required for all GraphQL requests).
+The package exports `appsyncFetch`, a function that takes similar arguments
+to [`window.fetch`][] (note that `method` is always `POST`) and returns a
+promise. The promise is resolved with the parsed JSON version of the
+request’s response (i.e. `return await response.json()` when using the
+Fetch API), because that’s what you wanted anyways. It also sets all
+required headers, including AWS authorization headers, a Date header, and
+Content-Type.
 
 In addition, the second argument can take a `query` property (string) and a
 `variables` property (object), which it will JSON.stringify into a valid
@@ -49,9 +60,6 @@ credentials handling, which will extract credentials from environment
 variables via `process.env`. Usage is illustrated in the code example
 below.
 
-In addition, `appsyncFetch` calls `await response.json()` and returns the
-result, because that’s what you wanted anyways.
-
 And lastly, if the response is an error (4xx or 5xx), `appsyncFetch` will
 throw an Error object with the response HTTP error and message as the Error
 object message and with the following additional properties:
@@ -60,6 +68,8 @@ object message and with the following additional properties:
 -   `Error.responseJSON`: if the response body can be parsed as JSON, the
     JSON representation returned from calling `JSON.parse()` on it
 -   `Error.responseText`: the response body as text
+
+[`window.fetch`]: http://developer.mozilla.org/en-US/docs/Web/API/fetch
 
 ```js
 import { appsyncFetch } from '@acusti/appsync-fetch';
@@ -133,7 +143,7 @@ const itemsResult = await appsyncFetch<ListItemsQuery>(appsyncURL, {
 ```
 
 The type of `itemsResult` will be
-`{ data? ListItemsQuery, errors?: GraphQLResponseError[] }`, where
+`{ data?: ListItemsQuery, errors?: GraphQLResponseError[] }`, where
 `GraphQLResponseError` is the shape of GraphQL errors returned by appsync
 as illustrated [in the docs][].
 
