@@ -74,8 +74,7 @@ object message and with the following additional properties:
 ```js
 import { appsyncFetch } from '@acusti/appsync-fetch';
 
-const appsyncURL =
-    'https://abcdefghijklmnopqrstuvwxyz.appsync-api.us-west-2.amazonaws.com/graphql';
+const appsyncURL = 'https://abcdefghi.appsync-api.us-west-2.amazonaws.com/graphql';
 
 // In its simplest usage, environment variables are used for authorization
 const itemsResult = await appsyncFetch(appsyncURL, {
