@@ -23,10 +23,10 @@ yarn add @acusti/post
 ```
 
 The default export is a function that takes similar arguments to
-[`window.fetch`][fetch] (`method` defaults to `'POST'`) and returns a
-promise. The promise is resolved with the parsed JSON version of the
-request’s response (i.e. `return await response.json()` when using the
-Fetch API), because that’s what you wanted anyways.
+[`window.fetch`][] (`method` defaults to `'POST'`) and returns a promise.
+The promise is resolved with the parsed JSON version of the request’s
+response (i.e. `return await response.json()` when using the Fetch API),
+because that’s what you wanted anyways.
 
 In addition, the second argument can take a `query` property (string) and a
 `variables` property (object), which it will JSON.stringify into a valid
@@ -42,6 +42,8 @@ message and with the following additional properties:
 -   `Error.responseJSON`: if the response body can be parsed as JSON, the
     JSON representation returned from calling `JSON.parse()` on it
 -   `Error.responseText`: the response body as text
+
+[`window.fetch`]: http://developer.mozilla.org/en-US/docs/Web/API/fetch
 
 ```ts
 import { post } from '@acusti/post';
