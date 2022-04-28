@@ -5,9 +5,9 @@
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/post?style=for-the-badge)](https://www.npmjs.com/package/@acusti/post)
 [![install size](https://packagephobia.com/badge?p=@acusti/post&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/post)
 
-`post` is a super-minimal fetch-inspired API wrapper around node.js’ http
-and https modules for making POST requests. It’s a good-enough
-implementation intended to cover the 80–90% GraphQL API use case with a
+`post` is a super minimal fetch-inspired API wrapper around node.js’ http
+and https modules for making POST requests. It’s a lean implementation with
+no dependencies that covers the most common GraphQL API use cases with a
 tiny fraction of the code of a spec-compliant solution like [node-fetch][].
 In addition, the ergonomics of `post` are optimized for making GraphQL
 queries.
