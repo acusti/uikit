@@ -5,7 +5,23 @@
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/textual?style=for-the-badge)](https://bundlephobia.com/package/@acusti/textual)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/textual?style=for-the-badge)](https://www.npmjs.com/package/@acusti/textual)
 
-Utilities for transforming and formatting text (i.e. strings), including:
+Utilities for transforming and formatting text (i.e. strings).
+
+## Usage
+
+```
+npm install @acusti/textual
+# or
+yarn add @acusti/textual
+```
+
+Import the utilities by name. The package only has named exports, making it maximally tree-shakeable:
+
+```js
+import { capitalize, getInitials } from '@acusti/textual';
+```
+
+The exported utilities are:
 
 #### `capitalize(text: string)`
 
