@@ -17,10 +17,10 @@ authorization.
 
 There are two primary reasons it’s worth using:
 
-1. it relies on the native node.js `http(s)` modules for fetching (via
-   @acusti/post) and on the native node.js `crypto` module for it’s
-   cryptographic logic, making it way lighter weight than alternatives so
-   that your lambda’s can benefit from faster start times
+1. it relies on the native node.js `http`/`https` modules for fetching (via
+   @acusti/post) and on the native node.js `crypto` module for its
+   cryptographic logic; this makes it way lighter weight than alternatives
+   and results in faster start times in your lambdas
 2. its DX ergonomics are carefully tuned for interacting with AppSync
    GraphQL APIs
 
