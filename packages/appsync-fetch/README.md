@@ -121,7 +121,7 @@ const manualAuthenticationResult = await appsyncFetch(
 
 ### With TypeScript
 
-You can pass in the expected data result from the GraphQL query as a
+You can pass in the expected `data` result from the GraphQL query as a
 generic to `appsyncFetch`. This works very well with the [codegen GraphQL
 API types][] provided by AWS amplify:
 
