@@ -15,7 +15,8 @@ npm install @acusti/textual
 yarn add @acusti/textual
 ```
 
-Import the utilities by name. The package only has named exports, making it maximally tree-shakeable:
+Import the utilities by name. The package only has named exports, making it
+maximally tree-shakeable:
 
 ```js
 import { capitalize, getInitials } from '@acusti/textual';
