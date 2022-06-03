@@ -4,7 +4,7 @@
 
 [![Build and Test results](https://img.shields.io/github/workflow/status/acusti/uikit/Build%20and%20Test?style=for-the-badge)](https://github.com/acusti/uikit/actions/workflows/node.js.yml)
 [![Top language](https://img.shields.io/github/languages/top/acusti/uikit?style=for-the-badge)](https://github.com/acusti/uikit/search?l=typescript)
-[![Commits per week](https://img.shields.io/github/commit-activity/w/acusti/uikit?style=for-the-badge)](https://github.com/acusti/uikit/pulse)
+[![Commits per month](https://img.shields.io/github/commit-activity/m/acusti/uikit?style=for-the-badge)](https://github.com/acusti/uikit/pulse)
 
 _UI toolkit monorepo containing a React component library, UI utilities, a
 drag-and-drop library, an [AWS AppSync](https://aws.amazon.com/appsync/)
