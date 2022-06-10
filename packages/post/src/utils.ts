@@ -1,4 +1,9 @@
-import type { FetchOptions, FetchOptionsWithQuery, RequestOptions } from './types.js';
+import type {
+    FetchHeaders,
+    FetchOptions,
+    FetchOptionsWithQuery,
+    RequestOptions,
+} from './types.js';
 
 const trimQuery = (query: string) => query.trim().replace(/\n +/g, ' ');
 
@@ -19,7 +24,7 @@ export const getRequestOptionsAndBody = (
 
     // Lowercase all headers to make them consistent
     let headers = options.headers || {};
-    headers = Object.keys(headers).reduce((acc, key) => {
+    headers = Object.keys(headers).reduce((acc: FetchHeaders, key) => {
         acc[key.toLowerCase()] = headers[key];
         return acc;
     }, {});
