@@ -31,7 +31,7 @@
     },
     "peerDependencies": {
         "classnames": "^2",
-        "react": "^16.8 || ^17",
-        "react-dom": "^16.8 || ^17"
+        "react": "^16.8 || ^17 || ^18",
+        "react-dom": "^16.8 || ^17 || ^18"
     }
 }

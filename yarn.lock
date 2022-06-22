@@ -27,8 +27,8 @@ __metadata:
     typescript: ^4.4.3
   peerDependencies:
     classnames: ^2
-    react: ^16.8 || ^17
-    react-dom: ^16.8 || ^17
+    react: ^16.8 || ^17 || ^18
+    react-dom: ^16.8 || ^17 || ^18
   languageName: unknown
   linkType: soft
 
@@ -53,8 +53,8 @@ __metadata:
     typescript: ^4.4.3
   peerDependencies:
     classnames: ^2
-    react: ^16.8 || ^17
-    react-dom: ^16.8 || ^17
+    react: ^16.8 || ^17 || ^18
+    react-dom: ^16.8 || ^17 || ^18
   languageName: unknown
   linkType: soft
 
@@ -65,8 +65,8 @@ __metadata:
     "@types/react": ^17.0.3
     typescript: ^4.4.3
   peerDependencies:
-    react: ^16.8 || ^17
-    react-dom: ^16.8 || ^17
+    react: ^16.8 || ^17 || ^18
+    react-dom: ^16.8 || ^17 || ^18
   languageName: unknown
   linkType: soft
 
@@ -95,8 +95,8 @@ __metadata:
     "@types/react": ^17.0.3
     typescript: ^4.4.3
   peerDependencies:
-    react: ^16.8 || ^17
-    react-dom: ^16.8 || ^17
+    react: ^16.8 || ^17 || ^18
+    react-dom: ^16.8 || ^17 || ^18
   languageName: unknown
   linkType: soft
 
@@ -185,8 +185,8 @@ __metadata:
     "@types/react": ^17.0.3
     typescript: ^4.4.3
   peerDependencies:
-    react: ^16.8 || ^17
-    react-dom: ^16.8 || ^17
+    react: ^16.8 || ^17 || ^18
+    react-dom: ^16.8 || ^17 || ^18
   languageName: unknown
   linkType: soft
 
@@ -199,8 +199,8 @@ __metadata:
     "@types/react": ^17.0.3
     typescript: ^4.4.3
   peerDependencies:
-    react: ^16.8 || ^17
-    react-dom: ^16.8 || ^17
+    react: ^16.8 || ^17 || ^18
+    react-dom: ^16.8 || ^17 || ^18
   languageName: unknown
   linkType: soft
 
