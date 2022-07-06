@@ -48,7 +48,7 @@ const appsyncFetch = async <Result extends unknown>(
         awsOptions = _awsOptions;
     }
 
-    request.headers = getHeadersWithAuthorization(
+    request.headers = await getHeadersWithAuthorization(
         resource,
         request as FetchOptionsWithBody,
         awsOptions as AWSOptions,

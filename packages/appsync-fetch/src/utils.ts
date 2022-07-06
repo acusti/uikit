@@ -8,7 +8,7 @@ const SERVICE = 'appsync';
 // @ts-ignore expected type error from this simple browser/node-agnostic check
 const REGION: string = typeof process === 'undefined' ? '' : process.env.REGION;
 
-const encrypt = (
+const encrypt = async (
     key: string | Uint8Array,
     src: string,
     encoding?: BinaryToTextEncoding,
@@ -18,9 +18,9 @@ const encrypt = (
     return encoding ? data.digest(encoding) : data.digest();
 };
 
-const getHash = (src: string = '') => {
-    const hash = createHash('sha256');
-    const data = hash.update(src);
+const hash = async (src: string = '') => {
+    const _hash = createHash('sha256');
+    const data = _hash.update(src);
     return data.digest('hex');
 };
 
@@ -81,7 +81,10 @@ CanonicalRequest =
     HexEncode(Hash(RequestPayload))
 </pre>
  */
-const getCanonicalString = (resource: string, fetchOptions: FetchOptionsWithBody) => {
+const getCanonicalString = async (
+    resource: string,
+    fetchOptions: FetchOptionsWithBody,
+) => {
     const url = new URL(resource);
     // Canonical query string parameter names must be sorted
     url.searchParams.sort();
@@ -92,7 +95,7 @@ const getCanonicalString = (resource: string, fetchOptions: FetchOptionsWithBody
         url.searchParams.toString(),
         getCanonicalHeaders(fetchOptions.headers),
         getSignedHeaders(fetchOptions.headers),
-        getHash(fetchOptions.body || ''),
+        await hash(fetchOptions.body || ''),
     ].join('\n');
 };
 
@@ -120,7 +123,7 @@ const getCredentialScope = ({
  * Create a string to sign
  * Refer to {@link http://docs.aws.amazon.com/general/latest/gr/sigv4-create-string-to-sign.html|Create String to Sign}
  */
-const getStringToSign = ({
+const getStringToSign = async ({
     algorithm,
     canonicalString,
     dateTimeString,
@@ -130,14 +133,14 @@ const getStringToSign = ({
     canonicalString: string;
     dateTimeString: string;
     scope: string;
-}) => [algorithm, dateTimeString, scope, getHash(canonicalString)].join('\n');
+}) => [algorithm, dateTimeString, scope, await hash(canonicalString)].join('\n');
 
 /**
  * @private
  * Create signing key
  * Refer to {@link http://docs.aws.amazon.com/general/latest/gr/sigv4-calculate-signature.html|Calculate Signature}
  */
-const getSigningKey = ({
+const getSigningKey = async ({
     dateString,
     region,
     secretAccessKey,
@@ -149,14 +152,14 @@ const getSigningKey = ({
     service: string;
 }) => {
     const key = 'AWS4' + secretAccessKey;
-    const keyDate = encrypt(key, dateString);
-    const keyRegion = encrypt(keyDate, region);
-    const keyService = encrypt(keyRegion, service);
-    return encrypt(keyService, 'aws4_request');
+    const keyDate = await encrypt(key, dateString);
+    const keyRegion = await encrypt(keyDate, region);
+    const keyService = await encrypt(keyRegion, service);
+    return await encrypt(keyService, 'aws4_request');
 };
 
-const getSignature = (signingKey: string | Uint8Array, stringToSign: string) =>
-    encrypt(signingKey, stringToSign, 'hex');
+const getSignature = async (signingKey: string | Uint8Array, stringToSign: string) =>
+    await encrypt(signingKey, stringToSign, 'hex');
 
 /**
  * @private
@@ -182,7 +185,7 @@ const getAuthorizationHeader = ({
         'Signature=' + signature,
     ].join(', ');
 
-const getHeadersWithAuthorization = (
+const getHeadersWithAuthorization = async (
     resource: string,
     fetchOptions: FetchOptionsWithBody,
     {
@@ -217,9 +220,17 @@ const getHeadersWithAuthorization = (
     delete headers['x-amz-date'];
 
     const scope = getCredentialScope({ dateString, region, service });
-    const signingKey = getSigningKey({ dateString, region, secretAccessKey, service });
-    const canonicalString = getCanonicalString(resource, { ...fetchOptions, headers });
-    const stringToSign = getStringToSign({
+    const signingKey = await getSigningKey({
+        dateString,
+        region,
+        secretAccessKey,
+        service,
+    });
+    const canonicalString = await getCanonicalString(resource, {
+        ...fetchOptions,
+        headers,
+    });
+    const stringToSign = await getStringToSign({
         algorithm,
         canonicalString,
         dateTimeString,
@@ -230,7 +241,7 @@ const getHeadersWithAuthorization = (
         accessKeyId,
         algorithm,
         scope,
-        signature: getSignature(signingKey, stringToSign),
+        signature: await getSignature(signingKey, stringToSign),
         signedHeaders: getSignedHeaders(headers),
     });
 

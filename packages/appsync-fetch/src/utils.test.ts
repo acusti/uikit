@@ -28,7 +28,7 @@ describe('utils', () => {
     });
 
     describe('getCanonicalString', () => {
-        it('builds an AWS SigV4 canonical request string from request object', () => {
+        it('builds an AWS SigV4 canonical request string from request object', async () => {
             // Example request from docs
             const requestURL =
                 'https://iam.amazonaws.com/?Action=ListUsers&Version=2010-05-08';
@@ -52,16 +52,18 @@ x-amz-date:${DATE_TIME_STRING}
 content-type;host;x-amz-date
 e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
 
-            expect(getCanonicalString(requestURL, fetchOptions)).toBe(canonicalString);
+            expect(await getCanonicalString(requestURL, fetchOptions)).toBe(
+                canonicalString,
+            );
         });
     });
 
     describe('getHeadersWithAuthorization', () => {
         const authorizationStart = `AWS4-HMAC-SHA256 Credential=${ACCESS_KEY_ID}/20150830/${REGION}/appsync/aws4_request`;
 
-        it('adds authorization headers to request headers based on passed in values', () => {
+        it('adds authorization headers to request headers based on passed in values', async () => {
             expect(
-                getHeadersWithAuthorization(
+                await getHeadersWithAuthorization(
                     RESOURCE,
                     { body: '{"query": "query listItems{}"}', method: 'POST' },
                     {
@@ -80,9 +82,9 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
             });
         });
 
-        it('merges authorization headers over top of any existing request headers', () => {
+        it('merges authorization headers over top of any existing request headers', async () => {
             expect(
-                getHeadersWithAuthorization(
+                await getHeadersWithAuthorization(
                     RESOURCE,
                     {
                         body: '{"query": "query listItems{}"}',
