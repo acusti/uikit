@@ -1,5 +1,4 @@
 import {
-    CSSValueType,
     DEFAULT_CSS_VALUE_TYPE,
     DEFAULT_UNIT_BY_CSS_VALUE_TYPE,
     getCSSValueAsNumber,
@@ -10,6 +9,8 @@ import {
 import InputText from '@acusti/input-text';
 import classnames from 'classnames';
 import * as React from 'react';
+
+import type { CSSValueType } from '@acusti/css-values';
 
 export type Props = {
     /** Boolean indicating if the user can submit an empty value (i.e. clear the value); defaults to true */

@@ -1,6 +1,7 @@
-import { BinaryToTextEncoding, createHash, createHmac } from 'crypto';
-import type { FetchHeaders, FetchOptionsWithBody } from '@acusti/post';
+import { createHash, createHmac } from 'crypto';
 
+import type { FetchHeaders, FetchOptionsWithBody } from '@acusti/post';
+import type { BinaryToTextEncoding } from 'crypto';
 import type { AWSOptions } from './types.js';
 
 const SERVICE = 'appsync';

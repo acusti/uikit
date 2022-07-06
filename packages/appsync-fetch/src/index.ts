@@ -1,12 +1,8 @@
-import {
-    FetchOptions,
-    FetchOptionsWithBody,
-    getRequestOptionsAndBody,
-    post,
-} from '@acusti/post';
+import { getRequestOptionsAndBody, post } from '@acusti/post';
 
 import { getHeadersWithAuthorization } from './utils.js';
 
+import type { FetchOptions, FetchOptionsWithBody } from '@acusti/post';
 import type { AWSOptions } from './types.js';
 
 // Reference: https://docs.aws.amazon.com/appsync/latest/devguide/troubleshooting-and-common-mistakes.html
