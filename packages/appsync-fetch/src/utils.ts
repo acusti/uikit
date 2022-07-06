@@ -4,7 +4,7 @@ import type { FetchHeaders, FetchOptionsWithBody } from '@acusti/post';
 import type { BinaryToTextEncoding } from 'crypto';
 import type { AWSOptions } from './types.js';
 
-const SERVICE = 'appsync';
+const DEFAULT_SERVICE = 'appsync';
 // @ts-ignore expected type error from this simple browser/node-agnostic check
 const REGION: string = typeof process === 'undefined' ? '' : process.env.REGION;
 
@@ -192,7 +192,7 @@ const getHeadersWithAuthorization = async (
         accessKeyId,
         region = REGION || getRegionFromResource(resource),
         secretAccessKey,
-        service = SERVICE,
+        service = DEFAULT_SERVICE,
         sessionToken,
     }: AWSOptions,
 ) => {
