@@ -1,5 +1,5 @@
-import * as React from 'react';
 import useBoundingClientRect from '@acusti/use-bounding-client-rect';
+import * as React from 'react';
 
 const { useEffect, useState } = React;
 
