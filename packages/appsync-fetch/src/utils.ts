@@ -18,7 +18,7 @@ const encrypt = async (
     return encoding ? data.digest(encoding) : data.digest();
 };
 
-const hash = async (src: string = '') => {
+const hash = async (src: string) => {
     const _hash = createHash('sha256');
     const data = _hash.update(src);
     return data.digest('hex');
