@@ -108,7 +108,7 @@ const getCanonicalString = async (
         url.searchParams.toString(),
         getCanonicalHeaders(fetchOptions.headers),
         getSignedHeaders(fetchOptions.headers),
-        await hash({ data: fetchOptions.body || '' }),
+        await hash({ data: fetchOptions.body || '', encoding: 'hex' }),
     ].join('\n');
 };
 
@@ -147,7 +147,12 @@ const getStringToSign = async ({
     dateTimeString: string;
     scope: string;
 }) =>
-    [algorithm, dateTimeString, scope, await hash({ data: canonicalString })].join('\n');
+    [
+        algorithm,
+        dateTimeString,
+        scope,
+        await hash({ data: canonicalString, encoding: 'hex' }),
+    ].join('\n');
 
 /**
  * @private
