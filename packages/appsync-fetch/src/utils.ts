@@ -4,24 +4,37 @@ import type { FetchHeaders, FetchOptionsWithBody } from '@acusti/post';
 import type { BinaryToTextEncoding } from 'crypto';
 import type { AWSOptions } from './types.js';
 
+const DEFAULT_ALGORITHM = 'sha256';
 const DEFAULT_SERVICE = 'appsync';
 // @ts-ignore expected type error from this simple browser/node-agnostic check
 const REGION: string = typeof process === 'undefined' ? '' : process.env.REGION;
 
-const encrypt = async (
-    key: string | Uint8Array,
-    src: string,
-    encoding?: BinaryToTextEncoding,
-) => {
-    const hmac = createHmac('sha256', key);
-    const data = hmac.update(src);
-    return encoding ? data.digest(encoding) : data.digest();
+const encrypt = async ({
+    algorithm = DEFAULT_ALGORITHM,
+    data,
+    encoding,
+    key,
+}: {
+    algorithm?: string;
+    data: string;
+    encoding?: BinaryToTextEncoding;
+    key: string | Uint8Array;
+}) => {
+    const hmac = createHmac(algorithm, key).update(data);
+    return encoding ? hmac.digest(encoding) : hmac.digest();
 };
 
-const hash = async (src: string) => {
-    const _hash = createHash('sha256');
-    const data = _hash.update(src);
-    return data.digest('hex');
+const hash = async ({
+    algorithm = DEFAULT_ALGORITHM,
+    data,
+    encoding,
+}: {
+    algorithm?: string;
+    data: string;
+    encoding?: BinaryToTextEncoding;
+}) => {
+    const _hash = createHash(algorithm).update(data);
+    return encoding ? _hash.digest(encoding) : _hash.digest();
 };
 
 const getNormalizedHeaders = (headers: FetchHeaders | undefined) => {
@@ -95,7 +108,7 @@ const getCanonicalString = async (
         url.searchParams.toString(),
         getCanonicalHeaders(fetchOptions.headers),
         getSignedHeaders(fetchOptions.headers),
-        await hash(fetchOptions.body || ''),
+        await hash({ data: fetchOptions.body || '' }),
     ].join('\n');
 };
 
@@ -133,7 +146,8 @@ const getStringToSign = async ({
     canonicalString: string;
     dateTimeString: string;
     scope: string;
-}) => [algorithm, dateTimeString, scope, await hash(canonicalString)].join('\n');
+}) =>
+    [algorithm, dateTimeString, scope, await hash({ data: canonicalString })].join('\n');
 
 /**
  * @private
@@ -152,14 +166,14 @@ const getSigningKey = async ({
     service: string;
 }) => {
     const key = 'AWS4' + secretAccessKey;
-    const keyDate = await encrypt(key, dateString);
-    const keyRegion = await encrypt(keyDate, region);
-    const keyService = await encrypt(keyRegion, service);
-    return await encrypt(keyService, 'aws4_request');
+    const keyDate = await encrypt({ data: dateString, key });
+    const keyRegion = await encrypt({ data: region, key: keyDate });
+    const keyService = await encrypt({ data: service, key: keyRegion });
+    return await encrypt({ data: 'aws4_request', key: keyService });
 };
 
 const getSignature = async (signingKey: string | Uint8Array, stringToSign: string) =>
-    await encrypt(signingKey, stringToSign, 'hex');
+    await encrypt({ data: stringToSign, encoding: 'hex', key: signingKey });
 
 /**
  * @private
