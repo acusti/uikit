@@ -140,6 +140,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/appsync-fetch/",\
           "packageDependencies": [\
             ["@acusti/appsync-fetch", "workspace:packages/appsync-fetch"],\
+            ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
             ["@acusti/post", "workspace:packages/post"],\
             ["@jest/globals", "npm:27.2.2"],\
             ["@types/node", "npm:17.0.23"],\

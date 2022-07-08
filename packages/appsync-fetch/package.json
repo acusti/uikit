@@ -1,6 +1,6 @@
 {
     "name": "@acusti/appsync-fetch",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/index.js",
@@ -21,6 +21,7 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/appsync-fetch#readme",
     "dependencies": {
+        "@acusti/aws-signature-v4": "^0.2.0",
         "@acusti/post": "^0.2.0"
     },
     "devDependencies": {
