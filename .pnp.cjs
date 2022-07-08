@@ -109,7 +109,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./",\
           "packageDependencies": [\
             ["@babel/core", "npm:7.13.14"],\
-            ["@jest/globals", "npm:27.2.2"],\
             ["@types/jest", "npm:27.0.2"],\
             ["@types/node", "npm:17.0.23"],\
             ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.28.1"],\
@@ -313,7 +312,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/post/",\
           "packageDependencies": [\
             ["@acusti/post", "workspace:packages/post"],\
-            ["@jest/globals", "npm:27.2.2"],\
             ["@types/node", "npm:17.0.23"],\
             ["typescript", "patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=bda367"]\
           ],\
@@ -383,7 +381,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@acusti/uikit", "workspace:."],\
             ["@babel/core", "npm:7.13.14"],\
-            ["@jest/globals", "npm:27.2.2"],\
             ["@types/jest", "npm:27.0.2"],\
             ["@types/node", "npm:17.0.23"],\
             ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.28.1"],\
