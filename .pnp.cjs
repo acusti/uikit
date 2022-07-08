@@ -71,6 +71,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       {\
         "name": "@acusti/use-is-out-of-bounds",\
         "reference": "workspace:packages/use-is-out-of-bounds"\
+      },\
+      {\
+        "name": "@acusti/webcrypto",\
+        "reference": "workspace:packages/webcrypto"\
       }\
     ],\
     "enableTopLevelFallback": true,\
@@ -89,7 +93,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@acusti/uikit-docs", ["workspace:packages/docs"]],\
       ["@acusti/uniquify", ["workspace:packages/uniquify"]],\
       ["@acusti/use-bounding-client-rect", ["virtual:837d6eaa9e0cf2083d1c41eea7dd7d01ca3a2a3067aaf9336d4ad072e8b9825f1596626b65b0662b2ed096411185ff505111c47daf24d8301a090efcfd29533e#workspace:packages/use-bounding-client-rect", "virtual:cf250536aa5bef8816901e30429995a332849368f737d2c8d19dcfb85de375bcec479981fff07648ab66b22f311ed6eb76033f9ecea3747bddf6101e5cd9dc3b#workspace:packages/use-bounding-client-rect", "workspace:packages/use-bounding-client-rect"]],\
-      ["@acusti/use-is-out-of-bounds", ["virtual:91419db2b75dba6373d1dcd664037a13a50cb8ad0c3c817040cf1c87f08000928f92bda28196eef227b714886c83c7008b731e73f3b4af88dcf66eb213a28434#workspace:packages/use-is-out-of-bounds", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/use-is-out-of-bounds", "workspace:packages/use-is-out-of-bounds"]]\
+      ["@acusti/use-is-out-of-bounds", ["virtual:91419db2b75dba6373d1dcd664037a13a50cb8ad0c3c817040cf1c87f08000928f92bda28196eef227b714886c83c7008b731e73f3b4af88dcf66eb213a28434#workspace:packages/use-is-out-of-bounds", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/use-is-out-of-bounds", "workspace:packages/use-is-out-of-bounds"]],\
+      ["@acusti/webcrypto", ["workspace:packages/webcrypto"]]\
     ],\
     "fallbackPool": [\
     ],\
@@ -525,6 +530,17 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/use-bounding-client-rect", "virtual:837d6eaa9e0cf2083d1c41eea7dd7d01ca3a2a3067aaf9336d4ad072e8b9825f1596626b65b0662b2ed096411185ff505111c47daf24d8301a090efcfd29533e#workspace:packages/use-bounding-client-rect"],\
             ["@types/classnames", "npm:2.2.11"],\
             ["@types/react", "npm:17.0.3"],\
+            ["typescript", "patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=bda367"]\
+          ],\
+          "linkType": "SOFT"\
+        }]\
+      ]],\
+      ["@acusti/webcrypto", [\
+        ["workspace:packages/webcrypto", {\
+          "packageLocation": "./packages/webcrypto/",\
+          "packageDependencies": [\
+            ["@acusti/webcrypto", "workspace:packages/webcrypto"],\
+            ["@types/node", "npm:17.0.23"],\
             ["typescript", "patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=bda367"]\
           ],\
           "linkType": "SOFT"\

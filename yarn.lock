@@ -204,6 +204,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@acusti/webcrypto@0.1.0, @acusti/webcrypto@workspace:packages/webcrypto":
+  version: 0.0.0-use.local
+  resolution: "@acusti/webcrypto@workspace:packages/webcrypto"
+  dependencies:
+    "@types/node": ^17.0.23
+    typescript: ^4.4.3
+  languageName: unknown
+  linkType: soft
+
 "@babel/code-frame@npm:7.10.4":
   version: 7.10.4
   resolution: "@babel/code-frame@npm:7.10.4"
