@@ -1,6 +1,8 @@
 import type { FetchHeaders, FetchOptionsWithBody } from '@acusti/post';
 import webcrypto from '@acusti/webcrypto';
-import type { AWSOptions } from './types.js';
+import type { AWSOptions as _AWSOptions } from './types.js';
+
+export type AWSOptions = _AWSOptions;
 
 const universalBtoa = (text: string) => {
     try {
