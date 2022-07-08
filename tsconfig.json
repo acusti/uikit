@@ -34,6 +34,7 @@
     ],
     "references": [
         { "path": "packages/appsync-fetch" },
+        { "path": "packages/aws-signature-v4" },
         { "path": "packages/css-value-input" },
         { "path": "packages/css-values" },
         { "path": "packages/dropdown" },

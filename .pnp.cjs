@@ -25,6 +25,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/appsync-fetch"\
       },\
       {\
+        "name": "@acusti/aws-signature-v4",\
+        "reference": "workspace:packages/aws-signature-v4"\
+      },\
+      {\
         "name": "@acusti/css-value-input",\
         "reference": "workspace:packages/css-value-input"\
       },\
@@ -81,6 +85,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "ignorePatternData": "(^(?:\\\\.yarn\\\\/sdks(?:\\\\/(?!\\\\.{1,2}(?:\\\\/|$))(?:(?:(?!(?:^|\\\\/)\\\\.{1,2}(?:\\\\/|$)).)*?)|$))$)",\
     "fallbackExclusionList": [\
       ["@acusti/appsync-fetch", ["workspace:packages/appsync-fetch"]],\
+      ["@acusti/aws-signature-v4", ["workspace:packages/aws-signature-v4"]],\
       ["@acusti/css-value-input", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/css-value-input", "workspace:packages/css-value-input"]],\
       ["@acusti/css-values", ["workspace:packages/css-values"]],\
       ["@acusti/dropdown", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/dropdown", "workspace:packages/dropdown"]],\
@@ -136,6 +141,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@acusti/appsync-fetch", "workspace:packages/appsync-fetch"],\
             ["@acusti/post", "workspace:packages/post"],\
+            ["@jest/globals", "npm:27.2.2"],\
+            ["@types/node", "npm:17.0.23"],\
+            ["typescript", "patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=bda367"]\
+          ],\
+          "linkType": "SOFT"\
+        }]\
+      ]],\
+      ["@acusti/aws-signature-v4", [\
+        ["workspace:packages/aws-signature-v4", {\
+          "packageLocation": "./packages/aws-signature-v4/",\
+          "packageDependencies": [\
+            ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
+            ["@acusti/post", "workspace:packages/post"],\
+            ["@acusti/webcrypto", "workspace:packages/webcrypto"],\
             ["@jest/globals", "npm:27.2.2"],\
             ["@types/node", "npm:17.0.23"],\
             ["typescript", "patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=bda367"]\
