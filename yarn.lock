@@ -13,7 +13,7 @@ __metadata:
     "@acusti/post": ^0.2.0
     "@jest/globals": ^27.2.2
     "@types/node": ^17.0.23
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -25,7 +25,7 @@ __metadata:
     "@acusti/webcrypto": ^0.1.0
     "@jest/globals": ^27.2.2
     "@types/node": ^17.0.23
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -37,7 +37,7 @@ __metadata:
     "@acusti/input-text": ^0.9.0
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   peerDependencies:
     classnames: ^2
     react: ^16.8 || ^17 || ^18
@@ -49,7 +49,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/css-values@workspace:packages/css-values"
   dependencies:
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -63,7 +63,7 @@ __metadata:
     "@acusti/use-is-out-of-bounds": ^0.5.0
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   peerDependencies:
     classnames: ^2
     react: ^16.8 || ^17 || ^18
@@ -76,7 +76,7 @@ __metadata:
   resolution: "@acusti/input-text@workspace:packages/input-text"
   dependencies:
     "@types/react": ^17.0.3
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   peerDependencies:
     react: ^16.8 || ^17 || ^18
     react-dom: ^16.8 || ^17 || ^18
@@ -87,7 +87,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/matchmaking@workspace:packages/matchmaking"
   dependencies:
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -97,7 +97,7 @@ __metadata:
   dependencies:
     "@jest/globals": ^27.2.2
     "@types/node": ^17.0.23
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -106,7 +106,7 @@ __metadata:
   resolution: "@acusti/styling@workspace:packages/styling"
   dependencies:
     "@types/react": ^17.0.3
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   peerDependencies:
     react: ^16.8 || ^17 || ^18
     react-dom: ^16.8 || ^17 || ^18
@@ -117,7 +117,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/textual@workspace:packages/textual"
   dependencies:
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -146,7 +146,7 @@ __metadata:
     react: ^17.0.2
     react-docgen: next
     react-dom: ^17.0.2
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -176,7 +176,7 @@ __metadata:
     npm-run-all: ^4.1.5
     prettier: ^2.4.1
     ts-jest: ^27.0.5
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -186,7 +186,7 @@ __metadata:
   dependencies:
     "@types/lodash.escaperegexp": ^4.1.6
     lodash.escaperegexp: ^4.1.2
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -196,7 +196,7 @@ __metadata:
   dependencies:
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   peerDependencies:
     react: ^16.8 || ^17 || ^18
     react-dom: ^16.8 || ^17 || ^18
@@ -210,7 +210,7 @@ __metadata:
     "@acusti/use-bounding-client-rect": ^0.5.0
     "@types/classnames": ^2.2.11
     "@types/react": ^17.0.3
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   peerDependencies:
     react: ^16.8 || ^17 || ^18
     react-dom: ^16.8 || ^17 || ^18
@@ -222,7 +222,7 @@ __metadata:
   resolution: "@acusti/webcrypto@workspace:packages/webcrypto"
   dependencies:
     "@types/node": ^17.0.23
-    typescript: ^4.4.3
+    typescript: ~4.6.4
   languageName: unknown
   linkType: soft
 
@@ -19793,7 +19793,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"typescript@^4.0.2, typescript@^4.4.3":
+typescript@^4.0.2:
   version: 4.4.3
   resolution: "typescript@npm:4.4.3"
   bin:
@@ -19803,13 +19803,33 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@^4.0.2#~builtin<compat/typescript>, typescript@patch:typescript@^4.4.3#~builtin<compat/typescript>":
+"typescript@npm:~4.6.4":
+  version: 4.6.4
+  resolution: "typescript@npm:4.6.4"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: e7bfcc39cd4571a63a54e5ea21f16b8445268b9900bf55aee0e02ad981be576acc140eba24f1af5e3c1457767c96cea6d12861768fb386cf3ffb34013718631a
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@^4.0.2#~builtin<compat/typescript>":
   version: 4.4.3
   resolution: "typescript@patch:typescript@npm%3A4.4.3#~builtin<compat/typescript>::version=4.4.3&hash=bda367"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
   checksum: 33a916819907e819430802c50405f18c187448d678696a81545f494a7ec16207f8c15340c945df62109bd1d951091a9f15f3d2eb931a3c889f962c8509017697
+  languageName: node
+  linkType: hard
+
+"typescript@patch:typescript@~4.6.4#~builtin<compat/typescript>":
+  version: 4.6.4
+  resolution: "typescript@patch:typescript@npm%3A4.6.4#~builtin<compat/typescript>::version=4.6.4&hash=bda367"
+  bin:
+    tsc: bin/tsc
+    tsserver: bin/tsserver
+  checksum: 1cb434fbc637d347be90e3a0c6cd05e33c38f941713c8786d3031faf1842c2c148ba91d2fac01e7276b0ae3249b8633f1660e32686cc7a8c6a8fd5361dc52c66
   languageName: node
   linkType: hard
 
