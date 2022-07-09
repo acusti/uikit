@@ -21,7 +21,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/aws-signature-v4@workspace:packages/aws-signature-v4"
   dependencies:
-    "@acusti/post": ^0.2.0
     "@acusti/webcrypto": ^0.1.0
     "@jest/globals": ^27.2.2
     "@types/node": ^18.0.3

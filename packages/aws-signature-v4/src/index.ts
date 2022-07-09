@@ -1,6 +1,6 @@
-import type { FetchHeaders, FetchOptionsWithBody } from '@acusti/post';
 import webcrypto from '@acusti/webcrypto';
-import type { AWSOptions as _AWSOptions } from './types.js';
+
+import type { AWSOptions as _AWSOptions, FetchHeaders, FetchOptions } from './types.js';
 
 export type AWSOptions = _AWSOptions;
 
@@ -120,10 +120,7 @@ CanonicalRequest =
     HexEncode(Hash(RequestPayload))
 </pre>
  */
-const getCanonicalString = async (
-    resource: string,
-    fetchOptions: FetchOptionsWithBody,
-) => {
+const getCanonicalString = async (resource: string, fetchOptions: FetchOptions) => {
     const url = new URL(resource);
     // Canonical query string parameter names must be sorted
     url.searchParams.sort();
@@ -232,7 +229,7 @@ const getAuthorizationHeader = ({
 
 const getHeadersWithAuthorization = async (
     resource: string,
-    fetchOptions: FetchOptionsWithBody,
+    fetchOptions: FetchOptions,
     {
         accessKeyId,
         region = REGION || getRegionFromResource(resource),

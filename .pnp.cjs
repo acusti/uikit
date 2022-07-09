@@ -153,7 +153,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/aws-signature-v4/",\
           "packageDependencies": [\
             ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
-            ["@acusti/post", "workspace:packages/post"],\
             ["@acusti/webcrypto", "workspace:packages/webcrypto"],\
             ["@jest/globals", "npm:27.2.2"],\
             ["@types/node", "npm:18.0.3"],\
