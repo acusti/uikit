@@ -1,13 +1,16 @@
-import type { RequestOptions as _RequestOptions } from 'node:https';
-
 export type FetchHeaders = { [key: string]: string };
 
-export type FetchOptionsWithBody = Omit<_RequestOptions, 'body' | 'headers'> & {
+// Make RequestInit.signal compatible with import("https").RequestOptions.signal
+type _RequestInit = Omit<RequestInit, 'signal'> & {
+    signal?: AbortSignal;
+};
+
+export type FetchOptionsWithBody = Omit<_RequestInit, 'body' | 'headers'> & {
     body: string;
     headers?: FetchHeaders;
 };
 
-export type FetchOptionsWithQuery = Omit<_RequestOptions, 'body' | 'headers'> & {
+export type FetchOptionsWithQuery = Omit<_RequestInit, 'body' | 'headers'> & {
     body?: never;
     headers?: FetchHeaders;
     query: string;
@@ -16,4 +19,4 @@ export type FetchOptionsWithQuery = Omit<_RequestOptions, 'body' | 'headers'> & 
 
 export type FetchOptions = FetchOptionsWithBody | FetchOptionsWithQuery;
 
-export type RequestOptions = Omit<_RequestOptions, 'headers'> & { headers: FetchHeaders };
+export type RequestOptions = Omit<_RequestInit, 'headers'> & { headers: FetchHeaders };
