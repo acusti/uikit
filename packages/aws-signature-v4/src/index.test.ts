@@ -1,9 +1,8 @@
-import { webcrypto } from 'crypto';
-// @ts-ignore add crypto global for test execution environment
-globalThis.crypto = webcrypto;
-
-const { getCanonicalString, getHeadersWithAuthorization, getRegionFromResource } =
-    await import('./index.js');
+import {
+    getCanonicalString,
+    getHeadersWithAuthorization,
+    getRegionFromResource,
+} from './index.js';
 
 export {}; // empty export to make this file a module
 
