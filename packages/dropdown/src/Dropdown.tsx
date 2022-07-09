@@ -1,3 +1,5 @@
+// TODO add mouseout event handler to check event.target and clear active element
+// whenever mouse leaves it
 import InputText from '@acusti/input-text';
 import { Style } from '@acusti/styling';
 import useIsOutOfBounds from '@acusti/use-is-out-of-bounds';
