@@ -4,6 +4,10 @@ import type { AWSOptions as _AWSOptions, FetchHeaders, FetchOptions } from './ty
 
 export type AWSOptions = _AWSOptions;
 
+type FetchOptionsWithHeaders = Omit<FetchOptions, 'headers'> & {
+    headers: FetchHeaders;
+};
+
 const universalBtoa = (text: string) => {
     try {
         return btoa(text);
@@ -63,13 +67,10 @@ const hash = async ({
     return decodeArrayBuffer(_hash, encoding);
 };
 
-const getNormalizedHeaders = (headers: FetchHeaders | undefined) => {
-    if (!headers) return [];
-
-    return Object.keys(headers)
+const getNormalizedHeaders = (headers: FetchHeaders) =>
+    Object.keys(headers)
         .map((key) => ({ key: key.toLowerCase(), value: headers[key] }))
         .sort((a, b) => (a.key < b.key ? -1 : 1));
-};
 
 /**
  * @private
@@ -82,9 +83,9 @@ CanonicalHeadersEntry =
     Lowercase(HeaderName) + ':' + Trimall(HeaderValue) + '\n'
 </pre>
  */
-const getCanonicalHeaders = (headers: FetchHeaders | undefined) => {
+const getCanonicalHeaders = (headers: FetchHeaders) => {
     const normalizedHeaders = getNormalizedHeaders(headers);
-    if (!headers || !normalizedHeaders.length) return '';
+    if (!normalizedHeaders.length) return '';
 
     return normalizedHeaders.reduce((acc, { key, value }) => {
         value = value ? value.trim().replace(/\s{2,}/g, ' ') : '';
@@ -100,7 +101,7 @@ const getCanonicalHeaders = (headers: FetchHeaders | undefined) => {
  * you must include the :authority header as a signed header. If you include a date or
  * x-amz-date header, you must also include that header in the list of signed headers.
  */
-const getSignedHeaders = (headers: FetchHeaders | undefined) =>
+const getSignedHeaders = (headers: FetchHeaders) =>
     getNormalizedHeaders(headers)
         .map(({ key }) => key)
         .join(';');
@@ -120,7 +121,10 @@ CanonicalRequest =
     HexEncode(Hash(RequestPayload))
 </pre>
  */
-const getCanonicalString = async (resource: string, fetchOptions: FetchOptions) => {
+const getCanonicalString = async (
+    resource: string,
+    fetchOptions: FetchOptionsWithHeaders,
+) => {
     const url = new URL(resource);
     // Canonical query string parameter names must be sorted
     url.searchParams.sort();
