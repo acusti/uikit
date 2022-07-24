@@ -259,7 +259,9 @@ const getHeadersWithAuthorization = async (
 
     let headers: FetchHeaders = fetchOptions.headers || {};
 
-    headers.accept = '*/*';
+    if (!headers.accept) {
+        headers.accept = '*/*';
+    }
     if (!headers['content-type']) {
         headers['content-type'] = 'application/json; charset=UTF-8';
     }
