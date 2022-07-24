@@ -259,14 +259,17 @@ const getHeadersWithAuthorization = async (
 
     let headers: FetchHeaders = fetchOptions.headers || {};
 
+    headers.host = host;
+    headers['x-amz-date'] = dateTimeString;
+
     if (!headers.accept) {
         headers.accept = '*/*';
     }
+
     if (!headers['content-type']) {
         headers['content-type'] = 'application/json; charset=UTF-8';
     }
-    headers.host = host;
-    headers['x-amz-date'] = dateTimeString;
+
     if (sessionToken) {
         headers['x-amz-security-token'] = sessionToken;
     }
