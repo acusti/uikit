@@ -263,8 +263,8 @@ const getHeadersWithAuthorization = async (
     if (!headers['content-type']) {
         headers['content-type'] = 'application/json; charset=UTF-8';
     }
-    headers.date = dateTimeString;
     headers.host = host;
+    headers['x-amz-date'] = dateTimeString;
     if (sessionToken) {
         headers['x-amz-security-token'] = sessionToken;
     }
@@ -273,9 +273,9 @@ const getHeadersWithAuthorization = async (
         headers['x-amz-content-sha256'] = 'UNSIGNED-PAYLOAD';
     }
 
-    // Ensure there is no redundant authorization or x-amz-date header
+    // Ensure there is no redundant authorization or date header
     delete headers.authorization;
-    delete headers['x-amz-date'];
+    delete headers.date;
 
     const scope = getCredentialScope({ dateString, region, service });
     const signingKey = await getSigningKey({
