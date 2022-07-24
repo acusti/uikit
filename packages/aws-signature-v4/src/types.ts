@@ -8,8 +8,7 @@ export type AWSOptions = {
 
 export type FetchHeaders = { [key: string]: string };
 
-export type FetchOptions = Omit<RequestInit, 'body' | 'headers' | 'signal'> & {
-    body: string;
+export type FetchOptions = Omit<RequestInit, 'headers' | 'signal'> & {
     headers?: FetchHeaders;
     // Make RequestInit.signal compatible with import("https").RequestOptions.signal
     signal?: AbortSignal;
