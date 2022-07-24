@@ -128,6 +128,14 @@ const getCanonicalString = async (
     const url = new URL(resource);
     // Canonical query string parameter names must be sorted
     url.searchParams.sort();
+    let bodyHash = '';
+    if (fetchOptions.headers['x-amz-content-sha256'] === 'UNSIGNED-PAYLOAD') {
+        bodyHash = 'UNSIGNED-PAYLOAD';
+    } else {
+        // If this is *not* an unsigned payload, than sign it with a hexencoded hash
+        const body = typeof fetchOptions.body === 'string' ? fetchOptions.body : '';
+        bodyHash = await hash({ data: body, encoding: 'hex' });
+    }
 
     return [
         fetchOptions.method,
@@ -135,7 +143,7 @@ const getCanonicalString = async (
         url.searchParams.toString(),
         getCanonicalHeaders(fetchOptions.headers),
         getSignedHeaders(fetchOptions.headers),
-        await hash({ data: fetchOptions.body || '', encoding: 'hex' }),
+        bodyHash,
     ].join('\n');
 };
 
@@ -259,6 +267,10 @@ const getHeadersWithAuthorization = async (
     headers.host = host;
     if (sessionToken) {
         headers['x-amz-security-token'] = sessionToken;
+    }
+
+    if (typeof fetchOptions.body !== 'string') {
+        headers['x-amz-content-sha256'] = 'UNSIGNED-PAYLOAD';
     }
 
     // Ensure there is no redundant authorization or x-amz-date header
