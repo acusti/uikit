@@ -25,9 +25,8 @@ const DEFAULT_SERVICE = 'appsync';
 // @ts-ignore expected type error from this simple browser/node-agnostic check
 const REGION: string = typeof process === 'undefined' ? '' : process.env.REGION;
 
-const decodeArrayBuffer = (buffer: ArrayBuffer, encoding?: string) => {
+const decodeArrayBuffer = (buffer: ArrayBuffer, encoding: string) => {
     const uint8Array = new Uint8Array(buffer);
-    if (!encoding) return uint8Array;
     switch (encoding) {
         case 'base64':
             return universalBtoa(String.fromCharCode(...uint8Array));
@@ -50,6 +49,7 @@ const encrypt = async (payload: {
     const algorithm = { hash: payload.algorithm || DEFAULT_ALGORITHM, name: 'HMAC' };
     const key = await subtleCrypto.importKey('raw', keyArray, algorithm, false, ['sign']);
     const signature = await subtleCrypto.sign('hmac', key, encoder.encode(payload.data));
+    if (!payload.encoding) return new Uint8Array(signature);
     return decodeArrayBuffer(signature, payload.encoding);
 };
 
@@ -60,10 +60,9 @@ const hash = async ({
 }: {
     algorithm?: string;
     data: string;
-    encoding?: string;
+    encoding: string;
 }) => {
     const _hash = await subtleCrypto.digest({ name: algorithm }, encoder.encode(data));
-
     return decodeArrayBuffer(_hash, encoding);
 };
 
