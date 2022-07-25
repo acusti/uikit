@@ -76,10 +76,10 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                 ),
             ).toEqual({
                 accept: '*/*',
-                authorization: `${authorizationStart}, SignedHeaders=accept;content-type;date;host;x-amz-security-token, Signature=99f2ac2a74fa33011166210f034c7f0d269be635907d1237af3f8aaff30d5972`,
+                authorization: `${authorizationStart}, SignedHeaders=accept;content-type;host;x-amz-date;x-amz-security-token, Signature=13e3c68981d700f280432ea4f869407f3c26599fde3581a3f3b8684b9b178ccb`,
                 'content-type': 'application/json; charset=UTF-8',
-                date: DATE_TIME_STRING,
                 host: HOST,
+                'x-amz-date': DATE_TIME_STRING,
                 'x-amz-security-token': SESSION_TOKEN,
             });
         });
@@ -105,11 +105,11 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                 ),
             ).toEqual({
                 accept: '*/*',
-                authorization: `${authorizationStart}, SignedHeaders=accept;cache-control;content-type;date;host;x-amz-security-token, Signature=f9ecd859d516f85e2f0575bfa874e8d5e50083b275d26cf558558e7eee9ebc09`,
+                authorization: `${authorizationStart}, SignedHeaders=accept;cache-control;content-type;host;x-amz-date;x-amz-security-token, Signature=b54bda159a3da79539e690db3aff77f143575056b79f131d55fb122b4185bfda`,
                 'cache-control': 'only-if-cached', // host and authorization are overwritten
                 'content-type': 'application/json; charset=UTF-8',
-                date: DATE_TIME_STRING,
                 host: HOST,
+                'x-amz-date': DATE_TIME_STRING,
                 'x-amz-security-token': SESSION_TOKEN,
             });
         });

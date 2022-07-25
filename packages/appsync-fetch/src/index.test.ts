@@ -27,7 +27,7 @@ const RESPONSE_AS_JSON = { data: { listItems: { items: [] } } };
 const DATE_TIME_STRING = '20150830T123600Z';
 
 const QUERY_ONLY_SIGNATURE =
-    '49703619d3a3379b321a5957f29861ca311512fbc530bb11ded13431673b5cd4';
+    '1a978b7ed853f34303cb9ca91f41a18263deacc0b97eda68e208fddeb4a963af';
 
 // @ts-ignore
 global.Date = class _Date {
@@ -65,11 +65,11 @@ describe('appsyncFetch', () => {
             body: QUERY_AS_JSON_STRING,
             headers: {
                 accept: '*/*',
-                authorization: `${authorizationStart}, SignedHeaders=accept;content-length;content-type;date;host;x-amz-security-token, Signature=${QUERY_ONLY_SIGNATURE}`,
+                authorization: `${authorizationStart}, SignedHeaders=accept;content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=${QUERY_ONLY_SIGNATURE}`,
                 'content-length': String(body.length),
                 'content-type': 'application/json; charset=UTF-8',
-                date: DATE_TIME_STRING,
                 host: HOST,
+                'x-amz-date': DATE_TIME_STRING,
                 'x-amz-security-token': SESSION_TOKEN,
             },
             method: 'POST',
@@ -93,11 +93,11 @@ describe('appsyncFetch', () => {
             body,
             headers: {
                 accept: '*/*',
-                authorization: `${authorizationStart}, SignedHeaders=accept;content-length;content-type;date;host;x-amz-security-token, Signature=16760ed9d47bf14b0be1bdc850c93e2a559b8efda9654f57da97fb803032937d`,
+                authorization: `${authorizationStart}, SignedHeaders=accept;content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=1c5ce65140d54b043959ca1aba80405d7903ce083307748363657d54d1852dfc`,
                 'content-length': String(body.length),
                 'content-type': 'application/json; charset=UTF-8',
-                date: DATE_TIME_STRING,
                 host: HOST,
+                'x-amz-date': DATE_TIME_STRING,
                 'x-amz-security-token': SESSION_TOKEN,
             },
             method: 'POST',
@@ -119,11 +119,11 @@ describe('appsyncFetch', () => {
             body: QUERY_AS_JSON_STRING,
             headers: {
                 accept: '*/*',
-                authorization: `${authorizationStart}, SignedHeaders=accept;content-length;content-type;date;host;x-amz-security-token, Signature=${QUERY_ONLY_SIGNATURE}`,
+                authorization: `${authorizationStart}, SignedHeaders=accept;content-length;content-type;host;x-amz-date;x-amz-security-token, Signature=${QUERY_ONLY_SIGNATURE}`,
                 'content-length': String(QUERY_AS_JSON_STRING.length),
                 'content-type': 'application/json; charset=UTF-8',
-                date: DATE_TIME_STRING,
                 host: HOST,
+                'x-amz-date': DATE_TIME_STRING,
                 'x-amz-security-token': SESSION_TOKEN,
             },
             method: 'POST',
