@@ -9,7 +9,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/appsync-fetch@workspace:packages/appsync-fetch"
   dependencies:
-    "@acusti/aws-signature-v4": ^0.4.1
+    "@acusti/aws-signature-v4": ^0.5.0
     "@acusti/post": ^0.3.0
     "@jest/globals": ^28.1.2
     "@types/node": ^18.0.3
@@ -17,7 +17,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/aws-signature-v4@^0.4.1, @acusti/aws-signature-v4@workspace:packages/aws-signature-v4":
+"@acusti/aws-signature-v4@^0.5.0, @acusti/aws-signature-v4@workspace:packages/aws-signature-v4":
   version: 0.0.0-use.local
   resolution: "@acusti/aws-signature-v4@workspace:packages/aws-signature-v4"
   dependencies:
