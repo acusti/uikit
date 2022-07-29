@@ -299,7 +299,7 @@ const getHeadersWithAuthorization = async (
         scope,
     });
 
-    const authorizationHeader = getAuthorizationHeader({
+    headers.authorization = getAuthorizationHeader({
         accessKeyId,
         algorithm,
         scope,
@@ -307,7 +307,8 @@ const getHeadersWithAuthorization = async (
         signedHeaders: getSignedHeaders(headers),
     });
 
-    headers.authorization = authorizationHeader;
+    // Need to use host to sign, but don’t return it (it’s a forbidden header name)
+    delete headers.host;
 
     return headers;
 };
