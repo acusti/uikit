@@ -18,6 +18,7 @@ export type Props = {
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
+    required?: boolean;
     selectTextOnFocus?: boolean;
     step?: number;
     tabIndex?: number;
@@ -49,6 +50,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             pattern,
             placeholder,
             readOnly,
+            required,
             selectTextOnFocus,
             step,
             tabIndex,
@@ -117,6 +119,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 pattern={pattern}
                 placeholder={placeholder}
                 readOnly={readOnly}
+                required={required}
                 ref={inputRef}
                 step={step}
                 tabIndex={tabIndex}
