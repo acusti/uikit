@@ -38,8 +38,8 @@ describe('utils', () => {
                 body: '',
                 method: 'GET',
                 headers: {
-                    host: 'iam.amazonaws.com',
                     'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
+                    host: 'iam.amazonaws.com',
                     'x-amz-date': DATE_TIME_STRING,
                 },
             };
@@ -78,7 +78,6 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                 accept: '*/*',
                 authorization: `${authorizationStart}, SignedHeaders=accept;content-type;host;x-amz-date;x-amz-security-token, Signature=13e3c68981d700f280432ea4f869407f3c26599fde3581a3f3b8684b9b178ccb`,
                 'content-type': 'application/json; charset=UTF-8',
-                host: HOST,
                 'x-amz-date': DATE_TIME_STRING,
                 'x-amz-security-token': SESSION_TOKEN,
             });
@@ -108,7 +107,6 @@ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`;
                 authorization: `${authorizationStart}, SignedHeaders=accept;cache-control;content-type;host;x-amz-date;x-amz-security-token, Signature=b54bda159a3da79539e690db3aff77f143575056b79f131d55fb122b4185bfda`,
                 'cache-control': 'only-if-cached', // host and authorization are overwritten
                 'content-type': 'application/json; charset=UTF-8',
-                host: HOST,
                 'x-amz-date': DATE_TIME_STRING,
                 'x-amz-security-token': SESSION_TOKEN,
             });
