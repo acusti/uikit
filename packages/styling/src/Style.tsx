@@ -11,11 +11,6 @@ type Props = {
 const Style = ({ children: styles }: Props) => {
     const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
 
-    const handleRef = useCallback((element: HTMLElement | null) => {
-        if (!element) return;
-        setOwnerDocument(element.ownerDocument);
-    }, []);
-
     useEffect(
         () => () => {
             if (!ownerDocument) return;
@@ -37,6 +32,11 @@ const Style = ({ children: styles }: Props) => {
 
         previousStylesRef.current = styles;
     }, [ownerDocument, styles]);
+
+    const handleRef = useCallback((element: HTMLElement | null) => {
+        if (!element) return;
+        setOwnerDocument(element.ownerDocument);
+    }, []);
 
     if (ownerDocument) return null;
 
