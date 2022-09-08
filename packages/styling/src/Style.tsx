@@ -40,7 +40,14 @@ const Style = ({ children: styles }: Props) => {
 
     if (ownerDocument) return null;
 
-    return <style ref={handleRef}>{styles}</style>;
+    return (
+        <style
+            dangerouslySetInnerHTML={{
+                __html: styles,
+            }}
+            ref={handleRef}
+        />
+    );
 };
 
 export default Style;
