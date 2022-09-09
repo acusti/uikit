@@ -8,8 +8,21 @@ type Props = {
     children: string;
 };
 
+const makeMinifyStyles = () => {
+    let lastStyles = '';
+    let lastMinified = '';
+    return (styles: string) => {
+        if (styles === lastStyles) return lastMinified;
+        lastStyles = styles;
+        lastMinified = styles.replace(/\s+/gm, ' ');
+        return lastMinified;
+    };
+};
+
 const Style = ({ children: styles }: Props) => {
     const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
+    const minifyStylesRef = useRef(makeMinifyStyles());
+    styles = minifyStylesRef.current(styles);
 
     useEffect(
         () => () => {
