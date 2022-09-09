@@ -57,7 +57,7 @@ __metadata:
   dependencies:
     "@acusti/input-text": "npm:^0.11.0"
     "@acusti/matchmaking": "npm:^0.3.0"
-    "@acusti/styling": "npm:^0.5.0"
+    "@acusti/styling": "npm:^0.5.1"
     "@acusti/use-is-out-of-bounds": "npm:^0.5.0"
     "@types/react": "npm:^18.0.15"
     classnames: "npm:^2"
@@ -98,7 +98,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/styling@npm:*, @acusti/styling@npm:^0.5.0, @acusti/styling@workspace:packages/styling":
+"@acusti/styling@npm:*, @acusti/styling@npm:^0.5.1, @acusti/styling@workspace:packages/styling":
   version: 0.0.0-use.local
   resolution: "@acusti/styling@workspace:packages/styling"
   dependencies:
