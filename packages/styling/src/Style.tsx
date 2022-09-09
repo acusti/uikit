@@ -2,27 +2,16 @@ import * as React from 'react';
 
 import { unregisterStyles, updateStyles } from './style-registry.js';
 
-const { useCallback, useEffect, useRef, useState } = React;
+const { useCallback, useEffect, useMemo, useRef, useState } = React;
 
 type Props = {
     children: string;
 };
 
-const makeMinifyStyles = () => {
-    let lastStyles = '';
-    let lastMinified = '';
-    return (styles: string) => {
-        if (styles === lastStyles) return lastMinified;
-        lastStyles = styles;
-        lastMinified = styles.replace(/\s+/gm, ' ');
-        return lastMinified;
-    };
-};
-
-const Style = ({ children: styles }: Props) => {
+const Style = ({ children }: Props) => {
+    // Minify CSS styles by replacing consecutive whitespace (including \n) with ' '
+    const styles = useMemo(() => children.replace(/\s+/gm, ' '), [children]);
     const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
-    const minifyStylesRef = useRef(makeMinifyStyles());
-    styles = minifyStylesRef.current(styles);
 
     useEffect(
         () => () => {
