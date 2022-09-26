@@ -159,7 +159,6 @@ __metadata:
     babel-eslint: "npm:^10.1.0"
     eslint: "npm:^8.19.0"
     eslint-config-react-app: "npm:^7.0.1"
-    eslint-plugin-flowtype: "npm:^8.0.3"
     eslint-plugin-import: "npm:^2.26.0"
     eslint-plugin-jest: "npm:^26.5.3"
     eslint-plugin-jsx-a11y: "npm:^6.6.0"
