@@ -40,6 +40,9 @@ export type Props = {
     label?: string;
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s name */
     name?: string;
+    onClick?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    onMouseDown?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    onMouseUp?: (event: React.MouseEvent<HTMLElement>) => unknown;
     onSubmitItem?: (payload: Item) => void;
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s placeholder */
     placeholder?: string;
@@ -73,6 +76,9 @@ const Dropdown: React.FC<Props> = ({
     isSearchable,
     label,
     name,
+    onClick,
+    onMouseDown,
+    onMouseUp,
     onSubmitItem,
     placeholder,
     tabIndex,
@@ -553,6 +559,9 @@ const Dropdown: React.FC<Props> = ({
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
                 })}
+                onClick={onClick}
+                onMouseDown={onMouseDown}
+                onMouseUp={onMouseUp}
                 onMouseMove={handleMouseMove}
                 onMouseOver={handleMouseOver}
                 ref={handleRef}
