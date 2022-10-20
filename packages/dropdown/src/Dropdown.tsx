@@ -3,7 +3,7 @@
 import InputText from '@acusti/input-text';
 import { Style } from '@acusti/styling';
 import useIsOutOfBounds from '@acusti/use-is-out-of-bounds';
-import classnames from 'classnames';
+import clsx from 'clsx';
 import * as React from 'react';
 
 import {
@@ -554,7 +554,7 @@ const Dropdown: React.FC<Props> = ({
         <Fragment>
             <Style>{STYLES}</Style>
             <div
-                className={classnames(ROOT_CLASS_NAME, className, {
+                className={clsx(ROOT_CLASS_NAME, className, {
                     disabled,
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
@@ -574,7 +574,7 @@ const Dropdown: React.FC<Props> = ({
                 {trigger}
                 {isOpen ? (
                     <div
-                        className={classnames(BODY_CLASS_NAME, {
+                        className={clsx(BODY_CLASS_NAME, {
                             'calculating-position': !outOfBounds.hasLayout,
                             'has-items': hasItems,
                             'out-of-bounds-bottom': outOfBounds.bottom,

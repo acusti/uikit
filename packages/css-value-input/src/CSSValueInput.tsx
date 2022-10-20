@@ -7,7 +7,7 @@ import {
     roundToPrecision,
 } from '@acusti/css-values';
 import InputText from '@acusti/input-text';
-import classnames from 'classnames';
+import clsx from 'clsx';
 import * as React from 'react';
 
 import type { CSSValueType } from '@acusti/css-values';
@@ -262,7 +262,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
         return (
             <label
-                className={classnames(ROOT_CLASS_NAME, className, { disabled })}
+                className={clsx(ROOT_CLASS_NAME, className, { disabled })}
                 title={title}
             >
                 {icon && <div className={`${ROOT_CLASS_NAME}-icon`}>{icon}</div>}

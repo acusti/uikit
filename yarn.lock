@@ -34,10 +34,9 @@ __metadata:
     "@acusti/css-values": ^0.18.0
     "@acusti/input-text": ^0.11.0
     "@types/react": ^18.0.15
-    classnames: ^2
+    clsx: ^1.1.1
     typescript: ^4.8.4
   peerDependencies:
-    classnames: ^2
     react: ^16.8 || ^17 || ^18
     react-dom: ^16.8 || ^17 || ^18
   languageName: unknown
@@ -60,10 +59,9 @@ __metadata:
     "@acusti/styling": ^0.5.3
     "@acusti/use-is-out-of-bounds": ^0.5.0
     "@types/react": ^18.0.15
-    classnames: ^2
+    clsx: ^1.1.1
     typescript: ^4.8.4
   peerDependencies:
-    classnames: ^2
     react: ^16.8 || ^17 || ^18
     react-dom: ^16.8 || ^17 || ^18
   languageName: unknown
@@ -10352,13 +10350,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"classnames@npm:^2":
-  version: 2.3.1
-  resolution: "classnames@npm:2.3.1"
-  checksum: 14db8889d56c267a591f08b0834989fe542d47fac659af5a539e110cc4266694e8de86e4e3bbd271157dbd831361310a8293e0167141e80b0f03a0f175c80960
-  languageName: node
-  linkType: hard
-
 "classnames@npm:^2.2.5":
   version: 2.2.6
   resolution: "classnames@npm:2.2.6"
@@ -10468,7 +10459,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clsx@npm:^1.0.4":
+"clsx@npm:^1.0.4, clsx@npm:^1.1.1":
   version: 1.2.1
   resolution: "clsx@npm:1.2.1"
   checksum: 30befca8019b2eb7dbad38cff6266cf543091dae2825c856a62a8ccf2c3ab9c2907c4d12b288b73101196767f66812365400a227581484a05f968b0307cfaf12

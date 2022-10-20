@@ -161,19 +161,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/css-value-input", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/css-value-input"],\
             ["@acusti/css-values", "workspace:packages/css-values"],\
             ["@acusti/input-text", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/input-text"],\
-            ["@types/classnames", null],\
             ["@types/react", "npm:18.0.15"],\
             ["@types/react-dom", null],\
-            ["classnames", "npm:2.3.0"],\
+            ["clsx", "npm:1.2.1"],\
             ["react", "npm:18.2.0"],\
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:18.2.0"],\
             ["typescript", "patch:typescript@npm%3A4.8.4#~builtin<compat/typescript>::version=4.8.4&hash=701156"]\
           ],\
           "packagePeers": [\
-            "@types/classnames",\
             "@types/react-dom",\
             "@types/react",\
-            "classnames",\
             "react-dom",\
             "react"\
           ],\
@@ -186,7 +183,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/css-values", "workspace:packages/css-values"],\
             ["@acusti/input-text", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text"],\
             ["@types/react", "npm:18.0.15"],\
-            ["classnames", "npm:2.3.1"],\
+            ["clsx", "npm:1.2.1"],\
             ["typescript", "patch:typescript@npm%3A4.8.4#~builtin<compat/typescript>::version=4.8.4&hash=701156"]\
           ],\
           "linkType": "SOFT"\
@@ -211,19 +208,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/matchmaking", "workspace:packages/matchmaking"],\
             ["@acusti/styling", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/styling"],\
             ["@acusti/use-is-out-of-bounds", "virtual:91419db2b75dba6373d1dcd664037a13a50cb8ad0c3c817040cf1c87f08000928f92bda28196eef227b714886c83c7008b731e73f3b4af88dcf66eb213a28434#workspace:packages/use-is-out-of-bounds"],\
-            ["@types/classnames", null],\
             ["@types/react", "npm:18.0.15"],\
             ["@types/react-dom", null],\
-            ["classnames", "npm:2.3.0"],\
+            ["clsx", "npm:1.2.1"],\
             ["react", "npm:18.2.0"],\
             ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:18.2.0"],\
             ["typescript", "patch:typescript@npm%3A4.8.4#~builtin<compat/typescript>::version=4.8.4&hash=701156"]\
           ],\
           "packagePeers": [\
-            "@types/classnames",\
             "@types/react-dom",\
             "@types/react",\
-            "classnames",\
             "react-dom",\
             "react"\
           ],\
@@ -238,7 +232,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/styling", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/styling"],\
             ["@acusti/use-is-out-of-bounds", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/use-is-out-of-bounds"],\
             ["@types/react", "npm:18.0.15"],\
-            ["classnames", "npm:2.3.1"],\
+            ["clsx", "npm:1.2.1"],\
             ["typescript", "patch:typescript@npm%3A4.8.4#~builtin<compat/typescript>::version=4.8.4&hash=701156"]\
           ],\
           "linkType": "SOFT"\
@@ -18506,13 +18500,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/classnames-npm-2.3.0-8972516692-1cc54da92e.zip/node_modules/classnames/",\
           "packageDependencies": [\
             ["classnames", "npm:2.3.0"]\
-          ],\
-          "linkType": "HARD"\
-        }],\
-        ["npm:2.3.1", {\
-          "packageLocation": "./.yarn/cache/classnames-npm-2.3.1-f2ae0a8d3c-14db8889d5.zip/node_modules/classnames/",\
-          "packageDependencies": [\
-            ["classnames", "npm:2.3.1"]\
           ],\
           "linkType": "HARD"\
         }]\
