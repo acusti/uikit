@@ -60,7 +60,7 @@ type TimeoutID = ReturnType<typeof setTimeout>;
 
 type MousePosition = { clientX: number; clientY: number };
 
-const { Children, Fragment, useCallback, useLayoutEffect, useRef, useState } = React;
+const { Children, Fragment, useCallback, useEffect, useRef, useState } = React;
 
 const noop = () => {};
 
@@ -121,7 +121,7 @@ const Dropdown: React.FC<Props> = ({
     const onSubmitItemRef = useRef(onSubmitItem);
     const valueRef = useRef(value);
 
-    useLayoutEffect(() => {
+    useEffect(() => {
         allowEmptyRef.current = allowEmpty;
         hasItemsRef.current = hasItems;
         isOpenRef.current = isOpen;
