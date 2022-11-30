@@ -6,9 +6,11 @@ export type Props = {
     disabled?: boolean;
     initialValue?: string;
     max?: number;
+    maxHeight?: number | string;
     maxLength?: number;
     min?: number;
     minLength?: number;
+    multiLine?: boolean;
     name?: string;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => unknown;
@@ -38,9 +40,11 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             disabled,
             initialValue,
             max,
+            maxHeight = Infinity,
             maxLength,
             min,
             minLength,
+            multiLine,
             name,
             onBlur,
             onChange,
@@ -79,6 +83,20 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             [onBlur],
         );
 
+        const setInputHeight = useCallback(() => {
+            const input = inputRef.current;
+            if (!multiLine || !input) return;
+            input.style.height = '';
+            const height = Math.min(
+                input.scrollHeight,
+                typeof maxHeight === 'string' ? parseFloat(maxHeight) : maxHeight,
+            );
+            input.style.height = `${height}px`;
+        }, [maxHeight, multiLine]);
+
+        // Initialize input height in useEffect
+        useEffect(setInputHeight, []);
+
         // NOTE Selecting the contents of the input onFocus makes for the best UX,
         // but it doesn’t work in Safari, so we use the initial onSelect event instead
         const handleSelect = useCallback(() => {
@@ -99,15 +117,15 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             input.selectionEnd = valueLength;
         }, []);
 
+        const Element: 'input' = (multiLine ? 'textarea' : 'input') as any;
+
         return (
-            <input
+            <Element
                 autoComplete={autoComplete}
                 className={className}
                 defaultValue={initialValue || ''}
                 disabled={disabled}
-                max={max}
                 maxLength={maxLength}
-                min={min}
                 minLength={minLength}
                 name={name}
                 onBlur={selectTextOnFocus ? handleBlur : onBlur}
@@ -121,10 +139,12 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 readOnly={readOnly}
                 required={required}
                 ref={inputRef}
-                step={step}
                 tabIndex={tabIndex}
                 title={title}
                 type={type}
+                {...(multiLine
+                    ? { onInput: setInputHeight, rows: 1 }
+                    : { max, min, step })}
             />
         );
     },
