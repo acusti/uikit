@@ -356,7 +356,7 @@ const Dropdown: React.FC<Props> = ({
                 }
             };
 
-            const handleKeyDown = (event: KeyboardEvent) => {
+            const handleGlobalKeyDown = (event: KeyboardEvent) => {
                 const { altKey, ctrlKey, key, metaKey } = event;
                 const eventTarget = event.target as HTMLElement;
                 const dropdownElement = dropdownElementRef.current;
@@ -373,7 +373,7 @@ const Dropdown: React.FC<Props> = ({
                 if (!isOpenRef.current) {
                     // If dropdown is closed, don’t handle key events if event target isn’t within dropdown
                     if (!isEventTargetingDropdown) return;
-                    // Open the dropdown on spacebar, enter, or if isSearchable and user hits the up/down arrows
+                    // Open the dropdown on spacebar, enter, or if isSearchable and user hits the ↑/↓ arrows
                     if (
                         key === ' ' ||
                         key === 'Enter' ||
@@ -486,7 +486,7 @@ const Dropdown: React.FC<Props> = ({
             };
 
             // Close dropdown if any element is focused outside of this dropdown
-            const handleFocusIn = ({ target }: Event) => {
+            const handleGlobalFocusIn = ({ target }: Event) => {
                 if (!isOpenRef.current) return;
 
                 const eventTarget = target as HTMLElement;
@@ -502,14 +502,14 @@ const Dropdown: React.FC<Props> = ({
                 closeDropdown();
             };
 
-            document.addEventListener('focusin', handleFocusIn);
-            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('focusin', handleGlobalFocusIn);
+            document.addEventListener('keydown', handleGlobalKeyDown);
             document.addEventListener('mousedown', handleGlobalMouseDown);
             document.addEventListener('mouseup', handleGlobalMouseUp);
 
             if (ownerDocument !== document) {
-                ownerDocument.addEventListener('focusin', handleFocusIn);
-                ownerDocument.addEventListener('keydown', handleKeyDown);
+                ownerDocument.addEventListener('focusin', handleGlobalFocusIn);
+                ownerDocument.addEventListener('keydown', handleGlobalKeyDown);
                 ownerDocument.addEventListener('mousedown', handleGlobalMouseDown);
                 ownerDocument.addEventListener('mouseup', handleGlobalMouseUp);
             }
@@ -546,14 +546,14 @@ const Dropdown: React.FC<Props> = ({
             }
 
             cleanupEventListenersRef.current = () => {
-                document.removeEventListener('focusin', handleFocusIn);
-                document.removeEventListener('keydown', handleKeyDown);
+                document.removeEventListener('focusin', handleGlobalFocusIn);
+                document.removeEventListener('keydown', handleGlobalKeyDown);
                 document.removeEventListener('mousedown', handleGlobalMouseDown);
                 document.removeEventListener('mouseup', handleGlobalMouseUp);
 
                 if (ownerDocument !== document) {
-                    ownerDocument.removeEventListener('focusin', handleFocusIn);
-                    ownerDocument.removeEventListener('keydown', handleKeyDown);
+                    ownerDocument.removeEventListener('focusin', handleGlobalFocusIn);
+                    ownerDocument.removeEventListener('keydown', handleGlobalKeyDown);
                     ownerDocument.removeEventListener('mousedown', handleGlobalMouseDown);
                     ownerDocument.removeEventListener('mouseup', handleGlobalMouseUp);
                 }
