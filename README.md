@@ -93,7 +93,7 @@ then commit the version updates with a message in the form of:
 
 ## Developing
 
-The two main run scripts for developing are `yarn start:watch`, which kicks
-off the TypeScript compiler in `--watch` mode, and `yarn start:stories`,
+The two main run scripts for developing are `yarn dev:watch`, which kicks
+off the TypeScript compiler in `--watch` mode, and `yarn dev:stories`,
 which kicks off the default `storybook` command from packages/docs/. To run
-both of those in a single terminal window, use `yarn start`.
+both of those in a single terminal window, use `yarn dev`.

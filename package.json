@@ -16,9 +16,9 @@
         "lintfix": "eslint ./packages/*/src/** --fix",
         "publish": "run-s build publish:all",
         "publish:all": "yarn workspaces foreach --parallel --exclude '@acusti/uikit' npm publish --access public",
-        "start:stories": "yarn workspace @acusti/uikit-docs storybook",
-        "start:watch": "tsc --build --watch",
-        "start": "run-p 'start:*'",
+        "dev:stories": "yarn workspace @acusti/uikit-docs storybook",
+        "dev:watch": "tsc --build --watch",
+        "dev": "run-p 'dev:*'",
         "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest --no-cache",
         "test:watch": "NODE_OPTIONS=--experimental-vm-modules yarn jest --no-cache --watch"
     },
