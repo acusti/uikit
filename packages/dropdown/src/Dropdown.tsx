@@ -281,22 +281,24 @@ const Dropdown: React.FC<Props> = ({
             if (onMouseUp) onMouseUp(event);
             // If dropdown isn’t open or is already closing, do nothing
             if (!isOpenRef.current || closingTimerRef.current) return;
-            // If dropdown has no items, do nothing
-            if (!hasItemsRef.current) return;
 
             const eventTarget = event.target as HTMLElement;
-            // If mouse event is within dropdown body, trigger submit
-            if (eventTarget.closest(BODY_SELECTOR)) {
-                handleSubmitItem(event);
+            // If click was outside dropdown body, don’t trigger submit
+            if (!eventTarget.closest(BODY_SELECTOR)) {
+                // Don’t close dropdown if isOpening or search input is focused
+                if (
+                    !isOpeningRef.current &&
+                    inputElementRef.current !== eventTarget.ownerDocument.activeElement
+                ) {
+                    closeDropdown();
+                }
                 return;
             }
-            // Don’t close dropdown if isOpening or search input is focused
-            if (
-                !isOpeningRef.current &&
-                inputElementRef.current !== eventTarget.ownerDocument.activeElement
-            ) {
-                closeDropdown();
-            }
+
+            // If dropdown has no items and click was within dropdown body, do nothing
+            if (!hasItemsRef.current) return;
+
+            handleSubmitItem(event);
         },
         [closeDropdown, handleSubmitItem, onMouseUp],
     );
