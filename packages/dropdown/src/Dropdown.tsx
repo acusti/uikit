@@ -284,7 +284,8 @@ const Dropdown: React.FC<Props> = ({
                     return;
                 }
 
-                const isTargetInBody = (target as HTMLElement).closest(BODY_SELECTOR);
+                const eventTarget = target as HTMLElement;
+                const isTargetInBody = eventTarget.closest(BODY_SELECTOR);
 
                 // If mouseup is on dropdown body and there are no items, don’t close the dropdown
                 if (!hasItemsRef.current && isTargetInBody) return;
@@ -432,10 +433,10 @@ const Dropdown: React.FC<Props> = ({
             };
 
             // Close dropdown if any element is focused outside of this dropdown
-            const handleFocusIn = (event: Event) => {
+            const handleFocusIn = ({ target }: Event) => {
                 if (!isOpenRef.current) return;
 
-                const eventTarget = event.target as HTMLElement;
+                const eventTarget = target as HTMLElement;
                 // If focused element is a descendant or a parent of the dropdown, do nothing
                 if (
                     !dropdownElementRef.current ||
