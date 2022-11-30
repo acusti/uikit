@@ -1,5 +1,3 @@
-// TODO add mouseout event handler to check event.target and clear active element
-// whenever mouse leaves it
 import InputText from '@acusti/input-text';
 import { Style } from '@acusti/styling';
 import useIsOutOfBounds from '@acusti/use-is-out-of-bounds';
@@ -243,6 +241,18 @@ const Dropdown: React.FC<Props> = ({
                 return;
             }
         }
+    }, []);
+
+    const handleMouseOut = useCallback((event: React.MouseEvent<HTMLElement>) => {
+        if (!hasItemsRef.current) return;
+        const activeItem = getActiveItemElement(dropdownElementRef.current);
+        if (!activeItem) return;
+        const eventRelatedTarget = event.relatedTarget as HTMLElement;
+        if (activeItem !== event.target || activeItem.contains(eventRelatedTarget)) {
+            return;
+        }
+        // If user moused out of activeItem (not into a descendant), it’s no longer active
+        delete activeItem.dataset.uktActive;
     }, []);
 
     const handleMouseDown = useCallback(
@@ -603,6 +613,7 @@ const Dropdown: React.FC<Props> = ({
                 onMouseDown={handleMouseDown}
                 onMouseUp={handleMouseUp}
                 onMouseMove={handleMouseMove}
+                onMouseOut={handleMouseOut}
                 onMouseOver={handleMouseOver}
                 ref={handleRef}
                 tabIndex={
