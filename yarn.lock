@@ -32,7 +32,7 @@ __metadata:
   resolution: "@acusti/css-value-input@workspace:packages/css-value-input"
   dependencies:
     "@acusti/css-values": ^0.18.0
-    "@acusti/input-text": ^0.11.0
+    "@acusti/input-text": ^0.12.0
     "@types/react": ^18.0.15
     clsx: ^1.1.1
     typescript: ^4.8.4
@@ -54,7 +54,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
-    "@acusti/input-text": ^0.11.0
+    "@acusti/input-text": ^0.12.0
     "@acusti/matchmaking": ^0.3.0
     "@acusti/styling": ^0.5.3
     "@acusti/use-is-out-of-bounds": ^0.5.0
@@ -67,7 +67,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/input-text@*, @acusti/input-text@^0.11.0, @acusti/input-text@workspace:packages/input-text":
+"@acusti/input-text@*, @acusti/input-text@^0.12.0, @acusti/input-text@workspace:packages/input-text":
   version: 0.0.0-use.local
   resolution: "@acusti/input-text@workspace:packages/input-text"
   dependencies:
