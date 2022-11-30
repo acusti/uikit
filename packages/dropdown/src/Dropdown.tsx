@@ -246,6 +246,31 @@ const Dropdown: React.FC<Props> = ({
         [onMouseDown],
     );
 
+    const handleMouseUp = useCallback(
+        (event: React.MouseEvent<HTMLElement>) => {
+            if (onMouseUp) onMouseUp(event);
+            // If dropdown isn’t open or is already closing, do nothing
+            if (!isOpenRef.current || closingTimerRef.current) return;
+            // If dropdown has no items, do nothing
+            if (!hasItemsRef.current) return;
+
+            const eventTarget = event.target as HTMLElement;
+            // If mouse event is within dropdown body, trigger submit
+            if (eventTarget.closest(BODY_SELECTOR)) {
+                handleSubmitItem();
+                return;
+            }
+            // Don’t close dropdown if isOpening or search input is focused
+            if (
+                !isOpeningRef.current &&
+                inputElementRef.current !== eventTarget.ownerDocument.activeElement
+            ) {
+                closeDropdown();
+            }
+        },
+        [closeDropdown, handleSubmitItem, onMouseUp],
+    );
+
     const cleanupEventListenersRef = useRef<() => void>(noop);
 
     const handleRef = useCallback(
@@ -279,7 +304,7 @@ const Dropdown: React.FC<Props> = ({
                 }
             };
 
-            const handleMouseUp = ({ target }: MouseEvent) => {
+            const handleGlobalMouseUp = ({ target }: MouseEvent) => {
                 if (!isOpenRef.current || closingTimerRef.current) return;
 
                 // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
@@ -293,20 +318,8 @@ const Dropdown: React.FC<Props> = ({
                 }
 
                 const eventTarget = target as HTMLElement;
-                const isTargetInBody = eventTarget.closest(BODY_SELECTOR);
-
-                // If mouseup is on dropdown body and there are no items, don’t close the dropdown
-                if (!hasItemsRef.current && isTargetInBody) return;
-
-                // If mouseup is on an item, trigger submit item, else close the dropdown
-                if (isTargetInBody) {
-                    handleSubmitItem();
-                } else if (
-                    !inputElementRef.current ||
-                    (dropdownElementRef.current &&
-                        dropdownElementRef.current.contains(ownerDocument.activeElement))
-                ) {
-                    // If dropdown is searchable and ref is still focused, this won’t be invoked
+                // Only handle mouseup events from outside the dropdown here
+                if (!dropdownElementRef.current?.contains(eventTarget)) {
                     closeDropdown();
                 }
             };
@@ -460,13 +473,13 @@ const Dropdown: React.FC<Props> = ({
             document.addEventListener('focusin', handleFocusIn);
             document.addEventListener('keydown', handleKeyDown);
             document.addEventListener('mousedown', handleGlobalMouseDown);
-            document.addEventListener('mouseup', handleMouseUp);
+            document.addEventListener('mouseup', handleGlobalMouseUp);
 
             if (ownerDocument !== document) {
                 ownerDocument.addEventListener('focusin', handleFocusIn);
                 ownerDocument.addEventListener('keydown', handleKeyDown);
                 ownerDocument.addEventListener('mousedown', handleGlobalMouseDown);
-                ownerDocument.addEventListener('mouseup', handleMouseUp);
+                ownerDocument.addEventListener('mouseup', handleGlobalMouseUp);
             }
 
             // If dropdown should be open on mount, focus it
@@ -504,13 +517,13 @@ const Dropdown: React.FC<Props> = ({
                 document.removeEventListener('focusin', handleFocusIn);
                 document.removeEventListener('keydown', handleKeyDown);
                 document.removeEventListener('mousedown', handleGlobalMouseDown);
-                document.removeEventListener('mouseup', handleMouseUp);
+                document.removeEventListener('mouseup', handleGlobalMouseUp);
 
                 if (ownerDocument !== document) {
                     ownerDocument.removeEventListener('focusin', handleFocusIn);
                     ownerDocument.removeEventListener('keydown', handleKeyDown);
                     ownerDocument.removeEventListener('mousedown', handleGlobalMouseDown);
-                    ownerDocument.removeEventListener('mouseup', handleMouseUp);
+                    ownerDocument.removeEventListener('mouseup', handleGlobalMouseUp);
                 }
 
                 if (inputElement) {
@@ -570,7 +583,7 @@ const Dropdown: React.FC<Props> = ({
                 })}
                 onClick={onClick}
                 onMouseDown={handleMouseDown}
-                onMouseUp={onMouseUp}
+                onMouseUp={handleMouseUp}
                 onMouseMove={handleMouseMove}
                 onMouseOver={handleMouseOver}
                 ref={handleRef}
