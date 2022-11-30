@@ -46,6 +46,21 @@ selects the entire contents of the input whenever the input is focused.
     >
         {(args) => <InputText {...args} />}
     </Story>
+    <Story
+        name="Multi-line Input With Initial Value And Select Text On Focus"
+        args={{
+            className: 'mutli-line-input-text',
+            initialValue:
+                'Concerning the UFO Sighting near Highland, Illinois',
+            maxHeight: 600,
+            multiLine: true,
+            name: 'mutli-line-input',
+            placeholder: 'enter text of any length',
+            selectTextOnFocus: true,
+        }}
+    >
+        {(args) => <InputText {...args} />}
+    </Story>
 </Canvas>
 
-<Props story="Input With Initial Value And Select Text On Focus" />
+<Props story="Multi-line Input With Initial Value And Select Text On Focus" />
