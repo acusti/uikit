@@ -227,6 +227,25 @@ const Dropdown: React.FC<Props> = ({
         }
     }, []);
 
+    const handleMouseDown = useCallback(
+        (event: React.MouseEvent<HTMLElement>) => {
+            if (onMouseDown) onMouseDown(event);
+            if (isOpenRef.current) return;
+
+            setIsOpen(true);
+            setIsOpening(true);
+            mouseDownPositionRef.current = {
+                clientX: event.clientX,
+                clientY: event.clientY,
+            };
+            isOpeningTimerRef.current = setTimeout(() => {
+                setIsOpening(false);
+                isOpeningTimerRef.current = null;
+            }, 1000);
+        },
+        [onMouseDown],
+    );
+
     const cleanupEventListenersRef = useRef<() => void>(noop);
 
     const handleRef = useCallback(
@@ -249,7 +268,7 @@ const Dropdown: React.FC<Props> = ({
                 inputElementRef.current = inputElement;
             }
 
-            const handleMouseDown = ({ clientX, clientY, target }: MouseEvent) => {
+            const handleGlobalMouseDown = ({ target }: MouseEvent) => {
                 const eventTarget = target as HTMLElement;
                 if (
                     dropdownElementRef.current &&
@@ -257,18 +276,7 @@ const Dropdown: React.FC<Props> = ({
                 ) {
                     // Close dropdown on an outside click
                     closeDropdown();
-                    return;
                 }
-
-                if (isOpenRef.current) return;
-
-                setIsOpen(true);
-                setIsOpening(true);
-                mouseDownPositionRef.current = { clientX, clientY };
-                isOpeningTimerRef.current = setTimeout(() => {
-                    setIsOpening(false);
-                    isOpeningTimerRef.current = null;
-                }, 1000);
             };
 
             const handleMouseUp = ({ target }: MouseEvent) => {
@@ -451,13 +459,13 @@ const Dropdown: React.FC<Props> = ({
 
             document.addEventListener('focusin', handleFocusIn);
             document.addEventListener('keydown', handleKeyDown);
-            document.addEventListener('mousedown', handleMouseDown);
+            document.addEventListener('mousedown', handleGlobalMouseDown);
             document.addEventListener('mouseup', handleMouseUp);
 
             if (ownerDocument !== document) {
                 ownerDocument.addEventListener('focusin', handleFocusIn);
                 ownerDocument.addEventListener('keydown', handleKeyDown);
-                ownerDocument.addEventListener('mousedown', handleMouseDown);
+                ownerDocument.addEventListener('mousedown', handleGlobalMouseDown);
                 ownerDocument.addEventListener('mouseup', handleMouseUp);
             }
 
@@ -495,13 +503,13 @@ const Dropdown: React.FC<Props> = ({
             cleanupEventListenersRef.current = () => {
                 document.removeEventListener('focusin', handleFocusIn);
                 document.removeEventListener('keydown', handleKeyDown);
-                document.removeEventListener('mousedown', handleMouseDown);
+                document.removeEventListener('mousedown', handleGlobalMouseDown);
                 document.removeEventListener('mouseup', handleMouseUp);
 
                 if (ownerDocument !== document) {
                     ownerDocument.removeEventListener('focusin', handleFocusIn);
                     ownerDocument.removeEventListener('keydown', handleKeyDown);
-                    ownerDocument.removeEventListener('mousedown', handleMouseDown);
+                    ownerDocument.removeEventListener('mousedown', handleGlobalMouseDown);
                     ownerDocument.removeEventListener('mouseup', handleMouseUp);
                 }
 
@@ -561,7 +569,7 @@ const Dropdown: React.FC<Props> = ({
                     'is-searchable': isSearchable,
                 })}
                 onClick={onClick}
-                onMouseDown={onMouseDown}
+                onMouseDown={handleMouseDown}
                 onMouseUp={onMouseUp}
                 onMouseMove={handleMouseMove}
                 onMouseOver={handleMouseOver}
