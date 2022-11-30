@@ -1,3 +1,5 @@
+// TODO fix searching to match on significant parts of value (i.e. not parts that are the same)
+// could also match on ukt-values (see searchable Font Weight example in storybook docs)
 import InputText from '@acusti/input-text';
 import { Style } from '@acusti/styling';
 import useIsOutOfBounds from '@acusti/use-is-out-of-bounds';
