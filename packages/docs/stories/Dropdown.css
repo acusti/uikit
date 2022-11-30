@@ -86,6 +86,14 @@
     align-self: center;
 }
 
+.checkboxes .uktdropdown-body {
+    width: 150px;
+}
+
+.checkboxes input[type="checkbox"] {
+    width: auto;
+}
+
 .out-of-bounds-example.uktdropdown {
     position: absolute;
     bottom: 30px;

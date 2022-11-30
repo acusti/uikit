@@ -263,6 +263,48 @@ of macOS.
         )}
     </Story>
     <Story
+        args={{ className: 'checkboxes', keepOpenOnSubmit: true }}
+        name="Checkboxes Dropdown"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                Colors
+                <ul>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Red
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Blue
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Yellow
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Cyan
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Orchid
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Slate
+                        </label>
+                    </li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
         args={{
             className: 'disabled-dropdown',
             disabled: true,
