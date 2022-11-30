@@ -37,6 +37,7 @@ export type Props = {
     hasItems?: boolean;
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
+    keepOpenOnSubmit?: boolean;
     label?: string;
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s name */
     name?: string;
@@ -74,6 +75,7 @@ const Dropdown: React.FC<Props> = ({
     hasItems = true,
     isOpenOnMount,
     isSearchable,
+    keepOpenOnSubmit = !hasItems,
     label,
     name,
     onClick,
@@ -115,6 +117,7 @@ const Dropdown: React.FC<Props> = ({
     const isOpenRef = useRef(isOpen);
     const isOpeningRef = useRef(isOpening);
     const isTriggerFromPropsRef = useRef(isOpening);
+    const keepOpenOnSubmitRef = useRef(keepOpenOnSubmit);
     const onSubmitItemRef = useRef(onSubmitItem);
     const valueRef = useRef(value);
 
@@ -124,6 +127,7 @@ const Dropdown: React.FC<Props> = ({
         isOpenRef.current = isOpen;
         isOpeningRef.current = isOpening;
         isTriggerFromPropsRef.current = isTriggerFromProps;
+        keepOpenOnSubmitRef.current = keepOpenOnSubmit;
         onSubmitItemRef.current = onSubmitItem;
         valueRef.current = value;
     }, [
@@ -132,6 +136,7 @@ const Dropdown: React.FC<Props> = ({
         isOpen,
         isOpening,
         isTriggerFromProps,
+        keepOpenOnSubmit,
         onSubmitItem,
         value,
     ]);
@@ -146,43 +151,56 @@ const Dropdown: React.FC<Props> = ({
         }
     }, []);
 
-    const handleSubmitItem = useCallback(() => {
-        if (isOpenRef.current) {
-            // A short timeout before closing is better UX when user selects an item so dropdown
-            // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
-            closingTimerRef.current = setTimeout(closeDropdown, 90);
-        }
-
-        if (!hasItemsRef.current) return;
-
-        const nextElement = getActiveItemElement(dropdownElementRef.current);
-        if (!nextElement) {
-            // If not allowEmpty, don’t allow submitting an empty item
-            if (!allowEmptyRef.current) return;
-            // If we have an input element as trigger & the user didn’t clear the text, do nothing
-            if (inputElementRef.current?.value) return;
-        }
-
-        const label = nextElement?.innerText || '';
-        const nextValue = nextElement?.dataset.uktValue || label;
-        const nextItem = { element: nextElement, value: nextValue };
-        if (inputElementRef.current) {
-            inputElementRef.current.value = label;
-            if (
-                inputElementRef.current ===
-                inputElementRef.current.ownerDocument.activeElement
-            ) {
-                inputElementRef.current.blur();
+    const handleSubmitItem = useCallback(
+        (event: Event | React.SyntheticEvent<HTMLElement>) => {
+            const eventTarget = event.target as HTMLElement;
+            if (isOpenRef.current && !keepOpenOnSubmitRef.current) {
+                const keepOpen = eventTarget.closest(
+                    '[data-ukt-keep-open]',
+                ) as HTMLElement | null;
+                // Don’t close dropdown if event occurs w/in data-ukt-keep-open element
+                if (
+                    !keepOpen?.dataset.uktKeepOpen ||
+                    keepOpen.dataset.uktKeepOpen === 'false'
+                ) {
+                    // A short timeout before closing is better UX when user selects an item so dropdown
+                    // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
+                    closingTimerRef.current = setTimeout(closeDropdown, 90);
+                }
             }
-        }
 
-        // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
-        if (valueRef.current && valueRef.current === nextValue) return;
+            if (!hasItemsRef.current) return;
 
-        if (onSubmitItemRef.current) {
-            onSubmitItemRef.current(nextItem);
-        }
-    }, [closeDropdown]);
+            const nextElement = getActiveItemElement(dropdownElementRef.current);
+            if (!nextElement) {
+                // If not allowEmpty, don’t allow submitting an empty item
+                if (!allowEmptyRef.current) return;
+                // If we have an input element as trigger & the user didn’t clear the text, do nothing
+                if (inputElementRef.current?.value) return;
+            }
+
+            const label = nextElement?.innerText || '';
+            const nextValue = nextElement?.dataset.uktValue || label;
+            const nextItem = { element: nextElement, value: nextValue };
+            if (inputElementRef.current) {
+                inputElementRef.current.value = label;
+                if (
+                    inputElementRef.current ===
+                    inputElementRef.current.ownerDocument.activeElement
+                ) {
+                    inputElementRef.current.blur();
+                }
+            }
+
+            // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
+            if (valueRef.current && valueRef.current === nextValue) return;
+
+            if (onSubmitItemRef.current) {
+                onSubmitItemRef.current(nextItem);
+            }
+        },
+        [closeDropdown],
+    );
 
     const handleMouseMove = useCallback(
         ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
@@ -257,7 +275,7 @@ const Dropdown: React.FC<Props> = ({
             const eventTarget = event.target as HTMLElement;
             // If mouse event is within dropdown body, trigger submit
             if (eventTarget.closest(BODY_SELECTOR)) {
-                handleSubmitItem();
+                handleSubmitItem(event);
                 return;
             }
             // Don’t close dropdown if isOpening or search input is focused
@@ -398,7 +416,7 @@ const Dropdown: React.FC<Props> = ({
                 // If dropdown isOpen, handle submitting the value
                 if (key === 'Enter' || (key === ' ' && !inputElementRef.current)) {
                     onEventHandled();
-                    handleSubmitItem();
+                    handleSubmitItem(event);
                     return;
                 }
                 // If dropdown isOpen, handle closing it on escape or spacebar if !hasItems
