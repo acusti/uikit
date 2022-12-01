@@ -2,6 +2,7 @@
     "name": "@acusti/input-text",
     "version": "0.12.0",
     "type": "module",
+    "description": "React component that renders a semi-controlled input with multiLine and selectTextOnFocus support",
     "sideEffects": false,
     "exports": "./dist/InputText.js",
     "main": "./dist/InputText.js",

@@ -1,6 +1,7 @@
 {
     "name": "@acusti/textual",
     "version": "0.2.0",
+    "description": "Utilities for transforming and formatting text (i.e. strings)",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/index.js",

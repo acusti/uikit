@@ -1,6 +1,7 @@
 {
     "name": "@acusti/uniquify",
     "version": "0.3.0",
+    "description": "Generate a unique string (e.g. for filenames or url slugs) using an incremental counter",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/uniquify.js",
