@@ -1,8 +1,8 @@
 {
     "name": "@acusti/input-text",
     "version": "0.12.0",
-    "type": "module",
     "description": "React component that renders a semi-controlled input with multiLine and selectTextOnFocus support",
+    "type": "module",
     "sideEffects": false,
     "exports": "./dist/InputText.js",
     "main": "./dist/InputText.js",
@@ -13,7 +13,8 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/acusti/uikit.git"
+        "url": "https://github.com/acusti/uikit.git",
+        "directory": "packages/input-text"
     },
     "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "license": "Unlicense",

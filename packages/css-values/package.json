@@ -13,7 +13,8 @@
     ],
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/acusti/uikit.git"
+        "url": "https://github.com/acusti/uikit.git",
+        "directory": "packages/css-values"
     },
     "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "license": "Unlicense",
