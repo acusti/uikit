@@ -2,6 +2,23 @@
     "name": "@acusti/uniquify",
     "version": "0.3.0",
     "description": "Generate a unique string (e.g. for filenames or url slugs) using an incremental counter",
+    "keywords": [
+        "unique",
+        "uniq",
+        "file",
+        "name",
+        "filename",
+        "url",
+        "slug",
+        "upload",
+        "utils",
+        "utilities",
+        "typescript",
+        "ts",
+        "flow",
+        "isomorphic",
+        "universal"
+    ],
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/uniquify.js",
@@ -16,12 +33,6 @@
         "url": "https://github.com/acusti/uikit.git",
         "directory": "packages/uniquify"
     },
-    "keywords": [
-        "unique",
-        "name",
-        "filename",
-        "slug"
-    ],
     "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "license": "Unlicense",
     "bugs": {

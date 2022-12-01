@@ -2,6 +2,16 @@
     "name": "@acusti/use-bounding-client-rect",
     "version": "0.5.0",
     "description": "React hook that returns the boundingClientRect for an element and triggers an update when those dimensions change",
+    "keywords": [
+        "react",
+        "react-hooks",
+        "hooks",
+        "boundingClientRect",
+        "useBoundingClientRect",
+        "typescript",
+        "ts",
+        "flow"
+    ],
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/useBoundingClientRect.js",

@@ -2,6 +2,18 @@
     "name": "@acusti/webcrypto",
     "version": "0.2.0",
     "description": "Isomorphic method for accessing the webcrypto API both from node.js and from the browser (including workers)",
+    "keywords": [
+        "webcrypto",
+        "crypto",
+        "isomorphic",
+        "universal",
+        "node",
+        "browser",
+        "workers",
+        "typescript",
+        "ts",
+        "flow"
+    ],
     "type": "module",
     "sideEffects": false,
     "exports": {

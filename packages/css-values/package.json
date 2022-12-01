@@ -2,6 +2,17 @@
     "name": "@acusti/css-values",
     "version": "0.18.0",
     "description": "Utilities for parsing different types of CSS values with or without their units",
+    "keywords": [
+        "utils",
+        "utilities",
+        "css",
+        "css-value",
+        "typescript",
+        "ts",
+        "flow",
+        "isomorphic",
+        "universal"
+    ],
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/index.js",

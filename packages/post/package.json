@@ -2,6 +2,16 @@
     "name": "@acusti/post",
     "version": "0.3.0",
     "description": "Super minimal fetch-inspired API wrapper around node.js’ http and https modules for making POST requests",
+    "keywords": [
+        "node",
+        "fetch",
+        "request",
+        "promise",
+        "graphql",
+        "typescript",
+        "ts",
+        "flow"
+    ],
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/index.js",

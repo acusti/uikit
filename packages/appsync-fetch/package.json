@@ -2,6 +2,18 @@
     "name": "@acusti/appsync-fetch",
     "version": "0.13.0",
     "description": "A lightweight node.js module for making requests to an AWS AppSync graphql API",
+    "keywords": [
+        "node",
+        "fetch",
+        "request",
+        "promise",
+        "graphql",
+        "appsync",
+        "aws",
+        "typescript",
+        "ts",
+        "flow"
+    ],
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/index.js",
