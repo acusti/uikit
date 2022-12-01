@@ -1,7 +1,7 @@
 # @acusti/webcrypto
 
 [![latest version](https://img.shields.io/npm/v/@acusti/webcrypto?style=for-the-badge)](https://www.npmjs.com/package/@acusti/webcrypto)
-[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/webcrypto?style=for-the-badge)](https://libraries.io/npm/@acusti%2Fwebcrypto/sourcerank)
+[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/webcrypto?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fwebcrypto)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/webcrypto?style=for-the-badge)](https://www.npmjs.com/package/@acusti/webcrypto)
 [![install size](https://packagephobia.com/badge?p=@acusti/webcrypto&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/webcrypto)
 

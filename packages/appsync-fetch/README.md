@@ -1,7 +1,7 @@
 # @acusti/appsync-fetch
 
 [![latest version](https://img.shields.io/npm/v/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
-[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/appsync-fetch?style=for-the-badge)](https://libraries.io/npm/@acusti%2Fappsync-fetch/sourcerank)
+[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/appsync-fetch?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fappsync-fetch)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
 [![install size](https://packagephobia.com/badge?p=@acusti/appsync-fetch&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/appsync-fetch)
 

@@ -1,12 +1,11 @@
 # @acusti/aws-signature-v4
 
 [![latest version](https://img.shields.io/npm/v/@acusti/aws-signature-v4?style=for-the-badge)](https://www.npmjs.com/package/@acusti/aws-signature-v4)
-[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/aws-signature-v4?style=for-the-badge)](https://libraries.io/npm/@acusti%2Faws-signature-v4/sourcerank)
+[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/aws-signature-v4?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Faws-signature-v4)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/aws-signature-v4?style=for-the-badge)](https://www.npmjs.com/package/@acusti/aws-signature-v4)
 [![install size](https://packagephobia.com/badge?p=@acusti/aws-signature-v4&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/aws-signature-v4)
 
-`aws-signature-v4` is a lightweight isomorphic module that enables
-generating request headers to fulfill the [AWS SigV4][] signing process.
+`aws-signature-v4` is a lightweight isomorphic module that generates request headers to fulfill the [AWS SigV4][] signing process.
 
 [aws sigv4]:
     https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html

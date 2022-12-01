@@ -1,7 +1,7 @@
 # @acusti/post
 
 [![latest version](https://img.shields.io/npm/v/@acusti/post?style=for-the-badge)](https://www.npmjs.com/package/@acusti/post)
-[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/post?style=for-the-badge)](https://libraries.io/npm/@acusti%2Fpost/sourcerank)
+[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/post?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fpost)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/post?style=for-the-badge)](https://www.npmjs.com/package/@acusti/post)
 [![install size](https://packagephobia.com/badge?p=@acusti/post&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/post)
 

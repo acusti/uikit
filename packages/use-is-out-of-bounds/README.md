@@ -1,7 +1,7 @@
 # @acusti/use-is-out-of-bounds
 
 [![latest version](https://img.shields.io/npm/v/@acusti/use-is-out-of-bounds?style=for-the-badge)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)
-[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/use-is-out-of-bounds?style=for-the-badge)](https://libraries.io/npm/@acusti%2Fuse-is-out-of-bounds/sourcerank)
+[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/use-is-out-of-bounds?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fuse-is-out-of-bounds)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/use-is-out-of-bounds?style=for-the-badge)](https://bundlephobia.com/package/@acusti/use-is-out-of-bounds)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/use-is-out-of-bounds?style=for-the-badge)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)
 

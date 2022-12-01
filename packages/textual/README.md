@@ -1,7 +1,7 @@
 # @acusti/textual
 
 [![latest version](https://img.shields.io/npm/v/@acusti/textual?style=for-the-badge)](https://www.npmjs.com/package/@acusti/textual)
-[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/textual?style=for-the-badge)](https://libraries.io/npm/@acusti%2Ftextual/sourcerank)
+[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/textual?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Ftextual)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/textual?style=for-the-badge)](https://bundlephobia.com/package/@acusti/textual)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/textual?style=for-the-badge)](https://www.npmjs.com/package/@acusti/textual)
 

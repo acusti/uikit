@@ -1,7 +1,7 @@
 # @acusti/dropdown
 
 [![latest version](https://img.shields.io/npm/v/@acusti/dropdown?style=for-the-badge)](https://www.npmjs.com/package/@acusti/dropdown)
-[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/dropdown?style=for-the-badge)](https://libraries.io/npm/@acusti%2Fdropdown/sourcerank)
+[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/dropdown?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fdropdown)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/dropdown?style=for-the-badge)](https://bundlephobia.com/package/@acusti/dropdown)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/dropdown?style=for-the-badge)](https://www.npmjs.com/package/@acusti/dropdown)
 

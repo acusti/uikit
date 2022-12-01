@@ -1,7 +1,7 @@
 # @acusti/matchmaking
 
 [![latest version](https://img.shields.io/npm/v/@acusti/matchmaking?style=for-the-badge)](https://www.npmjs.com/package/@acusti/matchmaking)
-[![dependencies status](https://img.shields.io/librariesio/release/npm/@acusti/matchmaking?style=for-the-badge)](https://libraries.io/npm/@acusti%2Fmatchmaking/sourcerank)
+[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/matchmaking?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fmatchmaking)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/matchmaking?style=for-the-badge)](https://bundlephobia.com/package/@acusti/matchmaking)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/matchmaking?style=for-the-badge)](https://www.npmjs.com/package/@acusti/matchmaking)
 
