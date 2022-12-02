@@ -65,8 +65,9 @@ repository.
 
 ## Tests
 
-The monorepo uses jest to run its tests. To run tests across all packages,
-use `yarn test`. To run them in watch mode, use `yarn test:watch`.
+The monorepo uses vitest to run its tests. To run tests across all
+packages, use `yarn test`. To run them in watch mode, use
+`yarn test:watch`.
 
 ## Building and Publishing
 

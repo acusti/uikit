@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { getBestMatch, sortByBestMatch } from './index.js';
 
 const STATES = [

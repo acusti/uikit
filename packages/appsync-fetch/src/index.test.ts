@@ -1,5 +1,4 @@
-import { jest } from '@jest/globals';
-import { getBodyFromQuery, getRequestOptionsAndBody } from '@acusti/post';
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest';
 
 const REGION = 'us-west-2';
 const HOST = `abcdefghijklmnopqrstuvwxyz.appsync-api.${REGION}.amazonaws.com`;
@@ -31,12 +30,12 @@ const QUERY_ONLY_SIGNATURE =
 
 const mockPost = vi.fn(async () => RESPONSE_AS_JSON);
 
-jest.unstable_mockModule('@acusti/post', () => ({
-    getBodyFromQuery,
-    getRequestOptionsAndBody,
-    post: mockPost,
-}));
+vi.mock('@acusti/post', async () => {
+    const actualPost = await vi.importActual('@acusti/post');
+    return { ...actualPost, post: mockPost };
+});
 
+const { getBodyFromQuery } = await import('@acusti/post');
 const { appsyncFetch } = await import('./index.js');
 
 describe('appsyncFetch', () => {

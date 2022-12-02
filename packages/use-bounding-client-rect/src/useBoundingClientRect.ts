@@ -101,7 +101,7 @@ const initializeUpdateHandlers = (element: HTMLElement) => {
             top: rect.top,
         };
 
-        const renderTime = Date.now();
+        const renderTime = typeof Date.now === 'function' ? Date.now() : 0;
         for (const setRenderTime of refs.renderTimeSetters) {
             setRenderTime(renderTime);
         }

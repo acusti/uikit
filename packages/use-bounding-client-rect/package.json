@@ -33,8 +33,8 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/use-bounding-client-rect#readme",
     "devDependencies": {
-        "@types/react": "^18.0.15",
-        "typescript": "^4.8.4"
+        "@types/react": "^18.0.25",
+        "typescript": "^4.9.3"
     },
     "peerDependencies": {
         "react": "^16.8 || ^17 || ^18",

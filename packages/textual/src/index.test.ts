@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { capitalize, getInitials, getNameFromEmail } from './index.js';
 
 describe('@acusti/text-transform', () => {

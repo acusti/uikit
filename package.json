@@ -33,8 +33,8 @@
         "dev:stories": "yarn workspace @acusti/uikit-docs storybook",
         "dev:watch": "tsc --build --watch",
         "dev": "run-p 'dev:*'",
-        "test": "NODE_OPTIONS=--experimental-vm-modules yarn jest --no-cache",
-        "test:watch": "NODE_OPTIONS=--experimental-vm-modules yarn jest --no-cache --watch"
+        "test": "vitest run",
+        "test:watch": "vitest"
     },
     "repository": {
         "type": "git",
@@ -51,48 +51,31 @@
         "packages/*"
     ],
     "devDependencies": {
-        "@babel/core": "^7.18.6",
-        "@types/jest": "^28.1.4",
-        "@types/node": "^18.0.3",
-        "@typescript-eslint/eslint-plugin": "^5.30.5",
-        "@typescript-eslint/parser": "^5.30.5",
+        "@babel/core": "^7.20.5",
+        "@types/node": "^18.11.10",
+        "@typescript-eslint/eslint-plugin": "^5.45.0",
+        "@typescript-eslint/parser": "^5.45.0",
         "babel-eslint": "^10.1.0",
-        "eslint": "^8.19.0",
+        "eslint": "^8.28.0",
         "eslint-config-react-app": "^7.0.1",
         "eslint-plugin-import": "^2.26.0",
-        "eslint-plugin-jest": "^26.5.3",
-        "eslint-plugin-jsx-a11y": "^6.6.0",
-        "eslint-plugin-react": "^7.30.1",
+        "eslint-plugin-jsx-a11y": "^6.6.1",
+        "eslint-plugin-react": "^7.31.11",
         "eslint-plugin-react-hooks": "^4.6.0",
-        "eslint-plugin-testing-library": "^5.5.1",
-        "flowgen": "^1.20.0",
-        "jest": "^28.1.2",
-        "jest-watch-typeahead": "^1.1.0",
+        "eslint-plugin-testing-library": "^5.9.1",
+        "flowgen": "^1.20.1",
         "npm-run-all": "^4.1.5",
-        "prettier": "^2.7.1",
-        "ts-jest": "^28.0.5",
-        "typescript": "^4.8.4"
+        "prettier": "^2.8.0",
+        "typescript": "^4.9.3",
+        "vite": "^3.2.4",
+        "vitest": "^0.25.3"
+    },
+    "resolutions": {
+        "@babel/core": "^7.20.5"
     },
     "eslintConfig": {
         "extends": [
-            "react-app",
-            "react-app/jest"
-        ]
-    },
-    "jest": {
-        "preset": "ts-jest/presets/default-esm",
-        "globals": {
-            "ts-jest": {
-                "useESM": true
-            }
-        },
-        "moduleNameMapper": {
-            "@acusti/(.*)$": "<rootDir>/packages/$1",
-            "^(\\.{1,2}/.*)\\.js$": "$1"
-        },
-        "watchPlugins": [
-            "jest-watch-typeahead/filename",
-            "jest-watch-typeahead/testname"
+            "react-app"
         ]
     },
     "prettier": {

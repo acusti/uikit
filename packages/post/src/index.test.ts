@@ -1,3 +1,5 @@
+import { describe, expect, it } from 'vitest';
+
 import { post } from './index.js';
 
 // To find open GraphQL APIs for testing:
