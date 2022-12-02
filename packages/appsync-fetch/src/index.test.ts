@@ -44,12 +44,12 @@ describe('appsyncFetch', () => {
 
     beforeAll(() => {
         // ISO version of the example DATE_TIME_STRING
-        Date.prototype.toISOString = () => '2015-08-30T12:36:00.000Z';
+        Date.prototype.toISOString = () => '2015-08-30T12:36:00.000Z'; // eslint-disable-line no-extend-native
     });
 
     afterAll(() => {
         // ISO version of the example DATE_TIME_STRING
-        Date.prototype.toISOString = originalToISOString;
+        Date.prototype.toISOString = originalToISOString; // eslint-disable-line no-extend-native
     });
 
     it('converts passed in query to a trimmed JSON string body', async () => {
