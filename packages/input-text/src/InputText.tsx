@@ -93,8 +93,14 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
 
         const setInputHeight = useCallback(() => {
             const input = inputRef.current;
-            if (!multiLine || !input) return;
-            input.style.height = '';
+            if (!input) return;
+
+            if (input.style.height) {
+                input.style.height = '';
+            }
+
+            if (!multiLine) return;
+
             const height = Math.min(
                 input.scrollHeight,
                 typeof maxHeight === 'string' ? parseFloat(maxHeight) : maxHeight,
