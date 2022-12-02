@@ -4,13 +4,16 @@ export type Props = {
     autoComplete?: string;
     className?: string;
     disabled?: boolean;
+    form?: string;
     initialValue?: string;
+    list?: string;
     max?: number;
     maxHeight?: number | string;
     maxLength?: number;
     min?: number;
     minLength?: number;
     multiLine?: boolean;
+    multiple?: boolean;
     name?: string;
     onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
     onChange?: (event: React.ChangeEvent<HTMLInputElement>) => unknown;
@@ -22,6 +25,7 @@ export type Props = {
     readOnly?: boolean;
     required?: boolean;
     selectTextOnFocus?: boolean;
+    size?: number;
     step?: number;
     tabIndex?: number;
     title?: string;
@@ -38,13 +42,16 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             autoComplete,
             className,
             disabled,
+            form,
             initialValue,
+            list,
             max,
             maxHeight = Infinity,
             maxLength,
             min,
             minLength,
             multiLine,
+            multiple,
             name,
             onBlur,
             onChange,
@@ -56,6 +63,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             readOnly,
             required,
             selectTextOnFocus,
+            size,
             step,
             tabIndex,
             title,
@@ -125,8 +133,11 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 className={className}
                 defaultValue={initialValue || ''}
                 disabled={disabled}
+                form={form}
+                list={list}
                 maxLength={maxLength}
                 minLength={minLength}
+                multiple={multiple}
                 name={name}
                 onBlur={selectTextOnFocus ? handleBlur : onBlur}
                 onChange={onChange}
@@ -139,6 +150,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 readOnly={readOnly}
                 required={required}
                 ref={inputRef}
+                size={size}
                 tabIndex={tabIndex}
                 title={title}
                 type={type}
