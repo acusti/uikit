@@ -29,15 +29,7 @@ const DATE_TIME_STRING = '20150830T123600Z';
 const QUERY_ONLY_SIGNATURE =
     '1a978b7ed853f34303cb9ca91f41a18263deacc0b97eda68e208fddeb4a963af';
 
-// @ts-ignore
-global.Date = class _Date {
-    toISOString() {
-        // ISO version of the example DATE_TIME_STRING
-        return '2015-08-30T12:36:00.000Z';
-    }
-};
-
-const mockPost = jest.fn(async () => RESPONSE_AS_JSON);
+const mockPost = vi.fn(async () => RESPONSE_AS_JSON);
 
 jest.unstable_mockModule('@acusti/post', () => ({
     getBodyFromQuery,
@@ -49,6 +41,17 @@ const { appsyncFetch } = await import('./index.js');
 
 describe('appsyncFetch', () => {
     const authorizationStart = `AWS4-HMAC-SHA256 Credential=${ACCESS_KEY_ID}/20150830/${REGION}/appsync/aws4_request`;
+    const originalToISOString = Date.prototype.toISOString;
+
+    beforeAll(() => {
+        // ISO version of the example DATE_TIME_STRING
+        Date.prototype.toISOString = () => '2015-08-30T12:36:00.000Z';
+    });
+
+    afterAll(() => {
+        // ISO version of the example DATE_TIME_STRING
+        Date.prototype.toISOString = originalToISOString;
+    });
 
     it('converts passed in query to a trimmed JSON string body', async () => {
         const fetchOptions = { query: QUERY };

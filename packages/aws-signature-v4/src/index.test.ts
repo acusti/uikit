@@ -14,15 +14,20 @@ const SECRET_ACCESS_KEY = 'wJalrXUtnFEMI/K7MDENG+bPxRfiCYEXAMPLEKEY';
 const SESSION_TOKEN = 'thisisafakesessiontoken';
 
 const DATE_TIME_STRING = '20150830T123600Z';
-// @ts-ignore
-global.Date = class _Date {
-    toISOString() {
-        // ISO version of the example DATE_TIME_STRING
-        return '2015-08-30T12:36:00.000Z';
-    }
-};
 
 describe('utils', () => {
+    const originalToISOString = Date.prototype.toISOString;
+
+    beforeAll(() => {
+        // ISO version of the example DATE_TIME_STRING
+        Date.prototype.toISOString = () => '2015-08-30T12:36:00.000Z';
+    });
+
+    afterAll(() => {
+        // ISO version of the example DATE_TIME_STRING
+        Date.prototype.toISOString = originalToISOString;
+    });
+
     describe('getRegionFromResource', () => {
         it('extracts the AWS region from passed in resource URL', () => {
             expect(getRegionFromResource(RESOURCE)).toBe(REGION);
