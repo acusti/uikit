@@ -103,7 +103,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
         }, [maxHeight, multiLine]);
 
         // Initialize input height in useEffect
-        useEffect(setInputHeight, []);
+        useEffect(setInputHeight, [setInputHeight]);
 
         // NOTE Selecting the contents of the input onFocus makes for the best UX,
         // but it doesn’t work in Safari, so we use the initial onSelect event instead
