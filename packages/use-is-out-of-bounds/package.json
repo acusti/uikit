@@ -1,6 +1,6 @@
 {
     "name": "@acusti/use-is-out-of-bounds",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "React hook that detects if an element is outside of its parent’s bounds on any of its sides (like collision detection)",
     "keywords": [
         "react",
@@ -39,7 +39,7 @@
         "typescript": "^4.9.3"
     },
     "dependencies": {
-        "@acusti/use-bounding-client-rect": "^0.5.0"
+        "@acusti/use-bounding-client-rect": "^1.0.0"
     },
     "peerDependencies": {
         "react": "^16.8 || ^17 || ^18",

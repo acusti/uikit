@@ -1,6 +1,6 @@
 {
     "name": "@acusti/css-values",
-    "version": "0.18.0",
+    "version": "0.19.0",
     "description": "Utilities for parsing different types of CSS values with or without their units",
     "keywords": [
         "utils",

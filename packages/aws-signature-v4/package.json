@@ -1,6 +1,6 @@
 {
     "name": "@acusti/aws-signature-v4",
-    "version": "0.5.0",
+    "version": "0.6.0",
     "description": "A lightweight isomorphic module to generate request headers that fulfill the AWS SigV4 signing process",
     "keywords": [
         "aws",
@@ -35,7 +35,7 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/aws-signature-v4#readme",
     "dependencies": {
-        "@acusti/webcrypto": "^0.2.0"
+        "@acusti/webcrypto": "^1.0.0"
     },
     "devDependencies": {
         "@types/node": "^18.11.10",

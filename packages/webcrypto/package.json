@@ -1,6 +1,6 @@
 {
     "name": "@acusti/webcrypto",
-    "version": "0.2.0",
+    "version": "1.0.0",
     "description": "Isomorphic method for accessing the webcrypto API both from node.js and from the browser (including workers)",
     "keywords": [
         "webcrypto",
