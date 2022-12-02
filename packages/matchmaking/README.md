@@ -24,7 +24,7 @@ yarn add @acusti/matchmaking
 Import them by name:
 
 ```js
-import { getBestMatch, sortByBestMatch } from '@acusti/textual';
+import { getBestMatch, sortByBestMatch } from '@acusti/matchmaking';
 ```
 
 Both functions take the same payload:
