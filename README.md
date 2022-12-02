@@ -27,6 +27,7 @@ fetch utility, and more_
 | **[@acusti/uniquify][]**                 | [![latest version](https://img.shields.io/npm/v/@acusti/uniquify?style=flat-square)](https://www.npmjs.com/package/@acusti/uniquify)                                 | A function that ensures a string is unique amongst items                                                 |
 | **[@acusti/use-bounding-client-rect][]** | [![latest version](https://img.shields.io/npm/v/@acusti/use-bounding-client-rect?style=flat-square)](https://www.npmjs.com/package/@acusti/use-bounding-client-rect) | React hook for getting an element’s `boundingClientRect`                                                 |
 | **[@acusti/use-is-out-of-bounds][]**     | [![latest version](https://img.shields.io/npm/v/@acusti/use-is-out-of-bounds?style=flat-square)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)         | React hook to check if an element overlaps its bounds                                                    |
+| **[@acusti/webcrypto][]**                | [![latest version](https://img.shields.io/npm/v/@acusti/webcrypto?style=flat-square)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)                    | Isomorphic method for accessing the webcrypto API                                                        |
 
 [@acusti/appsync-fetch]:
     https://github.com/acusti/uikit/tree/main/packages/appsync-fetch
@@ -55,6 +56,8 @@ fetch utility, and more_
     https://github.com/acusti/uikit/tree/main/packages/use-bounding-client-rect
 [@acusti/use-is-out-of-bounds]:
     https://github.com/acusti/uikit/tree/main/packages/use-is-out-of-bounds
+[@acusti/webcrypto]:
+    https://github.com/acusti/uikit/tree/main/packages/webcrypto
 
 The React components are documented and illustrated in the [storybook
 instance][], which is located at [`packages/docs/`][packages/docs] in the
