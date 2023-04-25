@@ -1,6 +1,6 @@
 {
     "name": "@acusti/dropdown",
-    "version": "0.25.0",
+    "version": "0.26.0",
     "description": "React component that renders a dropdown with a trigger and supports searching, keyboard access, and more",
     "keywords": [
         "react",
@@ -43,7 +43,7 @@
         "typescript": "^4.9.3"
     },
     "dependencies": {
-        "@acusti/input-text": "^1.1.0",
+        "@acusti/input-text": "^1.2.0",
         "@acusti/matchmaking": "^0.4.0",
         "@acusti/styling": "^0.6.0",
         "@acusti/use-is-out-of-bounds": "^0.6.0",
