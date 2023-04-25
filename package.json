@@ -25,7 +25,7 @@
         "clean:tsc": "tsc --build --clean",
         "clean:flowtypes": "find . -type f -regex './packages/[^/]+/dist/[^/]+.flow' -delete",
         "clean": "run-p 'clean:*'",
-        "format": "prettier --write package.json README.md tsconfig.json ./packages/",
+        "format": "prettier --write package.json README.md tsconfig.json ./packages/ ./packages/docs/.storybook/",
         "lint": "eslint ./packages/*/src/**",
         "lintfix": "eslint ./packages/*/src/** --fix",
         "publish": "run-s build publish:all",
