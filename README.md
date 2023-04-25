@@ -2,7 +2,7 @@
 
 # UIKit
 
-[![Build and Test results](https://img.shields.io/github/workflow/status/acusti/uikit/Build%20and%20Test?style=for-the-badge)](https://github.com/acusti/uikit/actions/workflows/node.js.yml)
+[![Build and Test results](https://img.shields.io/github/actions/workflow/status/acusti/uikit/node.js.yml?branch=main&style=for-the-badge)](https://github.com/acusti/uikit/actions/workflows/node.js.yml)
 [![Top language](https://img.shields.io/github/languages/top/acusti/uikit?style=for-the-badge)](https://github.com/acusti/uikit/search?l=typescript)
 [![Commits per month](https://img.shields.io/github/commit-activity/m/acusti/uikit?style=for-the-badge)](https://github.com/acusti/uikit/pulse)
 
