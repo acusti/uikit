@@ -84,6 +84,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
 
         const handleBlur = useCallback(
             (event: React.FocusEvent<HTMLInputElement>) => {
+                inputRef.current = event.currentTarget;
                 if (onBlur) onBlur(event);
                 // When input loses focus, reset isInitialSelection to true for next onSelect event
                 isInitialSelectionRef.current = true;
@@ -113,23 +114,28 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
 
         // NOTE Selecting the contents of the input onFocus makes for the best UX,
         // but it doesn’t work in Safari, so we use the initial onSelect event instead
-        const handleSelect = useCallback(() => {
-            // Do nothing if this isn’t the initial select-on-focus event
-            if (!isInitialSelectionRef.current) return;
-            // This is the initial select-on-focus event, so reset isInitialSelection to false
-            isInitialSelectionRef.current = false;
-            const input = inputRef.current;
-            // Do nothing if input has no value
-            if (!input || !input.value) return;
-            // Do nothing if input is no longer the document’s activeElement
-            if (input.ownerDocument.activeElement !== input) return;
-            // Do nothing if input’s contents are already selected
-            const valueLength = input.value.length;
-            if (input.selectionStart === 0 && input.selectionEnd === valueLength) return;
+        const handleSelect = useCallback(
+            (event: React.SyntheticEvent<HTMLInputElement>) => {
+                const input = event.currentTarget;
+                inputRef.current = input;
+                // Do nothing if this isn’t the initial select-on-focus event
+                if (!isInitialSelectionRef.current) return;
+                // This is the initial select-on-focus event, so reset isInitialSelection to false
+                isInitialSelectionRef.current = false;
+                // Do nothing if input has no value
+                if (!input.value) return;
+                // Do nothing if input is no longer the document’s activeElement
+                if (input.ownerDocument.activeElement !== input) return;
+                // Do nothing if input’s contents are already selected
+                const valueLength = input.value.length;
+                if (input.selectionStart === 0 && input.selectionEnd === valueLength)
+                    return;
 
-            input.selectionStart = 0;
-            input.selectionEnd = valueLength;
-        }, []);
+                input.selectionStart = 0;
+                input.selectionEnd = valueLength;
+            },
+            [],
+        );
 
         const Element: 'input' = (multiLine ? 'textarea' : 'input') as any;
 

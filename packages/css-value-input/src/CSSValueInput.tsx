@@ -80,25 +80,27 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
         const submittedValueRef = useRef<string>(value || '');
 
-        const handleSubmitValue = useCallback(() => {
-            if (!inputRef.current) return;
-
-            const currentValue = inputRef.current.value;
-            // Store last submittedValue (used to reset value on invalid input)
-            submittedValueRef.current = currentValue;
-            onSubmitValue(currentValue);
-        }, [onSubmitValue]);
+        const handleSubmitValue = useCallback(
+            (event: React.SyntheticEvent<HTMLInputElement>) => {
+                const currentValue = event.currentTarget.value;
+                // Store last submittedValue (used to reset value on invalid input)
+                submittedValueRef.current = currentValue;
+                onSubmitValue(currentValue);
+            },
+            [onSubmitValue],
+        );
 
         const handleBlur = useCallback(
             (event: React.FocusEvent<HTMLInputElement>) => {
+                const input = event.currentTarget;
+                inputRef.current = input;
                 if (onBlur) onBlur(event);
-                if (!inputRef.current) return;
 
-                const currentValue = inputRef.current.value.trim();
+                const currentValue = input.value.trim();
 
                 // If allowEmpty and value is empty, skip all validation + normalization
                 if (allowEmpty && !currentValue) {
-                    handleSubmitValue();
+                    handleSubmitValue(event);
                     return;
                 }
 
@@ -114,10 +116,10 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                     }
 
                     if (isValid) {
-                        handleSubmitValue();
+                        handleSubmitValue(event);
                     } else {
                         // If current value isn’t valid, revert to last submitted value
-                        inputRef.current.value = submittedValueRef.current;
+                        input.value = submittedValueRef.current;
                     }
 
                     return;
@@ -142,16 +144,16 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                         defaultUnit: unit,
                         value: currentValue,
                     });
-                    inputRef.current.value = normalizedValueAsNumber + currentUnit;
+                    input.value = normalizedValueAsNumber + currentUnit;
                 } else {
-                    inputRef.current.value = getCSSValueWithUnit({
+                    input.value = getCSSValueWithUnit({
                         cssValueType,
                         defaultUnit: unit,
                         value: currentValue,
                     });
                 }
 
-                handleSubmitValue();
+                handleSubmitValue(event);
             },
             [
                 allowEmpty,
@@ -213,9 +215,10 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
         const handleKeyDown = useCallback(
             (event: React.KeyboardEvent<HTMLInputElement>) => {
+                const input = event.currentTarget;
+                inputRef.current = input;
                 if (onKeyDown) onKeyDown(event);
 
-                const input = event.currentTarget;
                 const currentValue = input.value || placeholder || `0${unit}`;
                 let nextValue = '';
 
@@ -254,7 +257,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 if (onKeyUp) onKeyUp(event);
                 // If this is the key up from ↑ or ↓ keys, time to handleSubmitValue
                 if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
-                    handleSubmitValue();
+                    handleSubmitValue(event);
                 }
             },
             [handleSubmitValue, onKeyUp],
