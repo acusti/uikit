@@ -6,6 +6,7 @@
         "declaration": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
+        "ignoreDeprecations": "5.0",
         "jsx": "react",
         "lib": ["dom", "dom.iterable", "esnext"],
         "module": "esnext",
