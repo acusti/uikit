@@ -23,13 +23,15 @@ import {
     setActiveItem,
 } from './helpers.js';
 
+type ChildrenTuple = [React.ReactNode, React.ReactNode];
+
 export type Item = { element: HTMLElement | null; value: string };
 
 export type Props = {
     /** Boolean indicating if the user can submit an empty value (i.e. clear the value); defaults to true */
     allowEmpty?: boolean;
     /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
-    children: React.ReactChild | [React.ReactNode, React.ReactNode];
+    children: React.ReactChild | ChildrenTuple;
     className?: string;
     disabled?: boolean;
     /** Group identifier string links dropdowns together into a menu (like macOS top menubar) */
@@ -94,7 +96,10 @@ const Dropdown: React.FC<Props> = ({
         console.error(`${CHILDREN_ERROR} Received ${childrenCount} children.`);
     }
 
-    let trigger = childrenCount > 1 ? children[0] : null;
+    let trigger: React.ReactNode;
+    if (childrenCount > 1) {
+        trigger = (children as ChildrenTuple)[0];
+    }
     const isTriggerFromProps = React.isValidElement(trigger);
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
@@ -639,7 +644,7 @@ const Dropdown: React.FC<Props> = ({
                         })}
                         ref={setDropdownBodyElement}
                     >
-                        {children[1] || children[0] || children}
+                        {childrenCount > 1 ? (children as ChildrenTuple)[1] : children}
                     </div>
                 ) : null}
             </div>

@@ -6,7 +6,6 @@
         "declaration": true,
         "esModuleInterop": true,
         "forceConsistentCasingInFileNames": true,
-        "ignoreDeprecations": "5.0",
         "jsx": "react",
         "lib": ["dom", "dom.iterable", "esnext"],
         "module": "esnext",
@@ -21,7 +20,6 @@
         "skipLibCheck": true,
         "sourceMap": true,
         "strictNullChecks": true,
-        "suppressImplicitAnyIndexErrors": true,
         "target": "es2017"
     },
     "exclude": [

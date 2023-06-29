@@ -1,12 +1,13 @@
 import escapeRegExp from 'lodash.escaperegexp';
 
-type Items = Array<string | null | undefined> | Array<object | null | undefined>;
+type GenericObject = Record<string, unknown>;
+type Items = Array<string | null | undefined> | Array<GenericObject | null | undefined>;
 type StringKeyPath = Array<string>;
 
 const getIn = (item: unknown, path: Array<string>) => {
     let value = item;
     for (let i = 0; i < path.length && value != null; i++) {
-        value = (value as object)[path[i]];
+        value = (value as GenericObject)[path[i]];
     }
     return value;
 };
