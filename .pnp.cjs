@@ -72,6 +72,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/use-is-out-of-bounds"\
       },\
       {\
+        "name": "@acusti/use-keyboard-events",\
+        "reference": "workspace:packages/use-keyboard-events"\
+      },\
+      {\
         "name": "@acusti/webcrypto",\
         "reference": "workspace:packages/webcrypto"\
       }\
@@ -94,6 +98,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@acusti/uniquify", ["workspace:packages/uniquify"]],\
       ["@acusti/use-bounding-client-rect", ["virtual:837d6eaa9e0cf2083d1c41eea7dd7d01ca3a2a3067aaf9336d4ad072e8b9825f1596626b65b0662b2ed096411185ff505111c47daf24d8301a090efcfd29533e#workspace:packages/use-bounding-client-rect", "virtual:cf250536aa5bef8816901e30429995a332849368f737d2c8d19dcfb85de375bcec479981fff07648ab66b22f311ed6eb76033f9ecea3747bddf6101e5cd9dc3b#workspace:packages/use-bounding-client-rect", "workspace:packages/use-bounding-client-rect"]],\
       ["@acusti/use-is-out-of-bounds", ["virtual:91419db2b75dba6373d1dcd664037a13a50cb8ad0c3c817040cf1c87f08000928f92bda28196eef227b714886c83c7008b731e73f3b4af88dcf66eb213a28434#workspace:packages/use-is-out-of-bounds", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/use-is-out-of-bounds", "workspace:packages/use-is-out-of-bounds"]],\
+      ["@acusti/use-keyboard-events", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/use-keyboard-events", "workspace:packages/use-keyboard-events"]],\
       ["@acusti/webcrypto", ["workspace:packages/webcrypto"]]\
     ],\
     "fallbackPool": [\
@@ -395,6 +400,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/dropdown", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/dropdown"],\
             ["@acusti/input-text", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/input-text"],\
             ["@acusti/styling", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/styling"],\
+            ["@acusti/use-keyboard-events", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/use-keyboard-events"],\
             ["@babel/core", "npm:7.20.5"],\
             ["@mdx-js/react", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:1.6.22"],\
             ["@storybook/addon-actions", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:6.5.12"],\
@@ -534,6 +540,35 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [\
             ["@acusti/use-is-out-of-bounds", "workspace:packages/use-is-out-of-bounds"],\
             ["@acusti/use-bounding-client-rect", "virtual:837d6eaa9e0cf2083d1c41eea7dd7d01ca3a2a3067aaf9336d4ad072e8b9825f1596626b65b0662b2ed096411185ff505111c47daf24d8301a090efcfd29533e#workspace:packages/use-bounding-client-rect"],\
+            ["@types/react", "npm:18.0.25"],\
+            ["typescript", "patch:typescript@npm%3A5.1.6#~builtin<compat/typescript>::version=5.1.6&hash=5da071"]\
+          ],\
+          "linkType": "SOFT"\
+        }]\
+      ]],\
+      ["@acusti/use-keyboard-events", [\
+        ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/use-keyboard-events", {\
+          "packageLocation": "./.yarn/__virtual__/@acusti-use-keyboard-events-virtual-52818747d6/1/packages/use-keyboard-events/",\
+          "packageDependencies": [\
+            ["@acusti/use-keyboard-events", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/use-keyboard-events"],\
+            ["@types/react", "npm:18.0.25"],\
+            ["@types/react-dom", null],\
+            ["react", "npm:18.2.0"],\
+            ["react-dom", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:18.2.0"],\
+            ["typescript", "patch:typescript@npm%3A5.1.6#~builtin<compat/typescript>::version=5.1.6&hash=5da071"]\
+          ],\
+          "packagePeers": [\
+            "@types/react-dom",\
+            "@types/react",\
+            "react-dom",\
+            "react"\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["workspace:packages/use-keyboard-events", {\
+          "packageLocation": "./packages/use-keyboard-events/",\
+          "packageDependencies": [\
+            ["@acusti/use-keyboard-events", "workspace:packages/use-keyboard-events"],\
             ["@types/react", "npm:18.0.25"],\
             ["typescript", "patch:typescript@npm%3A5.1.6#~builtin<compat/typescript>::version=5.1.6&hash=5da071"]\
           ],\
