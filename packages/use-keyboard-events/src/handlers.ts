@@ -78,8 +78,8 @@ function handleKeyboardEvent(event: KeyboardEvent) {
             for (const handler of handlers) {
                 const config = handlersData.config.get(handler);
                 if (!targetUsesKeyEvents || config?.ignoreUsedKeyboardEvents === false) {
-                    const isHandled = handler(event);
-                    if (isHandled === true) return;
+                    const shouldPropagate = handler(event);
+                    if (shouldPropagate === false) return;
                 }
             }
         }
