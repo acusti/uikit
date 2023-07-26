@@ -38,7 +38,7 @@
         "vite": "^3.2.4"
     },
     "dependencies": {
-        "@acusti/css-value-input": "*",
+        "@acusti/css-value-input": "^1.0.0-rc.0",
         "@acusti/dropdown": "*",
         "@acusti/input-text": "*",
         "@acusti/styling": "*",
