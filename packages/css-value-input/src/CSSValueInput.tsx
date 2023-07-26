@@ -106,6 +106,11 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
 
                 const currentValueAsNumber = getValueAsNumber(currentValue);
                 const isCurrentValueFinite = Number.isFinite(currentValueAsNumber);
+                const defaultUnit = getUnitFromCSSValue({
+                    cssValueType,
+                    defaultUnit: unit,
+                    value: submittedValueRef.current,
+                });
 
                 if (!isCurrentValueFinite) {
                     let isValid = false;
@@ -141,14 +146,14 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
                 if (normalizedValueAsNumber !== currentValueAsNumber) {
                     const currentUnit = getUnitFromCSSValue({
                         cssValueType,
-                        defaultUnit: unit,
+                        defaultUnit,
                         value: currentValue,
                     });
                     input.value = normalizedValueAsNumber + currentUnit;
                 } else {
                     input.value = getCSSValueWithUnit({
                         cssValueType,
-                        defaultUnit: unit,
+                        defaultUnit,
                         value: currentValue,
                     });
                 }
