@@ -66,4 +66,17 @@ describe('CSSValueInput.tsx', async () => {
         await user.type(input, '14{Enter}');
         expect(input.value).toBe('14px');
     });
+
+    it('preserves last entered unit if different from props.unit when unit is missing', async () => {
+        const user = userEvent.setup();
+        const { getByRole } = render(
+            <CSSValueInput allowEmpty onSubmitValue={noop} unit="px" value="" />,
+        );
+        const input = getByRole('textbox');
+        expect(input.value).toBe('');
+        await user.type(input, '25vw{Enter}');
+        expect(input.value).toBe('25vw');
+        await user.type(input, '50{Enter}');
+        expect(input.value).toBe('50vw');
+    });
 });
