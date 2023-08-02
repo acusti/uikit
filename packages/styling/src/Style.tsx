@@ -1,6 +1,11 @@
 import * as React from 'react';
 
-import { unregisterStyles, updateStyles } from './style-registry.js';
+import {
+    getRegisteredStyles,
+    registerStyles,
+    unregisterStyles,
+    updateStyles,
+} from './style-registry.js';
 
 const { useCallback, useEffect, useMemo, useRef, useState } = React;
 
@@ -12,6 +17,12 @@ const Style = ({ children }: Props) => {
     // Minify CSS styles by replacing consecutive whitespace (including \n) with ' '
     const styles = useMemo(() => children.replace(/\s+/gm, ' '), [children]);
     const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
+    const isMountedRef = useRef<boolean>(false);
+
+    useEffect(() => {
+        isMountedRef.current = true;
+        unregisterStyles({ ownerDocument: 'global', styles });
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     useEffect(
         () => () => {
@@ -42,14 +53,13 @@ const Style = ({ children }: Props) => {
 
     if (ownerDocument) return null;
 
-    return (
-        <style
-            dangerouslySetInnerHTML={{
-                __html: styles,
-            }}
-            ref={handleRef}
-        />
-    );
+    // Avoid duplicate style rendering during SSR via style registry
+    if (!isMountedRef.current) {
+        if (getRegisteredStyles({ ownerDocument: 'global', styles })) return null;
+        registerStyles({ ownerDocument: 'global', styles });
+    }
+
+    return <style dangerouslySetInnerHTML={{ __html: styles }} ref={handleRef} />;
 };
 
 export default Style;
