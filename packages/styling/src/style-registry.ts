@@ -81,6 +81,20 @@ export const updateStyles = ({
 }: UpdatePayload) => {
     if (previousStyles === styles) return;
 
+    const stylesMap = styleRegistry.get(previousStyles);
+    const stylesItem = stylesMap?.get(ownerDocument);
+    if (stylesMap && stylesItem?.element && stylesItem?.referenceCount === 1) {
+        // Mutate existing <style> element with updated styles
+        stylesItem.element.innerHTML = styles;
+        styleRegistry.set(styles, new Map([[ownerDocument, stylesItem]]));
+        // Cleanup previous stylesMap
+        stylesMap.delete(ownerDocument);
+        if (!stylesMap.size) {
+            styleRegistry.delete(previousStyles);
+        }
+        return;
+    }
+
     if (previousStyles) {
         unregisterStyles({ ownerDocument, styles: previousStyles });
     }
