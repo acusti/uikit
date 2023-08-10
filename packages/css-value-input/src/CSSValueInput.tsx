@@ -42,7 +42,7 @@ export type Props = {
 
 type InputRef = HTMLInputElement | null;
 
-const { useCallback, useImperativeHandle, useRef } = React;
+const { useCallback, useEffect, useImperativeHandle, useRef } = React;
 
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
@@ -77,8 +77,11 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
     ) => {
         const inputRef = useRef<InputRef>(null);
         useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
-
         const submittedValueRef = useRef<string>(value || '');
+
+        useEffect(() => {
+            submittedValueRef.current = value || '';
+        }, [value]);
 
         const handleSubmitValue = useCallback(
             (event: React.SyntheticEvent<HTMLInputElement>) => {
