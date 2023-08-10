@@ -96,4 +96,20 @@ describe('CSSValueInput.tsx', async () => {
         await user.type(input, '200{Enter}');
         expect(input.value).toBe('200');
     });
+
+    it('updates default unit as props.unit and props.value changes', async () => {
+        const user = userEvent.setup();
+        const { getByRole, rerender } = render(
+            <CSSValueInput onSubmitValue={noop} unit="px" value="12px" />,
+        );
+        const input = getByRole('textbox');
+        rerender(<CSSValueInput onSubmitValue={noop} unit="" value="4" />);
+        expect(input.value).toBe('4');
+        await user.type(input, '25{Enter}');
+        expect(input.value).toBe('25');
+        rerender(<CSSValueInput onSubmitValue={noop} unit="rad" value="3rad" />);
+        expect(input.value).toBe('3rad');
+        await user.type(input, '-4.1{Enter}');
+        expect(input.value).toBe('-4.1rad');
+    });
 });
