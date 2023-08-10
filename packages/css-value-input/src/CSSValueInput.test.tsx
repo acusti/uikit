@@ -79,4 +79,21 @@ describe('CSSValueInput.tsx', async () => {
         await user.type(input, '50{Enter}');
         expect(input.value).toBe('50vw');
     });
+
+    it('treats value as numeric if props.unit is an empty string', async () => {
+        const user = userEvent.setup();
+        const { getByRole } = render(
+            <CSSValueInput allowEmpty onSubmitValue={noop} unit="" value="100" />,
+        );
+        const input = getByRole('textbox');
+        expect(input.value).toBe('100');
+        await user.type(input, '1{Enter}');
+        expect(input.value).toBe('1');
+        await user.type(input, '{Shift>}{ArrowUp}{/Shift}');
+        expect(input.value).toBe('11');
+        await user.clear(input);
+        expect(input.value).toBe('');
+        await user.type(input, '200{Enter}');
+        expect(input.value).toBe('200');
+    });
 });
