@@ -26,7 +26,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/css-value-input@^1.0.0-rc.0, @acusti/css-value-input@workspace:packages/css-value-input":
+"@acusti/css-value-input@^1.0.0-rc.1, @acusti/css-value-input@workspace:packages/css-value-input":
   version: 0.0.0-use.local
   resolution: "@acusti/css-value-input@workspace:packages/css-value-input"
   dependencies:
@@ -125,7 +125,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/uikit-docs@workspace:packages/docs"
   dependencies:
-    "@acusti/css-value-input": ^1.0.0-rc.0
+    "@acusti/css-value-input": ^1.0.0-rc.1
     "@acusti/dropdown": "*"
     "@acusti/input-text": "*"
     "@acusti/styling": "*"
