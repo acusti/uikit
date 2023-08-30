@@ -176,17 +176,15 @@ const Dropdown: React.FC<Props> = ({
 
             if (!hasItemsRef.current) return;
 
-            const nextElement = getActiveItemElement(dropdownElementRef.current);
-            if (!nextElement) {
+            const element = getActiveItemElement(dropdownElementRef.current);
+            if (!element) {
                 // If not allowEmpty, don’t allow submitting an empty item
                 if (!allowEmptyRef.current) return;
                 // If we have an input element as trigger & the user didn’t clear the text, do nothing
                 if (inputElementRef.current?.value) return;
             }
 
-            const label = nextElement?.innerText || '';
-            const nextValue = nextElement?.dataset.uktValue || label;
-            const nextItem = { element: nextElement, value: nextValue };
+            const label = element?.innerText || '';
             if (inputElementRef.current) {
                 inputElementRef.current.value = label;
                 if (
@@ -197,11 +195,12 @@ const Dropdown: React.FC<Props> = ({
                 }
             }
 
+            const nextValue = element?.dataset.uktValue || label;
             // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
             if (valueRef.current && valueRef.current === nextValue) return;
 
             if (onSubmitItemRef.current) {
-                onSubmitItemRef.current(nextItem);
+                onSubmitItemRef.current({ element, value: nextValue });
             }
         },
         [closeDropdown],
