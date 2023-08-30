@@ -25,7 +25,11 @@ import {
 
 type ChildrenTuple = [React.ReactNode, React.ReactNode];
 
-export type Item = { element: HTMLElement | null; value: string };
+export type Item = {
+    element: HTMLElement | null;
+    event: Event | React.SyntheticEvent<HTMLElement>;
+    value: string;
+};
 
 export type Props = {
     /** Boolean indicating if the user can submit an empty value (i.e. clear the value); defaults to true */
@@ -200,7 +204,7 @@ const Dropdown: React.FC<Props> = ({
             if (valueRef.current && valueRef.current === nextValue) return;
 
             if (onSubmitItemRef.current) {
-                onSubmitItemRef.current({ element, value: nextValue });
+                onSubmitItemRef.current({ element, event, value: nextValue });
             }
         },
         [closeDropdown],
