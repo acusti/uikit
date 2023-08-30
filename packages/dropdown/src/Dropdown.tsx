@@ -28,6 +28,7 @@ type ChildrenTuple = [React.ReactNode, React.ReactNode];
 export type Item = {
     element: HTMLElement | null;
     event: Event | React.SyntheticEvent<HTMLElement>;
+    label: string;
     value: string;
 };
 
@@ -204,7 +205,7 @@ const Dropdown: React.FC<Props> = ({
             if (valueRef.current && valueRef.current === nextValue) return;
 
             if (onSubmitItemRef.current) {
-                onSubmitItemRef.current({ element, event, value: nextValue });
+                onSubmitItemRef.current({ element, event, label, value: nextValue });
             }
         },
         [closeDropdown],
