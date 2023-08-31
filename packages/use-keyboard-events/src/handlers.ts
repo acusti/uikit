@@ -61,17 +61,49 @@ export function addHandler({
     };
 }
 
-const KEY_EVENT_ELEMENTS = new Set(['INPUT', 'TEXTAREA']);
+const NON_TEXT_INPUT_TYPES = new Set([
+    'button',
+    'checkbox',
+    'color',
+    'file',
+    'hidden',
+    'image',
+    'radio',
+    'range',
+    'reset',
+    'submit',
+]);
+
+const NON_TEXT_INPUT_USES_KEYS = new Set([
+    'ArrowDown',
+    'ArrowLeft',
+    'ArrowRight',
+    'ArrowUp',
+    'Enter',
+    ' ',
+]);
 
 export const usesKeyEvents = (target: EventTarget) =>
     (target as HTMLElement).isContentEditable ||
-    KEY_EVENT_ELEMENTS.has((target as HTMLElement).tagName);
+    (target as HTMLElement).tagName === 'TEXTAREA' ||
+    (target as HTMLElement).tagName === 'INPUT';
+
+export const isEventTargetUsingKeyEvent = (event: KeyboardEvent) => {
+    if (!event.target) return false;
+    const target = event.target as HTMLElement;
+    if (!usesKeyEvents(target) || target.tagName !== 'INPUT') return false;
+    // Non-text inputs can use arrow keys, escape, the spacebar, and return / enter
+    if (NON_TEXT_INPUT_TYPES.has((target as HTMLInputElement).type)) {
+        return NON_TEXT_INPUT_USES_KEYS.has(event.key);
+    }
+    return true;
+};
 
 function handleKeyboardEvent(event: KeyboardEvent) {
     const eventType = event.type as EventType;
     const handlersByPriority = handlersData[eventType];
     let index = handlersByPriority.length;
-    const targetUsesKeyEvents = event.target && usesKeyEvents(event.target);
+    const targetUsesKeyEvents = isEventTargetUsingKeyEvent(event);
     while (index--) {
         const handlers = handlersByPriority[index];
         if (handlers) {
