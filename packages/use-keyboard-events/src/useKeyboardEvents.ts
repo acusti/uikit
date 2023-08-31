@@ -39,7 +39,7 @@ export default function useKeyboardEvents({
                 ignoreUsedKeyboardEvents,
                 priority,
             }),
-        [onKeyDown, priority],
+        [ignoreUsedKeyboardEvents, onKeyDown, priority],
     );
 
     useEffect(
@@ -50,7 +50,7 @@ export default function useKeyboardEvents({
                 ignoreUsedKeyboardEvents,
                 priority,
             }),
-        [onKeyPress, priority],
+        [ignoreUsedKeyboardEvents, onKeyPress, priority],
     );
 
     useEffect(
@@ -61,7 +61,7 @@ export default function useKeyboardEvents({
                 ignoreUsedKeyboardEvents,
                 priority,
             }),
-        [onKeyUp, priority],
+        [ignoreUsedKeyboardEvents, onKeyUp, priority],
     );
 }
 
