@@ -89,14 +89,13 @@ export const usesKeyEvents = (target: EventTarget) =>
     (target as HTMLElement).tagName === 'INPUT';
 
 export const isEventTargetUsingKeyEvent = (event: KeyboardEvent) => {
-    if (!event.target) return false;
     const target = event.target as HTMLElement;
-    if (!usesKeyEvents(target) || target.tagName !== 'INPUT') return false;
+    if (!target || !usesKeyEvents(target)) return false;
+    // Restrict special handling to only non-text <input> elements
+    if (target.tagName !== 'INPUT') return true;
+    if (!NON_TEXT_INPUT_TYPES.has((target as HTMLInputElement).type)) return true;
     // Non-text inputs can use arrow keys, escape, the spacebar, and return / enter
-    if (NON_TEXT_INPUT_TYPES.has((target as HTMLInputElement).type)) {
-        return NON_TEXT_INPUT_USES_KEYS.has(event.key);
-    }
-    return true;
+    return NON_TEXT_INPUT_USES_KEYS.has(event.key);
 };
 
 function handleKeyboardEvent(event: KeyboardEvent) {
