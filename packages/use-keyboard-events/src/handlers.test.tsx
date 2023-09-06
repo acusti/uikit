@@ -1,6 +1,10 @@
-import { describe, expect, it } from 'vitest';
+// @vitest-environment jsdom
+import { cleanup, fireEvent, render } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { addHandler, handlersData } from './handlers.js';
+import { addHandler, handlersData, isEventTargetUsingKeyEvent } from './handlers.js';
 
 describe('@acusti/use-keyboard-events', () => {
     describe('handlers', () => {
@@ -87,6 +91,85 @@ describe('@acusti/use-keyboard-events', () => {
                 expect(handlersData.keypress.length).toBe(0);
                 cleanupKeyUpHandler();
                 expect(handlersData.keyup.length).toBe(0);
+            });
+        });
+
+        describe('isEventTargetUsingKeyEvent', () => {
+            let isUsingKeyEvent: null | boolean = null;
+            const handleKeyEvent = (event) => {
+                isUsingKeyEvent = isEventTargetUsingKeyEvent(event);
+            };
+
+            beforeEach(() => {
+                isUsingKeyEvent = null;
+            });
+
+            afterEach(cleanup);
+
+            it('detects that textual <input>s are using key events triggered on them', async () => {
+                const user = userEvent.setup();
+                const { getByRole, rerender } = render(
+                    <input onKeyDown={handleKeyEvent} type="text" />,
+                );
+                const input = getByRole('textbox');
+                expect(isUsingKeyEvent).toBe(null);
+                await user.type(input, 'A');
+                expect(isUsingKeyEvent).toBe(true);
+                isUsingKeyEvent = null;
+
+                rerender(<input onKeyUp={handleKeyEvent} type="password" />);
+                expect(isUsingKeyEvent).toBe(null);
+                await user.type(input, ' ');
+                expect(isUsingKeyEvent).toBe(true);
+            });
+
+            it('detects that <textarea>s are using key events triggered on them', async () => {
+                const user = userEvent.setup();
+                const { getByRole, rerender } = render(
+                    <textarea onKeyDown={handleKeyEvent} />,
+                );
+                const textarea = getByRole('textbox');
+                expect(isUsingKeyEvent).toBe(null);
+                await user.type(textarea, 'z');
+                expect(isUsingKeyEvent).toBe(true);
+                isUsingKeyEvent = null;
+
+                rerender(<textarea onKeyUp={handleKeyEvent} />);
+                expect(isUsingKeyEvent).toBe(null);
+                await user.type(textarea, '{Enter}');
+                expect(isUsingKeyEvent).toBe(true);
+            });
+
+            it('detects that contenteditable elements are using key events triggered on them', async () => {
+                const user = userEvent.setup();
+                // const text = 'Lorem ipsum dolor sit amet.';
+                const { getByTestId, rerender } = render(
+                    <div
+                        contentEditable
+                        onKeyDown={handleKeyEvent}
+                        data-testid="contenteditable"
+                    />,
+                );
+                const element = getByTestId('contenteditable');
+                // Add missing property http://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/isContentEditable
+                element.isContentEditable = true;
+                expect(isUsingKeyEvent).toBe(null);
+                await user.type(element, 'z');
+                expect(isUsingKeyEvent).toBe(true);
+                isUsingKeyEvent = null;
+
+                rerender(<div contentEditable onKeyUp={handleKeyEvent} />);
+                expect(isUsingKeyEvent).toBe(null);
+                await user.type(element, '{Enter}');
+                expect(isUsingKeyEvent).toBe(true);
+            });
+
+            it('detects that non-interactive elements aren’t using key events triggered on them', async () => {
+                const text = 'Lorem ipsum dolor sit amet.';
+                const { getByText } = render(<p onKeyDown={handleKeyEvent}>{text}</p>);
+                expect(isUsingKeyEvent).toBe(null);
+                fireEvent.keyDown(getByText(text), { key: 'A', code: 'KeyA' });
+                expect(isUsingKeyEvent).toBe(false);
             });
         });
     });
