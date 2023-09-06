@@ -171,6 +171,38 @@ describe('@acusti/use-keyboard-events', () => {
                 fireEvent.keyDown(getByText(text), { key: 'A', code: 'KeyA' });
                 expect(isUsingKeyEvent).toBe(false);
             });
+
+            it('detects that range <input>s use arrow key events', async () => {
+                const user = userEvent.setup();
+                const { getByRole } = render(
+                    <input onKeyDown={handleKeyEvent} defaultValue="1" type="range" />,
+                );
+                const input = getByRole('slider');
+                expect(isUsingKeyEvent).toBe(null);
+                await user.type(input, 'A');
+                expect(isUsingKeyEvent).toBe(false);
+                isUsingKeyEvent = null;
+                await user.type(input, '{ArrowDown}');
+                expect(isUsingKeyEvent).toBe(true);
+                isUsingKeyEvent = null;
+                expect(isUsingKeyEvent).toBe(null);
+                await user.type(input, '{ArrowRight}');
+                expect(isUsingKeyEvent).toBe(true);
+            });
+
+            it('detects that checkbox <input>s use spacebar and enter events', async () => {
+                const user = userEvent.setup();
+                const { getByRole } = render(
+                    <input onKeyDown={handleKeyEvent} type="checkbox" />,
+                );
+                const input = getByRole('checkbox');
+                expect(isUsingKeyEvent).toBe(null);
+                await user.type(input, 'A');
+                expect(isUsingKeyEvent).toBe(false);
+                isUsingKeyEvent = null;
+                await user.type(input, ' ');
+                expect(isUsingKeyEvent).toBe(true);
+            });
         });
     });
 });
