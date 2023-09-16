@@ -5,7 +5,11 @@ import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
 import './Dropdown.css';
 
 <Meta
-    argTypes={{ onSubmitItem: { action: 'submitted' } }}
+    argTypes={{
+        onClose: { action: 'closed' },
+        onOpen: { action: 'opened' },
+        onSubmitItem: { action: 'submitted' },
+    }}
     component={Dropdown}
     title="UIKit/Controls/Dropdown"
 />
