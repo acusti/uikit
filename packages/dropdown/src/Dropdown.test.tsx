@@ -64,4 +64,67 @@ describe('Dropdown.js', async () => {
         await user.click(trigger);
         expect(getByTestId('file-menu')).toBeTruthy();
     });
+
+    it('triggers props.onClose and props.onOpen at the appropriate times', async () => {
+        let closedCount = 0;
+        const handleClose = () => closedCount++;
+        let openedCount = 0;
+        const handleOpen = () => openedCount++;
+
+        const user = userEvent.setup();
+        const { getByRole, queryByTestId } = render(
+            <Dropdown onClose={handleClose} onOpen={handleOpen}>
+                File
+                <ul data-testid="file-menu">
+                    <li>New Window</li>
+                    <li>New Private Window</li>
+                    <li>New Tab</li>
+                    <li>New Empty Tab Group</li>
+                    <li>Open File…</li>
+                    <li>Open Location…</li>
+                    <li className="separator" />
+                    <li>Close Window</li>
+                    <li>Close All Window</li>
+                    <li>Close Tab</li>
+                    <li>Save As…</li>
+                    <li className="separator" />
+                    <li>Print…</li>
+                </ul>
+            </Dropdown>,
+        );
+
+        const trigger = getByRole('button');
+        expect(closedCount).toBe(0);
+        expect(openedCount).toBe(0);
+        await user.click(trigger);
+        expect(closedCount).toBe(0);
+        expect(openedCount).toBe(1);
+        expect(queryByTestId('file-menu')).toBeTruthy();
+        await user.type(trigger, '{Esc}');
+        expect(closedCount).toBe(1);
+        expect(openedCount).toBe(1);
+        expect(queryByTestId('file-menu')).toBe(null);
+    });
+
+    it('triggers props.onOpen immediately if props.isOpenOnMount', async () => {
+        let closedCount = 0;
+        const handleClose = () => closedCount++;
+        let openedCount = 0;
+        const handleOpen = () => openedCount++;
+
+        const user = userEvent.setup();
+        const { getByRole, queryByTestId } = render(
+            <Dropdown isOpenOnMount onClose={handleClose} onOpen={handleOpen}>
+                <p data-testid="dropdown">this is the dropdown contents</p>
+            </Dropdown>,
+        );
+
+        const trigger = getByRole('button');
+        expect(queryByTestId('dropdown')).toBeTruthy();
+        expect(openedCount).toBe(1);
+        await user.click(trigger);
+        expect(closedCount).toBe(1);
+        expect(openedCount).toBe(1);
+        expect(queryByTestId('dropdown')).toBe(null);
+    });
 });
