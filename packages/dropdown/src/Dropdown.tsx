@@ -49,8 +49,10 @@ export type Props = {
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s name */
     name?: string;
     onClick?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    onClose?: () => unknown;
     onMouseDown?: (event: React.MouseEvent<HTMLElement>) => unknown;
     onMouseUp?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    onOpen?: () => unknown;
     onSubmitItem?: (payload: Item) => void;
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s placeholder */
     placeholder?: string;
@@ -86,8 +88,10 @@ const Dropdown: React.FC<Props> = ({
     label,
     name,
     onClick,
+    onClose,
     onMouseDown,
     onMouseUp,
+    onOpen,
     onSubmitItem,
     placeholder,
     tabIndex,
@@ -128,6 +132,8 @@ const Dropdown: React.FC<Props> = ({
     const isOpeningRef = useRef(isOpening);
     const isTriggerFromPropsRef = useRef(isOpening);
     const keepOpenOnSubmitRef = useRef(keepOpenOnSubmit);
+    const onCloseRef = useRef(onClose);
+    const onOpenRef = useRef(onOpen);
     const onSubmitItemRef = useRef(onSubmitItem);
     const valueRef = useRef(value);
 
@@ -138,6 +144,8 @@ const Dropdown: React.FC<Props> = ({
         isOpeningRef.current = isOpening;
         isTriggerFromPropsRef.current = isTriggerFromProps;
         keepOpenOnSubmitRef.current = keepOpenOnSubmit;
+        onCloseRef.current = onClose;
+        onOpenRef.current = onOpen;
         onSubmitItemRef.current = onSubmitItem;
         valueRef.current = value;
     }, [
@@ -147,9 +155,30 @@ const Dropdown: React.FC<Props> = ({
         isOpening,
         isTriggerFromProps,
         keepOpenOnSubmit,
+        onClose,
+        onOpen,
         onSubmitItem,
         value,
     ]);
+
+    const isMountedRef = useRef(false);
+
+    useEffect(() => {
+        if (!isMountedRef.current) {
+            isMountedRef.current = true;
+            // If isOpenOnMount, trigger onOpen right away
+            if (isOpenRef.current && onOpenRef.current) {
+                onOpenRef.current();
+            }
+            return;
+        }
+
+        if (isOpen && onOpenRef.current) {
+            onOpenRef.current();
+        } else if (!isOpen && onCloseRef.current) {
+            onCloseRef.current();
+        }
+    }, [isOpen]);
 
     const closeDropdown = useCallback(() => {
         setIsOpen(false);
