@@ -25,7 +25,6 @@
     "exclude": [
         ".yarn/cache",
         "node_modules",
-        "packages/docs",
         "**/dist/*",
         "__tests__",
         "**/*.test*",
