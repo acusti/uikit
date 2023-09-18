@@ -5246,6 +5246,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["eslint-config-react-app", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.0.1"],\
             ["@babel/core", "npm:7.20.5"],\
             ["@babel/eslint-parser", "virtual:ed2c18cd957333c38e80df4fe3023c35565d6d7b6f4c949635704c972c52a6a8c26d0bdfb1a3ada04b3614d1a36b3946f40ceacf3914cba2a251ac2f23272b8b#npm:7.18.2"],\
+            ["@babel/plugin-syntax-flow", "virtual:2a4c80deee6c548e8518a9f7dc63356ec2cb2aed9e8750c2197c43be8e6e238ee4c8eb44e519e70e2347aa4685ba5a1faf5a37dbfabfb3390db3f1cc83d54efc#npm:7.18.6"],\
+            ["@babel/plugin-transform-react-jsx", "virtual:aedd18c19a1219d43a9db77ca94770a2a5d9dc2974cd09e703f725c047220f75775d7eaed7429e0cf2e2d721a39813f6ad9c0233ea2cf6c2ebff5be62ce5b1a2#npm:7.18.6"],\
             ["@rushstack/eslint-patch", "npm:1.1.4"],\
             ["@types/eslint", null],\
             ["@types/typescript", null],\
@@ -5331,8 +5333,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/__virtual__/eslint-plugin-flowtype-virtual-f012831fc3/0/cache/eslint-plugin-flowtype-npm-8.0.3-a302f4e4fe-30e63c5357.zip/node_modules/eslint-plugin-flowtype/",\
           "packageDependencies": [\
             ["eslint-plugin-flowtype", "virtual:ed2c18cd957333c38e80df4fe3023c35565d6d7b6f4c949635704c972c52a6a8c26d0bdfb1a3ada04b3614d1a36b3946f40ceacf3914cba2a251ac2f23272b8b#npm:8.0.3"],\
-            ["@babel/plugin-syntax-flow", null],\
-            ["@babel/plugin-transform-react-jsx", null],\
+            ["@babel/plugin-syntax-flow", "virtual:2a4c80deee6c548e8518a9f7dc63356ec2cb2aed9e8750c2197c43be8e6e238ee4c8eb44e519e70e2347aa4685ba5a1faf5a37dbfabfb3390db3f1cc83d54efc#npm:7.18.6"],\
+            ["@babel/plugin-transform-react-jsx", "virtual:aedd18c19a1219d43a9db77ca94770a2a5d9dc2974cd09e703f725c047220f75775d7eaed7429e0cf2e2d721a39813f6ad9c0233ea2cf6c2ebff5be62ce5b1a2#npm:7.18.6"],\
             ["@types/babel__plugin-syntax-flow", null],\
             ["@types/babel__plugin-transform-react-jsx", null],\
             ["@types/eslint", null],\
