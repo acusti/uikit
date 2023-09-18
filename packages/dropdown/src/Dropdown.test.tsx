@@ -6,8 +6,6 @@ import { afterEach, describe, expect, it } from 'vitest';
 
 import Dropdown from './Dropdown.js';
 
-const noop = () => {};
-
 afterEach(cleanup);
 
 describe('Dropdown.js', async () => {
