@@ -1,0 +1,390 @@
+// TODO make a story to test and verify the usage of useKeyboardEvents
+import CSSValueInput from '@acusti/css-value-input'; import Dropdown from
+'@acusti/dropdown'; import { Meta, Story, Canvas, Props } from
+'@storybook/addon-docs';
+
+import './Dropdown.css';
+
+<Meta
+    argTypes={{ onSubmitItem: { action: 'submitted' } }}
+    component={Dropdown}
+    title="UIKit/Controls/Dropdown"
+/>
+
+# Dropdown
+
+`Dropdown` is a React component that renders a menu-like UI with a trigger
+that the user clicks to disclose a dropdown positioned below the trigger.
+The body of the dropdown can include any DOM, and many dropdowns can be
+combined to form a multi-item menu, like the system menu in the top toolbar
+of macOS.
+
+<Canvas>
+    <Story args={{ className: 'css-lengths' }} name="CSS Lengths Dropdown">
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li>0px</li>
+                    <li>4px</li>
+                    <li>9px</li>
+                    <li>18px</li>
+                    <li>36px</li>
+                    <li>54px</li>
+                    <li>72px</li>
+                    <li>144px</li>
+                    <li>167px</li>
+                    <li>198px</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'states-dropdown',
+            isSearchable: true,
+            name: 'states',
+            placeholder: 'Choose a state…',
+        }}
+        name="States Dropdown"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li>Alabama</li>
+                    <li>Alaska</li>
+                    <li>Arizona</li>
+                    <li>Arkansas</li>
+                    <li>California</li>
+                    <li>Colorado</li>
+                    <li>Connecticut</li>
+                    <li>Delaware</li>
+                    <li>Florida</li>
+                    <li>Georgia</li>
+                    <li>Hawaii</li>
+                    <li>Idaho</li>
+                    <li>Illinois</li>
+                    <li>Indiana</li>
+                    <li>Iowa</li>
+                    <li>Kansas</li>
+                    <li>Kentucky</li>
+                    <li>Louisiana</li>
+                    <li>Maine</li>
+                    <li>Maryland</li>
+                    <li>Massachusetts</li>
+                    <li>Michigan</li>
+                    <li>Minnesota</li>
+                    <li>Mississippi</li>
+                    <li>Missouri</li>
+                    <li>Montana</li>
+                    <li>Nebraska</li>
+                    <li>Nevada</li>
+                    <li>New Hampshire</li>
+                    <li>New Jersey</li>
+                    <li>New Mexico</li>
+                    <li>New York</li>
+                    <li>North Carolina</li>
+                    <li>North Dakota</li>
+                    <li>Ohio</li>
+                    <li>Oklahoma</li>
+                    <li>Oregon</li>
+                    <li>Pennsylvania</li>
+                    <li>Rhode Island</li>
+                    <li>South Carolina</li>
+                    <li>South Dakota</li>
+                    <li>Tennessee</li>
+                    <li>Texas</li>
+                    <li>Utah</li>
+                    <li>Vermont</li>
+                    <li>Virginia</li>
+                    <li>Washington</li>
+                    <li>West Virginia</li>
+                    <li>Wisconsin</li>
+                    <li>Wyoming</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'font-weight',
+            isSearchable: true,
+            name: 'fontweight',
+        }}
+        name="Font Weight Dropdown"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li data-ukt-value="100">
+                        <span className="item-title">Font Weight - </span>
+                        100
+                    </li>
+                    <li data-ukt-value="200">
+                        <span className="item-title">Font Weight - </span>
+                        200
+                    </li>
+                    <li data-ukt-value="300">
+                        <span className="item-title">Font Weight - </span>
+                        300
+                    </li>
+                    <li data-ukt-value="400">
+                        <span className="item-title">Font Weight - </span>
+                        400
+                    </li>
+                    <li data-ukt-value="500">
+                        <span className="item-title">Font Weight - </span>
+                        500
+                    </li>
+                    <li data-ukt-value="600">
+                        <span className="item-title">Font Weight - </span>
+                        600
+                    </li>
+                    <li data-ukt-value="700">
+                        <span className="item-title">Font Weight - </span>
+                        700
+                    </li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'my-open-on-mount-context-menu',
+            isOpenOnMount: true,
+        }}
+        name="Show Context Menu On Mount"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                View menu
+                <Fragment>
+                    <h4 className="heading">View</h4>
+                    <ul>
+                        <li data-ukt-item>Open</li>
+                        <li data-ukt-item>Preview</li>
+                    </ul>
+                    <h4 className="heading">Edit</h4>
+                    <ul>
+                        <li data-ukt-value="save-item">Save</li>
+                        <li data-ukt-value="edit-item">Edit</li>
+                        <li data-ukt-value="delete-item">Delete</li>
+                    </ul>
+                </Fragment>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'dropdown-without-items',
+            hasItems: false,
+        }}
+        name="Dropdown With Interactive Contents"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                Open
+                <div>
+                    <p>
+                        Try interacting with the controls here. The
+                        dropdown should only close when you click outside
+                        of the entire dropdown or if you hit the escape key
+                        when focus isn’t in the input controls.
+                    </p>
+                    <CSSValueInput
+                        cssValueType="length"
+                        label="Width"
+                        onSubmitValue={() => {}}
+                        placeholder="100vw"
+                        unit="vw"
+                    />
+                    <CSSValueInput
+                        cssValueType="length"
+                        label="Rotation"
+                        onSubmitValue={() => {}}
+                        placeholder="0deg"
+                        step={5}
+                        unit="deg"
+                    />
+                </div>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'searchable-with-label',
+            isSearchable: true,
+            label: 'Font size',
+            name: 'fontsize',
+        }}
+        name="Searchable With Label"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li>0px</li>
+                    <li>4px</li>
+                    <li>9px</li>
+                    <li>18px</li>
+                    <li>36px</li>
+                    <li>54px</li>
+                    <li>72px</li>
+                    <li>144px</li>
+                    <li>167px</li>
+                    <li>198px</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'css-value-input-trigger',
+            hasItems: true,
+            label: 'Background size',
+        }}
+        name="CSSValueInput Trigger"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <CSSValueInput
+                    onSubmitValue={() => {}}
+                    name="cssinputbackgroundsize"
+                    placeholder="cover"
+                    validator={/^(auto|contain|cover)$/}
+                />
+                <ul>
+                    <li>cover</li>
+                    <li>contain</li>
+                    <li>auto</li>
+                    <li>50px</li>
+                    <li>100px</li>
+                    <li>200px</li>
+                    <li>50%</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{ className: 'checkboxes', keepOpenOnSubmit: true }}
+        name="Checkboxes Dropdown"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                Colors
+                <ul>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Red
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Blue
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Yellow
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Cyan
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Orchid
+                        </label>
+                    </li>
+                    <li>
+                        <label>
+                            <input type="checkbox" /> Slate
+                        </label>
+                    </li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'disabled-dropdown',
+            disabled: true,
+            isSearchable: true,
+            label: 'Disabled',
+            name: 'disabledexample',
+            value: '167px',
+        }}
+        name="Disabled Dropdown"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li>0px</li>
+                    <li>4px</li>
+                    <li>9px</li>
+                    <li>18px</li>
+                    <li>36px</li>
+                    <li>54px</li>
+                    <li>72px</li>
+                    <li>144px</li>
+                    <li>167px</li>
+                    <li>198px</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'out-of-bounds-example',
+            isSearchable: true,
+            name: 'outofboundsatbottom',
+            placeholder: 'Show above',
+        }}
+        name="Out Of Bounds At Bottom"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li>0px</li>
+                    <li>4px</li>
+                    <li>9px</li>
+                    <li>18px</li>
+                    <li>36px</li>
+                    <li>54px</li>
+                    <li>72px</li>
+                    <li>144px</li>
+                    <li>167px</li>
+                    <li>198px</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+    <Story
+        args={{
+            className: 'out-of-bounds-example position-right',
+            isSearchable: true,
+            name: 'outofboundsatright',
+            placeholder: 'Show above & to the left',
+        }}
+        name="Out Of Bounds At Right"
+    >
+        {(args) => (
+            <Dropdown {...args}>
+                <ul>
+                    <li>0px</li>
+                    <li>4px</li>
+                    <li>9px</li>
+                    <li>18px</li>
+                    <li>36px</li>
+                    <li>54px</li>
+                    <li>72px</li>
+                    <li>144px</li>
+                    <li>167px</li>
+                    <li>198px</li>
+                </ul>
+            </Dropdown>
+        )}
+    </Story>
+</Canvas>
+
+<Props story="States Dropdown" />
