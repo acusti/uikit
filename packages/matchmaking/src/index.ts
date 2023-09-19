@@ -62,10 +62,9 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
             }
         }
     }
-    // If score came out at 0 or less, give it best possible score for an inexact match
-    if (score <= 0) {
-        return MAX_INEXACT_SCORE;
-    }
+
+    // If score came to 0 or less, use best possible score for an inexact match
+    if (score <= 0) return MAX_INEXACT_SCORE;
 
     score = (worstPossibleScore - score) / worstPossibleScore;
     // Don’t allow an inexact match to get a score of 1 (reserved for an exact match)
