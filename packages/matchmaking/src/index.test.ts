@@ -57,6 +57,18 @@ const STATES = [
 
 const CSS_VALUES = ['7px', '11px', '18px', '36px', '128px'];
 
+const FONT_WEIGHT_VALUES = [
+    'Font Weight - 100',
+    'Font Weight - 200',
+    'Font Weight - 300',
+    'Font Weight - 400',
+    'Font Weight - 500',
+    'Font Weight - 600',
+    'Font Weight - 700',
+    'Font Weight - 800',
+    'Font Weight - 900',
+];
+
 describe('@acusti/matchmaking', () => {
     describe('sortByBestMatch', () => {
         it('returns items sorted from best to worst match based on case-insensitive alphabetical proximity and in the order in which they were provided in the case of equal proximity', () => {
@@ -65,8 +77,8 @@ describe('@acusti/matchmaking', () => {
                 'West Virginia',
                 'Wisconsin',
                 'Wyoming',
-                'Vermont',
-                'Virginia',
+                'New Hampshire',
+                'New Jersey',
             ]);
 
             expect(sortByBestMatch({ items: STATES, text: 'MIP' }).slice(0, 4)).toEqual([
@@ -126,6 +138,12 @@ describe('@acusti/matchmaking', () => {
     describe('getBestMatch', () => {
         it('returns best match from text items for search text', () => {
             expect(getBestMatch({ items: CSS_VALUES, text: '6' })).toEqual('7px');
+            expect(getBestMatch({ items: FONT_WEIGHT_VALUES, text: '300' })).toBe(
+                'Font Weight - 300',
+            );
+            expect(getBestMatch({ items: FONT_WEIGHT_VALUES, text: '9' })).toBe(
+                'Font Weight - 900',
+            );
             // 'rpyrg' is close to 'south', so best match is the first “south *” item
             expect(getBestMatch({ items: STATES, text: 'rpyrg' })).toBe('South Carolina');
         });
