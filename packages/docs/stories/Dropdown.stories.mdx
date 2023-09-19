@@ -1,14 +1,15 @@
 import CSSValueInput from '@acusti/css-value-input';
 import Dropdown from '@acusti/dropdown';
-import { Meta, Story, Canvas, Props } from '@storybook/addon-docs';
+import { ArgsTable, Canvas, Meta, Story } from '@storybook/addon-docs';
+import {Fragment} from 'react';
 
 import './Dropdown.css';
 
 <Meta
     argTypes={{
-        onClose: { action: 'closed' },
-        onOpen: { action: 'opened' },
-        onSubmitItem: { action: 'submitted' },
+        onClose: { action: 'onClose' },
+        onOpen: { action: 'onOpen' },
+        onSubmitItem: { action: 'onSubmitItem' },
     }}
     component={Dropdown}
     title="UIKit/Controls/Dropdown"
@@ -390,4 +391,4 @@ of macOS.
     </Story>
 </Canvas>
 
-<Props story="States Dropdown" />
+<ArgsTable of={Dropdown} />
