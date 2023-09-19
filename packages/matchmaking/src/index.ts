@@ -19,9 +19,15 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
     const strBLength = strB.length;
     const shortestLength = Math.min(strALength, strBLength);
 
-    // Exact partial match is next best score to exact match
-    if (strA.slice(0, shortestLength) === strB.slice(0, shortestLength)) {
-        return MAX_PARTIAL_EXACT_SCORE;
+    // Exact partial match is the next best score to an exact match with
+    // relative length from the beginning applying a penalty to total score
+    const [strLonger, strShorter] = strALength > strBLength ? [strA, strB] : [strB, strA];
+    const matchStart = strLonger.indexOf(strShorter);
+    if (matchStart > -1) {
+        // Maximum penalty for distance from beginning is 0.25
+        const penaltyPerStep = 0.25 / (strLonger.length - 2);
+        const penalty = penaltyPerStep * matchStart;
+        return MAX_PARTIAL_EXACT_SCORE - penalty;
     }
 
     // To proportionally weight consecutive exact matches, increase bonus relative to total length
