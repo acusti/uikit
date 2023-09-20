@@ -101,11 +101,6 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
 
         setOutOfBounds({ bottom, hasLayout: true, left, right, top });
     }, [
-        outOfBounds.bottom,
-        outOfBounds.hasLayout,
-        outOfBounds.left,
-        outOfBounds.right,
-        outOfBounds.top,
         elementRect.bottom,
         elementRect.left,
         elementRect.right,
@@ -114,6 +109,11 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
         offsetParentRect.left,
         offsetParentRect.right,
         offsetParentRect.top,
+        outOfBounds.bottom,
+        outOfBounds.hasLayout,
+        outOfBounds.left,
+        outOfBounds.right,
+        outOfBounds.top,
     ]);
 
     return outOfBounds;
