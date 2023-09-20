@@ -668,10 +668,11 @@ const Dropdown: React.FC<Props> = ({
                         className={clsx(BODY_CLASS_NAME, {
                             'calculating-position': !outOfBounds.hasLayout,
                             'has-items': hasItems,
-                            'out-of-bounds-bottom': outOfBounds.bottom,
-                            'out-of-bounds-left': outOfBounds.left,
-                            'out-of-bounds-right': outOfBounds.right,
-                            'out-of-bounds-top': outOfBounds.top,
+                            'out-of-bounds-bottom':
+                                outOfBounds.bottom && !outOfBounds.top,
+                            'out-of-bounds-left': outOfBounds.left && !outOfBounds.right,
+                            'out-of-bounds-right': outOfBounds.right && !outOfBounds.left,
+                            'out-of-bounds-top': outOfBounds.top && !outOfBounds.bottom,
                         })}
                         ref={setDropdownBodyElement}
                     >
