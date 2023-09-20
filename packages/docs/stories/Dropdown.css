@@ -1,5 +1,6 @@
-.sb-show-main, .sb-story {
-    min-height: 210px;
+.sb-show-main,
+.sb-story {
+    min-height: 180px;
 }
 .uktdropdown input {
     box-sizing: border-box;
@@ -102,7 +103,7 @@
 
 .out-of-bounds-example.uktdropdown {
     position: absolute;
-    bottom: 30px;
+    bottom: 20px;
 }
 .out-of-bounds-example input {
     width: 150px;
