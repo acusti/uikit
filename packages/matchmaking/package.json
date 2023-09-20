@@ -1,6 +1,6 @@
 {
     "name": "@acusti/matchmaking",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "Intuitive approximate string matching (i.e. fuzzy searches)",
     "keywords": [
         "utils",
