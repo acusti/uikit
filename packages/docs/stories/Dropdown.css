@@ -1,4 +1,4 @@
-.innerZoomElementWrapper {
+.sb-show-main, .sb-story {
     min-height: 210px;
 }
 .uktdropdown input {
@@ -18,12 +18,18 @@
     padding: 4px 8px;
     margin: 4px 0;
 }
+
 .uktdropdown-body .heading {
     color: #aaa;
     font-size: 12px;
     text-transform: uppercase;
     letter-spacing: 1px;
     font-weight: 700;
+    margin: 0.75rem 0 0.5rem;
+}
+
+.uktdropdown-body .heading:first-child {
+    margin-top: 0.25rem;
 }
 
 .css-lengths .uktdropdown-trigger {
