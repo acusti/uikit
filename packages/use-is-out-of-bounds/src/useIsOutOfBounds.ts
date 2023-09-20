@@ -48,22 +48,30 @@ const getOverflowHiddenParent = (element: MaybeHTMLElement): MaybeHTMLElement =>
 // Note: elementTop - elementHeight = (elementTop * 2) - elementBottom
 // Note: elementBottom + elementHeight = (elementBottom * 2) - elementTop
 const getWillBeOutOfBounds = ({
-    elementValue,
-    elementValueOpposite,
-    offsetParentValue,
+    boundingValue,
+    boundingValueOpposite,
+    value,
+    valueOpposite,
 }: {
-    elementValue: number;
-    elementValueOpposite: number;
-    offsetParentValue: number;
+    boundingValue: number;
+    boundingValueOpposite: number;
+    value: number;
+    valueOpposite: number;
 }) => {
-    const isEndValue = elementValue > elementValueOpposite;
-    const adjustedElementValue = elementValue * 2 - elementValueOpposite;
+    const isEndValue = value > valueOpposite;
+    const adjustedValue = value * 2 - valueOpposite;
     const adjustedOverlapValue = isEndValue
         ? // If checking bottom/right, overlap = element - offsetParent
-          adjustedElementValue - offsetParentValue
+          adjustedValue - boundingValue
         : // If checking top/left, overlap = offsetParent - element
-          offsetParentValue - adjustedElementValue;
-    return adjustedOverlapValue > 0;
+          boundingValue - adjustedValue;
+    if (adjustedOverlapValue <= 0) return false;
+    // This util is only called if already outOfBounds in opposite direction.
+    // Only consider adjusted value outOfBounds if more outOfBounds than that.
+    const oppositeOverlapValue = isEndValue
+        ? boundingValueOpposite - valueOpposite
+        : valueOpposite - boundingValueOpposite;
+    return adjustedOverlapValue > oppositeOverlapValue;
 };
 
 const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
@@ -102,33 +110,47 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
         let top = elementTop < offsetParentTop;
 
         const isDownward = !outOfBounds.bottom || outOfBounds.top; // defaults downward
-        if (isDownward && !top) {
+        const willBeDownward = !bottom || top; // defaults downward
+        if (isDownward && !willBeDownward) {
             top = getWillBeOutOfBounds({
-                elementValue: elementTop,
-                elementValueOpposite: elementBottom,
-                offsetParentValue: offsetParentTop,
+                boundingValue: offsetParentTop,
+                boundingValueOpposite: offsetParentBottom,
+                value: elementTop,
+                valueOpposite: elementBottom,
             });
-        } else if (!isDownward && !bottom) {
+            // If top would be *more* out-of-bounds, keep it downward
+            bottom = !top;
+        } else if (!isDownward && willBeDownward) {
             bottom = getWillBeOutOfBounds({
-                elementValue: elementBottom,
-                elementValueOpposite: elementTop,
-                offsetParentValue: offsetParentBottom,
+                boundingValue: offsetParentBottom,
+                boundingValueOpposite: offsetParentTop,
+                value: elementBottom,
+                valueOpposite: elementTop,
             });
+            // If bottom would be *more* out-of-bounds, keep it upward
+            top = !bottom;
         }
 
         const isRightward = !outOfBounds.right || outOfBounds.left; // defaults rightward
-        if (isRightward && !left) {
+        const willBeRightward = !right || left;
+        if (isRightward && !willBeRightward) {
             left = getWillBeOutOfBounds({
-                elementValue: elementLeft,
-                elementValueOpposite: elementRight,
-                offsetParentValue: offsetParentLeft,
+                boundingValue: offsetParentLeft,
+                boundingValueOpposite: offsetParentRight,
+                value: elementLeft,
+                valueOpposite: elementRight,
             });
-        } else if (!isRightward && !right) {
+            // If left would be *more* out-of-bounds, keep it rightward
+            right = !left;
+        } else if (!isRightward && willBeRightward) {
             right = getWillBeOutOfBounds({
-                elementValue: elementRight,
-                elementValueOpposite: elementLeft,
-                offsetParentValue: offsetParentRight,
+                boundingValue: offsetParentRight,
+                boundingValueOpposite: offsetParentLeft,
+                value: elementRight,
+                valueOpposite: elementLeft,
             });
+            // If right would be *more* out-of-bounds, keep it leftward
+            left = !right;
         }
 
         // Do nothing if none of the outOfBounds values have changed
