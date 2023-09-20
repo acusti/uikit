@@ -41,6 +41,31 @@ const getOverflowHiddenParent = (element: MaybeHTMLElement): MaybeHTMLElement =>
     return null;
 };
 
+// If element is out-of-bounds, UI will reposition it to move it back in bounds.
+// To prevent the element from becoming out-of-bounds in the opposite direction,
+// check if there is room in the opposite direction for the element to render.
+// If there isn’t room, mark it as out-of-bounds in the opposite direction also.
+// Note: elementTop - elementHeight = (elementTop * 2) - elementBottom
+// Note: elementBottom + elementHeight = (elementBottom * 2) - elementTop
+const getWillBeOutOfBounds = ({
+    elementValue,
+    elementValueOpposite,
+    offsetParentValue,
+}: {
+    elementValue: number;
+    elementValueOpposite: number;
+    offsetParentValue: number;
+}) => {
+    const isEndValue = elementValue > elementValueOpposite;
+    const adjustedElementValue = elementValue * 2 - elementValueOpposite;
+    const adjustedOverlapValue = isEndValue
+        ? // If checking bottom/right, overlap = element - offsetParent
+          adjustedElementValue - offsetParentValue
+        : // If checking top/left, overlap = offsetParent - element
+          offsetParentValue - adjustedElementValue;
+    return adjustedOverlapValue > 0;
+};
+
 const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
     const [outOfBounds, setOutOfBounds] = useState<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
     const elementRect = useBoundingClientRect(element);
@@ -76,24 +101,34 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
         let right = elementRight > offsetParentRight;
         let top = elementTop < offsetParentTop;
 
-        // If element is out-of-bounds, UI will reposition it to move it back in bounds.
-        // To prevent the element from becoming out-of-bounds in the opposite direction,
-        // check if there is room in the opposite direction for the element to render.
-        // If there isn’t room, mark it as out-of-bounds in the opposite direction also.
-        // Note: elementTop - elementHeight = (elementTop * 2) - elementBottom
-        // Note: elementBottom + elementHeight = (elementBottom * 2) - elementTop
         const isDownward = !outOfBounds.bottom || outOfBounds.top; // defaults downward
         if (isDownward && !top) {
-            top = elementTop * 2 - elementBottom < offsetParentTop;
+            top = getWillBeOutOfBounds({
+                elementValue: elementTop,
+                elementValueOpposite: elementBottom,
+                offsetParentValue: offsetParentTop,
+            });
         } else if (!isDownward && !bottom) {
-            bottom = elementBottom * 2 - elementTop > offsetParentBottom;
+            bottom = getWillBeOutOfBounds({
+                elementValue: elementBottom,
+                elementValueOpposite: elementTop,
+                offsetParentValue: offsetParentBottom,
+            });
         }
 
         const isRightward = !outOfBounds.right || outOfBounds.left; // defaults rightward
         if (isRightward && !left) {
-            left = elementLeft * 2 - elementRight < offsetParentLeft;
+            left = getWillBeOutOfBounds({
+                elementValue: elementLeft,
+                elementValueOpposite: elementRight,
+                offsetParentValue: offsetParentLeft,
+            });
         } else if (!isRightward && !right) {
-            right = elementRight * 2 - elementLeft > offsetParentRight;
+            right = getWillBeOutOfBounds({
+                elementValue: elementRight,
+                elementValueOpposite: elementLeft,
+                offsetParentValue: offsetParentRight,
+            });
         }
 
         // Do nothing if none of the outOfBounds values have changed
