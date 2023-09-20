@@ -19,6 +19,9 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
     const strBLength = strB.length;
     const shortestLength = Math.min(strALength, strBLength);
 
+    // If one of the texts is empty, they cannot match
+    if (!shortestLength) return 0;
+
     // Exact partial match is the next best score to an exact match with
     // relative length from the beginning applying a penalty to total score
     const [strLonger, strShorter] = strALength > strBLength ? [strA, strB] : [strB, strA];

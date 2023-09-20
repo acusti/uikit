@@ -58,6 +58,7 @@ const STATES = [
 const CSS_VALUES = ['7px', '11px', '18px', '36px', '128px'];
 
 const FONT_WEIGHT_VALUES = [
+    '',
     'Font Weight - 100',
     'Font Weight - 200',
     'Font Weight - 300',
