@@ -60,7 +60,7 @@ __metadata:
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
     "@acusti/input-text": ^1.2.0
-    "@acusti/matchmaking": ^0.5.0
+    "@acusti/matchmaking": ^0.5.1
     "@acusti/styling": ^0.6.0
     "@acusti/use-is-out-of-bounds": ^0.6.0
     "@testing-library/dom": ^9.3.1
@@ -90,7 +90,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/matchmaking@^0.5.0, @acusti/matchmaking@workspace:packages/matchmaking":
+"@acusti/matchmaking@^0.5.1, @acusti/matchmaking@workspace:packages/matchmaking":
   version: 0.0.0-use.local
   resolution: "@acusti/matchmaking@workspace:packages/matchmaking"
   dependencies:
