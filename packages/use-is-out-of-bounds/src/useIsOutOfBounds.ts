@@ -62,13 +62,31 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
             return;
         }
 
-        // If element is out-of-bounds, UI will adjust its position to move it back in bounds.
-        // To prevent that from causing this hook to wrongly think it can set it back to false,
-        // only allow outOfBounds values to switch from true to false when resetting to initial.
-        const bottom = outOfBounds.bottom || elementRect.bottom > offsetParentRect.bottom;
-        const left = outOfBounds.left || elementRect.left < offsetParentRect.left;
-        const right = outOfBounds.right || elementRect.right > offsetParentRect.right;
-        const top = outOfBounds.top || elementRect.top < offsetParentRect.top;
+        let bottom = elementRect.bottom > offsetParentRect.bottom;
+        let left = elementRect.left < offsetParentRect.left;
+        let right = elementRect.right > offsetParentRect.right;
+        let top = elementRect.top < offsetParentRect.top;
+
+        // If element is out-of-bounds, UI will reposition it to move it back in bounds.
+        // To prevent the element from becoming out-of-bounds in the opposite direction,
+        // check if there is room in the opposite direction for the element to render.
+        // If there isn’t room, mark it as out-of-bounds in the opposite direction also.
+        // Note: elementTop - elementHeight = (elementTop * 2) - elementBottom
+        // Note: elementBottom + elementHeight = (elementBottom * 2) - elementTop
+        const isDownward = !outOfBounds.bottom || outOfBounds.top; // defaults downward
+        if (isDownward && !top) {
+            top = elementRect.top! * 2 - elementRect.bottom! < offsetParentRect.top!;
+        } else if (!isDownward && !bottom) {
+            bottom =
+                elementRect.bottom! * 2 - elementRect.top! > offsetParentRect.bottom!;
+        }
+
+        const isRightward = !outOfBounds.right || outOfBounds.left; // defaults rightward
+        if (isRightward && !left) {
+            left = elementRect.left! * 2 - elementRect.right! < offsetParentRect.left!;
+        } else if (!isRightward && !right) {
+            right = elementRect.right! * 2 - elementRect.left! > offsetParentRect.right!;
+        }
 
         // Do nothing if none of the outOfBounds values have changed
         if (
