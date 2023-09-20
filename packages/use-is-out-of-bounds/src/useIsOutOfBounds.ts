@@ -52,12 +52,12 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
     }
 
     useEffect(() => {
-        if (elementRect.top === undefined) {
+        if (elementRect.top == null) {
             setOutOfBounds(INITIAL_OUT_OF_BOUNDS);
             return;
         }
 
-        if (offsetParentRect.top === undefined) {
+        if (offsetParentRect.top == null) {
             setOutOfBounds(INITIAL_OUT_OF_BOUNDS_HAS_LAYOUT);
             return;
         }
