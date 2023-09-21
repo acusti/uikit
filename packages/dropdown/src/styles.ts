@@ -19,6 +19,8 @@ export const STYLES = `
   --uktdd-body-bg-color: #fff;
   --uktdd-body-bg-color-hover: rgb(105,162,249);
   --uktdd-body-color-hover: #fff;
+  --uktdd-body-max-height: calc(100vh - 30px);
+  --uktdd-body-max-width: calc(100vw - 30px);
   --uktdd-body-pad-bottom: 9px;
   --uktdd-body-pad-left: 12px;
   --uktdd-body-pad-right: 12px;
@@ -49,8 +51,9 @@ ${BODY_SELECTOR} {
   box-sizing: border-box;
   position: absolute;
   top: 100%;
-  max-height: calc(100vh - 50px);
+  max-height: var(--uktdd-body-max-height);
   min-height: 50px;
+  max-width: var(--uktdd-body-max-width);
   min-width: 100%;
   overflow: auto;
   z-index: 2;
