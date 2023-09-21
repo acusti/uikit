@@ -8,6 +8,8 @@ type OutOfBounds = {
     bottom: boolean;
     hasLayout: boolean;
     left: boolean;
+    maxHeight: null | number;
+    maxWidth: null | number;
     right: boolean;
     top: boolean;
 };
@@ -16,6 +18,8 @@ const INITIAL_OUT_OF_BOUNDS: OutOfBounds = Object.freeze({
     bottom: false,
     hasLayout: false,
     left: false,
+    maxHeight: null,
+    maxWidth: null,
     right: false,
     top: false,
 });
@@ -153,18 +157,37 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
             left = !right;
         }
 
+        const maxHeight =
+            !bottom || top
+                ? offsetParentBottom - elementTop
+                : elementBottom - offsetParentTop;
+        const maxWidth =
+            !right || left
+                ? offsetParentRight - elementLeft
+                : elementRight - offsetParentLeft;
+
         // Do nothing if none of the outOfBounds values have changed
         if (
             outOfBounds.hasLayout &&
             bottom === outOfBounds.bottom &&
             left === outOfBounds.left &&
+            maxHeight === outOfBounds.maxHeight &&
+            maxWidth === outOfBounds.maxWidth &&
             right === outOfBounds.right &&
             top === outOfBounds.top
         ) {
             return;
         }
 
-        setOutOfBounds({ bottom, hasLayout: true, left, right, top });
+        setOutOfBounds({
+            bottom,
+            hasLayout: true,
+            left,
+            maxHeight,
+            maxWidth,
+            right,
+            top,
+        });
     }, [
         elementRect.bottom,
         elementRect.left,
@@ -177,6 +200,8 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
         outOfBounds.bottom,
         outOfBounds.hasLayout,
         outOfBounds.left,
+        outOfBounds.maxHeight,
+        outOfBounds.maxWidth,
         outOfBounds.right,
         outOfBounds.top,
     ]);
