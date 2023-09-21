@@ -1,4 +1,4 @@
-import CSSValueInput from '@acusti/css-value-input';
+import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
 
 import './CSSValueInput.css';
 import './InputText.css';

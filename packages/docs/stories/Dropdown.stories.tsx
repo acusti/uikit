@@ -1,6 +1,7 @@
-import CSSValueInput from '@acusti/css-value-input';
-import Dropdown from '@acusti/dropdown';
 import { Fragment } from 'react';
+
+import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
+import Dropdown from '../../dropdown/src/Dropdown.js';
 
 import './CSSValueInput.css';
 import './Dropdown.css';

@@ -1,5 +1,6 @@
-import useKeyboardEvents from '@acusti/use-keyboard-events';
 import { Fragment, useState } from 'react';
+
+import useKeyboardEvents from '../../use-keyboard-events/src/useKeyboardEvents.js';
 
 import './useKeyboardEvents.css';
 

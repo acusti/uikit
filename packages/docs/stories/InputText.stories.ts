@@ -1,4 +1,4 @@
-import InputText from '@acusti/input-text';
+import InputText from '../../input-text/src/InputText.js';
 
 import './InputText.css';
 
