@@ -13,14 +13,17 @@ export const LABEL_SELECTOR = `.${LABEL_CLASS_NAME}`;
 export const LABEL_TEXT_SELECTOR = `.${LABEL_TEXT_CLASS_NAME}`;
 export const TRIGGER_SELECTOR = `.${TRIGGER_CLASS_NAME}`;
 
+export const BODY_MAX_HEIGHT_VAR = '--uktdd-body-max-height';
+export const BODY_MAX_WIDTH_VAR = '--uktdd-body-max-width';
+
 export const STYLES = `
 :root {
   --uktdd-font-family: ${SYSTEM_UI_FONT};
   --uktdd-body-bg-color: #fff;
   --uktdd-body-bg-color-hover: rgb(105,162,249);
   --uktdd-body-color-hover: #fff;
-  --uktdd-body-max-height: calc(100vh - 30px);
-  --uktdd-body-max-width: calc(100vw - 30px);
+  ${BODY_MAX_HEIGHT_VAR}: calc(100vh - 30px);
+  ${BODY_MAX_WIDTH_VAR}: calc(100vw - 30px);
   --uktdd-body-pad-bottom: 9px;
   --uktdd-body-pad-left: 12px;
   --uktdd-body-pad-right: 12px;
@@ -51,9 +54,9 @@ ${BODY_SELECTOR} {
   box-sizing: border-box;
   position: absolute;
   top: 100%;
-  max-height: var(--uktdd-body-max-height);
+  max-height: var(${BODY_MAX_HEIGHT_VAR});
   min-height: 50px;
-  max-width: var(--uktdd-body-max-width);
+  max-width: var(${BODY_MAX_WIDTH_VAR});
   min-width: 100%;
   overflow: auto;
   z-index: 2;

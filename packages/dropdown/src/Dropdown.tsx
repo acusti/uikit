@@ -6,6 +6,8 @@ import * as React from 'react';
 
 import {
     BODY_CLASS_NAME,
+    BODY_MAX_HEIGHT_VAR,
+    BODY_MAX_WIDTH_VAR,
     BODY_SELECTOR,
     LABEL_CLASS_NAME,
     LABEL_TEXT_CLASS_NAME,
@@ -67,7 +69,7 @@ type TimeoutID = ReturnType<typeof setTimeout>;
 
 type MousePosition = { clientX: number; clientY: number };
 
-const { Children, Fragment, useCallback, useEffect, useRef, useState } = React;
+const { Children, Fragment, useCallback, useEffect, useMemo, useRef, useState } = React;
 
 const noop = () => {};
 
@@ -640,6 +642,18 @@ const Dropdown: React.FC<Props> = ({
         );
     }
 
+    const style = useMemo<{ [key: string]: string }>(
+        () => ({
+            ...(outOfBounds.maxHeight
+                ? { [BODY_MAX_HEIGHT_VAR]: `${outOfBounds.maxHeight}px` }
+                : null),
+            ...(outOfBounds.maxWidth
+                ? { [BODY_MAX_WIDTH_VAR]: `${outOfBounds.maxWidth}px` }
+                : null),
+        }),
+        [outOfBounds.maxHeight, outOfBounds.maxWidth],
+    );
+
     return (
         <Fragment>
             <Style>{STYLES}</Style>
@@ -656,6 +670,7 @@ const Dropdown: React.FC<Props> = ({
                 onMouseOut={handleMouseOut}
                 onMouseOver={handleMouseOver}
                 ref={handleRef}
+                style={style}
                 tabIndex={
                     isSearchable || inputElementRef.current || !isTriggerFromProps
                         ? undefined
