@@ -3,7 +3,6 @@ import { getBestMatch } from '@acusti/matchmaking';
 import { BODY_SELECTOR } from './styles.js';
 
 export const ITEM_SELECTOR = `[data-ukt-item], [data-ukt-value]`;
-export const KEY_EVENT_ELEMENTS = new Set(['INPUT', 'TEXTAREA']);
 
 export const getItemElements = (dropdownElement: HTMLElement | null) => {
     if (!dropdownElement) return null;

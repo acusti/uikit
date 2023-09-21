@@ -1,6 +1,9 @@
 import InputText from '@acusti/input-text';
 import { Style } from '@acusti/styling';
 import useIsOutOfBounds from '@acusti/use-is-out-of-bounds';
+import useKeyboardEvents, {
+    isEventTargetUsingKeyEvent,
+} from '@acusti/use-keyboard-events';
 import clsx from 'clsx';
 import * as React from 'react';
 
@@ -19,7 +22,6 @@ import {
     getActiveItemElement,
     getItemElements,
     ITEM_SELECTOR,
-    KEY_EVENT_ELEMENTS,
     setActiveItem,
 } from './helpers.js';
 
@@ -341,6 +343,127 @@ export default function Dropdown({
         [closeDropdown, handleSubmitItem, onMouseUp],
     );
 
+    const handleKeyDown = useCallback(
+        (event: KeyboardEvent) => {
+            const { altKey, ctrlKey, key, metaKey } = event;
+            const eventTarget = event.target as HTMLElement;
+            const dropdownElement = dropdownElementRef.current;
+            if (!dropdownElement) return;
+
+            const onEventHandled = () => {
+                event.stopPropagation();
+                event.preventDefault();
+                currentInputMethodRef.current = 'keyboard';
+            };
+
+            const isEventTargetingDropdown = dropdownElement.contains(eventTarget);
+
+            if (!isOpenRef.current) {
+                // If dropdown is closed, don’t handle key events if event target isn’t within dropdown
+                if (!isEventTargetingDropdown) return;
+                // Open the dropdown on spacebar, enter, or if isSearchable and user hits the ↑/↓ arrows
+                if (
+                    key === ' ' ||
+                    key === 'Enter' ||
+                    (hasItemsRef.current && (key === 'ArrowUp' || key === 'ArrowDown'))
+                ) {
+                    onEventHandled();
+                    setIsOpen(true);
+                }
+                return;
+            }
+
+            const isTargetUsingKeyEvents = isEventTargetUsingKeyEvent(event);
+
+            // If dropdown isOpen + hasItems & eventTargetNotUsingKeyEvents, handle characters
+            if (hasItemsRef.current && !isTargetUsingKeyEvents) {
+                let isEditingCharacters =
+                    !ctrlKey && !metaKey && /^[A-Za-z0-9]$/.test(key);
+                // User could also be editing characters if there are already characters entered
+                // and they are hitting delete or spacebar
+                if (!isEditingCharacters && enteredCharactersRef.current) {
+                    isEditingCharacters = key === ' ' || key === 'Backspace';
+                }
+
+                if (isEditingCharacters) {
+                    onEventHandled();
+                    if (key === 'Backspace') {
+                        enteredCharactersRef.current = enteredCharactersRef.current.slice(
+                            0,
+                            -1,
+                        );
+                    } else {
+                        enteredCharactersRef.current += key;
+                    }
+
+                    setActiveItem({
+                        dropdownElement,
+                        // If input element came from props, only override the input’s value
+                        // with an exact text match so user can enter a value not in items
+                        isExactMatch: isTriggerFromPropsRef.current,
+                        text: enteredCharactersRef.current,
+                    });
+
+                    if (clearEnteredCharactersTimerRef.current) {
+                        clearTimeout(clearEnteredCharactersTimerRef.current);
+                    }
+
+                    clearEnteredCharactersTimerRef.current = setTimeout(() => {
+                        enteredCharactersRef.current = '';
+                        clearEnteredCharactersTimerRef.current = null;
+                    }, 1500);
+
+                    return;
+                }
+            }
+
+            // If dropdown isOpen, handle submitting the value
+            if (key === 'Enter' || (key === ' ' && !inputElementRef.current)) {
+                onEventHandled();
+                handleSubmitItem(event);
+                return;
+            }
+
+            // If dropdown isOpen, handle closing it on escape or spacebar if !hasItems
+            if (
+                key === 'Escape' ||
+                (isEventTargetingDropdown && key === ' ' && !hasItemsRef.current)
+            ) {
+                // Close dropdown if hasItems or event target not using key events
+                if (hasItemsRef.current || !isTargetUsingKeyEvents) {
+                    closeDropdown();
+                }
+                return;
+            }
+
+            // Handle ↑/↓ arrows
+            if (hasItemsRef.current) {
+                if (key === 'ArrowUp') {
+                    onEventHandled();
+                    if (altKey || metaKey) {
+                        setActiveItem({ dropdownElement, index: 0 });
+                    } else {
+                        setActiveItem({ dropdownElement, indexAddend: -1 });
+                    }
+                    return;
+                }
+                if (key === 'ArrowDown') {
+                    onEventHandled();
+                    if (altKey || metaKey) {
+                        // Using a negative index counts back from the end
+                        setActiveItem({ dropdownElement, index: -1 });
+                    } else {
+                        setActiveItem({ dropdownElement, indexAddend: 1 });
+                    }
+                    return;
+                }
+            }
+        },
+        [closeDropdown, handleSubmitItem],
+    );
+
+    useKeyboardEvents({ ignoreUsedKeyboardEvents: false, onKeyDown: handleKeyDown });
+
     const cleanupEventListenersRef = useRef<() => void>(noop);
 
     const handleRef = useCallback(
@@ -394,135 +517,6 @@ export default function Dropdown({
                 }
             };
 
-            const handleGlobalKeyDown = (event: KeyboardEvent) => {
-                const { altKey, ctrlKey, key, metaKey } = event;
-                const eventTarget = event.target as HTMLElement;
-                const dropdownElement = dropdownElementRef.current;
-                if (!dropdownElement) return;
-
-                const onEventHandled = () => {
-                    event.stopPropagation();
-                    event.preventDefault();
-                    currentInputMethodRef.current = 'keyboard';
-                };
-
-                const isEventTargetingDropdown = dropdownElement.contains(eventTarget);
-
-                if (!isOpenRef.current) {
-                    // If dropdown is closed, don’t handle key events if event target isn’t within dropdown
-                    if (!isEventTargetingDropdown) return;
-                    // Open the dropdown on spacebar, enter, or if isSearchable and user hits the ↑/↓ arrows
-                    if (
-                        key === ' ' ||
-                        key === 'Enter' ||
-                        (hasItemsRef.current &&
-                            (key === 'ArrowUp' || key === 'ArrowDown'))
-                    ) {
-                        onEventHandled();
-                        setIsOpen(true);
-                        return;
-                    }
-
-                    return;
-                }
-
-                // If dropdown isOpen, hasItems, and not isSearchable, handle entering characters
-                if (hasItemsRef.current && !inputElementRef.current) {
-                    let isEditingCharacters =
-                        !ctrlKey && !metaKey && /^[A-Za-z0-9]$/.test(key);
-                    // User could also be editing characters if there are already characters entered
-                    // and they are hitting delete or spacebar
-                    if (!isEditingCharacters && enteredCharactersRef.current) {
-                        isEditingCharacters = key === ' ' || key === 'Backspace';
-                    }
-
-                    if (isEditingCharacters) {
-                        onEventHandled();
-                        if (key === 'Backspace') {
-                            enteredCharactersRef.current =
-                                enteredCharactersRef.current.slice(0, -1);
-                        } else {
-                            enteredCharactersRef.current += key;
-                        }
-
-                        setActiveItem({
-                            dropdownElement,
-                            // If input element came from props, only override the input’s value
-                            // with an exact text match so user can enter a value not in items
-                            isExactMatch: isTriggerFromPropsRef.current,
-                            text: enteredCharactersRef.current,
-                        });
-
-                        if (clearEnteredCharactersTimerRef.current) {
-                            clearTimeout(clearEnteredCharactersTimerRef.current);
-                        }
-
-                        clearEnteredCharactersTimerRef.current = setTimeout(() => {
-                            enteredCharactersRef.current = '';
-                            clearEnteredCharactersTimerRef.current = null;
-                        }, 1500);
-
-                        return;
-                    }
-                }
-                // If dropdown isOpen, handle submitting the value
-                if (key === 'Enter' || (key === ' ' && !inputElementRef.current)) {
-                    onEventHandled();
-                    handleSubmitItem(event);
-                    return;
-                }
-                // If dropdown isOpen, handle closing it on escape or spacebar if !hasItems
-                if (
-                    key === 'Escape' ||
-                    (isEventTargetingDropdown && key === ' ' && !hasItemsRef.current)
-                ) {
-                    // If there are no items & event target element uses key events, don’t close it
-                    if (
-                        !hasItemsRef.current &&
-                        (eventTarget.isContentEditable ||
-                            KEY_EVENT_ELEMENTS.has(eventTarget.tagName))
-                    ) {
-                        return;
-                    }
-                    closeDropdown();
-                    return;
-                }
-                // Handle ↑/↓ arrows
-                if (hasItemsRef.current) {
-                    if (key === 'ArrowUp') {
-                        onEventHandled();
-                        if (altKey || metaKey) {
-                            setActiveItem({
-                                dropdownElement,
-                                index: 0,
-                            });
-                        } else {
-                            setActiveItem({
-                                dropdownElement,
-                                indexAddend: -1,
-                            });
-                        }
-                        return;
-                    }
-                    if (key === 'ArrowDown') {
-                        onEventHandled();
-                        if (altKey || metaKey) {
-                            // Using a negative index counts back from the end
-                            setActiveItem({
-                                dropdownElement,
-                                index: -1,
-                            });
-                        } else {
-                            setActiveItem({
-                                dropdownElement,
-                                indexAddend: 1,
-                            });
-                        }
-                        return;
-                    }
-                }
-            };
-
             // Close dropdown if any element is focused outside of this dropdown
             const handleGlobalFocusIn = ({ target }: Event) => {
                 if (!isOpenRef.current) return;
@@ -541,13 +535,11 @@ export default function Dropdown({
             };
 
             document.addEventListener('focusin', handleGlobalFocusIn);
-            document.addEventListener('keydown', handleGlobalKeyDown);
             document.addEventListener('mousedown', handleGlobalMouseDown);
             document.addEventListener('mouseup', handleGlobalMouseUp);
 
             if (ownerDocument !== document) {
                 ownerDocument.addEventListener('focusin', handleGlobalFocusIn);
-                ownerDocument.addEventListener('keydown', handleGlobalKeyDown);
                 ownerDocument.addEventListener('mousedown', handleGlobalMouseDown);
                 ownerDocument.addEventListener('mouseup', handleGlobalMouseUp);
             }
@@ -585,13 +577,11 @@ export default function Dropdown({
 
             cleanupEventListenersRef.current = () => {
                 document.removeEventListener('focusin', handleGlobalFocusIn);
-                document.removeEventListener('keydown', handleGlobalKeyDown);
                 document.removeEventListener('mousedown', handleGlobalMouseDown);
                 document.removeEventListener('mouseup', handleGlobalMouseUp);
 
                 if (ownerDocument !== document) {
                     ownerDocument.removeEventListener('focusin', handleGlobalFocusIn);
-                    ownerDocument.removeEventListener('keydown', handleGlobalKeyDown);
                     ownerDocument.removeEventListener('mousedown', handleGlobalMouseDown);
                     ownerDocument.removeEventListener('mouseup', handleGlobalMouseUp);
                 }
@@ -601,7 +591,7 @@ export default function Dropdown({
                 }
             };
         },
-        [closeDropdown, handleSubmitItem, isOpenOnMount, isTriggerFromProps],
+        [closeDropdown, isOpenOnMount, isTriggerFromProps],
     );
 
     const handleTriggerFocus = useCallback(() => {

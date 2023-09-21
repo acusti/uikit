@@ -63,6 +63,7 @@ __metadata:
     "@acusti/matchmaking": ^0.5.1
     "@acusti/styling": ^0.6.0
     "@acusti/use-is-out-of-bounds": ^0.7.0
+    "@acusti/use-keyboard-events": ^0.4.0
     "@testing-library/dom": ^9.3.1
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.4.3
@@ -219,7 +220,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-keyboard-events@workspace:packages/use-keyboard-events":
+"@acusti/use-keyboard-events@^0.4.0, @acusti/use-keyboard-events@workspace:packages/use-keyboard-events":
   version: 0.0.0-use.local
   resolution: "@acusti/use-keyboard-events@workspace:packages/use-keyboard-events"
   dependencies:
