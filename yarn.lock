@@ -26,7 +26,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/css-value-input@^1.0.0-rc.1, @acusti/css-value-input@workspace:packages/css-value-input":
+"@acusti/css-value-input@workspace:packages/css-value-input":
   version: 0.0.0-use.local
   resolution: "@acusti/css-value-input@workspace:packages/css-value-input"
   dependencies:
@@ -55,7 +55,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/dropdown@*, @acusti/dropdown@workspace:packages/dropdown":
+"@acusti/dropdown@workspace:packages/dropdown":
   version: 0.0.0-use.local
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
@@ -78,7 +78,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/input-text@*, @acusti/input-text@^1.2.0, @acusti/input-text@workspace:packages/input-text":
+"@acusti/input-text@^1.2.0, @acusti/input-text@workspace:packages/input-text":
   version: 0.0.0-use.local
   resolution: "@acusti/input-text@workspace:packages/input-text"
   dependencies:
@@ -107,7 +107,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/styling@*, @acusti/styling@^0.6.0, @acusti/styling@workspace:packages/styling":
+"@acusti/styling@^0.6.0, @acusti/styling@workspace:packages/styling":
   version: 0.0.0-use.local
   resolution: "@acusti/styling@workspace:packages/styling"
   dependencies:
@@ -131,11 +131,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/uikit-docs@workspace:packages/docs"
   dependencies:
-    "@acusti/css-value-input": ^1.0.0-rc.1
-    "@acusti/dropdown": "*"
-    "@acusti/input-text": "*"
-    "@acusti/styling": "*"
-    "@acusti/use-keyboard-events": "*"
     "@babel/core": ^7.20.5
     "@storybook/addon-docs": 0.0.0-pr-23825-sha-7875282b
     "@storybook/addon-essentials": 0.0.0-pr-23825-sha-7875282b
@@ -148,7 +143,6 @@ __metadata:
     "@storybook/react-vite": 0.0.0-pr-23825-sha-7875282b
     "@storybook/testing-library": ^0.2.1
     "@types/react": ^18.0.25
-    classnames: ^2.3.0
     core-js: ^3.26.1
     react: ^18.2.0
     react-dom: ^18.2.0
@@ -225,7 +219,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-keyboard-events@*, @acusti/use-keyboard-events@workspace:packages/use-keyboard-events":
+"@acusti/use-keyboard-events@workspace:packages/use-keyboard-events":
   version: 0.0.0-use.local
   resolution: "@acusti/use-keyboard-events@workspace:packages/use-keyboard-events"
   dependencies:
@@ -6879,13 +6873,6 @@ __metadata:
   version: 3.8.0
   resolution: "ci-info@npm:3.8.0"
   checksum: d0a4d3160497cae54294974a7246202244fff031b0a6ea20dd57b10ec510aa17399c41a1b0982142c105f3255aff2173e5c0dd7302ee1b2f28ba3debda375098
-  languageName: node
-  linkType: hard
-
-"classnames@npm:^2.3.0":
-  version: 2.3.2
-  resolution: "classnames@npm:2.3.2"
-  checksum: 2c62199789618d95545c872787137262e741f9db13328e216b093eea91c85ef2bfb152c1f9e63027204e2559a006a92eb74147d46c800a9f96297ae1d9f96f4e
   languageName: node
   linkType: hard
 

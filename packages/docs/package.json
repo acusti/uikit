@@ -24,14 +24,6 @@
         "typescript": "^5.1.6",
         "vite": "^4.4.9"
     },
-    "dependencies": {
-        "@acusti/css-value-input": "^1.0.0-rc.1",
-        "@acusti/dropdown": "*",
-        "@acusti/input-text": "*",
-        "@acusti/styling": "*",
-        "@acusti/use-keyboard-events": "*",
-        "classnames": "^2.3.0"
-    },
     "scripts": {
         "build": "storybook build -o dist",
         "storybook": "storybook dev -p 6006"
