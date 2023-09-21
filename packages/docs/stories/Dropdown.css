@@ -6,9 +6,6 @@
     box-sizing: border-box;
     width: 110px;
 }
-.uktdropdown-body {
-    max-height: 150px;
-}
 .uktdropdown-body ul {
     text-align: left;
     list-style-type: none;
@@ -103,20 +100,17 @@
 
 .out-of-bounds-example.uktdropdown {
     position: absolute;
-    bottom: 20px;
+    bottom: 50px;
 }
 .out-of-bounds-example input {
     width: 150px;
 }
+
 .out-of-bounds-example .uktdropdown-body {
     width: 250px;
-}
-.out-of-bounds-example .uktdropdown-body {
-    height: 150px;
-    min-width: 0px;
 }
 
 .position-right.uktdropdown {
     position: absolute;
-    right: 30px;
+    right: 70px;
 }
