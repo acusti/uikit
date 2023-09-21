@@ -19,10 +19,10 @@ export const STYLES = `
   --uktdd-body-bg-color: #fff;
   --uktdd-body-bg-color-hover: rgb(105,162,249);
   --uktdd-body-color-hover: #fff;
-  --uktdd-body-pad-bottom: 10px;
+  --uktdd-body-pad-bottom: 9px;
   --uktdd-body-pad-left: 12px;
   --uktdd-body-pad-right: 12px;
-  --uktdd-body-pad-top: 10px;
+  --uktdd-body-pad-top: 9px;
   --uktdd-label-pad-right: 10px;
 }
 ${ROOT_SELECTOR},
