@@ -46,7 +46,7 @@ const { useCallback, useEffect, useImperativeHandle, useRef } = React;
 
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
-const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>(
+const CSSValueInput = React.forwardRef<HTMLInputElement, Props>(
     (
         {
             allowEmpty = true,
@@ -72,7 +72,7 @@ const CSSValueInput: React.FC<Props> = React.forwardRef<HTMLInputElement, Props>
             unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
             validator,
             value,
-        },
+        }: Props,
         ref,
     ) => {
         const inputRef = useRef<InputRef>(null);

@@ -76,7 +76,7 @@ const noop = () => {};
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 
-const Dropdown: React.FC<Props> = ({
+export default function Dropdown({
     allowEmpty = true,
     children,
     className,
@@ -96,7 +96,7 @@ const Dropdown: React.FC<Props> = ({
     placeholder,
     tabIndex,
     value,
-}) => {
+}: Props) {
     const childrenCount = Children.count(children);
     if (childrenCount !== 1 && childrenCount !== 2) {
         if (childrenCount === 0) {
@@ -697,6 +697,4 @@ const Dropdown: React.FC<Props> = ({
             </div>
         </Fragment>
     );
-};
-
-export default Dropdown;
+}
