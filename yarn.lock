@@ -62,7 +62,7 @@ __metadata:
     "@acusti/input-text": ^1.2.0
     "@acusti/matchmaking": ^0.5.1
     "@acusti/styling": ^0.6.0
-    "@acusti/use-is-out-of-bounds": ^0.6.0
+    "@acusti/use-is-out-of-bounds": ^0.7.0
     "@testing-library/dom": ^9.3.1
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.4.3
@@ -212,7 +212,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-is-out-of-bounds@^0.6.0, @acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds":
+"@acusti/use-is-out-of-bounds@^0.7.0, @acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds":
   version: 0.0.0-use.local
   resolution: "@acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds"
   dependencies:
