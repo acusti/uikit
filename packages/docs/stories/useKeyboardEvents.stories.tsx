@@ -39,6 +39,48 @@ function Demo() {
 }
 
 const meta: Meta<typeof Demo> = {
+    argTypes: {
+        ignoreUsedKeyboardEvents: {
+            control: 'boolean',
+            description:
+                'If the prop is true, the keyboard event target is an input, textarea, or contenteditable element, and the keyboard event is usable by the element, your keyboard event listeners will not be triggered',
+            table: {
+                defaultValue: { summary: true },
+                type: { summary: 'boolean' },
+            },
+        },
+        priority: {
+            control: 'number',
+            description:
+                'Priority defines what order handlers should be invoked and defaults to 0. It can be any number between -50 (lowest priority) and 50 (highest priority).',
+            table: {
+                defaultValue: { summary: 0 },
+                type: { summary: 'number' },
+            },
+        },
+        onKeyDown: {
+            action: 'onKeyDown',
+            description: 'A function that will be called when a key is pressed down',
+            table: {
+                type: { summary: 'function' },
+            },
+        },
+        onKeyPress: {
+            action: 'onKeyPress',
+            description:
+                'A function that will be called when a key that produces a character value is pressed down',
+            table: {
+                type: { summary: 'function' },
+            },
+        },
+        onKeyUp: {
+            action: 'onKeyUp',
+            description: 'A function that will be called when a key is released',
+            table: {
+                type: { summary: 'function' },
+            },
+        },
+    },
     component: Demo,
     parameters: {
         docs: {
@@ -48,7 +90,7 @@ const meta: Meta<typeof Demo> = {
             },
         },
     },
-    //https://storybook.js.org/docs/react/writing-docs/autodocs#setup-automated-documentation
+    // https://storybook.js.org/docs/react/writing-docs/autodocs#setup-automated-documentation
     tags: ['autodocs'],
     title: 'UIKit/Controls/useKeyboardEvents',
 };
