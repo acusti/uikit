@@ -1,4 +1,4 @@
-import { Fragment, useState } from 'react';
+import * as React from 'react';
 
 import useKeyboardEvents from '../../use-keyboard-events/src/useKeyboardEvents.js';
 
@@ -6,8 +6,10 @@ import './useKeyboardEvents.css';
 
 import type { Meta, StoryObj } from '@storybook/react';
 
+const { Fragment, useState } = React;
+
 function Demo() {
-    const [event, setEvent] = useState(null);
+    const [event, setEvent] = useState<KeyboardEvent | null>(null);
 
     useKeyboardEvents({ onKeyDown: setEvent, onKeyUp: setEvent });
 

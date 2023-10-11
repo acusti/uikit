@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import * as React from 'react';
 
 import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
 import Dropdown from '../../dropdown/src/Dropdown.js';
@@ -8,6 +8,8 @@ import './Dropdown.css';
 import './InputText.css';
 
 import type { Meta, StoryObj } from '@storybook/react';
+
+const { Fragment } = React;
 
 const meta: Meta<typeof Dropdown> = {
     component: Dropdown,

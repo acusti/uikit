@@ -1,3 +1,5 @@
+import * as React from 'react';
+
 import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
 
 import './CSSValueInput.css';
