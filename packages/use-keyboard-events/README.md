@@ -29,16 +29,17 @@ descendants aren’t focused.
     https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
 
 In addition to keyboard event handlers, you can pass the boolean prop
-`ignoreUsedKeyboardEvents`, which defaults to `true`. If the prop is true
-and the keyboard event target is an input, textarea, or contenteditable
-element, your keyboard event listeners will not be triggered. This makes it
-trivial to avoid erroneously handling keyboard shortcuts when the keyboard
-event is intended by the user to apply to the currently focused text
-editing U. For example: you have a “todo” application that has a delete key
-handler for deleting the currently selected todo item when. If editing the
-text of a todo item also means the todo item is selected, a keydown handler
-that deletes the todo item would be triggered when the user is editing the
-text of the todo item and hits the delete key. If you use this package and
+`ignoreUsedKeyboardEvents`, which defaults to `true`. If the prop is true,
+the keyboard event target is an input, textarea, or contenteditable
+element, and the keyboard event is usable by the element, your keyboard
+event listeners will not be triggered. This makes it trivial to avoid
+erroneously handling keyboard shortcuts when the keyboard event is intended
+by the user to apply to the currently focused text editing UI. For example:
+you have a “todo” application that has a delete key handler for deleting
+the currently selected todo item when. If editing the text of a todo item
+also means the todo item is selected, a keydown handler that deletes the
+todo item would be triggered when the user is editing the text of the todo
+item and hits the delete key. If you use this package and
 `ignoreUsedKeyboardEvents` is true (it defaults to true), the hook will not
 trigger your handler if an input or textarea or contenteditable element is
 the target of the event.
