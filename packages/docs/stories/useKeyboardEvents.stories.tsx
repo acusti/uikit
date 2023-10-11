@@ -7,37 +7,30 @@ import './useKeyboardEvents.css';
 import type { Meta, StoryObj } from '@storybook/react';
 
 function Demo() {
-    const [type, setType] = useState(null);
-    const [key, setKey] = useState(null);
-    const [altKey, setAltKey] = useState(null);
-    const [ctrlKey, setCtrlKey] = useState(null);
-    const [metaKey, setMetaKey] = useState(null);
-    const [shiftKey, setShiftKey] = useState(null);
+    const [event, setEvent] = useState(null);
 
-    const handleKeyEvent = (event) => {
-        setType(event.type);
-        setKey(event.key);
-        setAltKey(event.altKey);
-        setCtrlKey(event.ctrlKey);
-        setMetaKey(event.metaKey);
-        setShiftKey(event.shiftKey);
-    };
+    useKeyboardEvents({ onKeyDown: setEvent, onKeyUp: setEvent });
 
-    useKeyboardEvents({ onKeyDown: handleKeyEvent, onKeyUp: handleKeyEvent });
+    const modifiers = [
+        event?.shiftKey ? '⇧ ' : '',
+        event?.ctrlKey ? '⌃ ' : '',
+        event?.altKey ? '⌥ ' : '',
+        event?.metaKey ? '⌘ ' : '',
+    ].join('');
 
     return (
         <Fragment>
-            <p>
-                <span className="label">Event:</span> <code>{type}</code>
+            <p className="keyboard-event-row">
+                <span className="label">Event:</span>
+                <input className="code" disabled value={event?.type} />
             </p>
-            <p>
-                <span className="label">Key:</span> <code>{key}</code>
+            <p className="keyboard-event-row">
+                <span className="label">Key:</span>
+                <input className="code" disabled value={event?.key} />
             </p>
-            <p>
-                <span className="label">Modifiers:</span> {shiftKey ? '⇧ ' : ''}
-                {ctrlKey ? <code>ctrl</code> : ''}
-                {altKey ? '⌥ ' : ''}
-                {metaKey ? '⌘ ' : ''}
+            <p className="keyboard-event-row">
+                <span className="label">Modifiers:</span>
+                <input disabled value={modifiers} />
             </p>
         </Fragment>
     );
