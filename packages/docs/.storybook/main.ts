@@ -29,7 +29,9 @@ const config: StorybookConfig = {
         '../stories/**/*.stories.@(js|jsx|ts|tsx)',
     ],
     typescript: {
+        check: false,
         reactDocgen: 'react-docgen',
+        skipBabel: true,
     },
 };
 
