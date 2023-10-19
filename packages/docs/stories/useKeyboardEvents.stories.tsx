@@ -92,7 +92,7 @@ const meta: Meta<typeof Demo> = {
     },
     // https://storybook.js.org/docs/react/writing-docs/autodocs#setup-automated-documentation
     tags: ['autodocs'],
-    title: 'UIKit/Controls/useKeyboardEvents',
+    title: 'UIKit/Hooks/useKeyboardEvents',
 };
 
 export default meta;
