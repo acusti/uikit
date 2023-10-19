@@ -1,7 +1,7 @@
 input.input-text {
     width: 160px;
     padding: 3px 6px;
-    font-family: system-ui;
+    font-family: system-ui, sans-serif;
     font-size: 13px;
     line-height: 13px;
 }
