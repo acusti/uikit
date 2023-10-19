@@ -32,6 +32,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         "reference": "workspace:packages/css-values"\
       },\
       {\
+        "name": "@acusti/date-picker",\
+        "reference": "workspace:packages/date-picker"\
+      },\
+      {\
         "name": "@acusti/uikit-docs",\
         "reference": "workspace:packages/docs"\
       },\
@@ -87,11 +91,12 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
       ["@acusti/aws-signature-v4", ["workspace:packages/aws-signature-v4"]],\
       ["@acusti/css-value-input", ["workspace:packages/css-value-input"]],\
       ["@acusti/css-values", ["workspace:packages/css-values"]],\
+      ["@acusti/date-picker", ["workspace:packages/date-picker"]],\
       ["@acusti/dropdown", ["workspace:packages/dropdown"]],\
       ["@acusti/input-text", ["virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text", "workspace:packages/input-text"]],\
       ["@acusti/matchmaking", ["workspace:packages/matchmaking"]],\
       ["@acusti/post", ["workspace:packages/post"]],\
-      ["@acusti/styling", ["virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/styling", "workspace:packages/styling"]],\
+      ["@acusti/styling", ["virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling", "workspace:packages/styling"]],\
       ["@acusti/textual", ["workspace:packages/textual"]],\
       ["@acusti/uikit", ["workspace:."]],\
       ["@acusti/uikit-docs", ["workspace:packages/docs"]],\
@@ -192,6 +197,25 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "SOFT"\
         }]\
       ]],\
+      ["@acusti/date-picker", [\
+        ["workspace:packages/date-picker", {\
+          "packageLocation": "./packages/date-picker/",\
+          "packageDependencies": [\
+            ["@acusti/date-picker", "workspace:packages/date-picker"],\
+            ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
+            ["@testing-library/dom", "npm:9.3.1"],\
+            ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.0.0"],\
+            ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.4.3"],\
+            ["@types/react", "npm:18.0.25"],\
+            ["clsx", "npm:2.0.0"],\
+            ["jsdom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:22.1.0"],\
+            ["react", "npm:18.2.0"],\
+            ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:18.2.0"],\
+            ["typescript", "patch:typescript@npm%3A5.1.6#~builtin<compat/typescript>::version=5.1.6&hash=5da071"]\
+          ],\
+          "linkType": "SOFT"\
+        }]\
+      ]],\
       ["@acusti/dropdown", [\
         ["workspace:packages/dropdown", {\
           "packageLocation": "./packages/dropdown/",\
@@ -199,7 +223,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@acusti/dropdown", "workspace:packages/dropdown"],\
             ["@acusti/input-text", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text"],\
             ["@acusti/matchmaking", "workspace:packages/matchmaking"],\
-            ["@acusti/styling", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/styling"],\
+            ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
             ["@acusti/use-is-out-of-bounds", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/use-is-out-of-bounds"],\
             ["@acusti/use-keyboard-events", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/use-keyboard-events"],\
             ["@testing-library/dom", "npm:9.3.1"],\
@@ -266,10 +290,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@acusti/styling", [\
-        ["virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/styling", {\
-          "packageLocation": "./.yarn/__virtual__/@acusti-styling-virtual-c4b778ec5d/1/packages/styling/",\
+        ["virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling", {\
+          "packageLocation": "./.yarn/__virtual__/@acusti-styling-virtual-1ab26d9af6/1/packages/styling/",\
           "packageDependencies": [\
-            ["@acusti/styling", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/styling"],\
+            ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
             ["@types/react", "npm:18.0.25"],\
             ["@types/react-dom", null],\
             ["react", "npm:18.2.0"],\

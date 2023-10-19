@@ -18,6 +18,7 @@ fetch utility, and more_
 | **[@acusti/aws-signature-v4][]**         | [![latest version](https://img.shields.io/npm/v/@acusti/aws-signature-v4?style=flat-square)](https://www.npmjs.com/package/@acusti/aws-signature-v4)                 | An isomorphic module implementing the [AWS Signature V4 (SigV4) signing process][aws sigv4] for requests |
 | **[@acusti/css-values][]**               | [![latest version](https://img.shields.io/npm/v/@acusti/css-values?style=flat-square)](https://www.npmjs.com/package/@acusti/css-values)                             | Utilities for parsing different types of CSS values                                                      |
 | **[@acusti/css-value-input][]**          | [![latest version](https://img.shields.io/npm/v/@acusti/css-value-input?style=flat-square)](https://www.npmjs.com/package/@acusti/css-value-input)                   | React component that renders a CSS value input                                                           |
+| **[@acusti/date-picker][]**              | [![latest version](https://img.shields.io/npm/v/@acusti/date-picker?style=flat-square)](https://www.npmjs.com/package/@acusti/date-picker)                           | React component that renders a date picker with range support                                            |
 | **[@acusti/dropdown][]**                 | [![latest version](https://img.shields.io/npm/v/@acusti/dropdown?style=flat-square)](https://www.npmjs.com/package/@acusti/dropdown)                                 | React component that renders a dropdown UI element                                                       |
 | **[@acusti/input-text][]**               | [![latest version](https://img.shields.io/npm/v/@acusti/input-text?style=flat-square)](https://www.npmjs.com/package/@acusti/input-text)                             | React component that renders an uncontrolled text input                                                  |
 | **[@acusti/matchmaking][]**              | [![latest version](https://img.shields.io/npm/v/@acusti/matchmaking?style=flat-square)](https://www.npmjs.com/package/@acusti/matchmaking)                           | Utilities for approximate string matching (i.e. fuzzy search)                                            |
@@ -40,6 +41,8 @@ fetch utility, and more_
     https://github.com/acusti/uikit/tree/main/packages/css-values
 [@acusti/css-value-input]:
     https://github.com/acusti/uikit/tree/main/packages/css-value-input
+[@acusti/date-picker]:
+    https://github.com/acusti/uikit/tree/main/packages/date-picker
 [@acusti/dropdown]:
     https://github.com/acusti/uikit/tree/main/packages/dropdown
 [@acusti/input-text]:

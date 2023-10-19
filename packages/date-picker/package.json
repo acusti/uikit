@@ -1,0 +1,59 @@
+{
+    "name": "@acusti/date-picker",
+    "version": "0.0.1",
+    "description": "React component that renders a date picker with the option to choose a range",
+    "keywords": [
+        "react",
+        "react-component",
+        "datepicker",
+        "date-picker",
+        "daterangepicker",
+        "date-range-picker",
+        "date",
+        "picker",
+        "form",
+        "input",
+        "ssr",
+        "typescript",
+        "ts",
+        "flow"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "exports": "./dist/index.js",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/acusti/uikit.git",
+        "directory": "packages/date-picker"
+    },
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
+    "license": "Unlicense",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
+    },
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/date-picker#readme",
+    "devDependencies": {
+        "@testing-library/dom": "^9.3.1",
+        "@testing-library/react": "^14.0.0",
+        "@testing-library/user-event": "^14.4.3",
+        "@types/react": "^18.0.25",
+        "jsdom": "^22.1.0",
+        "react": "^18",
+        "react-dom": "^18",
+        "typescript": "^5.1.6"
+    },
+    "dependencies": {
+        "@acusti/styling": "^0.6.0",
+        "clsx": "^2"
+    },
+    "peerDependencies": {
+        "react": "^16.8 || ^17 || ^18",
+        "react-dom": "^16.8 || ^17 || ^18"
+    }
+}
