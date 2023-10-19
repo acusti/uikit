@@ -5,17 +5,11 @@ export const ROOT_CLASS_NAME = 'uktmonthcalendar';
 export const STYLES = `
 .${ROOT_CLASS_NAME} {
     display: flex;
-    flex: 1 1 auto;
-    justify-content: space-between;
-    font-family: ${SYSTEM_UI_FONT};
-}
-
-.${ROOT_CLASS_NAME}-month-item {
-    display: flex;
     flex-direction: column;
     flex: 1 1 auto;
     box-sizing: border-box;
     max-width: 325px;
+    font-family: ${SYSTEM_UI_FONT};
 }
 
 .${ROOT_CLASS_NAME}-month-title {
