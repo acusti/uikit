@@ -149,3 +149,12 @@ export const ZIndex: Story = {
         value: '0',
     },
 };
+
+export const NumberValue: Story = {
+    args: {
+        cssValueType: 'integer',
+        label: 'opacity',
+        name: 'opacity',
+        value: 0,
+    },
+};
