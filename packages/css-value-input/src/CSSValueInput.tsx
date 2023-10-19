@@ -77,6 +77,10 @@ const CSSValueInput = React.forwardRef<HTMLInputElement, Props>(
     ) => {
         const inputRef = useRef<InputRef>(null);
         useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
+        // props.value should be a string; if it’s a number, convert it here
+        if (typeof value === 'number' && !Number.isNaN(value)) {
+            value = `${value}`;
+        }
         const submittedValueRef = useRef<string>(value || '');
 
         useEffect(() => {
