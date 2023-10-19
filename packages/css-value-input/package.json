@@ -48,7 +48,7 @@
     "dependencies": {
         "@acusti/css-values": "^1.0.0",
         "@acusti/input-text": "^1.2.0",
-        "clsx": "^1.2.1"
+        "clsx": "^2"
     },
     "peerDependencies": {
         "react": "^16.8 || ^17 || ^18",
