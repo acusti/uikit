@@ -1,5 +1,3 @@
-import { SYSTEM_UI_FONT } from '@acusti/styling';
-
 export const ROOT_CLASS_NAME = 'uktmonthcalendar';
 
 export const STYLES = `
@@ -9,7 +7,6 @@ export const STYLES = `
     flex: 1 1 auto;
     box-sizing: border-box;
     max-width: 325px;
-    font-family: ${SYSTEM_UI_FONT};
 }
 
 .${ROOT_CLASS_NAME}-month-title {
