@@ -24,8 +24,10 @@ export const getMonthFromDate = (date: Date) =>
 export const getYearFromMonth = (month: number) => Math.floor(month / 12) + START_YEAR;
 
 export const getMonthNameFromMonth = (month: number): string => {
-    const index = month % 12;
-    return Number.isNaN(index) ? '' : MONTH_NAMES[index];
+    let index = month % 12;
+    if (Number.isNaN(index)) return '';
+    if (index < 0) index = 12 + index;
+    return MONTH_NAMES[index];
 };
 
 export const getMonthAbbreviationFromMonth = (month: number) => {
