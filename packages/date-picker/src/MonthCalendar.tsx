@@ -7,8 +7,8 @@ import { ROOT_CLASS_NAME, STYLES } from './styles/month-calendar.js';
 
 export type Props = {
     className?: string;
-    dateRangeStart?: Date | string | number;
-    dateRangeEnd?: Date | string | number;
+    dateStart?: Date | string | number;
+    dateEnd?: Date | string | number;
     month: number; // a unique numerical value representing the number of months since jan 1970
     onChange?: (event: React.SyntheticEvent<HTMLElement>) => void;
     title?: string;
@@ -22,8 +22,8 @@ const DAYS = Array(7).fill(null);
 
 export default function MonthCalendar({
     className,
-    dateRangeEnd,
-    dateRangeStart,
+    dateEnd,
+    dateStart,
     month,
     onChange,
     title,
@@ -41,8 +41,8 @@ export default function MonthCalendar({
     const daySpaces = totalDays + firstDay + spacesAfterLastDay;
 
     const [dateRangeStartDay, dateRangeEndDay]: DateRangeDays = [
-        dateRangeStart,
-        dateRangeEnd,
+        dateStart,
+        dateEnd,
     ].reduce(
         (acc: DateRangeDays, date, index) => {
             if (date != null && !(date instanceof Date)) {

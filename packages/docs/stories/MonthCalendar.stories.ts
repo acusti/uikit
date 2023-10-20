@@ -7,11 +7,11 @@ import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof MonthCalendar> = {
     argTypes: {
-        dateRangeEnd: {
+        dateEnd: {
             control: 'date',
             description: '(optional) end date of current date range',
         },
-        dateRangeStart: {
+        dateStart: {
             control: 'date',
             description: '(optional) start date of current date range',
         },
@@ -51,8 +51,8 @@ export const February1985Calendar: Story = {
 export const DateRangeDiwaliCalendar: Story = {
     args: {
         className: 'date-range-month-calendar-story',
-        dateRangeEnd: new Date(2023, 10, 14),
-        dateRangeStart: new Date(2023, 10, 9),
+        dateEnd: new Date(2023, 10, 14),
+        dateStart: new Date(2023, 10, 9),
         month: getMonthFromDate(new Date(2023, 10, 1)),
     },
 };
