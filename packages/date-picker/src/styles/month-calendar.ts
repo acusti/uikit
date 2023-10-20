@@ -77,7 +77,7 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
     cursor: pointer;
 }
 
-.${ROOT_CLASS_NAME}-month-day-item.selected {
+.${ROOT_CLASS_NAME}-month-day-item.is-selected {
     background-color: #f8f8f8;
 }
 
