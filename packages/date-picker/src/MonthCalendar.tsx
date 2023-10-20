@@ -2,21 +2,32 @@ import { Style } from '@acusti/styling';
 import clsx from 'clsx';
 import * as React from 'react';
 
-import { getMonthNameFromMonth, getYearFromMonth } from './utils.js';
+import { getMonthFromDate, getMonthNameFromMonth, getYearFromMonth } from './utils.js';
 import { ROOT_CLASS_NAME, STYLES } from './styles/month-calendar.js';
 
 export type Props = {
     className?: string;
+    dateRangeStart?: Date | string | number;
+    dateRangeEnd?: Date | string | number;
     month: number; // a unique numerical value representing the number of months since jan 1970
     onChange?: (event: React.SyntheticEvent<HTMLElement>) => void;
     title?: string;
 };
 
+type DateRangeDays = [number | null, number | null];
+
 const { Fragment, useCallback } = React;
 
 const DAYS = Array(7).fill(null);
 
-export default function MonthCalendar({ className, month, onChange, title }: Props) {
+export default function MonthCalendar({
+    className,
+    dateRangeEnd,
+    dateRangeStart,
+    month,
+    onChange,
+    title,
+}: Props) {
     const year = getYearFromMonth(month);
     title = title || `${getMonthNameFromMonth(month)} ${year}`;
     const monthWithinYear = month % 12;
@@ -28,6 +39,35 @@ export default function MonthCalendar({ className, month, onChange, title }: Pro
     const firstDay = firstDate.getDay();
     const spacesAfterLastDay = 7 - (lastDate.getDay() % 7); // prettier-ignore
     const daySpaces = totalDays + firstDay + spacesAfterLastDay;
+
+    const [dateRangeStartDay, dateRangeEndDay]: DateRangeDays = [
+        dateRangeStart,
+        dateRangeEnd,
+    ].reduce(
+        (acc: DateRangeDays, date, index) => {
+            if (date != null && !(date instanceof Date)) {
+                date = new Date(date);
+            }
+            if (date == null || Number.isNaN(date.getTime())) return acc;
+
+            const dateMonth = getMonthFromDate(date);
+            if (dateMonth < month) acc[index] = -1;
+            else if (dateMonth > month) acc[index] = totalDays + 1;
+            else acc[index] = date.getDate();
+            if (index === 1) {
+                const startDay = acc[index - 1];
+                const endDay = acc[index];
+                // Ensure that end date is after start date and swap them if not
+                if (startDay != null && endDay != null && startDay > endDay) {
+                    acc[index - 1] = endDay;
+                    acc[index] = startDay;
+                }
+            }
+
+            return acc;
+        },
+        [null, null],
+    );
 
     const handleClickDay = useCallback(
         (event: React.SyntheticEvent<HTMLElement>) => {
@@ -79,11 +119,27 @@ export default function MonthCalendar({ className, month, onChange, title }: Pro
                                     const dayNumber = (dayIndex - firstDay) + 1; // prettier-ignore
                                     const isEmpty =
                                         dayNumber < 1 || dayNumber > totalDays;
+                                    const isAfterDateRangeStart =
+                                        dateRangeStartDay != null &&
+                                        dayNumber > dateRangeStartDay;
+                                    const isBeforeDateRangeEnd =
+                                        dateRangeEndDay == null ||
+                                        dayNumber < dateRangeEndDay;
+
                                     return (
                                         <div
                                             className={clsx(
                                                 `${ROOT_CLASS_NAME}-month-day-item`,
-                                                { 'is-empty': isEmpty },
+                                                {
+                                                    'is-empty': isEmpty,
+                                                    'is-selected':
+                                                        isAfterDateRangeStart &&
+                                                        isBeforeDateRangeEnd,
+                                                    'end-date':
+                                                        dayNumber === dateRangeEndDay,
+                                                    'start-date':
+                                                        dayNumber === dateRangeStartDay,
+                                                },
                                             )}
                                             key={`MonthDayItem-${dayNumber}`}
                                             onClick={handleClickDay}
