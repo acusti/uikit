@@ -22,7 +22,7 @@ export type Props = {
     useMonthAbbreviations?: boolean;
 };
 
-const { Fragment, useCallback } = React;
+const { Fragment, useCallback, useState } = React;
 
 const getAbbreviatedMonthTitle = (month: number) =>
     `${getMonthAbbreviationFromMonth(month)} ${getYearFromMonth(month)}`;
@@ -45,23 +45,54 @@ export default function DatePicker({
             initialMonth -= 1;
         }
     }
+    const [month, setMonth] = useState(initialMonth);
+    // In two-up view we see 1 more month, so monthLimitLast needs to be 1 less
+    if (isTwoUp && monthLimitLast != null) {
+        monthLimitLast -= 1;
+    }
+
+    const handleClickLeftArrow = useCallback(() => {
+        setMonth((existingMonth) =>
+            monthLimitFirst == null || existingMonth > monthLimitFirst
+                ? existingMonth - 1
+                : existingMonth,
+        );
+    }, [monthLimitFirst]);
+
+    const handleClickRightArrow = useCallback(() => {
+        setMonth((existingMonth) =>
+            monthLimitLast == null || existingMonth < monthLimitLast
+                ? existingMonth + 1
+                : existingMonth,
+        );
+    }, [monthLimitLast]);
 
     return (
         <Fragment>
             <Style>{STYLES}</Style>
             <div className={clsx(ROOT_CLASS_NAME, className)}>
                 <div className={`${ROOT_CLASS_NAME}-range-arrow-wrap`}>
-                    <div className={`${ROOT_CLASS_NAME}-range-arrow left-arrow`} />
-                    <div className={`${ROOT_CLASS_NAME}-range-arrow right-arrow`} />
+                    <div
+                        className={clsx(`${ROOT_CLASS_NAME}-range-arrow left-arrow`, {
+                            disabled: monthLimitFirst != null && month <= monthLimitFirst,
+                        })}
+                        onClick={handleClickLeftArrow}
+                    />
+                    <div
+                        className={clsx(`${ROOT_CLASS_NAME}-range-arrow right-arrow`, {
+                            disabled: monthLimitLast != null && month >= monthLimitLast,
+                        })}
+                        onClick={handleClickRightArrow}
+                    />
                 </div>
                 <div className={`${ROOT_CLASS_NAME}-month-container`}>
                     <MonthCalendar
                         dateEnd={dateEnd}
                         dateStart={dateStart}
-                        month={initialMonth}
+                        month={month}
                         title={
                             useMonthAbbreviations
-                                ? getAbbreviatedMonthTitle(initialMonth)
+                                ? getAbbreviatedMonthTitle(month)
                                 : undefined
                         }
                     />
@@ -69,10 +100,10 @@ export default function DatePicker({
                         <MonthCalendar
                             dateEnd={dateEnd}
                             dateStart={dateStart}
-                            month={initialMonth + 1}
+                            month={month + 1}
                             title={
                                 useMonthAbbreviations
-                                    ? getAbbreviatedMonthTitle(initialMonth + 1)
+                                    ? getAbbreviatedMonthTitle(month + 1)
                                     : undefined
                             }
                         />

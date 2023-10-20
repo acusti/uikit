@@ -28,6 +28,11 @@ export const STYLES = `
     cursor: pointer;
 }
 
+.${ROOT_CLASS_NAME}-range-arrow.disabled {
+    color: #ccc;
+    cursor: default;
+}
+
 .${ROOT_CLASS_NAME}-range-arrow:active {
     transform: translateY(1px);
 }
