@@ -17,7 +17,7 @@ const meta: Meta<typeof MonthCalendar> = {
     },
     //https://storybook.js.org/docs/react/writing-docs/autodocs#setup-automated-documentation
     tags: ['autodocs'],
-    title: 'UIKit/Controls/MonthCalendar',
+    title: 'UIKit/Controls/DatePicker/MonthCalendar',
 };
 
 export default meta;
