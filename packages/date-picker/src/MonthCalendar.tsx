@@ -67,7 +67,7 @@ export default function MonthCalendar({ className, month, onChange, title }: Pro
                     </div>
                 </div>
                 <div className={`${ROOT_CLASS_NAME}-month-days`}>
-                    {Array(Math.ceil(daySpaces / 7))
+                    {Array(Math.floor(daySpaces / 7))
                         .fill(null)
                         .map((_, weekIndex) => (
                             <div
