@@ -133,11 +133,14 @@ export default function MonthCalendar({
                                                 {
                                                     'is-empty': isEmpty,
                                                     'is-selected':
+                                                        !isEmpty &&
                                                         isAfterDateRangeStart &&
                                                         isBeforeDateRangeEnd,
                                                     'end-date':
+                                                        !isEmpty &&
                                                         dayNumber === dateRangeEndDay,
                                                     'start-date':
+                                                        !isEmpty &&
                                                         dayNumber === dateRangeStartDay,
                                                 },
                                             )}
