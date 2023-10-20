@@ -4,7 +4,7 @@ import {
     getCSSValueWithUnit,
     getMillisecondsFromCSSValue,
     getUnitFromCSSValue,
-} from './index';
+} from './index.js';
 
 describe('@acusti/css-values', () => {
     describe('getUnitFromCSSValue', () => {
