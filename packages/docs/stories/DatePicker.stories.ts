@@ -1,5 +1,4 @@
-import DatePicker from '../../date-picker/src/DatePicker.js';
-import { getMonthFromDate } from '../../date-picker/src/index.js';
+import { DatePicker, getMonthFromDate } from '../../date-picker/src/index.js';
 
 import './DatePicker.css';
 

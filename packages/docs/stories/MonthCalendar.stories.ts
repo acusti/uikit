@@ -1,5 +1,4 @@
-import MonthCalendar from '../../date-picker/src/MonthCalendar.js';
-import { getMonthFromDate } from '../../date-picker/src/index.js';
+import { getMonthFromDate, MonthCalendar } from '../../date-picker/src/index.js';
 
 import './MonthCalendar.css';
 
