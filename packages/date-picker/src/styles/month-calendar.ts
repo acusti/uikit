@@ -132,6 +132,10 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
     visibility: hidden;
 }
 
+.${ROOT_CLASS_NAME}-month-day-item.is-empty:after {
+    content: none;
+}
+
 .${ROOT_CLASS_NAME}-month-day-item span.month-day-item-text {
     text-align: center;
     font-size: 13px;

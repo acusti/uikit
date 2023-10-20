@@ -77,17 +77,22 @@ export default function MonthCalendar({ className, month, onChange, title }: Pro
                                 {DAYS.map((_, dayIndex) => {
                                     dayIndex += weekIndex * 7;
                                     const dayNumber = (dayIndex - firstDay) + 1; // prettier-ignore
+                                    const isEmpty =
+                                        dayNumber < 1 || dayNumber > totalDays;
                                     return (
                                         <div
-                                            className={`${ROOT_CLASS_NAME}-month-day-item`}
+                                            className={clsx(
+                                                `${ROOT_CLASS_NAME}-month-day-item`,
+                                                { 'is-empty': isEmpty },
+                                            )}
                                             key={`MonthDayItem-${dayNumber}`}
                                             onClick={handleClickDay}
                                         >
-                                            <span className="month-day-item-text">
-                                                {dayNumber < 1 || dayNumber > totalDays
-                                                    ? ''
-                                                    : dayNumber}
-                                            </span>
+                                            {isEmpty ? null : (
+                                                <span className="month-day-item-text">
+                                                    {dayNumber}
+                                                </span>
+                                            )}
                                         </div>
                                     );
                                 })}
