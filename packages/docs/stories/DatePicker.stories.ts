@@ -1,4 +1,5 @@
 import DatePicker from '../../date-picker/src/DatePicker.js';
+import { getMonthFromDate } from '../../date-picker/src/index.js';
 
 import './DatePicker.css';
 
@@ -48,9 +49,17 @@ export const TwoUpDatePicker: Story = {
 
 export const DateRangeNavidadDiaDeLosReyesDatePicker: Story = {
     args: {
-        className: 'date-range-month-calendar-story',
+        className: 'date-range-date-picker-story',
         dateEnd: new Date(2024, 0, 6),
         dateStart: new Date(2023, 11, 25),
         isTwoUp: true,
+    },
+};
+
+export const NoFutureTwoUpDatePicker: Story = {
+    args: {
+        className: 'no-future-two-up-date-picker-story',
+        isTwoUp: true,
+        monthLimitLast: getMonthFromDate(new Date()),
     },
 };
