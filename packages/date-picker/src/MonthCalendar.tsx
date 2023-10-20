@@ -123,7 +123,7 @@ export default function MonthCalendar({
                                         dateRangeStartDay != null &&
                                         dayNumber > dateRangeStartDay;
                                     const isBeforeDateRangeEnd =
-                                        dateRangeEndDay == null ||
+                                        dateRangeEndDay != null &&
                                         dayNumber < dateRangeEndDay;
 
                                     return (
