@@ -1,7 +1,7 @@
 {
     "name": "@acusti/date-picker",
-    "version": "0.0.4",
-    "description": "React component that renders a date picker with the option to choose a range",
+    "version": "0.0.6",
+    "description": "React component that renders a date picker with support for date ranges",
     "keywords": [
         "react",
         "react-component",
