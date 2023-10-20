@@ -7,6 +7,11 @@ export const STYLES = `
     padding: 40px 60px 60px;
     flex: 1 1 auto;
     position: relative;
+    max-width: 450px;
+}
+
+.${ROOT_CLASS_NAME}.two-up {
+    max-width: 820px;
 }
 
 .${ROOT_CLASS_NAME}-range-arrow-wrap {

@@ -70,7 +70,11 @@ export default function DatePicker({
     return (
         <Fragment>
             <Style>{STYLES}</Style>
-            <div className={clsx(ROOT_CLASS_NAME, className)}>
+            <div
+                className={clsx(ROOT_CLASS_NAME, className, {
+                    'two-up': isTwoUp,
+                })}
+            >
                 <div className={`${ROOT_CLASS_NAME}-range-arrow-wrap`}>
                     <div
                         className={clsx(`${ROOT_CLASS_NAME}-range-arrow left-arrow`, {
