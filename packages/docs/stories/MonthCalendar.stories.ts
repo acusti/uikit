@@ -6,6 +6,16 @@ import './MonthCalendar.css';
 import type { Meta, StoryObj } from '@storybook/react';
 
 const meta: Meta<typeof MonthCalendar> = {
+    argTypes: {
+        dateRangeEnd: {
+            control: 'date',
+            description: '(optional) end date of current date range',
+        },
+        dateRangeStart: {
+            control: 'date',
+            description: '(optional) start date of current date range',
+        },
+    },
     component: MonthCalendar,
     parameters: {
         docs: {
@@ -31,9 +41,18 @@ export const ThisMonthsCalendar: Story = {
     },
 };
 
-export const February1985MonthCalendar: Story = {
+export const February1985Calendar: Story = {
     args: {
         className: 'february-month-calendar-story',
         month: 181,
+    },
+};
+
+export const DateRangeDiwaliCalendar: Story = {
+    args: {
+        className: 'date-range-month-calendar-story',
+        dateRangeEnd: new Date(2023, 10, 14),
+        dateRangeStart: new Date(2023, 10, 9),
+        month: getMonthFromDate(new Date(2023, 10, 1)),
     },
 };
