@@ -127,7 +127,7 @@ export default function MonthCalendar({
                                         dayNumber < dateRangeEndDay;
 
                                     return (
-                                        <div
+                                        <button
                                             className={clsx(
                                                 `${ROOT_CLASS_NAME}-month-day-item`,
                                                 {
@@ -146,13 +146,14 @@ export default function MonthCalendar({
                                             )}
                                             key={`MonthDayItem-${dayNumber}`}
                                             onClick={handleClickDay}
+                                            type="button"
                                         >
                                             {isEmpty ? null : (
                                                 <span className="month-day-item-text">
                                                     {dayNumber}
                                                 </span>
                                             )}
-                                        </div>
+                                        </button>
                                     );
                                 })}
                             </div>

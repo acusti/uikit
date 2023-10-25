@@ -75,6 +75,8 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
     height: 46px;
     width: 46px;
     cursor: pointer;
+    border: none;
+    background-color: transparent;
 }
 
 .${ROOT_CLASS_NAME}-month-day-item.is-selected {
