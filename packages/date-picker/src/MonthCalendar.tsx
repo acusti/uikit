@@ -7,14 +7,17 @@ import { ROOT_CLASS_NAME, STYLES } from './styles/month-calendar.js';
 
 export type Props = {
     className?: string;
-    dateStart?: Date | string | number;
-    dateEnd?: Date | string | number;
+    dateStart?: Date | string | number | null;
+    dateEnd?: Date | string | number | null;
+    dateEndPreview?: string | null;
+    isRange?: boolean;
     month: number; // a unique numerical value representing the number of months since jan 1970
-    onChange?: (event: React.SyntheticEvent<HTMLElement>) => void;
+    onChange?: (date: string) => void;
+    onChangeEndPreview?: (date: string) => void;
     title?: string;
 };
 
-type DateRangeDays = [number | null, number | null];
+type DateRangeDays = [number | null, number | null, number | null];
 
 const { Fragment, useCallback } = React;
 
@@ -23,9 +26,12 @@ const DAYS = Array(7).fill(null);
 export default function MonthCalendar({
     className,
     dateEnd,
+    dateEndPreview,
     dateStart,
+    isRange,
     month,
     onChange,
+    onChangeEndPreview,
     title,
 }: Props) {
     const year = getYearFromMonth(month);
@@ -40,9 +46,10 @@ export default function MonthCalendar({
     const spacesAfterLastDay = 7 - (lastDate.getDay() % 7); // prettier-ignore
     const daySpaces = totalDays + firstDay + spacesAfterLastDay;
 
-    const [dateRangeStartDay, dateRangeEndDay]: DateRangeDays = [
+    const [dateRangeStartDay, dateRangeEndDay, dateRangeEndPreviewDay]: DateRangeDays = [
         dateStart,
         dateEnd,
+        dateEndPreview,
     ].reduce(
         (acc: DateRangeDays, date, index) => {
             if (date != null && !(date instanceof Date)) {
@@ -66,14 +73,25 @@ export default function MonthCalendar({
 
             return acc;
         },
-        [null, null],
+        [null, null, null],
     );
 
     const handleClickDay = useCallback(
         (event: React.SyntheticEvent<HTMLElement>) => {
-            if (onChange) onChange(event);
+            const { date } = event.currentTarget.dataset;
+            if (date && onChange) onChange(date);
         },
         [onChange],
+    );
+
+    const handleMouseEnterDay = useCallback(
+        (event: React.SyntheticEvent<HTMLElement>) => {
+            if (isRange && onChangeEndPreview) {
+                const { date } = event.currentTarget.dataset;
+                if (date) onChangeEndPreview(date);
+            }
+        },
+        [isRange, onChangeEndPreview],
     );
 
     return (
@@ -123,8 +141,11 @@ export default function MonthCalendar({
                                         dateRangeStartDay != null &&
                                         dayNumber > dateRangeStartDay;
                                     const isBeforeDateRangeEnd =
-                                        dateRangeEndDay != null &&
-                                        dayNumber < dateRangeEndDay;
+                                        (dateRangeEndDay == null &&
+                                            dateRangeEndPreviewDay != null &&
+                                            dayNumber < dateRangeEndPreviewDay) ||
+                                        (dateRangeEndDay != null &&
+                                            dayNumber < dateRangeEndDay);
 
                                     return (
                                         <button
@@ -144,8 +165,14 @@ export default function MonthCalendar({
                                                         dayNumber === dateRangeStartDay,
                                                 },
                                             )}
+                                            data-date={new Date(
+                                                year,
+                                                monthWithinYear,
+                                                dayNumber,
+                                            ).toISOString()}
                                             key={`MonthDayItem-${dayNumber}`}
                                             onClick={handleClickDay}
+                                            onMouseEnter={handleMouseEnterDay}
                                             type="button"
                                         >
                                             {isEmpty ? null : (

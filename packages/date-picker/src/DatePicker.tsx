@@ -16,27 +16,52 @@ export type Props = {
     dateEnd?: Date | string | number;
     dateStart?: Date | string | number;
     initialMonth?: number;
+    isRange?: boolean;
     isTwoUp?: boolean;
     monthLimitFirst?: number;
     monthLimitLast?: number;
+    onChange: (payload: { dateEnd?: string; dateStart: string }) => void;
     useMonthAbbreviations?: boolean;
 };
 
-const { Fragment, useCallback, useState } = React;
+const { Fragment, useCallback, useEffect, useState } = React;
 
 const getAbbreviatedMonthTitle = (month: number) =>
     `${getMonthAbbreviationFromMonth(month)} ${getYearFromMonth(month)}`;
 
 export default function DatePicker({
     className,
-    dateEnd,
-    dateStart,
+    dateEnd: _dateEnd,
+    dateStart: _dateStart,
+    isRange = _dateEnd != null,
     isTwoUp,
     initialMonth,
     monthLimitFirst,
     monthLimitLast,
+    onChange,
     useMonthAbbreviations,
 }: Props) {
+    const dateEndFromProps =
+        _dateEnd != null && typeof _dateEnd !== 'string'
+            ? new Date(_dateEnd).toISOString()
+            : _dateEnd;
+    const dateStartFromProps =
+        _dateStart != null && typeof _dateStart !== 'string'
+            ? new Date(_dateStart).toISOString()
+            : _dateStart;
+    const [dateEnd, setDateEnd] = useState<null | string>(dateEndFromProps || null);
+    const [dateStart, setDateStart] = useState<null | string>(dateStartFromProps || null);
+
+    useEffect(() => {
+        if (dateEndFromProps == null) return;
+        setDateEnd(dateEndFromProps);
+    }, [dateEndFromProps]);
+
+    useEffect(() => {
+        if (dateStartFromProps == null) return;
+        setDateStart(dateStartFromProps);
+    }, [dateStartFromProps]);
+
     if (initialMonth == null) {
         // Use dateStart if it’s set
         const initialDate = dateStart == null ? new Date() : new Date(dateStart);
@@ -45,14 +70,17 @@ export default function DatePicker({
             initialMonth -= 1;
         }
     }
-    const [month, setMonth] = useState(initialMonth);
+
+    const [dateEndPreview, setDateEndPreview] = useState<null | string>(null);
+    const [month, setMonth] = useState<number>(initialMonth);
+
     // In two-up view we see 1 more month, so monthLimitLast needs to be 1 less
     if (isTwoUp && monthLimitLast != null) {
         monthLimitLast -= 1;
     }
 
     const handleClickLeftArrow = useCallback(() => {
-        setMonth((existingMonth) =>
+        setMonth((existingMonth: number) =>
             monthLimitFirst == null || existingMonth > monthLimitFirst
                 ? existingMonth - 1
                 : existingMonth,
@@ -60,12 +88,31 @@ export default function DatePicker({
     }, [monthLimitFirst]);
 
     const handleClickRightArrow = useCallback(() => {
-        setMonth((existingMonth) =>
+        setMonth((existingMonth: number) =>
             monthLimitLast == null || existingMonth < monthLimitLast
                 ? existingMonth + 1
                 : existingMonth,
         );
     }, [monthLimitLast]);
+
+    const handleChange = useCallback(
+        (date: string) => {
+            // If we have a dateStart but no dateEnd, set dateEnd
+            if (isRange && dateStart != null && dateEnd == null) {
+                setDateEnd(date);
+                onChange({ dateEnd: date, dateStart });
+            } else {
+                setDateStart(date);
+                setDateEnd(null);
+                onChange({ dateStart: date });
+            }
+        },
+        [dateEnd, dateStart, isRange, onChange],
+    );
+
+    const handleChangeEndPreview = useCallback((date: string) => {
+        setDateEndPreview(date);
+    }, []);
 
     return (
         <Fragment>
@@ -92,8 +139,12 @@ export default function DatePicker({
                 <div className={`${ROOT_CLASS_NAME}-month-container`}>
                     <MonthCalendar
                         dateEnd={dateEnd}
+                        dateEndPreview={dateEndPreview}
                         dateStart={dateStart}
+                        isRange={isRange}
                         month={month}
+                        onChange={handleChange}
+                        onChangeEndPreview={handleChangeEndPreview}
                         title={
                             useMonthAbbreviations
                                 ? getAbbreviatedMonthTitle(month)
@@ -103,8 +154,12 @@ export default function DatePicker({
                     {isTwoUp ? (
                         <MonthCalendar
                             dateEnd={dateEnd}
+                            dateEndPreview={dateEndPreview}
                             dateStart={dateStart}
+                            isRange={isRange}
                             month={month + 1}
+                            onChange={handleChange}
+                            onChangeEndPreview={handleChangeEndPreview}
                             title={
                                 useMonthAbbreviations
                                     ? getAbbreviatedMonthTitle(month + 1)
