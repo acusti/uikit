@@ -99,8 +99,15 @@ export default function DatePicker({
         (date: string) => {
             // If we have a dateStart but no dateEnd, set dateEnd
             if (isRange && dateStart != null && dateEnd == null) {
-                setDateEnd(date);
-                onChange({ dateEnd: date, dateStart });
+                // Ensure that dateEnd is after dateStart; if not, swap them
+                if (date < dateStart) {
+                    setDateStart(date);
+                    setDateEnd(dateStart);
+                    onChange({ dateEnd: dateStart, dateStart: date });
+                } else {
+                    setDateEnd(date);
+                    onChange({ dateEnd: date, dateStart });
+                }
             } else {
                 setDateStart(date);
                 setDateEnd(null);
