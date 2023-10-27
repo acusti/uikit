@@ -49,7 +49,7 @@
         "typescript": "^5.1.6"
     },
     "dependencies": {
-        "@acusti/input-text": "^1.2.0",
+        "@acusti/input-text": "^1.2.1",
         "@acusti/matchmaking": "^0.5.1",
         "@acusti/styling": "^0.6.0",
         "@acusti/use-is-out-of-bounds": "^0.7.0",

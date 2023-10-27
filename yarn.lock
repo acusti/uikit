@@ -31,7 +31,7 @@ __metadata:
   resolution: "@acusti/css-value-input@workspace:packages/css-value-input"
   dependencies:
     "@acusti/css-values": ^1.0.0
-    "@acusti/input-text": ^1.2.0
+    "@acusti/input-text": ^1.2.1
     "@testing-library/dom": ^9.3.1
     "@testing-library/react": ^14.0.0
     "@testing-library/user-event": ^14.4.3
@@ -79,7 +79,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
-    "@acusti/input-text": ^1.2.0
+    "@acusti/input-text": ^1.2.1
     "@acusti/matchmaking": ^0.5.1
     "@acusti/styling": ^0.6.0
     "@acusti/use-is-out-of-bounds": ^0.7.0
@@ -99,7 +99,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/input-text@^1.2.0, @acusti/input-text@workspace:packages/input-text":
+"@acusti/input-text@^1.2.1, @acusti/input-text@workspace:packages/input-text":
   version: 0.0.0-use.local
   resolution: "@acusti/input-text@workspace:packages/input-text"
   dependencies:
