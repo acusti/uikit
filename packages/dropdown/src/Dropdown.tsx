@@ -231,7 +231,7 @@ export default function Dropdown({
                 }
             }
 
-            const nextValue = element?.dataset.uktValue || label;
+            const nextValue = element?.dataset.uktValue ?? label;
             // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
             if (valueRef.current && valueRef.current === nextValue) return;
 
