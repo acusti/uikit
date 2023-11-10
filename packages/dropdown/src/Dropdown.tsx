@@ -218,16 +218,21 @@ export default function Dropdown({
             if (!hasItemsRef.current) return;
 
             const element = getActiveItemElement(dropdownElementRef.current);
-            if (!element) {
+            if (!element && !allowCreateRef.current) {
                 // If not allowEmpty, don’t allow submitting an empty item
                 if (!allowEmptyRef.current) return;
                 // If we have an input element as trigger & the user didn’t clear the text, do nothing
                 if (inputElementRef.current?.value) return;
             }
 
-            const label = element?.innerText || '';
+            let label = element?.innerText || '';
             if (inputElementRef.current) {
-                inputElementRef.current.value = label;
+                if (!element) {
+                    label = inputElementRef.current.value;
+                } else {
+                    inputElementRef.current.value = label;
+                }
+
                 if (
                     inputElementRef.current ===
                     inputElementRef.current.ownerDocument.activeElement
