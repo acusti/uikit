@@ -572,8 +572,15 @@ export default function Dropdown({
                 const isDeleting =
                     enteredCharactersRef.current.length > input.value.length;
                 enteredCharactersRef.current = input.value;
-                // Don’t set a new active item if user is deleting text unless text is now empty
-                if (isDeleting && input.value.length) return;
+                // When deleting text, if there’s already an active item and
+                // input isn’t empty, preserve the active item, else update it
+                if (
+                    isDeleting &&
+                    input.value.length &&
+                    getActiveItemElement(dropdownElement)
+                ) {
+                    return;
+                }
 
                 setActiveItem({
                     dropdownElement,
