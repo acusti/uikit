@@ -158,3 +158,14 @@ export const NumberValue: Story = {
         value: 0,
     },
 };
+
+export const LineHeight: Story = {
+    args: {
+        cssValueType: 'length',
+        label: 'line height',
+        name: 'line-height',
+        step: 0.1,
+        unit: '',
+        value: 1.4,
+    },
+};
