@@ -113,11 +113,15 @@ const CSSValueInput = React.forwardRef<HTMLInputElement, Props>(
 
                 const currentValueAsNumber = getValueAsNumber(currentValue);
                 const isCurrentValueFinite = Number.isFinite(currentValueAsNumber);
-                const defaultUnit = getUnitFromCSSValue({
-                    cssValueType,
-                    defaultUnit: unit,
-                    value: submittedValueRef.current,
-                });
+                // Inherit unit from last submitted value unless default is unitless;
+                // ensures that submitting a new value with no unit doesn’t add a unit
+                const defaultUnit = unit
+                    ? getUnitFromCSSValue({
+                          cssValueType,
+                          defaultUnit: unit,
+                          value: submittedValueRef.current,
+                      })
+                    : '';
 
                 if (!isCurrentValueFinite) {
                     let isValid = false;
