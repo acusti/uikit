@@ -35,6 +35,8 @@ export type Item = {
 };
 
 export type Props = {
+    /** Boolean indicating if the user can submit a value not already in the dropdown */
+    allowCreate?: boolean;
     /** Boolean indicating if the user can submit an empty value (i.e. clear the value); defaults to true */
     allowEmpty?: boolean;
     /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
@@ -81,6 +83,7 @@ const TEXT_INPUT_SELECTOR =
     'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea';
 
 export default function Dropdown({
+    allowCreate,
     allowEmpty = true,
     children,
     className,
@@ -130,11 +133,11 @@ export default function Dropdown({
     const mouseDownPositionRef = useRef<MousePosition | null>(null);
     const outOfBounds = useIsOutOfBounds(dropdownBodyElement);
 
+    const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
     const hasItemsRef = useRef(hasItems);
     const isOpenRef = useRef(isOpen);
     const isOpeningRef = useRef(isOpening);
-    const isTriggerFromPropsRef = useRef(isOpening);
     const keepOpenOnSubmitRef = useRef(keepOpenOnSubmit);
     const onCloseRef = useRef(onClose);
     const onOpenRef = useRef(onOpen);
@@ -142,22 +145,22 @@ export default function Dropdown({
     const valueRef = useRef(value);
 
     useEffect(() => {
+        allowCreateRef.current = allowCreate;
         allowEmptyRef.current = allowEmpty;
         hasItemsRef.current = hasItems;
         isOpenRef.current = isOpen;
         isOpeningRef.current = isOpening;
-        isTriggerFromPropsRef.current = isTriggerFromProps;
         keepOpenOnSubmitRef.current = keepOpenOnSubmit;
         onCloseRef.current = onClose;
         onOpenRef.current = onOpen;
         onSubmitItemRef.current = onSubmitItem;
         valueRef.current = value;
     }, [
+        allowCreate,
         allowEmpty,
         hasItems,
         isOpen,
         isOpening,
-        isTriggerFromProps,
         keepOpenOnSubmit,
         onClose,
         onOpen,
@@ -400,9 +403,9 @@ export default function Dropdown({
 
                     setActiveItem({
                         dropdownElement,
-                        // If input element came from props, only override the input’s value
-                        // with an exact text match so user can enter a value not in items
-                        isExactMatch: isTriggerFromPropsRef.current,
+                        // If props.allowCreate, only override the input’s value with an
+                        // exact text match so user can enter a value not in items
+                        isExactMatch: allowCreateRef.current,
                         text: enteredCharactersRef.current,
                     });
 
@@ -569,9 +572,9 @@ export default function Dropdown({
 
                 setActiveItem({
                     dropdownElement,
-                    // If input element came from props, only override the input’s value
-                    // with an exact text match so user can enter a value not in items
-                    isExactMatch: isTriggerFromPropsRef.current,
+                    // If props.allowCreate, only override the input’s value with an
+                    // exact text match so user can enter a value not in items
+                    isExactMatch: allowCreateRef.current,
                     text: enteredCharactersRef.current,
                 });
             };
