@@ -77,6 +77,8 @@ const noop = () => {};
 
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
+const TEXT_INPUT_SELECTOR =
+    'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea';
 
 export default function Dropdown({
     allowEmpty = true,
@@ -478,11 +480,14 @@ export default function Dropdown({
 
             const { ownerDocument } = ref;
             let inputElement = inputElementRef.current;
-            // Check if trigger from props is an input or textarea element
+            // Check if trigger from props is a textual input or textarea element
             if (isTriggerFromProps && !inputElement && ref.firstElementChild) {
-                inputElement = ref.firstElementChild.querySelector(
-                    'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea',
-                );
+                if (ref.firstElementChild.matches(TEXT_INPUT_SELECTOR)) {
+                    inputElement = ref.firstElementChild as HTMLInputElement;
+                } else {
+                    inputElement =
+                        ref.firstElementChild.querySelector(TEXT_INPUT_SELECTOR);
+                }
                 inputElementRef.current = inputElement;
             }
 
