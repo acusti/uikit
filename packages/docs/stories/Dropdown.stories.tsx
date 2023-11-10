@@ -253,6 +253,41 @@ export const CSSValueInputTrigger: Story = {
     },
 };
 
+export const TextareaTrigger: Story = {
+    args: {
+        children: [
+            <textarea></textarea>,
+            <ul>
+                <li>
+                    Lorem ipsum dolor sit amet, consectetur adipiscing elit. Pellentesque
+                    ullamcorper fringilla quam, vel tincidunt nisl mattis vel.
+                </li>
+                <li>
+                    Aenean posuere erat sed enim luctus, et accumsan nisl elementum. Nulla
+                    vel blandit urna, vel accumsan nulla. Nulla varius luctus ex, gravida
+                    ultrices orci sagittis eu.
+                </li>
+                <li>
+                    Quisque vitae magna euismod ligula molestie maximus id et nunc. Nam et
+                    lacus euismod, porttitor massa vel, sollicitudin ex. Sed ut tellus
+                    suscipit, faucibus tortor nec, fermentum mi.
+                </li>
+                <li>
+                    Nulla sagittis justo non accumsan sagittis. Cras a eros et dolor
+                    dapibus bibendum lobortis quis ante. Ut eget scelerisque massa.
+                </li>
+                <li>
+                    Vestibulum quis dignissim nunc. Mauris fringilla at nulla non lacinia.
+                    Etiam tristique elit non nisl finibus, fringilla hendrerit ligula
+                    hendrerit. Fusce eget leo lacinia, eleifend diam non, suscipit purus.
+                </li>
+            </ul>,
+        ],
+        className: 'textarea-trigger',
+        hasItems: true,
+    },
+};
+
 export const CheckboxesDropdown: Story = {
     args: {
         children: [

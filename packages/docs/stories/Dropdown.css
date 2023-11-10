@@ -89,6 +89,11 @@
     align-self: center;
 }
 
+.textarea-trigger .uktdropdown-body {
+    width: 400px;
+    font-size: 13px;
+}
+
 .checkboxes .uktdropdown-body {
     width: 150px;
 }
