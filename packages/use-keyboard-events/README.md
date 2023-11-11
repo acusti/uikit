@@ -41,8 +41,8 @@ also means the todo item is selected, a keydown handler that deletes the
 todo item would be triggered when the user is editing the text of the todo
 item and hits the delete key. If you use this package and
 `ignoreUsedKeyboardEvents` is true (it defaults to true), the hook will not
-trigger your handler if an input or textarea or contenteditable element is
-the target of the event.
+trigger your handler if the target of the keyboard event is using it for
+input.
 
 The hook exposes two more methods for controlling how events are handled:
 first, you can pass `priority`, which can be any number between -50 and 50.
