@@ -348,7 +348,13 @@ export default function Dropdown({
             // If dropdown has no items and click was within dropdown body, do nothing
             if (!hasItemsRef.current) return;
 
-            handleSubmitItem(event);
+            // If still isOpening, only trigger submit with an active element
+            if (
+                !isOpeningRef.current ||
+                getActiveItemElement(dropdownElementRef.current)
+            ) {
+                handleSubmitItem(event);
+            }
         },
         [closeDropdown, handleSubmitItem, onMouseUp],
     );
