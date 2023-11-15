@@ -29,32 +29,32 @@
     margin-top: 0.25rem;
 }
 
-.css-lengths .uktdropdown-trigger {
+.no-trigger-text .uktdropdown-trigger {
     position: relative;
     margin-left: 3px;
     width: 27px;
     height: 21px;
     vertical-align: top;
 }
-.css-lengths .uktdropdown-trigger:before {
+.no-trigger-text .uktdropdown-trigger:before {
     content: "";
     display: block;
     position: absolute;
     width: 9px;
     height: 2px;
-    top: 8px;
+    top: 10px;
     left: 4px;
     border-radius: 2px 0 0 3px;
     background-color: #666;
     transform: rotateZ(38deg);
 }
-.css-lengths .uktdropdown-trigger:after {
+.no-trigger-text .uktdropdown-trigger:after {
     content: "";
     display: block;
     position: absolute;
     width: 9px;
     height: 2px;
-    top: 8px;
+    top: 10px;
     right: 4px;
     border-radius: 0 2px 2px 0;
     background-color: #666;

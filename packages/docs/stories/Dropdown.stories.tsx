@@ -46,7 +46,7 @@ export const CSSLengthsDropdown: Story = {
                 <li>198px</li>
             </ul>
         ),
-        className: 'css-lengths',
+        className: 'css-lengths no-trigger-text',
     },
 };
 
