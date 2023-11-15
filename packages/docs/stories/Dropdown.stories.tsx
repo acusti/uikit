@@ -379,6 +379,24 @@ export const DisabledDropdown: Story = {
     },
 };
 
+export const OverlappingDropdown: Story = {
+    args: {
+        children: (
+            <ul>
+                <li>the carbon in our apple pies</li>
+                <li>sea of tranquility tesseract</li>
+                <li>encyclopaedia galactica</li>
+                <li>billions upon billions</li>
+                <li>network of wormholes</li>
+                <li>tingling of the spine</li>
+                <li>corpus callosum</li>
+                <li>finite but unbounded</li>
+            </ul>
+        ),
+        className: 'overlapping-dropdown no-trigger-text',
+    },
+};
+
 export const OutOfBoundsAtBottom: Story = {
     args: {
         children: (
