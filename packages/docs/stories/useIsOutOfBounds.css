@@ -1,0 +1,16 @@
+.out-of-bounds-example.uktdropdown {
+    position: absolute;
+    bottom: 50px;
+}
+.out-of-bounds-example input {
+    width: 150px;
+}
+
+.out-of-bounds-example .uktdropdown-body {
+    width: 250px;
+}
+
+.position-right.uktdropdown {
+    position: absolute;
+    right: 70px;
+}

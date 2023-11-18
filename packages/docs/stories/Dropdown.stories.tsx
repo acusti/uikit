@@ -397,29 +397,6 @@ export const OverlappingDropdown: Story = {
     },
 };
 
-export const OutOfBoundsAtBottom: Story = {
-    args: {
-        children: (
-            <ul>
-                <li>0px</li>
-                <li>4px</li>
-                <li>9px</li>
-                <li>18px</li>
-                <li>36px</li>
-                <li>54px</li>
-                <li>72px</li>
-                <li>144px</li>
-                <li>167px</li>
-                <li>198px</li>
-            </ul>
-        ),
-        className: 'out-of-bounds-example',
-        isSearchable: true,
-        name: 'outofboundsatbottom',
-        placeholder: 'Show above',
-    },
-};
-
 export const OutOfBoundsAtRight: Story = {
     args: {
         children: (
