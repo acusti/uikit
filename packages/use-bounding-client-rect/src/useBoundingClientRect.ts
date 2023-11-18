@@ -49,7 +49,7 @@ const refsByElement: WeakMap<HTMLElement, Refs> = new WeakMap();
 let resizeObserver = RESIZE_OBSERVER_STUB;
 
 if (typeof ResizeObserver === 'function') {
-    resizeObserver = new window.ResizeObserver((entries, observer) => {
+    resizeObserver = new ResizeObserver((entries, observer) => {
         for (const entry of entries) {
             const element = entry.target as HTMLElement;
             const refs = refsByElement.get(element);
@@ -82,6 +82,10 @@ const initializeUpdateHandlers = (element: HTMLElement) => {
                 );
             }
             return;
+        }
+
+        if (refs.retryCount) {
+            refs.retryCount = 0;
         }
 
         // Only update boundingClientRect if at least one of the values has changed
