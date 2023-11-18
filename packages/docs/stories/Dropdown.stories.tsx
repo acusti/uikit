@@ -442,3 +442,19 @@ export const OutOfBoundsAtRight: Story = {
         placeholder: 'Show above & to the left',
     },
 };
+
+export const OutOfBoundsWithNoDirectionChange: Story = {
+    args: {
+        children: (
+            <ul>
+                <li>Antarctica</li>
+                <li>Arctic Circle</li>
+                <li>North Pole</li>
+            </ul>
+        ),
+        className: 'out-of-bounds-example no-direction-change',
+        isSearchable: true,
+        name: 'outofboundsatbottomnodirectionchange',
+        placeholder: 'Show below even though it goes out of bounds',
+    },
+};

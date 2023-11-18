@@ -123,3 +123,27 @@
     position: absolute;
     right: 70px;
 }
+
+.out-of-bounds-example.no-direction-change.uktdropdown {
+    position: relative;
+    margin-top: 220px;
+}
+
+.out-of-bounds-example.no-direction-change .uktdropdown-trigger {
+    width: 255px;
+}
+
+.out-of-bounds-example.no-direction-change.uktdropdown .uktdropdown-body {
+    top: 100%;
+}
+
+#anchor--uikit-controls-dropdown--out-of-bounds-with-no-direction-change
+    .innerZoomElementWrapper
+    > * {
+    overflow: auto;
+    height: 200px;
+}
+
+#anchor--uikit-controls-dropdown--out-of-bounds-with-no-direction-change .sb-story {
+    height: 230px;
+}
