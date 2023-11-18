@@ -1,7 +1,7 @@
 import useBoundingClientRect from '@acusti/use-bounding-client-rect';
 import * as React from 'react';
 
-const { useEffect, useState } = React;
+const { useCallback, useEffect, useRef, useState } = React;
 
 type MaybeHTMLElement = HTMLElement | null;
 type OutOfBounds = {
@@ -79,7 +79,12 @@ const getWillBeOutOfBounds = ({
 };
 
 const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
-    const [outOfBounds, setOutOfBounds] = useState<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
+    const [outOfBounds, _setOutOfBounds] = useState<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
+    const outOfBoundsRef = useRef<OutOfBounds>(outOfBounds);
+    const setOutOfBounds = useCallback((nextOutOfBounds: OutOfBounds) => {
+        _setOutOfBounds(nextOutOfBounds);
+        outOfBoundsRef.current = nextOutOfBounds;
+    }, []);
     const elementRect = useBoundingClientRect(element);
     const offsetParent = getOverflowHiddenParent(element);
     const offsetParentRect = useBoundingClientRect(offsetParent);
@@ -113,7 +118,8 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
         let right = elementRight > offsetParentRight;
         let top = elementTop < offsetParentTop;
 
-        const isDownward = !outOfBounds.bottom || outOfBounds.top; // defaults downward
+        const previousOutOfBounds = outOfBoundsRef.current;
+        const isDownward = !previousOutOfBounds.bottom || previousOutOfBounds.top; // defaults downward
         const willBeDownward = !bottom || top; // defaults downward
         if (isDownward && !willBeDownward) {
             top = getWillBeOutOfBounds({
@@ -135,7 +141,7 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
             top = !bottom;
         }
 
-        const isRightward = !outOfBounds.right || outOfBounds.left; // defaults rightward
+        const isRightward = !previousOutOfBounds.right || previousOutOfBounds.left; // defaults rightward
         const willBeRightward = !right || left;
         if (isRightward && !willBeRightward) {
             left = getWillBeOutOfBounds({
@@ -168,13 +174,13 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
 
         // Do nothing if none of the outOfBounds values have changed
         if (
-            outOfBounds.hasLayout &&
-            bottom === outOfBounds.bottom &&
-            left === outOfBounds.left &&
-            maxHeight === outOfBounds.maxHeight &&
-            maxWidth === outOfBounds.maxWidth &&
-            right === outOfBounds.right &&
-            top === outOfBounds.top
+            previousOutOfBounds.hasLayout &&
+            bottom === previousOutOfBounds.bottom &&
+            left === previousOutOfBounds.left &&
+            maxHeight === previousOutOfBounds.maxHeight &&
+            maxWidth === previousOutOfBounds.maxWidth &&
+            right === previousOutOfBounds.right &&
+            top === previousOutOfBounds.top
         ) {
             return;
         }
@@ -197,13 +203,7 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
         offsetParentRect.left,
         offsetParentRect.right,
         offsetParentRect.top,
-        outOfBounds.bottom,
-        outOfBounds.hasLayout,
-        outOfBounds.left,
-        outOfBounds.maxHeight,
-        outOfBounds.maxWidth,
-        outOfBounds.right,
-        outOfBounds.top,
+        setOutOfBounds,
     ]);
 
     return outOfBounds;
