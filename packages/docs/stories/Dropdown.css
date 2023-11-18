@@ -14,6 +14,7 @@
 .uktdropdown-body li {
     padding: 4px 8px;
     margin: 4px 0;
+    white-space: nowrap;
 }
 
 .uktdropdown-body .heading {
@@ -63,9 +64,6 @@
 
 .font-weight {
     font-size: 13px;
-}
-.font-weight input {
-    width: 160px;
 }
 .font-weight .item-title {
     color: #ababab;
