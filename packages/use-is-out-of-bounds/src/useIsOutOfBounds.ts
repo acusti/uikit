@@ -1,7 +1,7 @@
 import useBoundingClientRect from '@acusti/use-bounding-client-rect';
 import * as React from 'react';
 
-const { useCallback, useEffect, useRef, useState } = React;
+const { useRef } = React;
 
 type MaybeHTMLElement = HTMLElement | null;
 type OutOfBounds = {
@@ -79,12 +79,7 @@ const getWillBeOutOfBounds = ({
 };
 
 const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
-    const [outOfBounds, _setOutOfBounds] = useState<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
-    const outOfBoundsRef = useRef<OutOfBounds>(outOfBounds);
-    const setOutOfBounds = useCallback((nextOutOfBounds: OutOfBounds) => {
-        _setOutOfBounds(nextOutOfBounds);
-        outOfBoundsRef.current = nextOutOfBounds;
-    }, []);
+    const outOfBoundsRef = useRef<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
     const elementRect = useBoundingClientRect(element);
     const offsetParent = getOverflowHiddenParent(element);
     const offsetParentRect = useBoundingClientRect(offsetParent);
@@ -93,99 +88,93 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
         offsetParentRect.bottom = offsetParent.ownerDocument.documentElement.clientHeight;
     }
 
-    useEffect(() => {
-        if (elementRect.top == null) {
-            setOutOfBounds(INITIAL_OUT_OF_BOUNDS);
-            return;
-        }
+    if (elementRect.top == null) {
+        outOfBoundsRef.current = INITIAL_OUT_OF_BOUNDS;
+        return INITIAL_OUT_OF_BOUNDS;
+    } else if (offsetParentRect.top == null) {
+        outOfBoundsRef.current = INITIAL_OUT_OF_BOUNDS_HAS_LAYOUT;
+        return INITIAL_OUT_OF_BOUNDS_HAS_LAYOUT;
+    }
 
-        if (offsetParentRect.top == null) {
-            setOutOfBounds(INITIAL_OUT_OF_BOUNDS_HAS_LAYOUT);
-            return;
-        }
+    const elementBottom = elementRect.bottom!;
+    const elementLeft = elementRect.left!;
+    const elementRight = elementRect.right!;
+    const elementTop = elementRect.top!;
+    const offsetParentBottom = offsetParentRect.bottom!;
+    const offsetParentLeft = offsetParentRect.left!;
+    const offsetParentRight = offsetParentRect.right!;
+    const offsetParentTop = offsetParentRect.top!;
 
-        const elementBottom = elementRect.bottom!;
-        const elementLeft = elementRect.left!;
-        const elementRight = elementRect.right!;
-        const elementTop = elementRect.top!;
-        const offsetParentBottom = offsetParentRect.bottom!;
-        const offsetParentLeft = offsetParentRect.left!;
-        const offsetParentRight = offsetParentRect.right!;
-        const offsetParentTop = offsetParentRect.top!;
+    let bottom = elementBottom > offsetParentBottom;
+    let left = elementLeft < offsetParentLeft;
+    let right = elementRight > offsetParentRight;
+    let top = elementTop < offsetParentTop;
 
-        let bottom = elementBottom > offsetParentBottom;
-        let left = elementLeft < offsetParentLeft;
-        let right = elementRight > offsetParentRight;
-        let top = elementTop < offsetParentTop;
+    const previousOutOfBounds = outOfBoundsRef.current;
+    const isDownward = !previousOutOfBounds.bottom || previousOutOfBounds.top; // defaults downward
+    const willBeDownward = !bottom || top; // defaults downward
+    if (isDownward && !willBeDownward) {
+        top = getWillBeOutOfBounds({
+            boundingValue: offsetParentTop,
+            boundingValueOpposite: offsetParentBottom,
+            value: elementTop,
+            valueOpposite: elementBottom,
+        });
+        // If top would be *more* out-of-bounds, keep it downward
+        bottom = !top;
+    } else if (!isDownward && willBeDownward) {
+        bottom = getWillBeOutOfBounds({
+            boundingValue: offsetParentBottom,
+            boundingValueOpposite: offsetParentTop,
+            value: elementBottom,
+            valueOpposite: elementTop,
+        });
+        // If bottom would be *more* out-of-bounds, keep it upward
+        top = !bottom;
+    }
 
-        const previousOutOfBounds = outOfBoundsRef.current;
-        const isDownward = !previousOutOfBounds.bottom || previousOutOfBounds.top; // defaults downward
-        const willBeDownward = !bottom || top; // defaults downward
-        if (isDownward && !willBeDownward) {
-            top = getWillBeOutOfBounds({
-                boundingValue: offsetParentTop,
-                boundingValueOpposite: offsetParentBottom,
-                value: elementTop,
-                valueOpposite: elementBottom,
-            });
-            // If top would be *more* out-of-bounds, keep it downward
-            bottom = !top;
-        } else if (!isDownward && willBeDownward) {
-            bottom = getWillBeOutOfBounds({
-                boundingValue: offsetParentBottom,
-                boundingValueOpposite: offsetParentTop,
-                value: elementBottom,
-                valueOpposite: elementTop,
-            });
-            // If bottom would be *more* out-of-bounds, keep it upward
-            top = !bottom;
-        }
+    const isRightward = !previousOutOfBounds.right || previousOutOfBounds.left; // defaults rightward
+    const willBeRightward = !right || left;
+    if (isRightward && !willBeRightward) {
+        left = getWillBeOutOfBounds({
+            boundingValue: offsetParentLeft,
+            boundingValueOpposite: offsetParentRight,
+            value: elementLeft,
+            valueOpposite: elementRight,
+        });
+        // If left would be *more* out-of-bounds, keep it rightward
+        right = !left;
+    } else if (!isRightward && willBeRightward) {
+        right = getWillBeOutOfBounds({
+            boundingValue: offsetParentRight,
+            boundingValueOpposite: offsetParentLeft,
+            value: elementRight,
+            valueOpposite: elementLeft,
+        });
+        // If right would be *more* out-of-bounds, keep it leftward
+        left = !right;
+    }
 
-        const isRightward = !previousOutOfBounds.right || previousOutOfBounds.left; // defaults rightward
-        const willBeRightward = !right || left;
-        if (isRightward && !willBeRightward) {
-            left = getWillBeOutOfBounds({
-                boundingValue: offsetParentLeft,
-                boundingValueOpposite: offsetParentRight,
-                value: elementLeft,
-                valueOpposite: elementRight,
-            });
-            // If left would be *more* out-of-bounds, keep it rightward
-            right = !left;
-        } else if (!isRightward && willBeRightward) {
-            right = getWillBeOutOfBounds({
-                boundingValue: offsetParentRight,
-                boundingValueOpposite: offsetParentLeft,
-                value: elementRight,
-                valueOpposite: elementLeft,
-            });
-            // If right would be *more* out-of-bounds, keep it leftward
-            left = !right;
-        }
+    const maxHeight =
+        !bottom || top
+            ? offsetParentBottom - elementTop
+            : elementBottom - offsetParentTop;
+    const maxWidth =
+        !right || left
+            ? offsetParentRight - elementLeft
+            : elementRight - offsetParentLeft;
 
-        const maxHeight =
-            !bottom || top
-                ? offsetParentBottom - elementTop
-                : elementBottom - offsetParentTop;
-        const maxWidth =
-            !right || left
-                ? offsetParentRight - elementLeft
-                : elementRight - offsetParentLeft;
-
-        // Do nothing if none of the outOfBounds values have changed
-        if (
-            previousOutOfBounds.hasLayout &&
-            bottom === previousOutOfBounds.bottom &&
-            left === previousOutOfBounds.left &&
-            maxHeight === previousOutOfBounds.maxHeight &&
-            maxWidth === previousOutOfBounds.maxWidth &&
-            right === previousOutOfBounds.right &&
-            top === previousOutOfBounds.top
-        ) {
-            return;
-        }
-
-        setOutOfBounds({
+    // Only overwrite outOfBoundsRef if one of the values has changed
+    if (
+        !previousOutOfBounds.hasLayout ||
+        bottom !== previousOutOfBounds.bottom ||
+        left !== previousOutOfBounds.left ||
+        maxHeight !== previousOutOfBounds.maxHeight ||
+        maxWidth !== previousOutOfBounds.maxWidth ||
+        right !== previousOutOfBounds.right ||
+        top !== previousOutOfBounds.top
+    ) {
+        outOfBoundsRef.current = {
             bottom,
             hasLayout: true,
             left,
@@ -193,20 +182,10 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
             maxWidth,
             right,
             top,
-        });
-    }, [
-        elementRect.bottom,
-        elementRect.left,
-        elementRect.right,
-        elementRect.top,
-        offsetParentRect.bottom,
-        offsetParentRect.left,
-        offsetParentRect.right,
-        offsetParentRect.top,
-        setOutOfBounds,
-    ]);
+        };
+    }
 
-    return outOfBounds;
+    return outOfBoundsRef.current;
 };
 
 export default useIsOutOfBounds;
