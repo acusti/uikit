@@ -22,8 +22,9 @@ export const STYLES = `
   --uktdd-body-bg-color: #fff;
   --uktdd-body-bg-color-hover: rgb(105,162,249);
   --uktdd-body-color-hover: #fff;
-  ${BODY_MAX_HEIGHT_VAR}: calc(100vh - 30px);
-  ${BODY_MAX_WIDTH_VAR}: calc(100vw - 30px);
+  --uktdd-body-buffer: 10px;
+  ${BODY_MAX_HEIGHT_VAR}: calc(100vh - var(--uktdd-body-buffer));
+  ${BODY_MAX_WIDTH_VAR}: calc(100vw - var(--uktdd-body-buffer));
   --uktdd-body-pad-bottom: 9px;
   --uktdd-body-pad-left: 12px;
   --uktdd-body-pad-right: 12px;

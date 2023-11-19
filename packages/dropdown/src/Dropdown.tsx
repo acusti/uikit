@@ -661,10 +661,14 @@ export default function Dropdown({
     const style = useMemo<{ [key: string]: string }>(
         () => ({
             ...(outOfBounds.maxHeight
-                ? { [BODY_MAX_HEIGHT_VAR]: `${outOfBounds.maxHeight}px` }
+                ? {
+                      [BODY_MAX_HEIGHT_VAR]: `calc(${outOfBounds.maxHeight}px - var(--uktdd-body-buffer))`,
+                  }
                 : null),
             ...(outOfBounds.maxWidth
-                ? { [BODY_MAX_WIDTH_VAR]: `${outOfBounds.maxWidth}px` }
+                ? {
+                      [BODY_MAX_WIDTH_VAR]: `calc(${outOfBounds.maxWidth}px - var(--uktdd-body-buffer))`,
+                  }
                 : null),
         }),
         [outOfBounds.maxHeight, outOfBounds.maxWidth],
