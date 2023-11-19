@@ -29,7 +29,7 @@ const INITIAL_OUT_OF_BOUNDS_HAS_LAYOUT: OutOfBounds = Object.freeze({
     hasLayout: true,
 });
 
-const getOverflowHiddenParent = (element: MaybeHTMLElement): MaybeHTMLElement => {
+const getOverflowHiddenParent = (element?: MaybeHTMLElement): MaybeHTMLElement => {
     while (element?.parentElement) {
         // If we’ve reached the body, use that as offsetParent
         if (element.parentElement.tagName === 'BODY') return element.parentElement;
@@ -76,7 +76,7 @@ const getIsCurrentDirectionBefore = ({
     return positionAfter < length / 2;
 };
 
-const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
+const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
     const outOfBoundsRef = useRef<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
     const computedStyleRef = useRef<CSSStyleDeclaration | null>(null);
     const elementRect = useBoundingClientRect(element);

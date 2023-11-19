@@ -143,7 +143,7 @@ const cleanupHookInstance = (element: HTMLElement, setRenderTime: SetRenderTime)
     refs.maybeCleanupElement();
 };
 
-const useBoundingClientRect = (element: HTMLElement | null): Rect | EmptyRect => {
+const useBoundingClientRect = (element?: HTMLElement | null): Rect | EmptyRect => {
     // Flip the bit to trigger a new return value from this hook
     const [, setRenderTime] = useState<number>(0);
 
