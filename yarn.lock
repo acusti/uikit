@@ -214,7 +214,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-bounding-client-rect@^1.0.0, @acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect":
+"@acusti/use-bounding-client-rect@^1.0.1, @acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect":
   version: 0.0.0-use.local
   resolution: "@acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect"
   dependencies:
@@ -230,7 +230,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds"
   dependencies:
-    "@acusti/use-bounding-client-rect": ^1.0.0
+    "@acusti/use-bounding-client-rect": ^1.0.1
     "@types/react": ^18.0.25
     typescript: ^5.1.6
   peerDependencies:
