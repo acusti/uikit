@@ -52,7 +52,7 @@
         "@acusti/input-text": "^1.2.1",
         "@acusti/matchmaking": "^0.5.1",
         "@acusti/styling": "^0.6.0",
-        "@acusti/use-is-out-of-bounds": "^0.7.0",
+        "@acusti/use-is-out-of-bounds": "^0.8.0",
         "@acusti/use-keyboard-events": "^0.4.0",
         "clsx": "^2"
     },
