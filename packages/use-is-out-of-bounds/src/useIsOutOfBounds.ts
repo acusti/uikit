@@ -78,6 +78,7 @@ const getIsCurrentDirectionBefore = ({
 
 const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
     const outOfBoundsRef = useRef<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
+    const elementRef = useRef<MaybeHTMLElement>(element || null);
     const computedStyleRef = useRef<CSSStyleDeclaration | null>(null);
     const elementRect = useBoundingClientRect(element);
     const offsetParent = getOverflowHiddenParent(element);
@@ -87,9 +88,13 @@ const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
         offsetParentRect.bottom = offsetParent.ownerDocument.documentElement.clientHeight;
     }
 
+    if (element !== elementRef.current) {
+        elementRef.current = element || null;
+        computedStyleRef.current = null;
+    }
+
     if (!element || elementRect.top == null) {
         outOfBoundsRef.current = INITIAL_OUT_OF_BOUNDS;
-        computedStyleRef.current = null;
         return INITIAL_OUT_OF_BOUNDS;
     } else if (offsetParentRect.top == null) {
         outOfBoundsRef.current = INITIAL_OUT_OF_BOUNDS_HAS_LAYOUT;
