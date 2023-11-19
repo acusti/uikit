@@ -329,8 +329,10 @@ export default function Dropdown({
     const handleMouseUp = useCallback(
         (event: React.MouseEvent<HTMLElement>) => {
             if (onMouseUp) onMouseUp(event);
-            // If dropdown isn’t open or is already closing, do nothing
-            if (!isOpenRef.current || closingTimerRef.current) return;
+            // If dropdown is still opening or isn’t open or is closing, do nothing
+            if (isOpeningRef.current || !isOpenRef.current || closingTimerRef.current) {
+                return;
+            }
 
             const eventTarget = event.target as HTMLElement;
             // If click was outside dropdown body, don’t trigger submit
@@ -348,13 +350,7 @@ export default function Dropdown({
             // If dropdown has no items and click was within dropdown body, do nothing
             if (!hasItemsRef.current) return;
 
-            // If still isOpening, only trigger submit with an active element
-            if (
-                !isOpeningRef.current ||
-                getActiveItemElement(dropdownElementRef.current)
-            ) {
-                handleSubmitItem(event);
-            }
+            handleSubmitItem(event);
         },
         [closeDropdown, handleSubmitItem, onMouseUp],
     );
