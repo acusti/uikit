@@ -45,41 +45,40 @@ const getOverflowHiddenParent = (element: MaybeHTMLElement): MaybeHTMLElement =>
     return null;
 };
 
-// If element is out-of-bounds, UI will reposition it to move it back in bounds.
-// To prevent the element from becoming out-of-bounds in the opposite direction,
-// check if there is room in the opposite direction for the element to render.
-// If there isn’t room, mark it as out-of-bounds in the opposite direction also.
-// Note: elementTop - elementHeight = (elementTop * 2) - elementBottom
-// Note: elementBottom + elementHeight = (elementBottom * 2) - elementTop
-const getWillBeOutOfBounds = ({
-    boundingValue,
-    boundingValueOpposite,
-    value,
-    valueOpposite,
+// Opposite direction needs to have much more available space then current direction
+const getShouldSwitchDirection = (
+    spaceAvailable: number,
+    spaceAvailableOpposite: number,
+) => {
+    // Give preference to current direction if it is within 10px out of bounds
+    if (spaceAvailable > -10) return false;
+    const difference = spaceAvailableOpposite - spaceAvailable;
+    // If opposite direction doesn’t have a lot more available space, don’t switch
+    if (difference <= 40) return false;
+    // To be worth switching, opposite direction has to be at least ¼ less out of bounds
+    return spaceAvailableOpposite >= spaceAvailable * 0.75;
+};
+
+const getIsCurrentDirectionBefore = ({
+    length,
+    positionAfter,
+    positionBefore,
 }: {
-    boundingValue: number;
-    boundingValueOpposite: number;
-    value: number;
-    valueOpposite: number;
+    length: number;
+    positionBefore: number;
+    positionAfter: number;
 }) => {
-    const isEndValue = value > valueOpposite;
-    const adjustedValue = value * 2 - valueOpposite;
-    const adjustedOverlapValue = isEndValue
-        ? // If checking bottom/right, overlap = element - offsetParent
-          adjustedValue - boundingValue
-        : // If checking top/left, overlap = offsetParent - element
-          boundingValue - adjustedValue;
-    if (adjustedOverlapValue <= 0) return false;
-    // This util is only called if already outOfBounds in opposite direction.
-    // Only consider adjusted value outOfBounds if more outOfBounds than that.
-    const oppositeOverlapValue = isEndValue
-        ? boundingValueOpposite - valueOpposite
-        : valueOpposite - boundingValueOpposite;
-    return adjustedOverlapValue > oppositeOverlapValue;
+    if (Number.isNaN(positionAfter)) return false;
+    if (Number.isNaN(positionBefore)) return true;
+    // If before position is already positive, it’s direction isn’t before
+    if (positionBefore >= 0) return false;
+    // Consider element in negative direction if more than ½ its length is before origin
+    return positionAfter < length / 2;
 };
 
 const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
     const outOfBoundsRef = useRef<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
+    const computedStyleRef = useRef<CSSStyleDeclaration | null>(null);
     const elementRect = useBoundingClientRect(element);
     const offsetParent = getOverflowHiddenParent(element);
     const offsetParentRect = useBoundingClientRect(offsetParent);
@@ -88,14 +87,16 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
         offsetParentRect.bottom = offsetParent.ownerDocument.documentElement.clientHeight;
     }
 
-    if (elementRect.top == null) {
+    if (!element || elementRect.top == null) {
         outOfBoundsRef.current = INITIAL_OUT_OF_BOUNDS;
+        computedStyleRef.current = null;
         return INITIAL_OUT_OF_BOUNDS;
     } else if (offsetParentRect.top == null) {
         outOfBoundsRef.current = INITIAL_OUT_OF_BOUNDS_HAS_LAYOUT;
         return INITIAL_OUT_OF_BOUNDS_HAS_LAYOUT;
     }
 
+    const previousOutOfBounds = outOfBoundsRef.current;
     const elementBottom = elementRect.bottom!;
     const elementLeft = elementRect.left!;
     const elementRight = elementRect.right!;
@@ -104,55 +105,57 @@ const useIsOutOfBounds = (element: MaybeHTMLElement): OutOfBounds => {
     const offsetParentLeft = offsetParentRect.left!;
     const offsetParentRight = offsetParentRect.right!;
     const offsetParentTop = offsetParentRect.top!;
+    const elementHeight = elementBottom - elementTop;
+    const elementWidth = elementRight - elementLeft;
 
-    let bottom = elementBottom > offsetParentBottom;
-    let left = elementLeft < offsetParentLeft;
-    let right = elementRight > offsetParentRight;
-    let top = elementTop < offsetParentTop;
+    // If direction isn’t currently out-of-bounds, default to previous value.
+    // This prevents us erroneously switching back if direction changed and new
+    // direction causes the previous direction to seem to now have available space.
+    let bottom = elementBottom > offsetParentBottom || previousOutOfBounds.bottom;
+    let left = elementLeft < offsetParentLeft || previousOutOfBounds.left;
+    let right = elementRight > offsetParentRight || previousOutOfBounds.right;
+    let top = elementTop < offsetParentTop || previousOutOfBounds.top;
 
-    const previousOutOfBounds = outOfBoundsRef.current;
-    const isDownward = !previousOutOfBounds.bottom || previousOutOfBounds.top; // defaults downward
-    const willBeDownward = !bottom || top; // defaults downward
-    if (isDownward && !willBeDownward) {
-        top = getWillBeOutOfBounds({
-            boundingValue: offsetParentTop,
-            boundingValueOpposite: offsetParentBottom,
-            value: elementTop,
-            valueOpposite: elementBottom,
+    if (bottom || left || right || top) {
+        const style = computedStyleRef.current || getComputedStyle(element);
+        if (!computedStyleRef.current) {
+            computedStyleRef.current = style;
+        }
+        const isUpward = getIsCurrentDirectionBefore({
+            length: elementHeight,
+            positionAfter: parseFloat(style.getPropertyValue('bottom')),
+            positionBefore: parseFloat(style.getPropertyValue('top')),
         });
-        // If top would be *more* out-of-bounds, keep it downward
-        bottom = !top;
-    } else if (!isDownward && willBeDownward) {
-        bottom = getWillBeOutOfBounds({
-            boundingValue: offsetParentBottom,
-            boundingValueOpposite: offsetParentTop,
-            value: elementBottom,
-            valueOpposite: elementTop,
+        const isLeftward = getIsCurrentDirectionBefore({
+            length: elementWidth,
+            positionAfter: parseFloat(style.getPropertyValue('right')),
+            positionBefore: parseFloat(style.getPropertyValue('left')),
         });
-        // If bottom would be *more* out-of-bounds, keep it upward
-        top = !bottom;
-    }
+        // Identify available space in each direction
+        const offsetBottom = isUpward ? elementHeight : 0;
+        const offsetLeft = isLeftward ? 0 : elementWidth;
+        const offsetRight = isLeftward ? elementWidth : 0;
+        const offsetTop = isUpward ? 0 : elementHeight;
+        const availableLeft = (elementLeft - offsetLeft) - offsetParentLeft; // prettier-ignore
+        const availableRight = offsetParentRight - (elementRight + offsetRight); // prettier-ignore
+        const availableTop = (elementTop - offsetTop) - offsetParentTop; // prettier-ignore
+        const availableBottom = offsetParentBottom - (elementBottom + offsetBottom); // prettier-ignore
+        // If element is out-of-bounds in direction it’s rendering, check if should switch
+        if (isUpward && top) {
+            top = getShouldSwitchDirection(availableTop, availableBottom);
+            bottom = !top;
+        } else if (!isUpward && bottom) {
+            bottom = getShouldSwitchDirection(availableBottom, availableTop);
+            top = !bottom;
+        }
 
-    const isRightward = !previousOutOfBounds.right || previousOutOfBounds.left; // defaults rightward
-    const willBeRightward = !right || left;
-    if (isRightward && !willBeRightward) {
-        left = getWillBeOutOfBounds({
-            boundingValue: offsetParentLeft,
-            boundingValueOpposite: offsetParentRight,
-            value: elementLeft,
-            valueOpposite: elementRight,
-        });
-        // If left would be *more* out-of-bounds, keep it rightward
-        right = !left;
-    } else if (!isRightward && willBeRightward) {
-        right = getWillBeOutOfBounds({
-            boundingValue: offsetParentRight,
-            boundingValueOpposite: offsetParentLeft,
-            value: elementRight,
-            valueOpposite: elementLeft,
-        });
-        // If right would be *more* out-of-bounds, keep it leftward
-        left = !right;
+        if (isLeftward && left) {
+            left = getShouldSwitchDirection(availableLeft, availableRight);
+            right = !left;
+        } else if (!isLeftward && right) {
+            right = getShouldSwitchDirection(availableRight, availableLeft);
+            left = !right;
+        }
     }
 
     const maxHeight =
