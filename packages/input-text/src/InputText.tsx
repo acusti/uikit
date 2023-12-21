@@ -1,7 +1,7 @@
 import * as React from 'react';
 
 export type Props = {
-    autoComplete?: string;
+    autoComplete?: HTMLInputElement['autocomplete'];
     className?: string;
     disabled?: boolean;
     form?: string;
