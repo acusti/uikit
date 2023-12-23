@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, render } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
@@ -12,15 +12,15 @@ afterEach(cleanup);
 
 describe('CSSValueInput.tsx', async () => {
     it('renders a text input with the given props.value', async () => {
-        const { getByRole } = render(<CSSValueInput onSubmitValue={noop} value="24px" />);
-        const input = (getByRole('textbox') as HTMLInputElement);
+        render(<CSSValueInput onSubmitValue={noop} value="24px" />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('24px');
     });
 
     it('handles ↑/↓ keys to increment/decrement by 1 and ⇧↑/⇧↓ to increment/decrement by 10 (preserving the CSS unit)', async () => {
         const user = userEvent.setup();
-        const { getByRole } = render(<CSSValueInput onSubmitValue={noop} value="75%" />);
-        const input = (getByRole('textbox') as HTMLInputElement);
+        render(<CSSValueInput onSubmitValue={noop} value="75%" />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('75%');
         await user.type(input, '{ArrowUp}');
         expect(input.value).toBe('76%');
@@ -38,10 +38,8 @@ describe('CSSValueInput.tsx', async () => {
 
     it('supports custom props.step for ↑/↓ key handling', async () => {
         const user = userEvent.setup();
-        const { getByRole } = render(
-            <CSSValueInput onSubmitValue={noop} step={0.1} value="2rem" />,
-        );
-        const input = (getByRole('textbox') as HTMLInputElement);
+        render(<CSSValueInput onSubmitValue={noop} step={0.1} value="2rem" />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('2rem');
         await user.type(input, '{ArrowUp}');
         expect(input.value).toBe('2.1rem');
@@ -59,10 +57,8 @@ describe('CSSValueInput.tsx', async () => {
 
     it('uses props.unit as default unit when unit is missing', async () => {
         const user = userEvent.setup();
-        const { getByRole } = render(
-            <CSSValueInput allowEmpty onSubmitValue={noop} unit="px" value="" />,
-        );
-        const input = (getByRole('textbox') as HTMLInputElement);
+        render(<CSSValueInput allowEmpty onSubmitValue={noop} unit="px" value="" />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('');
         await user.type(input, '14{Enter}');
         expect(input.value).toBe('14px');
@@ -70,10 +66,8 @@ describe('CSSValueInput.tsx', async () => {
 
     it('preserves last entered unit if different from props.unit when unit is missing', async () => {
         const user = userEvent.setup();
-        const { getByRole } = render(
-            <CSSValueInput allowEmpty onSubmitValue={noop} unit="px" value="" />,
-        );
-        const input = (getByRole('textbox') as HTMLInputElement);
+        render(<CSSValueInput allowEmpty onSubmitValue={noop} unit="px" value="" />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('');
         await user.type(input, '25vw{Enter}');
         expect(input.value).toBe('25vw');
@@ -83,10 +77,8 @@ describe('CSSValueInput.tsx', async () => {
 
     it('treats value as numeric if props.unit is an empty string', async () => {
         const user = userEvent.setup();
-        const { getByRole } = render(
-            <CSSValueInput allowEmpty onSubmitValue={noop} unit="" value="100" />,
-        );
-        const input = (getByRole('textbox') as HTMLInputElement);
+        render(<CSSValueInput allowEmpty onSubmitValue={noop} unit="" value="100" />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('100');
         await user.type(input, '1{Enter}');
         expect(input.value).toBe('1');
@@ -100,10 +92,10 @@ describe('CSSValueInput.tsx', async () => {
 
     it('updates default unit as props.unit and props.value changes', async () => {
         const user = userEvent.setup();
-        const { getByRole, rerender } = render(
+        const { rerender } = render(
             <CSSValueInput onSubmitValue={noop} unit="px" value="12px" />,
         );
-        const input = (getByRole('textbox') as HTMLInputElement);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
         rerender(<CSSValueInput onSubmitValue={noop} unit="" value="4" />);
         expect(input.value).toBe('4');
         await user.type(input, '25{Enter}');

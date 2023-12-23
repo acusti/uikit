@@ -44,7 +44,7 @@ const EMPTY_REFS = Object.freeze({
 
 const MINUTE = 60 * 1000;
 
-const refsByElement: WeakMap<HTMLElement, Refs> = new WeakMap();
+const refsByElement = new WeakMap<HTMLElement, Refs>();
 
 let resizeObserver = RESIZE_OBSERVER_STUB;
 

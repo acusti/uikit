@@ -39,12 +39,12 @@ describe('post', () => {
         const result = await post<{
             data?: {
                 country: {
-                    name: string;
-                    native: string;
                     languages: Array<{
                         code: string;
                         name: string;
                     }>;
+                    name: string;
+                    native: string;
                 };
             };
             errors?: Array<{ message: string }>;
@@ -61,7 +61,7 @@ describe('post', () => {
             }`,
         });
 
-        const country = (result as any).data.country;
+        const country = result.data.country;
         expect(country.name).toBe('Mexico');
         expect(country.native).toBe('México');
         expect(country.languages[0].code).toBe('es');

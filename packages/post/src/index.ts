@@ -2,16 +2,15 @@ import http, { IncomingMessage } from 'node:http';
 import https from 'node:https';
 import { URL } from 'node:url';
 
-import { getBodyFromQuery, getRequestOptionsAndBody } from './utils.js';
-
 import type {
     FetchHeaders,
     FetchOptions,
     FetchOptionsWithBody,
     FetchOptionsWithQuery,
 } from './types.js';
+import { getRequestOptionsAndBody } from './utils.js';
 
-export { getBodyFromQuery, getRequestOptionsAndBody };
+export { getBodyFromQuery, getRequestOptionsAndBody } from './utils.js';
 export type { FetchHeaders, FetchOptions, FetchOptionsWithBody, FetchOptionsWithQuery };
 
 type UnknownGQLResponseJSON = {
@@ -19,10 +18,7 @@ type UnknownGQLResponseJSON = {
     errors: Array<{ message: string }>;
 };
 
-export const post = async <ResponseJSON extends unknown>(
-    url: string,
-    options: FetchOptions,
-) => {
+export const post = async <ResponseJSON>(url: string, options: FetchOptions) => {
     const parsedURL = new URL(url);
     if (parsedURL.protocol !== 'https:' && parsedURL.protocol !== 'http:') {
         const urlScheme = parsedURL.protocol.replace(/:$/, '');

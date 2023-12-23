@@ -2,14 +2,13 @@ import { Style } from '@acusti/styling';
 import clsx from 'clsx';
 import * as React from 'react';
 
+import MonthCalendar from './MonthCalendar.js';
+import { ROOT_CLASS_NAME, STYLES } from './styles/date-picker.js';
 import {
     getMonthAbbreviationFromMonth,
     getMonthFromDate,
     getYearFromMonth,
 } from './utils.js';
-import { ROOT_CLASS_NAME, STYLES } from './styles/date-picker.js';
-
-import MonthCalendar from './MonthCalendar.js';
 
 export type Props = {
     className?: string;

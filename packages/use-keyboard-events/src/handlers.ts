@@ -14,6 +14,8 @@ const PRIORITY_MIN = -50;
 const PRIORITY_MAX = 50;
 const PRIORITY_MODIFIER = PRIORITY_MIN * -1;
 
+const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
+
 export function addHandler({
     eventType,
     handler,
@@ -25,11 +27,11 @@ export function addHandler({
     ignoreUsedKeyboardEvents?: boolean;
     priority?: number;
 }) {
-    if (!handler) return () => {};
+    if (!handler) return noop;
     // normalize priority to be zero-based between min and max (for use as an array index)
     const priority = Math.min(
         PRIORITY_MAX + PRIORITY_MODIFIER,
-        Math.max(0, (_priority || 0) + PRIORITY_MODIFIER),
+        Math.max(0, (_priority ?? 0) + PRIORITY_MODIFIER),
     );
 
     const handlersByPriority = handlersData[eventType];
