@@ -1,9 +1,12 @@
 import * as React from 'react';
+import type { InputHTMLAttributes } from 'react';
 
 export type Props = {
+    autoCapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters';
     autoComplete?: HTMLInputElement['autocomplete'];
     className?: string;
     disabled?: boolean;
+    enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
     form?: string;
     initialValue?: string;
     list?: string;
@@ -27,6 +30,8 @@ export type Props = {
     selectTextOnFocus?: boolean;
     size?: number;
     step?: number;
+    style?: React.CSSProperties;
+    submitOnEnter?: boolean;
     tabIndex?: number;
     title?: string;
     type?: 'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url';
@@ -39,9 +44,11 @@ const { useCallback, useEffect, useImperativeHandle, useRef } = React;
 const InputText = React.forwardRef<HTMLInputElement, Props>(
     (
         {
+            autoCapitalize,
             autoComplete,
             className,
             disabled,
+            enterKeyHint,
             form,
             initialValue,
             list,
@@ -64,6 +71,8 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
             required,
             selectTextOnFocus,
             size,
+            style,
+            // submitOnEnter,
             step,
             tabIndex,
             title,
@@ -141,10 +150,12 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
 
         return (
             <Element
+                autoCapitalize={autoCapitalize}
                 autoComplete={autoComplete}
                 className={className}
                 defaultValue={initialValue || ''}
                 disabled={disabled}
+                enterKeyHint={enterKeyHint}
                 form={form}
                 list={list}
                 maxLength={maxLength}
@@ -163,6 +174,7 @@ const InputText = React.forwardRef<HTMLInputElement, Props>(
                 required={required}
                 ref={inputRef}
                 size={size}
+                style={style}
                 tabIndex={tabIndex}
                 title={title}
                 type={type}

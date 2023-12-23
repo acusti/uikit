@@ -22,15 +22,7 @@
         "strictNullChecks": true,
         "target": "es2017"
     },
-    "exclude": [
-        ".yarn/cache",
-        "node_modules",
-        "packages/docs",
-        "**/dist/*",
-        "__tests__",
-        "**/*.test*",
-        "**/*.spec*"
-    ],
+    "exclude": [".yarn/cache", "node_modules", "packages/docs", "**/dist/**/*"],
     "references": [
         { "path": "packages/appsync-fetch" },
         { "path": "packages/aws-signature-v4" },

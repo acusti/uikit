@@ -60,6 +60,7 @@ export type Props = {
     onSubmitItem?: (payload: Item) => void;
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s placeholder */
     placeholder?: string;
+    style?: React.CSSProperties;
     /** Only usable in conjunction with {isSearchable: true}; used as search input’s tabIndex */
     tabIndex?: number;
     /**
@@ -101,6 +102,7 @@ export default function Dropdown({
     onOpen,
     onSubmitItem,
     placeholder,
+    style: styleFromProps,
     tabIndex,
     value,
 }: Props) {
@@ -654,8 +656,9 @@ export default function Dropdown({
         );
     }
 
-    const style = useMemo<{ [key: string]: string }>(
+    const style = useMemo<React.CSSProperties>(
         () => ({
+            ...styleFromProps,
             ...(outOfBounds.maxHeight
                 ? {
                       [BODY_MAX_HEIGHT_VAR]: `calc(${outOfBounds.maxHeight}px - var(--uktdd-body-buffer))`,
@@ -667,7 +670,7 @@ export default function Dropdown({
                   }
                 : null),
         }),
-        [outOfBounds.maxHeight, outOfBounds.maxWidth],
+        [outOfBounds.maxHeight, outOfBounds.maxWidth, styleFromProps],
     );
 
     return (

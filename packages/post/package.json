@@ -34,6 +34,7 @@
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/post#readme",
     "devDependencies": {
         "@types/node": "^20.10.5",
-        "typescript": "^5.3.3"
+        "typescript": "^5.3.3",
+        "vitest": "^1.1.0"
     }
 }

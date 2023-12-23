@@ -1,4 +1,4 @@
-// @vitest-environment jsdom
+// @vitest-environment happy-dom
 import { cleanup, fireEvent, render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import React from 'react';
@@ -96,8 +96,8 @@ describe('@acusti/use-keyboard-events', () => {
 
         describe('isEventTargetUsingKeyEvent', () => {
             let isUsingKeyEvent: null | boolean = null;
-            const handleKeyEvent = (event) => {
-                isUsingKeyEvent = isEventTargetUsingKeyEvent(event);
+            const handleKeyEvent = (event: React.KeyboardEvent<HTMLElement>) => {
+                isUsingKeyEvent = isEventTargetUsingKeyEvent(event.nativeEvent);
             };
 
             beforeEach(() => {
@@ -152,7 +152,7 @@ describe('@acusti/use-keyboard-events', () => {
                 );
                 const element = getByTestId('contenteditable');
                 // Add missing property http://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/isContentEditable
-                element.isContentEditable = true;
+                (element as any).isContentEditable = true;
                 expect(isUsingKeyEvent).toBe(null);
                 await user.type(element, 'z');
                 expect(isUsingKeyEvent).toBe(true);
