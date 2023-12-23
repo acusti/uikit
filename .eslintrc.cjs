@@ -57,7 +57,7 @@ module.exports = {
             plugins: ['@typescript-eslint', 'import', 'typescript-sort-keys'],
             parser: '@typescript-eslint/parser',
             parserOptions: {
-                project: ['./tsconfig.json', 'packages/*/tsconfig.json'],
+                project: ['./tsconfig.eslint.json'],
                 tsconfigRootDir: __dirname,
             },
             settings: {
@@ -109,6 +109,9 @@ module.exports = {
                 'plugin:testing-library/react',
                 'prettier',
             ],
+            rules: {
+                'testing-library/no-manual-cleanup': 'off',
+            },
             settings: {
                 jest: {
                     // we’re using vitest which has a very similar API to jest
