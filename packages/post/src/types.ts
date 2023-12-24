@@ -1,4 +1,4 @@
-export type FetchHeaders = { [key: string]: string };
+export type FetchHeaders = Record<string, string>;
 
 // Make RequestInit.signal compatible with import("https").RequestOptions.signal
 type _RequestInit = Omit<RequestInit, 'signal'> & {

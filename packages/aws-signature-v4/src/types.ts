@@ -6,7 +6,7 @@ export type AWSOptions = {
     sessionToken?: string;
 };
 
-export type FetchHeaders = { [key: string]: string };
+export type FetchHeaders = Record<string, string>;
 
 export type FetchOptions = Omit<RequestInit, 'headers' | 'signal'> & {
     headers?: FetchHeaders;
