@@ -110,6 +110,9 @@ module.exports = {
                 'prettier',
             ],
             rules: {
+                'jest-dom/prefer-empty': 'off',
+                'jest-dom/prefer-in-document': 'off',
+                'jest-dom/prefer-to-have-value': 'off',
                 'testing-library/no-manual-cleanup': 'off',
             },
             settings: {
