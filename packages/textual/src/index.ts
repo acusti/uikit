@@ -10,7 +10,7 @@ export const capitalize = (text: string) =>
         },
     );
 
-export const getInitials = (name: string, maxLength: number = 3) =>
+export const getInitials = (name: string, maxLength = 3) =>
     name.replace(WORDS_REGEX, '$1').trim().substring(0, maxLength).toUpperCase();
 
 const EMAIL_SEPARATOR_REGEX = /[+.]/g;
