@@ -2,7 +2,7 @@ import * as React from 'react';
 
 const { useEffect, useState } = React;
 
-const noop = () => {};
+const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
 
 const RESIZE_OBSERVER_STUB = {
     disconnect: noop,

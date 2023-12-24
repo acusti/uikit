@@ -76,7 +76,7 @@ type MousePosition = { clientX: number; clientY: number };
 
 const { Children, Fragment, useCallback, useEffect, useMemo, useRef, useState } = React;
 
-const noop = () => {};
+const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
 
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
