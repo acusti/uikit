@@ -33,8 +33,7 @@
         "dev:stories": "yarn workspace @acusti/uikit-docs storybook",
         "dev:watch": "tsc --build --watch",
         "dev": "run-p 'dev:*'",
-        "test": "vitest run",
-        "test:watch": "vitest"
+        "test": "vitest"
     },
     "repository": {
         "type": "git",
