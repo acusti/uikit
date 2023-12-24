@@ -18,21 +18,21 @@
         "flow"
     ],
     "scripts": {
+        "build": "run-s format clean build:tsc build:flowtypes",
         "build:flowtypes": "find . -type f -not -path './node_modules/*' -regex '.*/dist/[^/]*.d.ts' -exec sh -c 'yarn flowgen --add-flow-header --no-inexact $1 -o ${1%.*.*}.js.flow; sed -E -i \"\" \"s/React\\\\.ReactNode/React.Node/g; s/React\\\\.ReactChild/React.Element<any>/g; s/React\\\\.SyntheticEvent/SyntheticEvent/g; s/React\\\\.ChangeEvent/SyntheticInputEvent/g; s/React\\\\.FormEvent/SyntheticEvent/g; s/React\\\\.KeyboardEvent/SyntheticKeyboardEvent/g; s/React\\\\.MouseEvent/SyntheticMouseEvent/g; s/React\\\\.FocusEvent/SyntheticFocusEvent/g; s/React\\\\.RefAttributes<([^>]+)>/{| ref?: \\1 |}/g; s/React\\\\.ForwardRefExoticComponent/React.StatelessFunctionalComponent/g;\" ${1%.*.*}.js.flow' _ '{}' \\;",
         "build:stories": "yarn workspace @acusti/uikit-docs build",
         "build:tsc": "tsc --build",
-        "build": "run-s format clean build:tsc build:flowtypes",
-        "clean:tsc": "tsc --build --clean",
-        "clean:flowtypes": "find . -type f -regex './packages/[^/]+/dist/[^/]+.flow' -delete",
         "clean": "run-p 'clean:*'",
+        "clean:flowtypes": "find . -type f -regex './packages/[^/]+/dist/[^/]+.flow' -delete",
+        "clean:tsc": "tsc --build --clean",
+        "dev": "run-p 'dev:*'",
+        "dev:stories": "yarn workspace @acusti/uikit-docs storybook",
+        "dev:watch": "tsc --build --watch",
         "format": "prettier --write .eslintrc.cjs package.json README.md tsconfig.json ./packages/ ./packages/docs/.storybook/",
         "lint": "eslint ./packages/*/src/**",
         "lintfix": "eslint ./packages/*/src/** --fix",
         "publish": "run-s build publish:all",
         "publish:all": "yarn workspaces foreach --parallel --exclude '@acusti/uikit' npm publish --access public",
-        "dev:stories": "yarn workspace @acusti/uikit-docs storybook",
-        "dev:watch": "tsc --build --watch",
-        "dev": "run-p 'dev:*'",
         "test": "vitest"
     },
     "repository": {
