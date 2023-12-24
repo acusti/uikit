@@ -30,6 +30,7 @@ export const getItemElements = (dropdownElement: HTMLElement | null) => {
 
 export const getActiveItemElement = (dropdownElement: HTMLElement | null) => {
     if (!dropdownElement) return null;
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     return dropdownElement.querySelector('[data-ukt-active]') as HTMLElement | null;
 };
 

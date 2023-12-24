@@ -103,14 +103,14 @@ const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
     }
 
     const previousOutOfBounds = outOfBoundsRef.current;
-    const elementBottom = elementRect.bottom!;
-    const elementLeft = elementRect.left!;
-    const elementRight = elementRect.right!;
-    const elementTop = elementRect.top!;
-    const boundingElementBottom = boundingElementRect.bottom!;
-    const boundingElementLeft = boundingElementRect.left!;
-    const boundingElementRight = boundingElementRect.right!;
-    const boundingElementTop = boundingElementRect.top!;
+    const elementBottom = elementRect.bottom!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+    const elementLeft = elementRect.left!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+    const elementRight = elementRect.right!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+    const elementTop = elementRect.top!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+    const boundingElementBottom = boundingElementRect.bottom!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+    const boundingElementLeft = boundingElementRect.left!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+    const boundingElementRight = boundingElementRect.right!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+    const boundingElementTop = boundingElementRect.top!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
     const elementHeight = elementBottom - elementTop;
     const elementWidth = elementRight - elementLeft;
 

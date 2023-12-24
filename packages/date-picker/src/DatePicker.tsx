@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 import { Style } from '@acusti/styling';
 import clsx from 'clsx';
 import * as React from 'react';
