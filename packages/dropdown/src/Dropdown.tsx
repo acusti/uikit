@@ -285,13 +285,10 @@ export default function Dropdown({
 
         const eventTarget = event.target as HTMLElement;
         const item = eventTarget.closest(ITEM_SELECTOR) as HTMLElement | null;
-        const element = item || eventTarget;
-        for (let index = 0; index < itemElements.length; index++) {
-            if (itemElements[index] === element) {
-                setActiveItem({
-                    dropdownElement,
-                    element,
-                });
+        const element = item ?? eventTarget;
+        for (const itemElement of itemElements) {
+            if (itemElement === element) {
+                setActiveItem({ dropdownElement, element });
                 return;
             }
         }
