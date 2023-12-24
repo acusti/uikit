@@ -9,8 +9,10 @@ describe('post', () => {
         const url = 'https://swapi-graphql.netlify.app/.netlify/functions/index';
         const result = await post<{
             data?: {
-                allFIlms: {
-                    edges: Array<{ director: string; episodeID: string; title: string }>;
+                allFilms: {
+                    edges: Array<{
+                        node: { director: string; episodeID: string; title: string };
+                    }>;
                 };
             };
             errors?: Array<{ message: string }>;
@@ -28,7 +30,7 @@ describe('post', () => {
             }`,
         });
 
-        const firstFilm = result.data?.allFilms.edges[0].node || {};
+        const firstFilm = result.data!.allFilms.edges[0].node;
         expect(firstFilm.title).toBeTruthy();
         expect(firstFilm.episodeID).toBeTruthy();
         expect(firstFilm.director).toBeTruthy();
@@ -61,7 +63,7 @@ describe('post', () => {
             }`,
         });
 
-        const country = result.data.country;
+        const country = result.data!.country;
         expect(country.name).toBe('Mexico');
         expect(country.native).toBe('México');
         expect(country.languages[0].code).toBe('es');
