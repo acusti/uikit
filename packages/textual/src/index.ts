@@ -2,10 +2,13 @@ const WORDS_REGEX = /\b([a-zA-Z0-9])([^\s.-]*)([\s.-]*)/g;
 
 // Returns text with equivalent formatting to text-transform: capitalize
 export const capitalize = (text: string) =>
-    text.replace(WORDS_REGEX, (match, firstLetter, restOfWord, separator) => {
-        if (!firstLetter) return match;
-        return firstLetter.toUpperCase() + restOfWord + separator;
-    });
+    text.replace(
+        WORDS_REGEX,
+        (match: string, firstLetter: string, restOfWord: string, separator: string) => {
+            if (!firstLetter) return match;
+            return firstLetter.toUpperCase() + restOfWord + separator;
+        },
+    );
 
 export const getInitials = (name: string, maxLength: number = 3) =>
     name.replace(WORDS_REGEX, '$1').trim().substring(0, maxLength).toUpperCase();
