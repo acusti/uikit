@@ -151,7 +151,7 @@ const getRegionFromResource = (resource: string) => {
 
     const matched = host.match(/([^.]+)\.(?:([^.]*)\.)?amazonaws\.com$/);
     // The region will be the third subdomain within the URL host
-    let region = matched && matched[2];
+    const region = matched && matched[2];
     return region ?? '';
 };
 
