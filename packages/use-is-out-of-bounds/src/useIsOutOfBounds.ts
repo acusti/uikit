@@ -78,7 +78,7 @@ const getIsCurrentDirectionBefore = ({
 
 const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
     const outOfBoundsRef = useRef<OutOfBounds>(INITIAL_OUT_OF_BOUNDS);
-    const elementRef = useRef<MaybeHTMLElement>(element || null);
+    const elementRef = useRef<MaybeHTMLElement>(element ?? null);
     const computedStyleRef = useRef<CSSStyleDeclaration | null>(null);
     const elementRect = useBoundingClientRect(element);
     const boundingElement = getBoundingAncestor(element);
@@ -90,7 +90,7 @@ const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
     }
 
     if (element !== elementRef.current) {
-        elementRef.current = element || null;
+        elementRef.current = element ?? null;
         computedStyleRef.current = null;
     }
 
@@ -123,7 +123,7 @@ const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
     let top = elementTop < boundingElementTop || previousOutOfBounds.top;
 
     if (bottom || left || right || top) {
-        const style = computedStyleRef.current || getComputedStyle(element);
+        const style = computedStyleRef.current ?? getComputedStyle(element);
         if (!computedStyleRef.current) {
             computedStyleRef.current = style;
         }

@@ -119,7 +119,7 @@ export default function Dropdown({
         trigger = (children as ChildrenTuple)[0];
     }
     const isTriggerFromProps = React.isValidElement(trigger);
-    const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount || false);
+    const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [dropdownBodyElement, setDropdownBodyElement] = useState<HTMLDivElement | null>(
         null,
@@ -227,7 +227,7 @@ export default function Dropdown({
                 if (inputElementRef.current?.value) return;
             }
 
-            let label = element?.innerText || '';
+            let label = element?.innerText ?? '';
             if (inputElementRef.current) {
                 if (!element) {
                     label = inputElementRef.current.value;
@@ -628,7 +628,7 @@ export default function Dropdown({
                 <InputText
                     className={TRIGGER_CLASS_NAME}
                     disabled={disabled}
-                    initialValue={value || ''}
+                    initialValue={value ?? ''}
                     name={name}
                     onFocus={handleTriggerFocus}
                     placeholder={placeholder}

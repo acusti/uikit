@@ -46,7 +46,7 @@ const encrypt = async (payload: {
 }) => {
     const keyArray =
         typeof payload.key === 'string' ? encoder.encode(payload.key) : payload.key;
-    const algorithm = { hash: payload.algorithm || DEFAULT_ALGORITHM, name: 'HMAC' };
+    const algorithm = { hash: payload.algorithm ?? DEFAULT_ALGORITHM, name: 'HMAC' };
     const key = await subtleCrypto.importKey('raw', keyArray, algorithm, false, ['sign']);
     const signature = await subtleCrypto.sign('hmac', key, encoder.encode(payload.data));
     if (!payload.encoding) return new Uint8Array(signature);
@@ -152,7 +152,7 @@ const getRegionFromResource = (resource: string) => {
     const matched = host.match(/([^.]+)\.(?:([^.]*)\.)?amazonaws\.com$/);
     // The region will be the third subdomain within the URL host
     let region = matched && matched[2];
-    return region || '';
+    return region ?? '';
 };
 
 const getCredentialScope = ({
@@ -256,7 +256,7 @@ const getHeadersWithAuthorization = async (
 
     const { host } = new URL(resource);
 
-    let headers: FetchHeaders = fetchOptions.headers || {};
+    const headers: FetchHeaders = fetchOptions.headers ?? {};
 
     headers.host = host;
     headers['x-amz-date'] = dateTimeString;

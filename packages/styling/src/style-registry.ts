@@ -11,7 +11,7 @@ export const getRegisteredStyles = ({ ownerDocument, styles }: Payload) => {
     if (!styles) return null;
     const stylesMap = styleRegistry.get(styles);
     if (!stylesMap) return null;
-    return stylesMap.get(ownerDocument) || null;
+    return stylesMap.get(ownerDocument) ?? null;
 };
 
 export const registerStyles = ({ ownerDocument, styles }: Payload) => {

@@ -48,8 +48,8 @@ export default function DatePicker({
         _dateStart != null && typeof _dateStart !== 'string'
             ? new Date(_dateStart).toISOString()
             : _dateStart;
-    const [dateEnd, setDateEnd] = useState<null | string>(dateEndFromProps || null);
-    const [dateStart, setDateStart] = useState<null | string>(dateStartFromProps || null);
+    const [dateEnd, setDateEnd] = useState<null | string>(dateEndFromProps ?? null);
+    const [dateStart, setDateStart] = useState<null | string>(dateStartFromProps ?? null);
 
     useEffect(() => {
         if (dateEndFromProps == null) return;

@@ -35,7 +35,7 @@ export default function MonthCalendar({
     title,
 }: Props) {
     const year = getYearFromMonth(month);
-    title = title || `${getMonthNameFromMonth(month)} ${year}`;
+    title = title ?? `${getMonthNameFromMonth(month)} ${year}`;
     const monthWithinYear = month % 12;
     const firstDate = new Date(year, monthWithinYear, 1);
     const nextMonth = month + 1;

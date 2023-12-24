@@ -149,7 +149,7 @@ const useBoundingClientRect = (element?: HTMLElement | null): Rect | EmptyRect =
 
     // If element isn’t in our refs map, initialize it
     let isInitializing = false;
-    let refs: Refs | null = (element && refsByElement.get(element)) || null;
+    let refs: Refs | null = (element && refsByElement.get(element)) ?? null;
     if (element && !refs) {
         isInitializing = true;
         refs = {
@@ -178,7 +178,7 @@ const useBoundingClientRect = (element?: HTMLElement | null): Rect | EmptyRect =
         };
     }, [element]);
 
-    return refs?.boundingClientRect || EMPTY_RECT;
+    return refs?.boundingClientRect ?? EMPTY_RECT;
 };
 
 export default useBoundingClientRect;

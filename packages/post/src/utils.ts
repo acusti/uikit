@@ -19,11 +19,12 @@ export const getRequestOptionsAndBody = (
     let { body = '', method = 'POST', query = '', variables, ...baseOptions } = options;
 
     if (query) {
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         body = getBodyFromQuery({ query, variables });
     }
 
     // Lowercase all headers to make them consistent
-    let headers = options.headers || {};
+    let headers = options.headers ?? {};
     headers = Object.keys(headers).reduce((acc: FetchHeaders, key) => {
         acc[key.toLowerCase()] = headers[key];
         return acc;
