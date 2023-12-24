@@ -37,7 +37,7 @@ export const post = async <ResponseJSON>(url: string, options: FetchOptions) => 
             parsedURL,
             requestOptions,
             (response: IncomingMessage) => {
-                response.on('data', (chunk: Buffer) => {
+                response.on('data', (chunk: string) => {
                     data += chunk;
                 });
 
@@ -76,23 +76,27 @@ export const post = async <ResponseJSON>(url: string, options: FetchOptions) => 
                 error.message =
                     `: ${messageBase}` +
                     errors.reduce(
-                        (acc: string, error: any) =>
+                        (acc: string, error: { message: string } | null) =>
                             acc + acc ? '\n' : '' + error?.message,
                         '',
                     );
             }
-        } catch (innerError) {}
+        } catch (innerError) {
+            // no need for separate inner error handling
+        }
 
         throw error;
     }
 
     try {
-        return JSON.parse(data);
+        return JSON.parse(data) as ResponseJSON;
     } catch (error) {
         // If response was a 204 No content or just empty, error is from parsing non-existent JSON
-        if (response.statusCode === 204) return {};
-        if (response.headers['content-length'] === '0' && response.statusCode === 200) {
-            return {};
+        if (
+            response.statusCode === 204 ||
+            (response.headers['content-length'] === '0' && response.statusCode === 200)
+        ) {
+            return {} as ResponseJSON;
         }
 
         // If error came from JSON parsing, use response.statusText as message and throw
