@@ -18,6 +18,7 @@ const SESSION_TOKEN = 'thisisafakesessiontoken';
 const DATE_TIME_STRING = '20150830T123600Z';
 
 describe('utils', () => {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/unbound-method
     const originalToISOString = Date.prototype.toISOString;
 
     beforeAll(() => {
@@ -26,8 +27,8 @@ describe('utils', () => {
     });
 
     afterAll(() => {
-        // ISO version of the example DATE_TIME_STRING
-        Date.prototype.toISOString = originalToISOString; // eslint-disable-line no-extend-native
+        // eslint-disable-next-line no-extend-native, @typescript-eslint/no-unsafe-assignment
+        Date.prototype.toISOString = originalToISOString;
     });
 
     describe('getRegionFromResource', () => {
