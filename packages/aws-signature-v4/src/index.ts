@@ -212,7 +212,7 @@ const getSigningKey = async ({
 };
 
 const getSignature = async (signingKey: string | Uint8Array, stringToSign: string) =>
-    await encrypt({ data: stringToSign, encoding: 'hex', key: signingKey });
+    (await encrypt({ data: stringToSign, encoding: 'hex', key: signingKey })) as string;
 
 /**
  * @private
@@ -229,7 +229,7 @@ const getAuthorizationHeader = ({
     accessKeyId: string;
     algorithm: string;
     scope: string;
-    signature: string | Uint8Array;
+    signature: string;
     signedHeaders: string;
 }) =>
     [
