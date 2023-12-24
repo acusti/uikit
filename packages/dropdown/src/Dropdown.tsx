@@ -687,11 +687,6 @@ export default function Dropdown({
                 onMouseUp={handleMouseUp}
                 ref={handleRef}
                 style={style}
-                tabIndex={
-                    isSearchable || inputElementRef.current || !isTriggerFromProps
-                        ? undefined
-                        : 0
-                }
             >
                 {trigger}
                 {isOpen ? (
