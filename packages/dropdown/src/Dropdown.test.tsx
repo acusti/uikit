@@ -8,7 +8,7 @@ import Dropdown from './Dropdown.js';
 
 afterEach(cleanup);
 
-describe('Dropdown.js', async () => {
+describe('Dropdown.js', () => {
     it('renders its contents as a dropdown menu with an empty button to trigger it when it’s rendered with a single child', async () => {
         const user = userEvent.setup();
         const { getByRole, getByTestId } = render(

@@ -10,8 +10,8 @@ const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-functi
 
 afterEach(cleanup);
 
-describe('CSSValueInput.tsx', async () => {
-    it('renders a text input with the given props.value', async () => {
+describe('CSSValueInput.tsx', () => {
+    it('renders a text input with the given props.value', () => {
         render(<CSSValueInput onSubmitValue={noop} value="24px" />);
         const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('24px');
