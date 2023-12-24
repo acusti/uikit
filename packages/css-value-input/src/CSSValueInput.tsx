@@ -6,11 +6,10 @@ import {
     getUnitFromCSSValue,
     roundToPrecision,
 } from '@acusti/css-values';
+import type { CSSValueType } from '@acusti/css-values';
 import InputText from '@acusti/input-text';
 import clsx from 'clsx';
 import * as React from 'react';
-
-import type { CSSValueType } from '@acusti/css-values';
 
 export type Props = {
     /** Boolean indicating if the user can submit an empty value (i.e. clear the value); defaults to true */

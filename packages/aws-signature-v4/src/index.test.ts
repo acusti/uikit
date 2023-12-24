@@ -43,12 +43,12 @@ describe('utils', () => {
                 'https://iam.amazonaws.com/?Action=ListUsers&Version=2010-05-08';
             const fetchOptions = {
                 body: '',
-                method: 'GET',
                 headers: {
                     'content-type': 'application/x-www-form-urlencoded; charset=utf-8',
                     host: 'iam.amazonaws.com',
                     'x-amz-date': DATE_TIME_STRING,
                 },
+                method: 'GET',
             };
 
             const canonicalString = `GET

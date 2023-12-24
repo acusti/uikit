@@ -8,6 +8,12 @@ import clsx from 'clsx';
 import * as React from 'react';
 
 import {
+    getActiveItemElement,
+    getItemElements,
+    ITEM_SELECTOR,
+    setActiveItem,
+} from './helpers.js';
+import {
     BODY_CLASS_NAME,
     BODY_MAX_HEIGHT_VAR,
     BODY_MAX_WIDTH_VAR,
@@ -18,12 +24,6 @@ import {
     STYLES,
     TRIGGER_CLASS_NAME,
 } from './styles.js';
-import {
-    getActiveItemElement,
-    getItemElements,
-    ITEM_SELECTOR,
-    setActiveItem,
-} from './helpers.js';
 
 type ChildrenTuple = [React.ReactNode, React.ReactNode];
 
@@ -684,10 +684,10 @@ export default function Dropdown({
                 })}
                 onClick={onClick}
                 onMouseDown={handleMouseDown}
-                onMouseUp={handleMouseUp}
                 onMouseMove={handleMouseMove}
                 onMouseOut={handleMouseOut}
                 onMouseOver={handleMouseOver}
+                onMouseUp={handleMouseUp}
                 ref={handleRef}
                 style={style}
                 tabIndex={

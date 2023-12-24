@@ -1,7 +1,6 @@
 import { getHeadersWithAuthorization } from '@acusti/aws-signature-v4';
-import { getRequestOptionsAndBody, post } from '@acusti/post';
-
 import type { AWSOptions } from '@acusti/aws-signature-v4';
+import { getRequestOptionsAndBody, post } from '@acusti/post';
 import type { FetchOptions, FetchOptionsWithBody } from '@acusti/post';
 
 // Reference: https://docs.aws.amazon.com/appsync/latest/devguide/troubleshooting-and-common-mistakes.html
@@ -17,7 +16,7 @@ const ENV_SECRET = 'AWS_SECRET_ACCESS_KEY';
 const ENV_SESSION = 'AWS_SESSION_TOKEN';
 const ENV_EXPIRATION = 'AWS_CREDENTIAL_EXPIRATION';
 
-const appsyncFetch = async <Result extends unknown>(
+const appsyncFetch = async <Result>(
     resource: string,
     fetchOptions: FetchOptions,
     awsOptions: Partial<AWSOptions> = {},

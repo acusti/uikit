@@ -2,14 +2,14 @@ import { Style } from '@acusti/styling';
 import clsx from 'clsx';
 import * as React from 'react';
 
-import { getMonthFromDate, getMonthNameFromMonth, getYearFromMonth } from './utils.js';
 import { ROOT_CLASS_NAME, STYLES } from './styles/month-calendar.js';
+import { getMonthFromDate, getMonthNameFromMonth, getYearFromMonth } from './utils.js';
 
 export type Props = {
     className?: string;
-    dateStart?: Date | string | number | null;
     dateEnd?: Date | string | number | null;
     dateEndPreview?: string | null;
+    dateStart?: Date | string | number | null;
     isRange?: boolean;
     month: number; // a unique numerical value representing the number of months since jan 1970
     onChange?: (date: string) => void;
@@ -152,14 +152,14 @@ export default function MonthCalendar({
                                             className={clsx(
                                                 `${ROOT_CLASS_NAME}-month-day-item`,
                                                 {
+                                                    'end-date':
+                                                        !isEmpty &&
+                                                        dayNumber === dateRangeEndDay,
                                                     'is-empty': isEmpty,
                                                     'is-selected':
                                                         !isEmpty &&
                                                         isAfterDateRangeStart &&
                                                         isBeforeDateRangeEnd,
-                                                    'end-date':
-                                                        !isEmpty &&
-                                                        dayNumber === dateRangeEndDay,
                                                     'start-date':
                                                         !isEmpty &&
                                                         dayNumber === dateRangeStartDay,

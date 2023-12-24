@@ -65,8 +65,8 @@ const getIsCurrentDirectionBefore = ({
     positionBefore,
 }: {
     length: number;
-    positionBefore: number;
     positionAfter: number;
+    positionBefore: number;
 }) => {
     if (Number.isNaN(positionAfter)) return false;
     if (Number.isNaN(positionBefore)) return true;

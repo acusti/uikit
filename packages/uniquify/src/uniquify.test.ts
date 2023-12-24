@@ -81,16 +81,16 @@ describe('uniquify', () => {
 
         const nestedItems = [
             {
-                id: '04a1',
                 content: { name: 'I ❤️ the Smell of Napalm in the Morning 2' },
+                id: '04a1',
             },
             {
-                id: '17e1',
                 content: { name: 'Hardcore History' },
+                id: '17e1',
             },
             {
-                id: 'b883',
                 content: { name: 'I ❤️ the Smell of Napalm in the Morning' },
+                id: 'b883',
             },
         ];
 
@@ -261,12 +261,12 @@ describe('uniquify', () => {
     it('handles a custom property path along with an alternate property path', () => {
         const items = [
             {
-                id: '04a1',
                 content: { name: 'I ❤️ the Smell of Napalm in the Morning 2' },
+                id: '04a1',
             },
             {
-                id: '17e1',
                 content: { name: 'Hardcore History' },
+                id: '17e1',
             },
             {
                 id: 'b883',
