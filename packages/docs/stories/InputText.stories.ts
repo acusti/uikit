@@ -52,7 +52,7 @@ export const InputWithInitialValueAndSelectTextOnFocus: Story = {
 export const MultiLineInputWithInitialValueAndSelectTextOnFocus: Story = {
     args: {
         className: 'multi-line-input-text',
-        initialValue: 'Concerning the UFO Sighting near Highland, Illinois',
+        initialValue: 'The Black Hawk War, or, How to Demolish an Entire Civilization and Still Feel Good About Yourself in the Morning, or, We Apologize for the Inconvenience but You’re Going to Have to Leave Now, or, “I have fought the Big Knives and will continue to fight them until they are off our lands!”',
         maxHeight: 600,
         multiLine: true,
         name: 'multi-line-input',
