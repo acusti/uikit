@@ -1,6 +1,8 @@
 import * as React from 'react';
 import type { InputHTMLAttributes } from 'react';
 
+type InputElement = HTMLInputElement | HTMLTextAreaElement;
+
 export type Props = {
     autoCapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters';
     autoComplete?: HTMLInputElement['autocomplete'];
@@ -18,11 +20,11 @@ export type Props = {
     multiLine?: boolean;
     multiple?: boolean;
     name?: string;
-    onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => unknown;
-    onFocus?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
-    onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
-    onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
+    onBlur?: (event: React.FocusEvent<InputElement>) => unknown;
+    onChange?: (event: React.ChangeEvent<InputElement>) => unknown;
+    onFocus?: (event: React.FocusEvent<InputElement>) => unknown;
+    onKeyDown?: (event: React.KeyboardEvent<InputElement>) => unknown;
+    onKeyUp?: (event: React.KeyboardEvent<InputElement>) => unknown;
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
