@@ -74,7 +74,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         size,
         style,
         step,
-        // submitOnEnter,
+        submitOnEnter,
         tabIndex,
         title,
         type = 'text',
@@ -151,6 +151,30 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         [setInputElement],
     );
 
+    const handleKeyDown = useCallback(
+        (event: React.KeyboardEvent<HTMLInputElement>) => {
+            if (onKeyDown) onKeyDown(event);
+            if (
+                multiLine &&
+                submitOnEnter &&
+                event.key === 'Enter' &&
+                !event.shiftKey &&
+                !event.altKey &&
+                !event.ctrlKey
+            ) {
+                event.preventDefault();
+                const form = event.currentTarget.closest('form');
+                if (form) {
+                    form.requestSubmit();
+                } else {
+                    // if no form to submit, trigger input blur
+                    event.currentTarget.blur();
+                }
+            }
+        },
+        [multiLine, onKeyDown, submitOnEnter],
+    );
+
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
     const Element: 'input' = (multiLine ? 'textarea' : 'input') as any;
 
@@ -171,7 +195,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             onBlur={selectTextOnFocus ? handleBlur : onBlur}
             onChange={onChange}
             onFocus={onFocus}
-            onKeyDown={onKeyDown}
+            onKeyDown={handleKeyDown}
             onKeyUp={onKeyUp}
             onSelect={selectTextOnFocus ? handleSelect : undefined}
             pattern={pattern}
