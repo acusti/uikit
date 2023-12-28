@@ -136,6 +136,7 @@ export default function Dropdown({
     const mouseDownPositionRef = useRef<MousePosition | null>(null);
     const outOfBounds = useIsOutOfBounds(dropdownBodyElement);
 
+    const setDropdownOpenRef = useRef(() => setIsOpen(true));
     const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
     const hasItemsRef = useRef(hasItems);
@@ -618,10 +619,6 @@ export default function Dropdown({
         [closeDropdown, isOpenOnMount, isTriggerFromProps],
     );
 
-    const handleTriggerFocus = useCallback(() => {
-        setIsOpen(true);
-    }, []);
-
     if (!isTriggerFromProps) {
         if (isSearchable) {
             trigger = (
@@ -630,7 +627,7 @@ export default function Dropdown({
                     disabled={disabled}
                     initialValue={value ?? ''}
                     name={name}
-                    onFocus={handleTriggerFocus}
+                    onFocus={setDropdownOpenRef.current}
                     placeholder={placeholder}
                     ref={inputElementRef}
                     selectTextOnFocus
