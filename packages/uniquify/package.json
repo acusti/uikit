@@ -1,6 +1,6 @@
 {
     "name": "@acusti/uniquify",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "description": "Generate a unique string (e.g. for filenames or url slugs) using an incremental counter",
     "keywords": [
         "unique",

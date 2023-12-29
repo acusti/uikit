@@ -1,6 +1,6 @@
 {
     "name": "@acusti/use-keyboard-events",
-    "version": "0.4.0",
+    "version": "0.5.0",
     "description": "React hook that takes keyboard event handlers and attaches them to the document",
     "keywords": [
         "react",

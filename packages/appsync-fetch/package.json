@@ -1,6 +1,6 @@
 {
     "name": "@acusti/appsync-fetch",
-    "version": "0.14.0",
+    "version": "0.15.0",
     "description": "A lightweight node.js module for making requests to an AWS AppSync graphql API",
     "keywords": [
         "node",
@@ -35,8 +35,8 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/appsync-fetch#readme",
     "dependencies": {
-        "@acusti/aws-signature-v4": "^0.6.0",
-        "@acusti/post": "^0.4.0"
+        "@acusti/aws-signature-v4": "^0.6.1",
+        "@acusti/post": "^0.5.0"
     },
     "devDependencies": {
         "@types/node": "^20.10.5",

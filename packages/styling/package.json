@@ -1,6 +1,6 @@
 {
     "name": "@acusti/styling",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "description": "React component that renders a CSS style string as a <style> element in the <head> of the document (with global style de-duplication)",
     "keywords": [
         "react",

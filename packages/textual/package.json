@@ -1,6 +1,6 @@
 {
     "name": "@acusti/textual",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "Utilities for transforming and formatting text (i.e. strings)",
     "keywords": [
         "utils",

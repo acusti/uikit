@@ -1,6 +1,6 @@
 {
     "name": "@acusti/input-text",
-    "version": "1.2.1",
+    "version": "1.3.0",
     "description": "React component that renders a semi-controlled input with multiLine and selectTextOnFocus support",
     "keywords": [
         "react",
