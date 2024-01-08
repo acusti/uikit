@@ -13,7 +13,7 @@ const meta: Meta<typeof CSSValueInput> = {
         docs: {
             description: {
                 component:
-                    '`CSSValueInput` is a React component that renders a text input that can take and update a CSS value of a particular type with a default unit. The input’s behavior is similar to those in design applications such as Adobe Illustrator or XD. Note that to illustrate custom tab indeces, tabbing through the inputs below should go from “Font size” to “Letter spacing” then through the rest.',
+                    '`CSSValueInput` is a React component that renders a text input that can take and update a CSS value of a particular type with a default unit. The input’s behavior is similar to those in design applications such as Adobe Illustrator or XD.',
             },
         },
     },
