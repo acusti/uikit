@@ -22,8 +22,8 @@ export type Props = {
     min?: number;
     minLength?: number;
     /**
-     * If true, input renders as a textarea element that automatically grows
-     * and shrinks to adjust to the length of its contents.
+     * If true, input renders as a <textarea> that automatically grows and
+     * shrinks vertically to adjust to the length of its contents.
      */
     multiLine?: boolean;
     multiple?: boolean;

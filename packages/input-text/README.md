@@ -8,8 +8,8 @@
 `InputText` is a React component that renders a semi-controlled input,
 meaning that while it is [uncontrolled][] in the React sense, it’s value is
 overwritten whenever `props.initialValue` changes. It also support
-multiline inputs (via `<textarea>`) that automatically resize vertically to
-fit their content.
+multiline inputs (rendered as a `<textarea>`) that automatically resize
+vertically to fit their content.
 
 See the [storybook docs and demo][] to get a feel for what it can do.
 
@@ -51,8 +51,8 @@ type Props = {
     min?: number;
     minLength?: number;
     /**
-     * If true, input renders as a textarea element that automatically grows
-     * and shrinks to adjust to the length of its contents.
+     * If true, input renders as a <textarea> that automatically grows and
+     * shrinks vertically to adjust to the length of its contents.
      */
     multiLine?: boolean;
     multiple?: boolean;

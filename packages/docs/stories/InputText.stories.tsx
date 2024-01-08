@@ -11,7 +11,7 @@ const meta: Meta<typeof InputText> = {
         docs: {
             description: {
                 component:
-                    '`InputText` is a React component that renders a textual input (`type: "text"|"email"|"number"|"password"|"search"|"tel"|"url"`) that is uncontrolled, but whose value is overwritten whenever `props.initialValue` changes. Also, if `props.selectTextOnFocus` is true, it selects the entire contents of the input whenever the input is focused. And it supports multiline inputs (via `<textarea>`) that automatically resize vertically to fit their content.',
+                    '`InputText` is a React component that renders a textual input (`type: "text"|"email"|"number"|"password"|"search"|"tel"|"url"`) that is uncontrolled, but whose value is overwritten whenever `props.initialValue` changes. Also, if `props.selectTextOnFocus` is true, it selects the entire contents of the input whenever the input is focused. And it supports multiline inputs (rendered as a `<textarea>`) that automatically resize vertically to fit their content.',
             },
         },
     },
