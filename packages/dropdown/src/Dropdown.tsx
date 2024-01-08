@@ -36,22 +36,37 @@ export type Item = {
 };
 
 export type Props = {
-    /** Boolean indicating if the user can submit a value not already in the dropdown */
+    /**
+     * Boolean indicating if the user can submit a value not already in the
+     * dropdown.
+     */
     allowCreate?: boolean;
-    /** Boolean indicating if the user can submit an empty value (i.e. clear the value); defaults to true */
+    /**
+     * Boolean indicating if the user can submit an empty value (i.e. clear
+     * the value). Defaults to true.
+     */
     allowEmpty?: boolean;
-    /** Can take a single React element (e.g. ReactChild) or exactly two renderable children */
+    /**
+     * Can take a single React element (e.g. ReactChild) or exactly two
+     * renderable children.
+     */
     children: React.ReactChild | ChildrenTuple;
     className?: string;
     disabled?: boolean;
-    /** Group identifier string links dropdowns together into a menu (like macOS top menubar) */
+    /**
+     * Group identifier string links dropdowns together into a menu
+     * (like macOS top menubar).
+     */
     group?: string;
     hasItems?: boolean;
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
     keepOpenOnSubmit?: boolean;
     label?: string;
-    /** Only usable in conjunction with {isSearchable: true}; used as search input’s name */
+    /**
+     * Only usable in conjunction with {isSearchable: true}.
+     * Used as search input’s name.
+     */
     name?: string;
     onClick?: (event: React.MouseEvent<HTMLElement>) => unknown;
     onClose?: () => unknown;
@@ -59,10 +74,16 @@ export type Props = {
     onMouseUp?: (event: React.MouseEvent<HTMLElement>) => unknown;
     onOpen?: () => unknown;
     onSubmitItem?: (payload: Item) => void;
-    /** Only usable in conjunction with {isSearchable: true}; used as search input’s placeholder */
+    /**
+     * Only usable in conjunction with {isSearchable: true}.
+     * Used as search input’s placeholder.
+     */
     placeholder?: string;
     style?: React.CSSProperties;
-    /** Only usable in conjunction with {isSearchable: true}; used as search input’s tabIndex */
+    /**
+     * Only usable in conjunction with {isSearchable: true}.
+     * Used as search input’s tabIndex.
+     */
     tabIndex?: number;
     /**
      * Used as search input’s value if props.isSearchable === true
@@ -77,7 +98,7 @@ type MousePosition = { clientX: number; clientY: number };
 
 const { Children, Fragment, useCallback, useEffect, useMemo, useRef, useState } = React;
 
-const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
+const noop = () => { }; // eslint-disable-line @typescript-eslint/no-empty-function
 
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
@@ -658,13 +679,13 @@ export default function Dropdown({
             ...styleFromProps,
             ...(outOfBounds.maxHeight
                 ? {
-                      [BODY_MAX_HEIGHT_VAR]: `calc(${outOfBounds.maxHeight}px - var(--uktdd-body-buffer))`,
-                  }
+                    [BODY_MAX_HEIGHT_VAR]: `calc(${outOfBounds.maxHeight}px - var(--uktdd-body-buffer))`,
+                }
                 : null),
             ...(outOfBounds.maxWidth
                 ? {
-                      [BODY_MAX_WIDTH_VAR]: `calc(${outOfBounds.maxWidth}px - var(--uktdd-body-buffer))`,
-                  }
+                    [BODY_MAX_WIDTH_VAR]: `calc(${outOfBounds.maxWidth}px - var(--uktdd-body-buffer))`,
+                }
                 : null),
         }),
         [outOfBounds.maxHeight, outOfBounds.maxWidth, styleFromProps],
