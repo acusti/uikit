@@ -10,6 +10,10 @@ export type Props = {
     disabled?: boolean;
     enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
     form?: string;
+    /**
+     * The initial value of the text input. If props.initialValue changes at
+     * any point, the new value will override the local state of the input.
+     */
     initialValue?: string;
     list?: string;
     max?: number;
@@ -17,6 +21,10 @@ export type Props = {
     maxLength?: number;
     min?: number;
     minLength?: number;
+    /**
+     * If true, input renders as a textarea element that automatically grows
+     * and shrinks to adjust to the length of its contents.
+     */
     multiLine?: boolean;
     multiple?: boolean;
     name?: string;
@@ -29,10 +37,15 @@ export type Props = {
     placeholder?: string;
     readOnly?: boolean;
     required?: boolean;
+    /** If true, the contents of the input are selected when it’s focused. */
     selectTextOnFocus?: boolean;
     size?: number;
     step?: number;
     style?: React.CSSProperties;
+    /**
+     * If true, pressing enter/return submits the <form> that the input is a
+     * part of, or else blurs the input if no form is found.
+     */
     submitOnEnter?: boolean;
     tabIndex?: number;
     title?: string;
