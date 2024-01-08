@@ -30,6 +30,6 @@ jobs:
             - name: Lint files
               run: yarn lint
             - name: Typecheck and build packages
-              run: yarn build
+              run: yarn buildci
             - name: Test files
               run: yarn test
