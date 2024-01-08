@@ -32,3 +32,76 @@ The three primary design goals for the existence of this component:
        override the minimal default CSS as appropriate
 3. Lightweight bundle size with the bare minimum of dependencies (see
    minzipped size above)
+
+See the [storybook docs and demo][] to get a feel for what it can do.
+
+[storybook docs and demo]:
+    https://acusti-uikit.netlify.app/?path=/docs/uikit-controls-Dropdown--docs
+
+## Usage
+
+```
+npm install @acusti/dropdown
+# or
+yarn add @acusti/dropdown
+```
+
+### Props
+
+This is the type signature for the props you can pass to `Dropdown`. The
+unique features provided by the component are called out and explained
+above the corresponding prop via JSDoc comments:
+
+```ts
+type Props = {
+    /**
+     * Boolean indicating if the user can submit a value not already in the
+     * dropdown.
+     */
+    allowCreate?: boolean;
+    /**
+     * Boolean indicating if the user can submit an empty value (i.e. clear
+     * the value). Defaults to true.
+     */
+    allowEmpty?: boolean;
+    /**
+     * Can take a single React element (e.g. ReactChild) or exactly two
+     * renderable children.
+     */
+    children: React.ReactChild | ChildrenTuple;
+    className?: string;
+    disabled?: boolean;
+    hasItems?: boolean;
+    isOpenOnMount?: boolean;
+    isSearchable?: boolean;
+    keepOpenOnSubmit?: boolean;
+    label?: string;
+    /**
+     * Only usable in conjunction with {isSearchable: true}.
+     * Used as search input’s name.
+     */
+    name?: string;
+    onClick?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    onClose?: () => unknown;
+    onMouseDown?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    onMouseUp?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    onOpen?: () => unknown;
+    onSubmitItem?: (payload: Item) => void;
+    /**
+     * Only usable in conjunction with {isSearchable: true}.
+     * Used as search input’s placeholder.
+     */
+    placeholder?: string;
+    style?: React.CSSProperties;
+    /**
+     * Only usable in conjunction with {isSearchable: true}.
+     * Used as search input’s tabIndex.
+     */
+    tabIndex?: number;
+    /**
+     * Used as search input’s value if props.isSearchable === true
+     * Used to determine if value has changed to avoid triggering onSubmitItem if not
+     */
+    value?: string;
+};
+```
