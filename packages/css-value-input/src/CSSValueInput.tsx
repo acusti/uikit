@@ -12,11 +12,18 @@ import clsx from 'clsx';
 import * as React from 'react';
 
 export type Props = {
-    /** Boolean indicating if the user can submit an empty value (i.e. clear the value); defaults to true */
+    /**
+     * Boolean indicating if the user can submit an empty value (i.e. clear
+     * the value). Defaults to true.
+     */
     allowEmpty?: boolean;
     className?: string;
     cssValueType?: CSSValueType;
     disabled?: boolean;
+    /**
+     * Function that receives a value and converts it to its numerical equivalent
+     * (i.e. '12px' → 12). Defaults to parseFloat().
+     */
     getValueAsNumber?: (value: string | number) => number;
     icon?: React.ReactNode;
     label?: string;
@@ -28,6 +35,11 @@ export type Props = {
     onFocus?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
     onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
     onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
+    /**
+     * Custom event handler triggered when the user presses enter/return
+     * or blurs the input after making a change. Hitting esc will restore
+     * the previous submitted value or original value.
+     */
     onSubmitValue: (value: string) => unknown;
     placeholder?: string;
     step?: number;
@@ -115,10 +127,10 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
             // ensures that submitting a new value with no unit doesn’t add a unit
             const defaultUnit = unit
                 ? getUnitFromCSSValue({
-                      cssValueType,
-                      defaultUnit: unit,
-                      value: submittedValueRef.current,
-                  })
+                    cssValueType,
+                    defaultUnit: unit,
+                    value: submittedValueRef.current,
+                })
                 : '';
 
             if (!isCurrentValueFinite) {
