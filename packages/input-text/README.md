@@ -7,10 +7,84 @@
 
 `InputText` is a React component that renders a semi-controlled input,
 meaning that while it is [uncontrolled][] in the React sense, it’s value is
-overwritten whenever `props.initialValue` changes. Also, if
-`props.selectTextOnFocus` is true, it selects the entire contents of the
-input whenever the input is focused. Lastly, if `props.multiLine` is true,
-it renders a textarea element that autogrows and shrinks to adjust to the
-length of its contents.
+overwritten whenever `props.initialValue` changes. It also support
+multiline inputs (via `<textarea>`) that automatically resize vertically to
+fit their content.
 
+See the [storybook docs and demo][] to get a feel for what it can do.
+
+[storybook docs and demo]:
+    https://acusti-uikit.netlify.app/?path=/docs/uikit-controls-inputtext--docs
 [uncontrolled]: https://reactjs.org/docs/uncontrolled-components.html
+
+## Usage
+
+```
+npm install @acusti/input-text
+# or
+yarn add @acusti/input-text
+```
+
+### Props
+
+This is the type signature for the props you can pass to `InputText`. The
+unique features provided by the component are called out and explained
+above the corresponding prop via JSDoc comments:
+
+```ts
+type Props = {
+    autoCapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters';
+    autoComplete?: HTMLInputElement['autocomplete'];
+    className?: string;
+    disabled?: boolean;
+    enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
+    form?: string;
+    /**
+     * The initial value of the text input. If props.initialValue changes at
+     * any point, the new value will override the local state of the input.
+     */
+    initialValue?: string;
+    list?: string;
+    max?: number;
+    maxHeight?: number | string;
+    maxLength?: number;
+    min?: number;
+    minLength?: number;
+    /**
+     * If true, input renders as a textarea element that automatically grows
+     * and shrinks to adjust to the length of its contents.
+     */
+    multiLine?: boolean;
+    multiple?: boolean;
+    name?: string;
+    onBlur?: (event: React.FocusEvent<InputElement>) => unknown;
+    onChange?: (event: React.ChangeEvent<InputElement>) => unknown;
+    onFocus?: (event: React.FocusEvent<InputElement>) => unknown;
+    onKeyDown?: (event: React.KeyboardEvent<InputElement>) => unknown;
+    onKeyUp?: (event: React.KeyboardEvent<InputElement>) => unknown;
+    pattern?: string;
+    placeholder?: string;
+    readOnly?: boolean;
+    required?: boolean;
+    /** If true, the contents of the input are selected when it’s focused. */
+    selectTextOnFocus?: boolean;
+    size?: number;
+    step?: number;
+    style?: React.CSSProperties;
+    /**
+     * If true, pressing enter/return submits the <form> that the input is a
+     * part of, or else blurs the input if no form is found.
+     */
+    submitOnEnter?: boolean;
+    tabIndex?: number;
+    title?: string;
+    type?:
+        | 'text'
+        | 'email'
+        | 'number'
+        | 'password'
+        | 'search'
+        | 'tel'
+        | 'url';
+};
+```
