@@ -37,6 +37,13 @@ type Props = {
     autoComplete?: HTMLInputElement['autocomplete'];
     className?: string;
     disabled?: boolean;
+    /**
+     * If true, input renders as readonly initially and only becomes interactive
+     * when double-clicked or when user focuses the readonly input and then
+     * presses the enter key. Likewise, the input becomes readonly again when
+     * it is blurred or when the user presses enter or escape.
+     */
+    doubleClickToEdit?: boolean;
     enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
     form?: string;
     /**

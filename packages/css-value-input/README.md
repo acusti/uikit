@@ -25,8 +25,8 @@ yarn add @acusti/css-value-input
 
 ### Props
 
-This is the type signature for the props you can pass to `CSSValueInput`. The
-unique features provided by the component are called out and explained
+This is the type signature for the props you can pass to `CSSValueInput`.
+The unique features provided by the component are called out and explained
 above the corresponding prop via JSDoc comments:
 
 ```ts

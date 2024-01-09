@@ -63,7 +63,6 @@ export const MultiLineInputWithInitialValueAndSelectTextOnFocus: Story = {
     },
 };
 
-// TODO how do i wrap this in a <form onSubmit={() => {console.log('form submitted')}}>?
 const SUBMIT_ON_ENTER_PROPS = {
     className: 'multi-line-input-text',
     maxHeight: 600,
@@ -101,5 +100,14 @@ export const MultiLineInputWithSubmitOnEnterNoForm: Story = {
     args: {
         ...SUBMIT_ON_ENTER_PROPS,
         name: SUBMIT_ON_ENTER_PROPS.name + '-no-form',
+    },
+};
+
+export const InputWithDoubleClickToEdit: Story = {
+    args: {
+        className: 'input-text-double-click-to-edit',
+        doubleClickToEdit: true,
+        initialValue: 'Lorem ipsum dolor sit amet',
+        name: 'double-click-to-edit-input',
     },
 };

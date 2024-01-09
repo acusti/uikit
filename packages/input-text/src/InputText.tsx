@@ -8,6 +8,13 @@ export type Props = {
     autoComplete?: HTMLInputElement['autocomplete'];
     className?: string;
     disabled?: boolean;
+    /**
+     * If true, input renders as readonly initially and only becomes interactive
+     * when double-clicked or when user focuses the readonly input and then
+     * presses the enter key. Likewise, the input becomes readonly again when
+     * it is blurred or when the user presses enter or escape.
+     */
+    doubleClickToEdit?: boolean;
     enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
     form?: string;
     /**
@@ -62,6 +69,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         autoComplete,
         className,
         disabled,
+        doubleClickToEdit,
         enterKeyHint,
         form,
         initialValue,
@@ -109,17 +117,28 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         inputRef.current.value = initialValue ?? '';
     }, [initialValue]);
 
+    const [readOnlyState, setReadOnlyState] = useState<boolean | undefined>(
+        readOnly ?? doubleClickToEdit,
+    );
     const isInitialSelectionRef = useRef<boolean>(true);
+
+    const startEditing = useCallback(() => {
+        if (!doubleClickToEdit) return;
+        setReadOnlyState(false);
+    }, [doubleClickToEdit]);
 
     const handleBlur = useCallback(
         (event: React.FocusEvent<HTMLInputElement>) => {
             if (onBlur) onBlur(event);
+            if (doubleClickToEdit) {
+                setReadOnlyState(true);
+            }
             if (!selectTextOnFocus) return;
             setInputElement(event.currentTarget);
             // When input loses focus, reset isInitialSelection to true for next onSelect event
             isInitialSelectionRef.current = true;
         },
-        [onBlur, selectTextOnFocus, setInputElement],
+        [doubleClickToEdit, onBlur, selectTextOnFocus, setInputElement],
     );
 
     const setInputHeight = useCallback(() => {
@@ -185,9 +204,17 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
                     // if no form to submit, trigger input blur
                     event.currentTarget.blur();
                 }
+            } else if (doubleClickToEdit && inputRef.current) {
+                if (readOnlyState) {
+                    if (event.key === 'Enter') {
+                        setReadOnlyState(false);
+                    }
+                } else if (event.key === 'Enter' || event.key === 'Escape') {
+                    inputRef.current.blur();
+                }
             }
         },
-        [multiLine, onKeyDown, submitOnEnter],
+        [doubleClickToEdit, multiLine, onKeyDown, readOnlyState, submitOnEnter],
     );
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment
@@ -209,13 +236,14 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             name={name}
             onBlur={handleBlur}
             onChange={onChange}
+            onDoubleClick={startEditing}
             onFocus={onFocus}
             onKeyDown={handleKeyDown}
             onKeyUp={onKeyUp}
             onSelect={handleSelect}
             pattern={pattern}
             placeholder={placeholder}
-            readOnly={readOnly}
+            readOnly={readOnlyState}
             ref={setInputElement}
             required={required}
             size={size}

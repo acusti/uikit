@@ -127,10 +127,10 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
             // ensures that submitting a new value with no unit doesn’t add a unit
             const defaultUnit = unit
                 ? getUnitFromCSSValue({
-                    cssValueType,
-                    defaultUnit: unit,
-                    value: submittedValueRef.current,
-                })
+                      cssValueType,
+                      defaultUnit: unit,
+                      value: submittedValueRef.current,
+                  })
                 : '';
 
             if (!isCurrentValueFinite) {
