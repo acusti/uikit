@@ -5,3 +5,11 @@ input.input-text {
     font-size: 13px;
     line-height: 13px;
 }
+
+.input-text-double-click-to-edit {
+    border-color: transparent;
+
+    &:read-only {
+        cursor: pointer;
+    }
+}
