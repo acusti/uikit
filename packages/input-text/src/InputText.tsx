@@ -113,12 +113,13 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
 
     const handleBlur = useCallback(
         (event: React.FocusEvent<HTMLInputElement>) => {
-            setInputElement(event.currentTarget);
             if (onBlur) onBlur(event);
+            if (!selectTextOnFocus) return;
+            setInputElement(event.currentTarget);
             // When input loses focus, reset isInitialSelection to true for next onSelect event
             isInitialSelectionRef.current = true;
         },
-        [onBlur, setInputElement],
+        [onBlur, selectTextOnFocus, setInputElement],
     );
 
     const setInputHeight = useCallback(() => {
@@ -144,6 +145,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     // but it doesn’t work in Safari, so we use the initial onSelect event instead
     const handleSelect = useCallback(
         (event: React.SyntheticEvent<HTMLInputElement>) => {
+            if (!selectTextOnFocus) return;
             const input = event.currentTarget;
             setInputElement(input);
             // Do nothing if this isn’t the initial select-on-focus event
@@ -161,7 +163,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             input.selectionStart = 0;
             input.selectionEnd = valueLength;
         },
-        [setInputElement],
+        [selectTextOnFocus, setInputElement],
     );
 
     const handleKeyDown = useCallback(
@@ -205,12 +207,12 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             minLength={minLength}
             multiple={multiple}
             name={name}
-            onBlur={selectTextOnFocus ? handleBlur : onBlur}
+            onBlur={handleBlur}
             onChange={onChange}
             onFocus={onFocus}
             onKeyDown={handleKeyDown}
             onKeyUp={onKeyUp}
-            onSelect={selectTextOnFocus ? handleSelect : undefined}
+            onSelect={handleSelect}
             pattern={pattern}
             placeholder={placeholder}
             readOnly={readOnly}
