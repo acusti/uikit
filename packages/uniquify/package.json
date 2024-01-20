@@ -28,6 +28,9 @@
         "isomorphic",
         "universal"
     ],
+    "scripts": {
+        "test": "vitest"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
