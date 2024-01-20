@@ -1,6 +1,15 @@
 {
     "name": "@acusti/uniquify",
     "version": "0.5.0",
+    "type": "module",
+    "sideEffects": false,
+    "exports": "./dist/uniquify.js",
+    "main": "./dist/uniquify.js",
+    "types": "./dist/uniquify.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
     "description": "Generate a unique string (e.g. for filenames or url slugs) using an incremental counter",
     "keywords": [
         "unique",
@@ -18,15 +27,6 @@
         "flow",
         "isomorphic",
         "universal"
-    ],
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/uniquify.js",
-    "main": "./dist/uniquify.js",
-    "types": "./dist/uniquify.d.ts",
-    "files": [
-        "dist",
-        "src"
     ],
     "repository": {
         "type": "git",

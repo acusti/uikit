@@ -1,6 +1,15 @@
 {
     "name": "@acusti/styling",
     "version": "0.7.0",
+    "type": "module",
+    "sideEffects": false,
+    "exports": "./dist/index.js",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
     "description": "React component that renders a CSS style string as a <style> element in the <head> of the document (with global style de-duplication)",
     "keywords": [
         "react",
@@ -12,15 +21,6 @@
         "typescript",
         "ts",
         "flow"
-    ],
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/index.js",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "files": [
-        "dist",
-        "src"
     ],
     "repository": {
         "type": "git",

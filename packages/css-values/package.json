@@ -1,6 +1,15 @@
 {
     "name": "@acusti/css-values",
     "version": "1.0.1",
+    "type": "module",
+    "sideEffects": false,
+    "exports": "./dist/index.js",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
     "description": "Utilities for parsing different types of CSS values with or without their units",
     "keywords": [
         "utils",
@@ -12,15 +21,6 @@
         "flow",
         "isomorphic",
         "universal"
-    ],
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/index.js",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "files": [
-        "dist",
-        "src"
     ],
     "repository": {
         "type": "git",

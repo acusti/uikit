@@ -1,6 +1,15 @@
 {
     "name": "@acusti/dropdown",
     "version": "0.36.0",
+    "type": "module",
+    "sideEffects": false,
+    "exports": "./dist/Dropdown.js",
+    "main": "./dist/Dropdown.js",
+    "types": "./dist/Dropdown.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
     "description": "React component that renders a dropdown with a trigger and supports searching, keyboard access, and more",
     "keywords": [
         "react",
@@ -17,15 +26,6 @@
         "typescript",
         "ts",
         "flow"
-    ],
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/Dropdown.js",
-    "main": "./dist/Dropdown.js",
-    "types": "./dist/Dropdown.d.ts",
-    "files": [
-        "dist",
-        "src"
     ],
     "repository": {
         "type": "git",

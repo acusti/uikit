@@ -1,6 +1,15 @@
 {
     "name": "@acusti/aws-signature-v4",
     "version": "0.6.1",
+    "type": "module",
+    "sideEffects": false,
+    "exports": "./dist/index.js",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
     "description": "A lightweight isomorphic module to generate request headers that fulfill the AWS SigV4 signing process",
     "keywords": [
         "aws",
@@ -13,15 +22,6 @@
         "typescript",
         "ts",
         "flow"
-    ],
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/index.js",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "files": [
-        "dist",
-        "src"
     ],
     "repository": {
         "type": "git",
