@@ -22,6 +22,9 @@
         "ts",
         "flow"
     ],
+    "scripts": {
+        "test": "vitest"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
@@ -34,7 +37,13 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/styling#readme",
     "devDependencies": {
+        "@testing-library/dom": "^9.3.1",
+        "@testing-library/react": "^14.0.0",
+        "@testing-library/user-event": "^14.4.3",
         "@types/react": "^18.2.45",
+        "happy-dom": "^12.10.3",
+        "react": "^18",
+        "react-dom": "^18",
         "typescript": "^5.3.3",
         "vitest": "^1.1.0"
     },
