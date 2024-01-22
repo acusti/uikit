@@ -24,10 +24,14 @@ export const registerStyles = ({ ownerDocument, styles }: Payload) => {
     }
 
     if (ownerDocument === 'global') {
-        styleRegistry.set(
-            styles,
-            new Map([[ownerDocument, { element: null, referenceCount: 1 }]]),
-        );
+        const stylesItem = { element: null, referenceCount: 1 };
+        let stylesMap = styleRegistry.get(styles);
+        if (stylesMap) {
+            stylesMap.set(ownerDocument, stylesItem);
+        } else {
+            stylesMap = new Map([[ownerDocument, stylesItem]]);
+        }
+        styleRegistry.set(styles, stylesMap);
         return;
     }
 
