@@ -105,3 +105,9 @@ export const updateStyles = ({
 
     registerStyles({ ownerDocument, styles });
 };
+
+export const getStyleRegistryKeys = () => styleRegistry.keys();
+
+export const clearRegistry = () => {
+    styleRegistry.clear();
+};
