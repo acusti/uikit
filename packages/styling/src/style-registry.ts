@@ -14,6 +14,8 @@ export const getRegisteredStyles = ({ ownerDocument, styles }: Payload) => {
     return stylesMap.get(ownerDocument) ?? null;
 };
 
+// NOTE a more idiomatic API than (register|unregister)Styles would be
+// to make registerStyles a thunk that returns a cleanup function
 export const registerStyles = ({ ownerDocument, styles }: Payload) => {
     if (!styles) return;
 
