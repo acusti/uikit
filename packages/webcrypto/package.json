@@ -29,6 +29,9 @@
         "ts",
         "flow"
     ],
+    "scripts": {
+        "test": "vitest"
+    },
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
@@ -45,6 +48,7 @@
     },
     "devDependencies": {
         "@types/node": "^20.10.5",
+        "happy-dom": "^12.10.3",
         "typescript": "^5.3.3",
         "vitest": "^1.1.0"
     }

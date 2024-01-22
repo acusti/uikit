@@ -294,6 +294,7 @@ __metadata:
   resolution: "@acusti/webcrypto@workspace:packages/webcrypto"
   dependencies:
     "@types/node": "npm:^20.10.5"
+    happy-dom: "npm:^12.10.3"
     typescript: "npm:^5.3.3"
     vitest: "npm:^1.1.0"
   languageName: unknown
