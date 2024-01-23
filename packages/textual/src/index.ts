@@ -10,8 +10,15 @@ export const capitalize = (text: string) =>
         },
     );
 
-export const getInitials = (name: string, maxLength = 3) =>
-    name.replace(WORDS_REGEX, '$1').trim().substring(0, maxLength).toUpperCase();
+export const getInitials = (name: string, maxLength = 3) => {
+    let initials = '';
+    const matches = name.matchAll(WORDS_REGEX);
+    for (const match of matches) {
+        initials += match[1].toUpperCase();
+        if (initials.length >= maxLength) break;
+    }
+    return initials;
+};
 
 const EMAIL_SEPARATOR_REGEX = /[+.]/g;
 

@@ -62,6 +62,10 @@ describe('@acusti/text-transform', () => {
         it('ignores any extra whitespace in the input text', () => {
             expect(getInitials(' \nfranklin\t\t delano   roosevelt \n ')).toBe('FDR');
         });
+
+        it('ignores any non alphanumeric characters', () => {
+            expect(getInitials('**franklin delano !! roosevelt 3rd', 4)).toBe('FDR3');
+        });
     });
 
     describe('getNameFromEmail', () => {
