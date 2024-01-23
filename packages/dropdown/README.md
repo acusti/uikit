@@ -65,10 +65,8 @@ type Props = {
      */
     allowEmpty?: boolean;
     /**
-     * Can take a single React element (e.g. ReactChild) or exactly two
-     * renderable children.
+     * Can take a single React element or exactly two renderable children.
      */
-    children: React.ReactChild | ChildrenTuple;
     className?: string;
     disabled?: boolean;
     hasItems?: boolean;
