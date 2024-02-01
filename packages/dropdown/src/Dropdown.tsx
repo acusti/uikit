@@ -643,6 +643,7 @@ export default function Dropdown({
         if (isSearchable) {
             trigger = (
                 <InputText
+                    autoComplete="off"
                     className={TRIGGER_CLASS_NAME}
                     disabled={disabled}
                     initialValue={value ?? ''}
