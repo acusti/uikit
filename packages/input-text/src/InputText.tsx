@@ -6,6 +6,7 @@ type InputElement = HTMLInputElement | HTMLTextAreaElement;
 export type Props = {
     autoCapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters';
     autoComplete?: HTMLInputElement['autocomplete'];
+    autoFocus?: boolean;
     className?: string;
     disabled?: boolean;
     /**
@@ -67,6 +68,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     {
         autoCapitalize,
         autoComplete,
+        autoFocus,
         className,
         disabled,
         doubleClickToEdit,
@@ -224,6 +226,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         <Element
             autoCapitalize={autoCapitalize}
             autoComplete={autoComplete}
+            autoFocus={autoFocus} // eslint-disable-line jsx-a11y/no-autofocus
             className={className}
             defaultValue={initialValue ?? ''}
             disabled={disabled}
