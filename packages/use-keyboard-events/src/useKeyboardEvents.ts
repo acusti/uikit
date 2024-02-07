@@ -3,7 +3,11 @@ import { useEffect } from 'react';
 import { addHandler, addHandlers } from './handlers.js';
 import type { Handler } from './handlers.js';
 
-export { isEventTargetUsingKeyEvent, usesKeyEvents } from './handlers.js';
+export {
+    isEventTargetUsingKeyEvent,
+    isPrimaryModifierPressed,
+    usesKeyEvents,
+} from './handlers.js';
 
 type Props = {
     ignoreUsedKeyboardEvents?: boolean;

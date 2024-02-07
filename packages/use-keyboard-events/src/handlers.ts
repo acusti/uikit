@@ -63,6 +63,13 @@ export function addHandler({
     };
 }
 
+const IS_APPLE_REGEXP = /mac|iphone|ipad|ipod/i;
+
+export function isPrimaryModifierPressed(event: KeyboardEvent) {
+    const platform = globalThis.navigator?.platform ?? '';
+    return IS_APPLE_REGEXP.test(platform) ? event.metaKey : event.ctrlKey;
+}
+
 const NON_TEXT_INPUT_TYPES = new Set([
     'button',
     'checkbox',
