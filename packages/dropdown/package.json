@@ -1,6 +1,6 @@
 {
     "name": "@acusti/dropdown",
-    "version": "0.38.0",
+    "version": "0.38.1",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/Dropdown.js",
@@ -57,7 +57,7 @@
         "@acusti/matchmaking": "^0.6.1",
         "@acusti/styling": "^0.7.2",
         "@acusti/use-is-out-of-bounds": "^0.9.0",
-        "@acusti/use-keyboard-events": "^0.5.1",
+        "@acusti/use-keyboard-events": "^0.6.0",
         "clsx": "^2"
     },
     "peerDependencies": {
