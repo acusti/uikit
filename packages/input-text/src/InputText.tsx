@@ -226,7 +226,8 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         <Element
             autoCapitalize={autoCapitalize}
             autoComplete={autoComplete}
-            autoFocus={autoFocus} // eslint-disable-line jsx-a11y/no-autofocus
+            // @ts-expect-error using HTML’s autofocus attribute
+            autofocus={autoFocus}
             className={className}
             defaultValue={initialValue ?? ''}
             disabled={disabled}
