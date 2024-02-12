@@ -111,3 +111,34 @@ export const InputWithDoubleClickToEdit: Story = {
         name: 'double-click-to-edit-input',
     },
 };
+
+export const InputWithAutoFocus: Story = {
+    args: {
+        autoFocus: true,
+        name: 'autofocus-input',
+    },
+};
+
+const MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS = {
+    autoFocus: true,
+    initialValue: 'This multi-line input should be focused when the popover opens',
+    multiLine: true,
+    name: 'autofocus-multi-line-input',
+    selectTextOnFocus: true,
+};
+
+export const MultiLineInputWithAutoFocusInPopover: Story = {
+    args: MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS,
+    render() {
+        return (
+            <>
+                <button popoverTarget="multi-line-input-with-autofocus-in-popover">
+                    Open Popover
+                </button>
+                <div id="multi-line-input-with-autofocus-in-popover" popover="auto">
+                    <InputText {...MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS} />
+                </div>
+            </>
+        );
+    },
+};
