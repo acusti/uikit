@@ -137,20 +137,6 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         setReadOnlyState(false);
     }, [doubleClickToEdit]);
 
-    const handleBlur = useCallback(
-        (event: React.FocusEvent<HTMLInputElement>) => {
-            if (onBlur) onBlur(event);
-            if (doubleClickToEdit) {
-                setReadOnlyState(true);
-            }
-            if (!selectTextOnFocus) return;
-            setInputElement(event.currentTarget);
-            // When input loses focus, reset isInitialSelection to true for next onSelect event
-            isInitialSelectionRef.current = true;
-        },
-        [doubleClickToEdit, onBlur, selectTextOnFocus, setInputElement],
-    );
-
     const setInputHeight = useCallback(() => {
         if (!inputElement) return;
 
@@ -169,6 +155,20 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
 
     // Initialize input height in useEffect
     useEffect(setInputHeight, [setInputHeight]);
+
+    const handleBlur = useCallback(
+        (event: React.FocusEvent<HTMLInputElement>) => {
+            if (onBlur) onBlur(event);
+            if (doubleClickToEdit) {
+                setReadOnlyState(true);
+            }
+            if (!selectTextOnFocus) return;
+            setInputElement(event.currentTarget);
+            // When input loses focus, reset isInitialSelection to true for next onSelect event
+            isInitialSelectionRef.current = true;
+        },
+        [doubleClickToEdit, onBlur, selectTextOnFocus, setInputElement],
+    );
 
     // NOTE Selecting the contents of the input onFocus makes for the best UX,
     // but it doesn’t work in Safari, so we use the initial onSelect event instead
