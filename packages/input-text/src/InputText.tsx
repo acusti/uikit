@@ -158,6 +158,14 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     // Initialize input height in useEffect
     useEffect(setInputHeight, [setInputHeight]);
 
+    const handleFocus = useCallback(
+        (event: React.FocusEvent<HTMLInputElement>) => {
+            if (onFocus) onFocus(event);
+            if (multiLine) setInputHeight();
+        },
+        [multiLine, onFocus, setInputHeight],
+    );
+
     const handleBlur = useCallback(
         (event: React.FocusEvent<HTMLInputElement>) => {
             if (onBlur) onBlur(event);
@@ -250,7 +258,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             onBlur={handleBlur}
             onChange={onChange}
             onDoubleClick={startEditing}
-            onFocus={onFocus}
+            onFocus={handleFocus}
             onKeyDown={handleKeyDown}
             onKeyUp={onKeyUp}
             onSelect={handleSelect}
