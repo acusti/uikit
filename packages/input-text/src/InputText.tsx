@@ -111,10 +111,15 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     const setInputElement = useCallback((element: InputRef) => {
         inputRef.current = element;
         _setInputElement(element);
-        if (element && autoFocus) {
-            element.setAttribute('autofocus', 'autofocus');
-        }
     }, []);
+
+    if (inputRef.current) {
+        if (autoFocus && !inputRef.current.autofocus) {
+            inputRef.current.setAttribute('autofocus', 'autofocus');
+        } else if (!autoFocus && inputRef.current.autofocus) {
+            inputRef.current.removeAttribute('autofocus');
+        }
+    }
 
     // If props.initialValue changes, override input value from it
     useEffect(() => {
