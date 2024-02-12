@@ -150,7 +150,9 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             inputElement.scrollHeight,
             typeof maxHeight === 'string' ? parseFloat(maxHeight) : maxHeight,
         );
-        inputElement.style.height = `${height}px`;
+        if (height) {
+            inputElement.style.height = `${height}px`;
+        }
     }, [inputElement, maxHeight, multiLine]);
 
     // Initialize input height in useEffect
