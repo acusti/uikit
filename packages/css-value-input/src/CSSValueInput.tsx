@@ -287,7 +287,11 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
     );
 
     return (
-        <label className={clsx(ROOT_CLASS_NAME, className, { disabled })} title={title}>
+        <label
+            aria-label={label ? undefined : title}
+            className={clsx(ROOT_CLASS_NAME, className, { disabled })}
+            title={title}
+        >
             {icon ? <div className={`${ROOT_CLASS_NAME}-icon`}>{icon}</div> : null}
             {label ? (
                 <div className={`${ROOT_CLASS_NAME}-label`}>
