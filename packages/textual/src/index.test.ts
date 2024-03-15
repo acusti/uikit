@@ -59,6 +59,18 @@ describe('@acusti/text-transform', () => {
             expect(getInitials('Jamie-Lee Curtis')).toBe('JLC');
         });
 
+        it('for single-word names, uses the first letter/number and any uppercase letters or numbers as initials', () => {
+            expect(getInitials('Cat')).toBe('C');
+            expect(getInitials('CAT')).toBe('CAT');
+            expect(getInitials('C4t')).toBe('C4');
+            expect(getInitials('C4T')).toBe('C4T');
+            expect(getInitials('BigO')).toBe('BO');
+            expect(getInitials(' "LastPass"')).toBe('LP');
+            expect(getInitials(' "LastP4ss"')).toBe('LP4');
+            // if initials would be only numbers, include 1st letter (if present)
+            expect(getInitials('4ty')).toBe('4T');
+        });
+
         it('ignores any extra whitespace in the input text', () => {
             expect(getInitials(' \nfranklin\t\t delano   roosevelt \n ')).toBe('FDR');
         });

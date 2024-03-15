@@ -1,4 +1,5 @@
 const WORDS_REGEX = /\b([a-zA-Z0-9])([^\s.-]*)([\s.-]*)/g;
+const SINGLE_WORD_NON_INITIALS_REGEX = /(^[^A-Za-z0-9]+|[^A-Z0-9]+)/g;
 
 // Returns text with equivalent formatting to text-transform: capitalize
 export const capitalize = (text: string) =>
@@ -11,7 +12,20 @@ export const capitalize = (text: string) =>
     );
 
 export const getInitials = (name: string, maxLength = 3) => {
+    name = name.trim();
+    if (!name) return '';
+
     let initials = '';
+    // for single word names, use uppercase letters and numbers
+    if (!name.includes(' ')) {
+        initials = name.replace(SINGLE_WORD_NON_INITIALS_REGEX, '').substring(0, maxLength);
+        // if initials are only numbers, include 1st letter (if present)
+        if (!/[a-zA-Z]/.test(initials)) {
+            initials += name.replace(/[^A-Za-z]+/, '')[0];
+        }
+        return initials.substring(0, maxLength).toUpperCase();
+    }
+
     const matches = name.matchAll(WORDS_REGEX);
     for (const match of matches) {
         initials += match[1].toUpperCase();
