@@ -67,6 +67,8 @@ describe('@acusti/text-transform', () => {
             expect(getInitials('BigO')).toBe('BO');
             expect(getInitials(' "LastPass"')).toBe('LP');
             expect(getInitials(' "LastP4ss"')).toBe('LP4');
+            expect(getInitials('LastPassFirstTask')).toBe('LPF');
+            expect(getInitials('LastPassFirstTask', 4)).toBe('LPFT');
             // if initials would be only numbers, include 1st letter (if present)
             expect(getInitials('4ty')).toBe('4T');
         });

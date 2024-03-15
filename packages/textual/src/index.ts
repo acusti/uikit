@@ -18,7 +18,7 @@ export const getInitials = (name: string, maxLength = 3) => {
     let initials = '';
     // for single word names, use uppercase letters and numbers
     if (!name.includes(' ')) {
-        initials = name.replace(SINGLE_WORD_NON_INITIALS_REGEX, '').substring(0, maxLength);
+        initials = name.replace(SINGLE_WORD_NON_INITIALS_REGEX, '');
         // if initials are only numbers, include 1st letter (if present)
         if (!/[a-zA-Z]/.test(initials)) {
             initials += name.replace(/[^A-Za-z]+/, '')[0];
