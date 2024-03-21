@@ -24,10 +24,17 @@ export const parsePartialJSON = (text: string) => {
         let char = text[index];
         if (isInsideString) {
             if (char === '"' && !escaped) {
-                isInsideString = false;
-                // Ensure that the closing quote is followed by a comma or a colon if another field follows.
-                if (/^[^:,]*"/.test(text.slice(index + 1))) {
-                    char += ',';
+                // If this quotemark starts a new string value, there was a
+                // missing closing quote + comma from the last string value.
+                const nextChar = text[index + 1];
+                if (nextChar && /[a-z]/i.test(nextChar)) {
+                    char = '","';
+                } else {
+                    isInsideString = false;
+                    // Ensure that the closing quote is followed by a comma or a colon if another field follows.
+                    if (/^[^:,]*"/.test(text.slice(index + 1))) {
+                        char += ',';
+                    }
                 }
             } else if (char === '\n' && !escaped) {
                 char = '\\n'; // Replace the newline character with the escape sequence.
