@@ -1,6 +1,6 @@
 // Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
 // MIT License
-const parsePartialJSON = (text: string) => {
+export const parsePartialJSON = (text: string) => {
     // If the input is undefined/null, return null to indicate failure.
     if (text == null) return null;
 
@@ -10,6 +10,8 @@ const parsePartialJSON = (text: string) => {
     } catch (error) {
         // Pass
     }
+
+    text = text.trim();
 
     // Initialize variables.
     let newText = '';
@@ -47,7 +49,13 @@ const parsePartialJSON = (text: string) => {
                     stack.pop();
                 } else {
                     // Mismatched closing character; the input is malformed.
-                    return null;
+                    // If this is the last character in the text, remove it, else return null.
+                    if (index === text.length - 1) {
+                        console.log('mismatched closing character', char);
+                        char = '';
+                    } else {
+                        return null;
+                    }
                 }
             }
         }
@@ -79,18 +87,20 @@ const parsePartialJSON = (text: string) => {
 type ReturnValue = string | boolean | number | Record<string, unknown> | Array<unknown>;
 
 export function asJSON(result: string): ReturnValue | null {
-    // because props are Record<string, string>, there should only be 1 '{' and 1 '}'
-    const startJSONIndex = result.indexOf('{');
+    result = result.substring(Math.max(result.indexOf('{'), 0));
+    let props: ReturnValue | null = parsePartialJSON(result);
+    if (props) return props;
+    // If initial attempt was unsuccessful
     let endJSONIndex = result.lastIndexOf('}');
     if (endJSONIndex === -1) {
         result += '}';
         endJSONIndex = result.length;
     }
-    result = result.substring(startJSONIndex, endJSONIndex + 1);
+    result = result.substring(0, endJSONIndex + 1);
+    props = parsePartialJSON(result);
+    if (props) return props;
+
     // remove any arrays (TODO make this better)
     result = result.split('[')[0];
-
     return parsePartialJSON(result);
-    // const props: LayoutProps | null = parsePartialJSON(result);
-    // return props;
 }

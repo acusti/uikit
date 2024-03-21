@@ -107,5 +107,32 @@ Here is the JSON output for the "Meet the Team" page:
                     'Our bakery is built on the foundation of passionate individuals who are dedicated to creating the best sourdough bread in North Lake Tahoe. Meet the team behind Masa Madre.',
             });
         });
+
+        it('should handle too many closing curly braces', () => {
+            const response = `\
+{
+"heading": "Notable Projects",
+"subheading": "Explore some of our most successful and innovative designs",
+"projects": [
+{
+"description": "Design for a new skyscraper in the city center, featuring a sleek and modern aesthetic. The building features a large atrium and floor-to-ceiling windows, providing an abundance of natural light and stunning views of the city skyline.",
+"image": "https://pentagram.com/images/skyscraper.jpg",
+"altText": "Skyscraper"
+},
+{
+"description": "Redesign of a popular magazine, focusing on a clean and minimalist aesthetic, with a new layout and typography. The goal was to create a more modern and sophisticated look and feel.",
+"image": "https://pentagram.com/images/magazine.jpg",
+"altText": "Magazine"
+},
+{
+"description": "Website design for a non-profit organization, featuring a clean and intuitive layout, with a focus on accessibility and user experience. The goal was to create a user-friendly platform that would allow the organization to effectively communicate their mission and goals.",
+"image": "https://pentagram.com/images/non-profit.jpg",
+"altText": "Non-Profit Organization"
+}
+]
+}}`;
+            const props = asJSON(response);
+            expect(Object.keys(props!).length).toBe(3);
+        });
     });
 });
