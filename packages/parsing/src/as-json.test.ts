@@ -72,6 +72,40 @@ Here is the JSON output for the "About Us" page based on the provided props:
             });
         });
 
+        it('should handle JSON with trailing comma-separators', () => {
+            const response = `\
+  {
+  "sectionTitle": "Meet the Team",
+  "item1Content": "Tom Ryder - Owner & Wine Director",
+  "item1AttributionLine1": "Learn more about Tom's passion for wine and his journey to opening Ryders",
+  "item1AttributionLine2": "Read about Tom's experience in the wine industry and his approach to curating Ryders' wine list",
+  "item2Content": "Sarah Johnson - Wine Educator",
+  "item2AttributionLine1": "Discover Sarah's background in wine and her role in educating customers at Ryders",
+  "item2AttributionLine2": "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
+  "item3Content": "Mike Smith - Cheese Specialist",
+  "item3AttributionLine1": "Find out more about Mike's expertise in cheese and his role in curating Ryders' selection",
+  "item3AttributionLine2": "Read about Mike's favorite cheese pairings and his recommendations for unique flavor combinations",
+  }`;
+            expect(asJSON(response)).toEqual({
+                item1AttributionLine1:
+                    "Learn more about Tom's passion for wine and his journey to opening Ryders",
+                item1AttributionLine2:
+                    "Read about Tom's experience in the wine industry and his approach to curating Ryders' wine list",
+                item1Content: 'Tom Ryder - Owner & Wine Director',
+                item2AttributionLine1:
+                    "Discover Sarah's background in wine and her role in educating customers at Ryders",
+                item2AttributionLine2:
+                    "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
+                item2Content: 'Sarah Johnson - Wine Educator',
+                item3AttributionLine1:
+                    "Find out more about Mike's expertise in cheese and his role in curating Ryders' selection",
+                item3AttributionLine2:
+                    "Read about Mike's favorite cheese pairings and his recommendations for unique flavor combinations",
+                item3Content: 'Mike Smith - Cheese Specialist',
+                sectionTitle: 'Meet the Team',
+            });
+        });
+
         it('should strip invalid JSON when the LLM response goes off the rails', () => {
             const response = `\
 Here is the JSON output for the "Meet the Team" page:

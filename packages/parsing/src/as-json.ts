@@ -49,13 +49,18 @@ export const parsePartialJSON = (text: string) => {
                     stack.pop();
                 } else {
                     // Mismatched closing character; the input is malformed.
-                    // If this is the last character in the text, remove it, else return null.
+                    // If this is the last character in the text, just remove it.
+                    // Otherwise, return null.
                     if (index === text.length - 1) {
-                        console.log('mismatched closing character', char);
                         char = '';
                     } else {
                         return null;
                     }
+                }
+            } else if (char === ',') {
+                // If this is a trailing comma, remove it.
+                if (/^[^"]*[\]}]/.test(text.slice(index + 1))) {
+                    char = '';
                 }
             }
         }
@@ -64,7 +69,7 @@ export const parsePartialJSON = (text: string) => {
         newText += char;
     }
 
-    // If we're still inside a string at the end of processing,
+    // If we’re still inside a string at the end of processing,
     // we need to close the string.
     if (isInsideString) {
         newText += '"';
