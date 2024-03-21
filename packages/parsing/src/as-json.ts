@@ -33,7 +33,8 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
                     char = '","';
                 } else {
                     isInsideString = false;
-                    // Ensure that the closing quote is followed by a comma or a colon if another field follows.
+                    // Ensure that the closing quote is followed by a comma
+                    // if another field follows.
                     if (/^[^:,]*"/.test(text.slice(index + 1))) {
                         char += ',';
                     }
@@ -54,7 +55,7 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
             } else if (char === '[') {
                 stack.push(']');
             } else if (char === '}' || char === ']') {
-                if (stack && stack[stack.length - 1] === char) {
+                if (stack && stack.at(-1) === char) {
                     stack.pop();
                     // Ensure that we have a trailing comma if needed.
                     if (/^[^:,]*"/.test(text.slice(index + 1))) {
@@ -89,8 +90,8 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
     }
 
     // Close any remaining open structures in the reverse order that they were opened.
-    for (let i = stack.length - 1; i >= 0; i -= 1) {
-        newText += stack[i];
+    for (let index = stack.length - 1; index >= 0; index--) {
+        newText += stack[index];
     }
 
     // Attempt to parse the modified string as JSON.
