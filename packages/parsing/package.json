@@ -1,0 +1,40 @@
+{
+    "name": "@acusti/parsing",
+    "version": "0.1.0",
+    "type": "module",
+    "sideEffects": false,
+    "exports": "./dist/index.js",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "files": [
+        "dist",
+        "src"
+    ],
+    "description": "Loosely parse a string as JSON with numerous affordances for syntax errors",
+    "keywords": [
+        "parse",
+        "parsing",
+        "json",
+        "llm",
+        "genai",
+        "generative-ai"
+    ],
+    "scripts": {
+        "test": "vitest"
+    },
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/acusti/uikit.git",
+        "directory": "packages/parsing"
+    },
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
+    "license": "Unlicense",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
+    },
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/parsing#readme",
+    "devDependencies": {
+        "typescript": "^5.3.3",
+        "vitest": "^1.1.0"
+    }
+}

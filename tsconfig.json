@@ -16,7 +16,9 @@
         "noUnusedLocals": true,
         "noUnusedParameters": true,
         "outDir": "dist",
-        "paths": { "@acusti/*": ["packages/*/src"] },
+        "paths": {
+            "@acusti/*": ["packages/*/src"]
+        },
         "skipLibCheck": true,
         "sourceMap": true,
         "strictNullChecks": true,
@@ -32,6 +34,7 @@
         { "path": "packages/dropdown" },
         { "path": "packages/input-text" },
         { "path": "packages/matchmaking" },
+        { "path": "packages/parsing" },
         { "path": "packages/post" },
         { "path": "packages/styling" },
         { "path": "packages/textual" },

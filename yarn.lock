@@ -133,6 +133,15 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@acusti/parsing@workspace:packages/parsing":
+  version: 0.0.0-use.local
+  resolution: "@acusti/parsing@workspace:packages/parsing"
+  dependencies:
+    typescript: "npm:^5.3.3"
+    vitest: "npm:^1.1.0"
+  languageName: unknown
+  linkType: soft
+
 "@acusti/post@npm:^0.5.1, @acusti/post@workspace:packages/post":
   version: 0.0.0-use.local
   resolution: "@acusti/post@workspace:packages/post"

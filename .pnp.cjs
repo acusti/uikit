@@ -50,6 +50,10 @@ const RAW_RUNTIME_STATE =
       "reference": "workspace:packages/matchmaking"\
     },\
     {\
+      "name": "@acusti/parsing",\
+      "reference": "workspace:packages/parsing"\
+    },\
+    {\
       "name": "@acusti/post",\
       "reference": "workspace:packages/post"\
     },\
@@ -93,6 +97,7 @@ const RAW_RUNTIME_STATE =
     ["@acusti/dropdown", ["workspace:packages/dropdown"]],\
     ["@acusti/input-text", ["virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text", "workspace:packages/input-text"]],\
     ["@acusti/matchmaking", ["workspace:packages/matchmaking"]],\
+    ["@acusti/parsing", ["workspace:packages/parsing"]],\
     ["@acusti/post", ["workspace:packages/post"]],\
     ["@acusti/styling", ["virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling", "workspace:packages/styling"]],\
     ["@acusti/textual", ["workspace:packages/textual"]],\
@@ -294,6 +299,17 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/matchmaking/",\
         "packageDependencies": [\
           ["@acusti/matchmaking", "workspace:packages/matchmaking"],\
+          ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
+          ["vitest", "virtual:ae52462715931ea007dc50efba07d133bbd2707991d966b03dd50bc7d26895a233be9457b0dfcacf62c9e7732b6ee7fddb7ea173aaf1a49dde4d8dadb45358ba#npm:1.1.0"]\
+        ],\
+        "linkType": "SOFT"\
+      }]\
+    ]],\
+    ["@acusti/parsing", [\
+      ["workspace:packages/parsing", {\
+        "packageLocation": "./packages/parsing/",\
+        "packageDependencies": [\
+          ["@acusti/parsing", "workspace:packages/parsing"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
           ["vitest", "virtual:ae52462715931ea007dc50efba07d133bbd2707991d966b03dd50bc7d26895a233be9457b0dfcacf62c9e7732b6ee7fddb7ea173aaf1a49dde4d8dadb45358ba#npm:1.1.0"]\
         ],\
