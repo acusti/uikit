@@ -108,20 +108,14 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
 };
 
 export function asJSON(result: string): ReturnValue | null {
-    result = result.substring(Math.max(result.indexOf('{'), 0));
-    let props: ReturnValue | null = parsePartialJSON(result);
-    if (props) return props;
-    // If initial attempt was unsuccessful
-    let endJSONIndex = result.lastIndexOf('}');
-    if (endJSONIndex === -1) {
-        result += '}';
-        endJSONIndex = result.length;
-    }
-    result = result.substring(0, endJSONIndex + 1);
-    props = parsePartialJSON(result);
+    result = result.substring(
+        Math.max(result.indexOf('{'), 0),
+        Math.max(result.lastIndexOf('}'), result.length),
+    );
+    const props = parsePartialJSON(result);
     if (props) return props;
 
-    // remove any arrays (TODO make this better)
+    // If initial attempt was unsuccessful, remove any arrays (TODO make this better)
     result = result.split('[')[0];
     return parsePartialJSON(result);
 }
