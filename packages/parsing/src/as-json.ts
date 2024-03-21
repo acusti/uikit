@@ -94,13 +94,7 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
                     }
                 } else {
                     // Mismatched closing character; the input is malformed.
-                    // If this is the last character in the text, just remove it.
-                    // Otherwise, return null.
-                    if (index === text.length - 1) {
-                        char = '';
-                    } else {
-                        return null;
-                    }
+                    char = '';
                 }
             } else if (char === ',') {
                 // If this is a trailing comma, remove it.
@@ -129,12 +123,17 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
     try {
         return JSON.parse(newText);
     } catch (error) {
-        // Some repairs enable further repairs if we try again.
-        // If repairs were made, try again with the partially repaired text.
-        if (text !== newText) {
-            return parsePartialJSON(newText);
+        // Try again from before the closest delimiter.
+        let resetText = newText;
+        while (resetText && /["[\]{}]/.test(resetText.at(-1)!)) {
+            resetText = resetText.slice(0, -1);
         }
-        // If we still can't parse the string as JSON, return null to indicate failure.
+        const endIndex = resetText.search(/[^"[\]{}]*$/);
+        if (endIndex > 4 && endIndex < newText.length - 2) {
+            return parsePartialJSON(newText.substring(0, endIndex - 1));
+        }
+        // If we still can't parse the string as JSON,
+        // return null to indicate failure.
         return null;
     }
 };
@@ -144,10 +143,5 @@ export function asJSON(result: string): ReturnValue | null {
         Math.max(result.indexOf('{'), 0),
         Math.max(result.lastIndexOf('}'), result.length),
     );
-    const props = parsePartialJSON(result);
-    if (props) return props;
-
-    // If initial attempt was unsuccessful, remove any arrays (TODO make this better)
-    result = result.split('[')[0];
     return parsePartialJSON(result);
 }
