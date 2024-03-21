@@ -43,6 +43,35 @@ Here is the JSON output for the "About Us" page based on the provided props:
             });
         });
 
+        it('should handle JSON with missing comma-separators', () => {
+            const response = `\
+    Sure, here's an example of a JSON response for the "Contact Form" page:
+{
+"heading": "Get in Touch",
+"subheading": "We'd love to hear from you!"
+"props": {
+"form": {
+"name": "Contact Form",
+"email": "info@masamadre.com",
+"message": "Please enter your message or inquiry below"
+"submit": "Submit"
+}
+}
+`;
+            expect(asJSON(response)).toEqual({
+                heading: 'Get in Touch',
+                props: {
+                    form: {
+                        email: 'info@masamadre.com',
+                        message: 'Please enter your message or inquiry below',
+                        name: 'Contact Form',
+                        submit: 'Submit',
+                    },
+                },
+                subheading: "We'd love to hear from you!",
+            });
+        });
+
         it('should strip invalid JSON when the LLM response goes off the rails', () => {
             const response = `\
 Here is the JSON output for the "Meet the Team" page:

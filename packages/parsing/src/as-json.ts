@@ -18,10 +18,15 @@ const parsePartialJSON = (text: string) => {
     let escaped = false;
 
     // Process each character in the string one at a time.
-    for (let char of text) {
+    for (let index = 0; index < text.length; index++) {
+        let char = text[index];
         if (isInsideString) {
             if (char === '"' && !escaped) {
                 isInsideString = false;
+                // Ensure that the closing quote is followed by a comma or a colon if another field follows.
+                if (/^[^:,]*"/.test(text.slice(index + 1))) {
+                    char += ',';
+                }
             } else if (char === '\n' && !escaped) {
                 char = '\\n'; // Replace the newline character with the escape sequence.
             } else if (char === '\\') {
