@@ -1,3 +1,37 @@
+type Optional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;
+
+type FollowedByFullPayload = {
+    char: string;
+    chars: Array<string>;
+    index: number;
+    text: string;
+};
+
+type FollowedByPayload =
+    | Optional<FollowedByFullPayload, 'char'>
+    | Optional<FollowedByFullPayload, 'chars'>;
+
+const WHITESPACE_CHARS = new Set([' ', '\n', '\r', '\t']);
+
+// A helper function that takes a start index, a char or chars representing
+// the next non-whitespace character to look for, and the text itself.
+function isFollowedBy({ char, chars, index, text }: FollowedByPayload) {
+    const charsSet = chars ? new Set(chars) : null;
+    for (index += 1; index < text.length; index++) {
+        const nextCharacter = text[index];
+        // if this is a match, return true
+        if (char && nextCharacter === char) return true;
+        if (charsSet && charsSet.has(nextCharacter)) return true;
+        // if this is not a match but it is a whitespace character, keep iterating
+        if (WHITESPACE_CHARS.has(nextCharacter)) {
+            continue;
+        }
+        return false;
+    }
+
+    return false;
+}
+
 type ReturnValue = string | boolean | number | Record<string, unknown> | Array<unknown>;
 
 // Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
@@ -34,8 +68,8 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
                 } else {
                     isInsideString = false;
                     // Ensure that the closing quote is followed by a comma
-                    // if another field follows.
-                    if (/^[^:,]*"/.test(text.slice(index + 1))) {
+                    // if another string key follows.
+                    if (isFollowedBy({ char: '"', index, text })) {
                         char += ',';
                     }
                 }
@@ -58,7 +92,7 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
                 if (stack && stack.at(-1) === char) {
                     stack.pop();
                     // Ensure that we have a trailing comma if needed.
-                    if (/^[^:,]*"/.test(text.slice(index + 1))) {
+                    if (isFollowedBy({ chars: ['"', '{', '['], index, text })) {
                         char += ',';
                     }
                 } else {
@@ -73,7 +107,7 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
                 }
             } else if (char === ',') {
                 // If this is a trailing comma, remove it.
-                if (/^[^"]*[\]}]/.test(text.slice(index + 1))) {
+                if (!isFollowedBy({ char: '"', index, text })) {
                     char = '';
                 }
             }
