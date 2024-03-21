@@ -1,6 +1,8 @@
+type ReturnValue = string | boolean | number | Record<string, unknown> | Array<unknown>;
+
 // Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
 // MIT License
-export const parsePartialJSON = (text: string) => {
+export const parsePartialJSON = (text: string): ReturnValue | null => {
     // If the input is undefined/null, return null to indicate failure.
     if (text == null) return null;
 
@@ -95,12 +97,15 @@ export const parsePartialJSON = (text: string) => {
     try {
         return JSON.parse(newText);
     } catch (error) {
+        // Some repairs enable further repairs if we try again.
+        // If repairs were made, try again with the partially repaired text.
+        if (text !== newText) {
+            return parsePartialJSON(newText);
+        }
         // If we still can't parse the string as JSON, return null to indicate failure.
         return null;
     }
 };
-
-type ReturnValue = string | boolean | number | Record<string, unknown> | Array<unknown>;
 
 export function asJSON(result: string): ReturnValue | null {
     result = result.substring(Math.max(result.indexOf('{'), 0));
