@@ -54,6 +54,10 @@ export const parsePartialJSON = (text: string) => {
             } else if (char === '}' || char === ']') {
                 if (stack && stack[stack.length - 1] === char) {
                     stack.pop();
+                    // Ensure that we have a trailing comma if needed.
+                    if (/^[^:,]*"/.test(text.slice(index + 1))) {
+                        char += ',';
+                    }
                 } else {
                     // Mismatched closing character; the input is malformed.
                     // If this is the last character in the text, just remove it.
