@@ -76,7 +76,7 @@ type ReturnValue = string | boolean | number | Record<string, unknown> | Array<u
 export function asJSON(result: string): ReturnValue | null {
     // because props are Record<string, string>, there should only be 1 '{' and 1 '}'
     const startJSONIndex = result.indexOf('{');
-    let endJSONIndex = result.indexOf('}');
+    let endJSONIndex = result.lastIndexOf('}');
     if (endJSONIndex === -1) {
         result += '}';
         endJSONIndex = result.length;
