@@ -53,13 +53,12 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
     let newText = '';
     const stack = [];
     let isInsideString = false;
-    let escaped = false;
 
     // Process each character in the string one at a time.
     for (let index = 0; index < text.length; index++) {
         let char = text[index];
         if (isInsideString) {
-            if (char === '"' && !escaped) {
+            if (char === '"' && text[index - 1] !== '\\') {
                 // If this quotemark starts a new string value, there was a
                 // missing closing quote + comma from the last string value.
                 const nextChar = text[index + 1];
@@ -73,17 +72,15 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
                         char += ',';
                     }
                 }
-            } else if (char === '\n' && !escaped) {
-                char = '\\n'; // Replace the newline character with the escape sequence.
-            } else if (char === '\\') {
-                escaped = !escaped;
-            } else {
-                escaped = false;
+            } else if (char === '\n') {
+                // If not escaped, escape the newline character now.
+                if (text[index - 1] !== '\\') {
+                    char = '\\n';
+                }
             }
         } else {
             if (char === '"') {
                 isInsideString = true;
-                escaped = false;
             } else if (char === '{') {
                 stack.push('}');
             } else if (char === '[') {
