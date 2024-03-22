@@ -5,7 +5,7 @@
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/parsing?style=for-the-badge)](https://bundlephobia.com/package/@acusti/parsing)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/parsing?style=for-the-badge)](https://www.npmjs.com/package/@acusti/parsing)
 
-`@acusti/parsing` exports `asJSON`, a function that takes a string and
+`@acusti/parsing` exports `parseAsJSON`, a function that takes a string and
 attempts to parse it as JSON, returning the resulting JS value, or `null`
 if the string defeated all attempts at parsing it. This is especially
 useful for generative AI when you prompt an LLM to generate a response in
@@ -21,12 +21,12 @@ npm install @acusti/parsing
 yarn add @acusti/parsing
 ```
 
-Import `asJSON` (it’s a named export) and pass a string to it:
+Import `parseAsJSON` (it’s a named export) and pass a string to it:
 
-````js
-import { asJSON } from '@acusti/parsing';
+```js
+import { parseAsJSON } from '@acusti/parsing';
 
-asJSON(`Here is the JSON output for the "About Us" page based on the provided props:
+parseAsJSON(`Here is the JSON output for the "About Us" page based on the provided props:
 {
 "heading": "Our Story",
 "subheading": "A Passion for Sourdough"

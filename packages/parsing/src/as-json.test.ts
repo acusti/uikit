@@ -1,10 +1,10 @@
 /* eslint-disable sort-keys */
 import { describe, expect, it } from 'vitest';
 
-import { asJSON } from './as-json.js';
+import { parseAsJSON } from './as-json.js';
 
 describe('@acusti/parsing', () => {
-    describe('asJSON', () => {
+    describe('parseAsJSON', () => {
         it('should convert a LLM response string to a props object', () => {
             const response = `\
   Here is the JSON output for the "About Us" page based on the provided props:
@@ -13,7 +13,7 @@ describe('@acusti/parsing', () => {
 "subheading": "A Passion for Sourdough"
 }
 `;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 heading: 'Our Story',
                 subheading: 'A Passion for Sourdough',
             });
@@ -32,7 +32,7 @@ describe('@acusti/parsing', () => {
 }
 }
 `;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 heading: 'Get in Touch',
                 props: {
                     form: {
@@ -59,7 +59,7 @@ describe('@acusti/parsing', () => {
 }
 }
 `;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 heading: 'Get in Touch',
                 props: {
                     form: {
@@ -84,7 +84,7 @@ describe('@acusti/parsing', () => {
 "item2AttributionLine1": "Discover Sarah's background in wine and her role in educating customers at Ryders",
 "item2AttributionLine2": "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
 }`;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 sectionTitle: 'Meet the Team',
                 item1AttributionLine1:
                     "Learn more about Tom's passion for wine and his journey to opening Ryders",
@@ -122,7 +122,7 @@ describe('@acusti/parsing', () => {
 
 }
 `;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 callToAction: 'Learn More',
                 heading: 'Meet the Team',
                 subheading:
@@ -149,7 +149,7 @@ describe('@acusti/parsing', () => {
 
 ]
 }}`;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 heading: 'Notable Projects',
                 subheading:
                     'Explore some of our most successful and innovative designs',
@@ -173,7 +173,7 @@ describe('@acusti/parsing', () => {
   Here is the JSON output for the "Locations" page based on the provided props:
 {"contactEmail1":"info@masamadre.com","contactPhoneNumber1":"772.555.8989","addressLine1":"123 Main St.","addressLine2":"North Lake Tahoe CA 96150","officeHours":"Monday - Friday: 9:00am - 4:30pm","officeHoursDays":"Mon - Fri"}"}`;
 
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 contactEmail1: 'info@masamadre.com',
                 contactPhoneNumber1: '772.555.8989',
                 addressLine1: '123 Main St.',
@@ -222,7 +222,7 @@ Here are some of the services we offer:
 ]
 
 }}`;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 bodyCopy: `\
 At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.
 Here are some of the services we offer:
@@ -263,7 +263,7 @@ Sure, here's an example JSON output for the "Services" section based on the prov
 Here are some of the services we offer:
 {
 "contentLi`;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 bodyCopy: `\
 At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.
 Here are some of the services we offer:
@@ -282,7 +282,7 @@ Here are some of the services we offer:
 "teamMembers": [
 {
 "`;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 callToAction: 'Learn More',
                 heading: 'Meet the Team',
                 subheading:
@@ -297,7 +297,7 @@ Props:
 "heading1": "News",
 "subheading2":`;
 
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 subheading1: 'Explore Our News Archive',
                 heading1: 'News',
                 subheading2: '',
@@ -327,7 +327,7 @@ This output includes the following props:
 * "itemSubtitle2", "itemTitle2", "itemDescription2": These props are used to define the second item in the list of lessons, which is intermediate. The subtitle is "Intermediate", the title is "Advanced Techniques", and the description is "Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance."
 * "link": The link prop is used to define the URL of the lessons page, which is "https://marteeeen.com/lessons/".".`;
 
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 sectionSubtitle: 'Dance Lessons for All Levels',
                 sectionTitle: 'Lessons Offered',
                 itemSubtitle1: 'Beginner',
@@ -359,7 +359,7 @@ Props:
 "blogPostHeading3": "Learn the Basics of Artisanal Bread Making",
 "blogPostLede3": "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
 `;
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 blogPostImage1: '/images/blog-post-image1.jpg',
                 blogPostSubheading1: 'Exploring the Art of Sourdough Baking',
                 blogPostHeading1: 'The Magic of Sourdough',
@@ -381,7 +381,7 @@ Props:
         it('handles partial responses without getting stuck', () => {
             const response =
                 '  Here is a sample JSON output for the "Branding Portfolio"';
-            expect(asJSON(response)).toEqual('');
+            expect(parseAsJSON(response)).toEqual('');
         });
 
         it('detects responses where the response restarts halfway through', () => {
@@ -410,7 +410,7 @@ Props:
 "itemDescription3": "John is a sports historian with a Ph.D. in American Studies. He has written several books on the history of sports and is a frequent guest on sports talk shows, providing historical context and perspective."
 }`;
 
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 sectionTitle: 'Our Contributors',
                 sectionDescription:
                     'Meet the talented team of writers, analysts, and experts who make Defector possible.',
@@ -440,7 +440,7 @@ Props:
 }
 \`\`\``;
 
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 heading: 'New Moon Natural Foods: Your Community Market',
                 subheading: 'Welcome to a Healthier Way of Life',
                 description:
@@ -462,7 +462,7 @@ Props:
 | blogPostHeading2 | "Community and Connection" |
 | miniBlogPostLede2 | "Vytas' Hatha Yoga classes offer a sense of community and connection, fostering a supportive environment for all practitioners" | |`;
 
-            expect(asJSON(response)).toEqual({
+            expect(parseAsJSON(response)).toEqual({
                 'Prop Name': 'Value',
                 blogPostImage1: '/vytas-yoga-class-background.jpg',
                 shortBlogPostCaption1:
