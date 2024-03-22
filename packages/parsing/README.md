@@ -26,7 +26,7 @@ yarn add @acusti/parsing
 
 Import `parseAsJSON` (it’s a named export) and pass a string to it:
 
-```js
+````js
 import { parseAsJSON } from '@acusti/parsing';
 
 // it might neglect to close the outer curly braces
@@ -128,7 +128,7 @@ parseAsJSON(
     ],
 }
 */
-```
+````
 
 Again, there are more examples of the kinds of things that the parser can
 handle in the [unit tests][].

@@ -271,8 +271,7 @@ Here are some of the services we offer:
                 contentLi: '',
             });
 
-            response =
-                '  Here is a sample JSON output for the "Branding Portfolio"';
+            response = '  Here is a sample JSON output for the "Branding Portfolio"';
             expect(parseAsJSON(response)).toEqual('');
 
             response = `\
