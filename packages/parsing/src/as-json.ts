@@ -1,35 +1,43 @@
 type Optional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;
 
-type FollowedByFullPayload = {
+type IndexOfClosestCharFullPayload = {
     char: string;
-    chars: Array<string>;
+    chars: Array<string> | Set<string>;
     index: number;
     text: string;
 };
 
-type FollowedByPayload =
-    | Optional<FollowedByFullPayload, 'char'>
-    | Optional<FollowedByFullPayload, 'chars'>;
+type IndexOfClosestCharPayload =
+    | Optional<IndexOfClosestCharFullPayload, 'char'>
+    | Optional<IndexOfClosestCharFullPayload, 'chars'>;
 
 const WHITESPACE_CHARS = new Set([' ', '\n', '\r', '\t']);
 
-// A helper function that takes a start index, a char or chars representing
+// a helper function that takes a start index, a char or chars representing
 // the next non-whitespace character to look for, and the text itself.
-function isFollowedBy({ char, chars, index, text }: FollowedByPayload) {
+function indexOfClosestChar({
+    char,
+    chars,
+    index,
+    text,
+}: IndexOfClosestCharPayload) {
     const charsSet = chars ? new Set(chars) : null;
     for (index += 1; index < text.length; index++) {
         const nextCharacter = text[index];
         // if this is a match, return true
-        if (char && nextCharacter === char) return true;
-        if (charsSet && charsSet.has(nextCharacter)) return true;
+        if (char && nextCharacter === char) return index;
+        if (charsSet && charsSet.has(nextCharacter)) return index;
         // if this is not a match but it is a whitespace character, keep iterating
-        if (WHITESPACE_CHARS.has(nextCharacter)) {
-            continue;
-        }
-        return false;
+        if (WHITESPACE_CHARS.has(nextCharacter)) continue;
+
+        return -1;
     }
 
-    return false;
+    return -1;
+}
+
+function isFollowedBy(payload: IndexOfClosestCharPayload) {
+    return indexOfClosestChar(payload) > -1;
 }
 
 type ReturnValue = string | boolean | number | Record<string, unknown> | Array<unknown>;
