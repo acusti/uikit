@@ -149,8 +149,7 @@ function lengthOf(item: unknown): number {
                 return item.reduce((acc, item) => acc + lengthOf(item), 0);
             }
             return Object.keys(item).reduce(
-                (acc, key) =>
-                    acc + key.length + lengthOf((item as GenericObject)[key]),
+                (acc, key) => acc + key.length + lengthOf((item as GenericObject)[key]),
                 0,
             );
         default:
@@ -160,11 +159,11 @@ function lengthOf(item: unknown): number {
 
 const OBJECT_KEY_REGEXP = /^"[^"]+":/;
 
-type ReturnValue = string | boolean | number | GenericObject | Array<unknown>;
-
 // Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
 // MIT License
-export function parseAsJSON(text: string): ReturnValue | null {
+export function parseAsJSON(
+    text: string,
+): string | boolean | number | GenericObject | Array<unknown> | null {
     // if the input is undefined/null, return null to indicate failure
     if (text == null) return null;
 

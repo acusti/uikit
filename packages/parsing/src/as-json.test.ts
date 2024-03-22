@@ -151,8 +151,7 @@ describe('@acusti/parsing', () => {
 }}`;
             expect(parseAsJSON(response)).toEqual({
                 heading: 'Notable Projects',
-                subheading:
-                    'Explore some of our most successful and innovative designs',
+                subheading: 'Explore some of our most successful and innovative designs',
                 projects: [
                     {
                         description:
