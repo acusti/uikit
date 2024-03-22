@@ -185,10 +185,10 @@ export function asJSON(text: string): ReturnValue | null {
     if (OBJECT_KEY_REGEXP.test(text)) {
         text = '{' + text;
     }
-    // if the preamble is long, check if it appears twice in the text.
+    // if there’s a preamble, check if it appears twice in the text.
     // if it does, the model must’ve restarted part of the way through.
     const lengthDifference = originalText.length - text.length;
-    if (lengthDifference > 25) {
+    if (lengthDifference > 3) {
         const preamble = originalText.slice(0, lengthDifference);
         const preambleIndex = text.indexOf(preamble, 1);
         if (preambleIndex > -1) {

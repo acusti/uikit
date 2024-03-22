@@ -385,7 +385,7 @@ Props:
         });
 
         it('detects responses where the response restarts halfway through', () => {
-            const response = `\
+            let response = `\
   Sure, here's an example JSON output for the "Contributor Profiles" section:
 {
 "sectionTitle": "Our Contributors",
@@ -426,6 +426,25 @@ Props:
                 itemTitle3: 'John Johnson',
                 itemDescription3:
                     'John is a sports historian with a Ph.D. in American Studies. He has written several books on the history of sports and is a frequent guest on sports talk shows, providing historical context and perspective.',
+            });
+
+            response = `\`\`\`json
+{
+    "heading": "New Moon Natural Foods",
+    "subheading": "Your Community Market for Organic & Natural Goods",
+    "imageURL":\`\`\`json
+{
+    "heading": "New Moon Natural Foods: Your Community Market",
+    "subheading": "Welcome to a Healthier Way of Life",
+    "description": "At New Moon Natural Foods, we are committed to providing our community with the highest quality organic produce, locally-sourced meats, and carefully curated health and wellness products. We also offer a unique selection of beer, wine, and cheese, as well as all the best in natural grocery. Our family-owned market is dedicated to supporting local growers and artisans, while providing a welcoming and supportive environment for our customers to find the healthiest and most sustainable options for their families. Join us on your journey to a healthier way of life."
+}
+\`\`\``;
+
+            expect(asJSON(response)).toEqual({
+                heading: 'New Moon Natural Foods: Your Community Market',
+                subheading: 'Welcome to a Healthier Way of Life',
+                description:
+                    'At New Moon Natural Foods, we are committed to providing our community with the highest quality organic produce, locally-sourced meats, and carefully curated health and wellness products. We also offer a unique selection of beer, wine, and cheese, as well as all the best in natural grocery. Our family-owned market is dedicated to supporting local growers and artisans, while providing a welcoming and supportive environment for our customers to find the healthiest and most sustainable options for their families. Join us on your journey to a healthier way of life.',
             });
         });
 
