@@ -134,6 +134,8 @@ function isValidContext({
     }
 }
 
+const OBJECT_KEY_REGEXP = /^"[^"]+":/;
+
 type ReturnValue = string | boolean | number | Record<string, unknown> | Array<unknown>;
 
 // Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
@@ -158,12 +160,20 @@ export function asJSON(text: string): ReturnValue | null {
 
     // identify start of JSON
     do {
-        text = text.replace(/^[^{[]+/, '');
+        // if text starts with a control char, it didn’t pass the while condition
+        text = text.replace(/^[[{"]?[^[{"]+/, '');
     } while (
         // if new start is [, ensure it’s an array & not part of preamble
-        text[0] === '[' &&
-        !isFollowedBy({ chars: VALUE_START_CHARS, index: 0, text })
+        (text[0] === '[' &&
+            !isFollowedBy({ chars: VALUE_START_CHARS, index: 0, text })) ||
+        // if new start is ", ensure it’s a JSON string & not part of preamble
+        (text[0] === '"' && !OBJECT_KEY_REGEXP.test(text))
     );
+
+    // if the first character is a key, add opening curly brace
+    if (OBJECT_KEY_REGEXP.test(text)) {
+        text = '{' + text;
+    }
 
     // process each character in the string one at a time
     for (let index = 0; index < text.length; index++) {
