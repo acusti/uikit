@@ -134,9 +134,33 @@ function isValidContext({
     }
 }
 
+type GenericObject = Record<string, unknown>;
+
+// get the length of anything (vs JSON.stringify: https://jsperf.app/qisaso/2)
+function lengthOf(item: unknown): number {
+    switch (typeof item) {
+        case 'string':
+            return item.length;
+        case 'number':
+            return 1;
+        case 'object':
+            if (!item) return 0;
+            if (Array.isArray(item)) {
+                return item.reduce((acc, item) => acc + lengthOf(item), 0);
+            }
+            return Object.keys(item).reduce(
+                (acc, key) =>
+                    acc + key.length + lengthOf((item as GenericObject)[key]),
+                0,
+            );
+        default:
+            return 0;
+    }
+}
+
 const OBJECT_KEY_REGEXP = /^"[^"]+":/;
 
-type ReturnValue = string | boolean | number | Record<string, unknown> | Array<unknown>;
+type ReturnValue = string | boolean | number | GenericObject | Array<unknown>;
 
 // Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
 // MIT License
@@ -166,7 +190,6 @@ export function parseAsJSON(text: string): ReturnValue | null {
     let isInsideString = false;
 
     // identify start of JSON
-    const originalText = text;
     let previousText;
     do {
         previousText = text;
@@ -185,25 +208,10 @@ export function parseAsJSON(text: string): ReturnValue | null {
     if (OBJECT_KEY_REGEXP.test(text)) {
         text = '{' + text;
     }
-    // if there’s a preamble, check if it appears twice in the text.
-    // if it does, the model must’ve restarted part of the way through.
-    const lengthDifference = originalText.length - text.length;
-    if (lengthDifference > 3) {
-        const preamble = originalText.slice(0, lengthDifference);
-        const preambleIndex = text.indexOf(preamble, 1);
-        if (preambleIndex > -1) {
-            // use the response after the repeated preamble if it’s longer than what’s before
-            if (preambleIndex + lengthDifference < text.length / 2) {
-                text = text.slice(preambleIndex + lengthDifference);
-            } else {
-                // otherwise use the text up until the repeated preamble
-                text = text.slice(0, preambleIndex);
-            }
-        }
-    }
 
+    let index = 0;
     // process each character in the string one at a time
-    for (let index = 0; index < text.length; index++) {
+    for (; index < text.length; index++) {
         let char = text[index];
         if (isInsideString) {
             if (char === '"' && newText.at(-1) !== '\\') {
@@ -284,10 +292,41 @@ export function parseAsJSON(text: string): ReturnValue | null {
     for (let index = stack.length - 1; index >= 0; index--) {
         newText += stack[index];
     }
+
     // attempt to parse the modified string as JSON
+    let result = null;
     try {
-        return JSON.parse(newText);
+        result = JSON.parse(newText);
     } catch (error) {
-        return null;
+        // in case of error, return null (after checking remainder of text)
     }
+
+    // if there’s still unparsed text and parsing failed or its more than ½
+    // what we already parsed, the model might’ve restarted partway through.
+    // try parsing the rest to see if we get a larger result and use it if so.
+    const remainingText = text.substring(index);
+    if (remainingText.length > 5 && (!result || remainingText.length > index)) {
+        const remainingResult = parseAsJSON(remainingText);
+        if (remainingResult) {
+            if (!result) return remainingResult;
+            // choose whichever has more keys (or, if equal, more characters)
+            if (
+                typeof result === 'object' &&
+                typeof remainingResult === 'object' &&
+                !Array.isArray(result) &&
+                !Array.isArray(remainingResult)
+            ) {
+                const keysLength = Object.keys(result).length;
+                const remainingKeysLength = Object.keys(remainingResult).length;
+                if (keysLength > remainingKeysLength) return result;
+                if (remainingKeysLength > keysLength) return remainingResult;
+            }
+            // if not objects or same number of keys, choose longer item
+            if (lengthOf(remainingResult) > lengthOf(result)) {
+                return remainingResult;
+            }
+        }
+    }
+
+    return result;
 }
