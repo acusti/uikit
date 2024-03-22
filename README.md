@@ -7,7 +7,7 @@
 [![Commits per month](https://img.shields.io/github/commit-activity/m/acusti/uikit?style=for-the-badge)](https://github.com/acusti/uikit/pulse)
 
 _UI toolkit monorepo containing a React component library, UI utilities, a
-drag-and-drop library, an [AWS AppSync](https://aws.amazon.com/appsync/)
+generative AI LLM parser, an [AWS AppSync](https://aws.amazon.com/appsync/)
 fetch utility, and more_
 
 ## Packages
@@ -22,6 +22,7 @@ fetch utility, and more_
 | **[@acusti/dropdown][]**                 | [![latest version](https://img.shields.io/npm/v/@acusti/dropdown?style=flat-square)](https://www.npmjs.com/package/@acusti/dropdown)                                 | React component that renders a dropdown UI element                                                       |
 | **[@acusti/input-text][]**               | [![latest version](https://img.shields.io/npm/v/@acusti/input-text?style=flat-square)](https://www.npmjs.com/package/@acusti/input-text)                             | React component that renders an uncontrolled text input                                                  |
 | **[@acusti/matchmaking][]**              | [![latest version](https://img.shields.io/npm/v/@acusti/matchmaking?style=flat-square)](https://www.npmjs.com/package/@acusti/matchmaking)                           | Utilities for approximate string matching (i.e. fuzzy search)                                            |
+| **[@acusti/parsing][]**                  | [![latest version](https://img.shields.io/npm/v/@acusti/parsing?style=flat-square)](https://www.npmjs.com/package/@acusti/parsing)                                   | Loosely parse a string as JSON with numerous affordances for syntax errors                               |
 | **[@acusti/post][]**                     | [![latest version](https://img.shields.io/npm/v/@acusti/post?style=flat-square)](https://www.npmjs.com/package/@acusti/post)                                         | A promise-based node.js function for making graphql requests                                             |
 | **[@acusti/styling][]**                  | [![latest version](https://img.shields.io/npm/v/@acusti/styling?style=flat-square)](https://www.npmjs.com/package/@acusti/styling)                                   | React component that renders a CSS string to the `<head>`                                                |
 | **[@acusti/textual][]**                  | [![latest version](https://img.shields.io/npm/v/@acusti/textual?style=flat-square)](https://www.npmjs.com/package/@acusti/textual)                                   | Utilities for transforming and formatting text                                                           |
@@ -49,6 +50,8 @@ fetch utility, and more_
     https://github.com/acusti/uikit/tree/main/packages/input-text
 [@acusti/matchmaking]:
     https://github.com/acusti/uikit/tree/main/packages/matchmaking
+[@acusti/parsing]:
+    https://github.com/acusti/uikit/tree/main/packages/parsing
 [@acusti/post]: https://github.com/acusti/uikit/tree/main/packages/post
 [@acusti/styling]:
     https://github.com/acusti/uikit/tree/main/packages/styling
