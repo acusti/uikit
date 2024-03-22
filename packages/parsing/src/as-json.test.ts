@@ -263,5 +263,39 @@ Here are some of the services we offer:
                 ],
             });
         });
+
+        it('should handle partial (streaming) LLM reponses as they come in', () => {
+            let response = `\
+    Sure, here's an example JSON output for the "Services" section based on the provided information:
+    {
+    "bodyCopy": "At the Cleveland Clinic Wound Center in Vero Beach, Florida, we offer a range of services to help you manage your wounds and promote healing. Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible.
+    Here are some of the services we offer:
+    {
+    "contentLi`;
+            expect(asJSON(response)).toEqual({
+                bodyCopy: `\
+    At the Cleveland Clinic Wound Center in Vero Beach, Florida, we offer a range of services to help you manage your wounds and promote healing. Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible.
+    Here are some of the services we offer:
+    {
+    `,
+            });
+
+            response = `\
+      Here is the JSON output for the "Meet the Team" page:
+    {
+    "callToAction": "Learn More",
+    "heading": "Meet the Team",
+    "subheading": "Our bakery is built on the foundation of passionate individuals who are dedicated to creating the best sourdough bread in North Lake Tahoe. Meet the team behind Masa Madre."
+    [
+    "teamMembers": [
+    {
+    "`;
+            expect(asJSON(response)).toEqual({
+                callToAction: 'Learn More',
+                heading: 'Meet the Team',
+                subheading:
+                    'Our bakery is built on the foundation of passionate individuals who are dedicated to creating the best sourdough bread in North Lake Tahoe. Meet the team behind Masa Madre.',
+            });
+        });
     });
 });
