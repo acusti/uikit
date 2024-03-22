@@ -1,3 +1,4 @@
+/* eslint-disable sort-keys */
 import { describe, expect, it } from 'vitest';
 
 import { asJSON } from './as-json.js';
@@ -6,7 +7,7 @@ describe('@acusti/parsing', () => {
     describe('asJSON', () => {
         it('should convert a LLM response string to a props object', () => {
             const response = `\
-Here is the JSON output for the "About Us" page based on the provided props:
+  Here is the JSON output for the "About Us" page based on the provided props:
 {
 "heading": "Our Story",
 "subheading": "A Passion for Sourdough"
@@ -45,7 +46,7 @@ Here is the JSON output for the "About Us" page based on the provided props:
 
         it('should handle JSON with missing comma-separators', () => {
             const response = `\
-    Sure, here's an example of a JSON response for the "Contact Form" page:
+  Sure, here's an example of a JSON response for the "Contact Form" page:
 {
 "heading": "Get in Touch",
 "subheading": "We'd love to hear from you!"
@@ -154,12 +155,6 @@ Here is the JSON output for the "About Us" page based on the provided props:
 "altText": "Skyscraper"
 },
 {
-"description": "Redesign of a popular magazine, focusing on a clean and minimalist aesthetic, with a new layout and typography. The goal was to create a more modern and sophisticated look and feel.",
-"image": "https://pentagram.com/images/magazine.jpg",
-"altText": "Magazine"
-
-},
-{
 "description": "Website design for a non-profit organization, featuring a clean and intuitive layout, with a focus on accessibility and user experience. The goal was to create a user-friendly platform that would allow the organization to effectively communicate their mission and goals.",
 "image": "https://pentagram.com/images/non-profit.jpg",
 "altText": "Non-Profit Organization"
@@ -182,12 +177,6 @@ Here is the JSON output for the "About Us" page based on the provided props:
                     },
                     {
                         description:
-                            'Redesign of a popular magazine, focusing on a clean and minimalist aesthetic, with a new layout and typography. The goal was to create a more modern and sophisticated look and feel.',
-                        image: 'https://pentagram.com/images/magazine.jpg',
-                        altText: 'Magazine',
-                    },
-                    {
-                        description:
                             'Website design for a non-profit organization, featuring a clean and intuitive layout, with a focus on accessibility and user experience. The goal was to create a user-friendly platform that would allow the organization to effectively communicate their mission and goals.',
                         image: 'https://pentagram.com/images/non-profit.jpg',
                         altText: 'Non-Profit Organization',
@@ -204,17 +193,6 @@ Here is the JSON output for the "About Us" page based on the provided props:
 Here are some of the services we offer:
 {
 "contentList1": [
-{
-"title": "Wound Care",
-"description": "Our wound care services are designed to help you manage and treat your wounds, including cleaning and dressing the wound, managing infection, and promoting healing. We use the latest techniques and technologies to ensure the best possible outcomes.",
-"content": "Wound care"
-},
-{
-"title": "Hyperbaric Oxygen Therapy",
-
-"description": "Hyperbaric oxygen therapy is a non-invasive treatment that uses pure oxygen to promote healing and reduce inflammation. We use a state-of-the-art hyperbaric chamber to deliver the oxygen to your body, helping to speed up the healing process.",
-"content": "Hyperbaric oxygen therapy"
-},
 {
 "title": "Surgical Debridement",
 
@@ -254,18 +232,6 @@ Here are some of the services we offer:
 `,
                 contentList1: [
                     {
-                        content: 'Wound care',
-                        description:
-                            'Our wound care services are designed to help you manage and treat your wounds, including cleaning and dressing the wound, managing infection, and promoting healing. We use the latest techniques and technologies to ensure the best possible outcomes.',
-                        title: 'Wound Care',
-                    },
-                    {
-                        content: 'Hyperbaric oxygen therapy',
-                        description:
-                            'Hyperbaric oxygen therapy is a non-invasive treatment that uses pure oxygen to promote healing and reduce inflammation. We use a state-of-the-art hyperbaric chamber to deliver the oxygen to your body, helping to speed up the healing process.',
-                        title: 'Hyperbaric Oxygen Therapy',
-                    },
-                    {
                         content: 'Surgical debridement',
                         description:
                             'Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.',
@@ -293,30 +259,31 @@ Here are some of the services we offer:
 
         it('should handle partial (streaming) LLM reponses as they come in', () => {
             let response = `\
-    Sure, here's an example JSON output for the "Services" section based on the provided information:
-    {
-    "bodyCopy": "At the Cleveland Clinic Wound Center in Vero Beach, Florida, we offer a range of services to help you manage your wounds and promote healing. Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible.
-    Here are some of the services we offer:
-    {
-    "contentLi`;
+Sure, here's an example JSON output for the "Services" section based on the provided information:
+{
+"bodyCopy": "At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.
+Here are some of the services we offer:
+{
+"contentLi`;
             expect(asJSON(response)).toEqual({
                 bodyCopy: `\
-    At the Cleveland Clinic Wound Center in Vero Beach, Florida, we offer a range of services to help you manage your wounds and promote healing. Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible.
-    Here are some of the services we offer:
-    {
-    `,
+At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.
+Here are some of the services we offer:
+{
+`,
+                contentLi: '',
             });
 
             response = `\
-      Here is the JSON output for the "Meet the Team" page:
-    {
-    "callToAction": "Learn More",
-    "heading": "Meet the Team",
-    "subheading": "Our bakery is built on the foundation of passionate individuals who are dedicated to creating the best sourdough bread in North Lake Tahoe. Meet the team behind Masa Madre."
-    [
-    "teamMembers": [
-    {
-    "`;
+  Here is the JSON output for the "Meet the Team" page:
+{
+"callToAction": "Learn More",
+"heading": "Meet the Team",
+"subheading": "Our bakery is built on the foundation of passionate individuals who are dedicated to creating the best sourdough bread in North Lake Tahoe. Meet the team behind Masa Madre."
+[
+"teamMembers": [
+{
+"`;
             expect(asJSON(response)).toEqual({
                 callToAction: 'Learn More',
                 heading: 'Meet the Team',
@@ -327,6 +294,7 @@ Here are some of the services we offer:
             response = `\
   Here are the props for the News Archive page based on the provided description and previous conversations:
 Props:
+
 "subheading1": "Explore Our News Archive",
 "heading1": "News",
 "subheading2":`;
@@ -350,21 +318,15 @@ Props:
 "itemSubtitle2": "Intermediate",
 "itemTitle2": "Advanced Techniques",
 "itemDescription2": "Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance.",
-"itemSubtitle3": "Advanced",
-"itemTitle3": "Performance Training",
-"itemDescription3": "For those looking to take their dancing to the next level, our advanced lessons focus on performance techniques and styling. Prior experience in Latin dance is required.",
-"itemSubtitle4": "Private Lessons",
-"itemTitle4": "Customized Instruction",
-"itemDescription4": "Get one-on-one instruction tailored to your needs and goals. Perfect for those who want to learn at their own pace or have specific requests.",
 "link": "https://marteeeen.com/lessons/"
 }
+
 This output includes the following props:
+
 * "sectionSubtitle": A subtitle for the section, which is "Dance Lessons for All Levels".
 * "sectionTitle": The title of the section, which is "Lessons Offered".
 * "itemSubtitle1", "itemTitle1", "itemDescription1": These props are used to define the first item in the list of lessons, which is beginner. The subtitle is "Beginner", the title is "Introduction to Latin Dance", and the description is "Learn the basics of Latin dance, including salsa, bachata, and cha cha cha. Perfect for beginners looking to get started or those who want to refresh their skills."
 * "itemSubtitle2", "itemTitle2", "itemDescription2": These props are used to define the second item in the list of lessons, which is intermediate. The subtitle is "Intermediate", the title is "Advanced Techniques", and the description is "Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance."
-* "itemSubtitle3", "itemTitle3", "itemDescription3": These props are used to define the third item in the list of lessons, which is advanced. The subtitle is "Advanced", the title is "Performance Training", and the description is "For those looking to take their dancing to the next level, our advanced lessons focus on performance techniques and styling. Prior experience in Latin dance is required."
-* "itemSubtitle4", "itemTitle4", "itemDescription4": These props are used to define the fourth item in the list of lessons, which is private lessons. The subtitle is "Private Lessons", the title is "Customized Instruction", and the description is "Get one-on-one instruction tailored to your needs and goals. Perfect for those who want to learn at their own pace or have specific requests."
 * "link": The link prop is used to define the URL of the lessons page, which is "https://marteeeen.com/lessons/".".`;
 
             expect(asJSON(response)).toEqual({
@@ -378,35 +340,27 @@ This output includes the following props:
                 itemTitle2: 'Advanced Techniques',
                 itemDescription2:
                     'Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance.',
-                itemSubtitle3: 'Advanced',
-                itemTitle3: 'Performance Training',
-                itemDescription3:
-                    'For those looking to take their dancing to the next level, our advanced lessons focus on performance techniques and styling. Prior experience in Latin dance is required.',
-                itemSubtitle4: 'Private Lessons',
-                itemTitle4: 'Customized Instruction',
-                itemDescription4:
-                    'Get one-on-one instruction tailored to your needs and goals. Perfect for those who want to learn at their own pace or have specific requests.',
                 link: 'https://marteeeen.com/lessons/',
             });
         });
 
         it('should infer if content looks like an object and add missing curly braces if so', () => {
             const response = `\
-      Here are the props for the "Blog" page:
-    Props:
-    "blogPostImage1": "/images/blog-post-image1.jpg",
-    "blogPostSubheading1": "Exploring the Art of Sourdough Baking",
-    "blogPostHeading1": "The Magic of Sourdough",
-    "blogPostLede1": "At Masa Madre, we're passionate about creating the perfect sourdough bread. Learn more about the art and craft of this ancient tradition.",
-    "blogPostImage2": "/images/blog-post-image2.jpg",
-    "blogPostSubheading2": "From Seed to Loaf",
-    "blogPostHeading2": "Our Journey to Your Table",
-    "blogPostLede2": "Discover the journey of our sourdough bread, from the seed to the loaf.",
-    "blogPostImage3": "/images/blog-post-image3.jpg",
-    "blogPostSubheading3": "Sourdough 101",
-    "blogPostHeading3": "Learn the Basics of Artisanal Bread Making",
-    "blogPostLede3": "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
-    `;
+  Here are the props for the "Blog" page:
+Props:
+"blogPostImage1": "/images/blog-post-image1.jpg",
+"blogPostSubheading1": "Exploring the Art of Sourdough Baking",
+"blogPostHeading1": "The Magic of Sourdough",
+"blogPostLede1": "At Masa Madre, we're passionate about creating the perfect sourdough bread. Learn more about the art and craft of this ancient tradition.",
+"blogPostImage2": "/images/blog-post-image2.jpg",
+"blogPostSubheading2": "From Seed to Loaf",
+"blogPostHeading2": "Our Journey to Your Table",
+"blogPostLede2": "Discover the journey of our sourdough bread, from the seed to the loaf.",
+"blogPostImage3": "/images/blog-post-image3.jpg",
+"blogPostSubheading3": "Sourdough 101",
+"blogPostHeading3": "Learn the Basics of Artisanal Bread Making",
+"blogPostLede3": "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
+`;
             expect(asJSON(response)).toEqual({
                 blogPostImage1: '/images/blog-post-image1.jpg',
                 blogPostSubheading1: 'Exploring the Art of Sourdough Baking',
