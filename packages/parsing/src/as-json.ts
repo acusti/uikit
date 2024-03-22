@@ -21,7 +21,7 @@ function indexOfClosestChar({
     chars,
     step = 1,
     text,
-    index = text.length - 1,
+    index = step < 0 ? text.length : text.length - 1,
 }: IndexOfClosestCharPayload) {
     const charsSet = chars ? new Set(chars) : null;
     for (index += step; index >= 0 && index < text.length; index += step) {
