@@ -463,6 +463,7 @@ Props:
 "teamMemberImage2": "/images/jane-smith.jpg",
 "teamMemberJobTitle2": "Senior Consultant",
 "teamMemberName3": "Bob Johnson",
+"teamMemberImage3": "/images/bob-johnson.jpg",
 }
 `;
             expect(parseAsJSON(response)).toEqual({
@@ -473,6 +474,7 @@ Props:
                 teamMemberImage2: '/images/jane-smith.jpg',
                 teamMemberJobTitle2: 'Senior Consultant',
                 teamMemberName3: 'Bob Johnson',
+                teamMemberImage3: '/images/bob-johnson.jpg',
             });
         });
 
