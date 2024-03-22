@@ -27,7 +27,7 @@ describe('@acusti/parsing', () => {
 "subheading": "We'd love to hear from you!",
 "props": {
 "form": {
-"email": "info@masamadre.com",
+"email": "info@example.net",
 "message": "Please enter your message or inquiry below"
 }
 }
@@ -36,7 +36,7 @@ describe('@acusti/parsing', () => {
                 heading: 'Get in Touch',
                 props: {
                     form: {
-                        email: 'info@masamadre.com',
+                        email: 'info@example.net',
                         message: 'Please enter your message or inquiry below',
                     },
                 },
@@ -53,7 +53,7 @@ describe('@acusti/parsing', () => {
 "props": {
 "form": {
 "name": "Contact Form",
-"email": "info@masamadre.com",
+"email": "info@example.net",
 "message": "Please enter your message or inquiry below"
 "submit": "Submit"
 }
@@ -63,7 +63,7 @@ describe('@acusti/parsing', () => {
                 heading: 'Get in Touch',
                 props: {
                     form: {
-                        email: 'info@masamadre.com',
+                        email: 'info@example.net',
                         message: 'Please enter your message or inquiry below',
                         name: 'Contact Form',
                         submit: 'Submit',
@@ -170,10 +170,10 @@ describe('@acusti/parsing', () => {
 
             response = `\
   Here is the JSON output for the "Locations" page based on the provided props:
-{"contactEmail1":"info@masamadre.com","contactPhoneNumber1":"772.555.8989","addressLine1":"123 Main St.","addressLine2":"North Lake Tahoe CA 96150","officeHours":"Monday - Friday: 9:00am - 4:30pm","officeHoursDays":"Mon - Fri"}"}`;
+{"contactEmail1":"info@example.net","contactPhoneNumber1":"772.555.8989","addressLine1":"123 Main St.","addressLine2":"North Lake Tahoe CA 96150","officeHours":"Monday - Friday: 9:00am - 4:30pm","officeHoursDays":"Mon - Fri"}"}`;
 
             expect(parseAsJSON(response)).toEqual({
-                contactEmail1: 'info@masamadre.com',
+                contactEmail1: 'info@example.net',
                 contactPhoneNumber1: '772.555.8989',
                 addressLine1: '123 Main St.',
                 addressLine2: 'North Lake Tahoe CA 96150',
