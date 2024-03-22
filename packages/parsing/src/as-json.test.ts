@@ -83,11 +83,9 @@ describe('@acusti/parsing', () => {
 "item2Content": "Sarah Johnson - Wine Educator",
 "item2AttributionLine1": "Discover Sarah's background in wine and her role in educating customers at Ryders",
 "item2AttributionLine2": "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
-"item3Content": "Mike Smith - Cheese Specialist",
-"item3AttributionLine1": "Find out more about Mike's expertise in cheese and his role in curating Ryders' selection",
-"item3AttributionLine2": "Read about Mike's favorite cheese pairings and his recommendations for unique flavor combinations",
 }`;
             expect(asJSON(response)).toEqual({
+                sectionTitle: 'Meet the Team',
                 item1AttributionLine1:
                     "Learn more about Tom's passion for wine and his journey to opening Ryders",
                 item1AttributionLine2:
@@ -98,12 +96,6 @@ describe('@acusti/parsing', () => {
                 item2AttributionLine2:
                     "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
                 item2Content: 'Sarah Johnson - Wine Educator',
-                item3AttributionLine1:
-                    "Find out more about Mike's expertise in cheese and his role in curating Ryders' selection",
-                item3AttributionLine2:
-                    "Read about Mike's favorite cheese pairings and his recommendations for unique flavor combinations",
-                item3Content: 'Mike Smith - Cheese Specialist',
-                sectionTitle: 'Meet the Team',
             });
         });
 
@@ -120,11 +112,6 @@ describe('@acusti/parsing', () => {
 "name": "Jenny Lee",
 "role": "Head Baker",
 "description": "Jenny is the mastermind behind Masa Madre's delicious sourdough bread. With over 10 years of experience in the baking industry, she brings a wealth of knowledge and expertise to the table. Jenny's passion for sourdough bread is evident in every loaf she creates, and her dedication to using only the finest ingredients has earned her a loyal following of customers."
-},
-{
-"name": "Tommy Thompson",
-"role": "Baker",
-"description": "Tommy is the muscle behind Masa Madre's bakery. With a background in culinary arts, he brings a creative touch to every loaf he bakes. Tommy's attention to detail and commitment to quality has made him an invaluable member of the team."
 },
 {
 "name": "Emily Chen",
@@ -183,8 +170,8 @@ describe('@acusti/parsing', () => {
             });
 
             response = `\
-               Here is the JSON output for the "Locations" page based on the provided props:
-             {"contactEmail1":"info@masamadre.com","contactPhoneNumber1":"772.555.8989","addressLine1":"123 Main St.","addressLine2":"North Lake Tahoe CA 96150","officeHours":"Monday - Friday: 9:00am - 4:30pm","officeHoursDays":"Mon - Fri"}"}`;
+  Here is the JSON output for the "Locations" page based on the provided props:
+{"contactEmail1":"info@masamadre.com","contactPhoneNumber1":"772.555.8989","addressLine1":"123 Main St.","addressLine2":"North Lake Tahoe CA 96150","officeHours":"Monday - Friday: 9:00am - 4:30pm","officeHoursDays":"Mon - Fri"}"}`;
 
             expect(asJSON(response)).toEqual({
                 contactEmail1: 'info@masamadre.com',
@@ -200,7 +187,7 @@ describe('@acusti/parsing', () => {
             const response = `\
   Sure, here's an example JSON output for the "Services" section based on the provided information:
 {
-"bodyCopy": "At the Cleveland Clinic Wound Center in Vero Beach, Florida, we offer a range of services to help you manage your wounds and promote healing. Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible.
+"bodyCopy": "At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.
 Here are some of the services we offer:
 {
 "contentList1": [
@@ -237,7 +224,7 @@ Here are some of the services we offer:
 }}`;
             expect(asJSON(response)).toEqual({
                 bodyCopy: `\
-At the Cleveland Clinic Wound Center in Vero Beach, Florida, we offer a range of services to help you manage your wounds and promote healing. Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible.
+At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.
 Here are some of the services we offer:
 {
 `,
