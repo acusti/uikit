@@ -153,6 +153,13 @@ export function asJSON(text: string): ReturnValue | null {
 
     text = text.trim();
 
+    // if this is a two-column markdown table, convert it to JSON key/value pairs
+    text = text.replace(
+        /^\| (.+?) \| (.+?)(?: \|)+$/gm,
+        (_match, key, value) =>
+            `"${key.replace(/(^"|"$)/g, '')}": "${value.replace(/(^"|"$)/g, '')}",`,
+    );
+
     // initialize variables
     let newText = '';
     const stack = [];
