@@ -324,5 +324,57 @@ Here are some of the services we offer:
                     'Our bakery is built on the foundation of passionate individuals who are dedicated to creating the best sourdough bread in North Lake Tahoe. Meet the team behind Masa Madre.',
             });
         });
+
+        it('should detect and strip detailed pre- and post-amble text', () => {
+            const response = `\
+  Sure, here's an example JSON output for the "Types of Lessons" section based on the provided props:
+{
+"sectionSubtitle": "Dance Lessons for All Levels",
+"sectionTitle": "Lessons Offered",
+"itemSubtitle1": "Beginner",
+"itemTitle1": "Introduction to Latin Dance",
+"itemDescription1": "Learn the basics of Latin dance, including salsa, bachata, and cha cha cha. Perfect for beginners looking to get started or those who want to refresh their skills.",
+"itemSubtitle2": "Intermediate",
+"itemTitle2": "Advanced Techniques",
+"itemDescription2": "Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance.",
+"itemSubtitle3": "Advanced",
+"itemTitle3": "Performance Training",
+"itemDescription3": "For those looking to take their dancing to the next level, our advanced lessons focus on performance techniques and styling. Prior experience in Latin dance is required.",
+"itemSubtitle4": "Private Lessons",
+"itemTitle4": "Customized Instruction",
+"itemDescription4": "Get one-on-one instruction tailored to your needs and goals. Perfect for those who want to learn at their own pace or have specific requests.",
+"link": "https://marteeeen.com/lessons/"
+}
+This output includes the following props:
+* "sectionSubtitle": A subtitle for the section, which is "Dance Lessons for All Levels".
+* "sectionTitle": The title of the section, which is "Lessons Offered".
+* "itemSubtitle1", "itemTitle1", "itemDescription1": These props are used to define the first item in the list of lessons, which is beginner. The subtitle is "Beginner", the title is "Introduction to Latin Dance", and the description is "Learn the basics of Latin dance, including salsa, bachata, and cha cha cha. Perfect for beginners looking to get started or those who want to refresh their skills."
+* "itemSubtitle2", "itemTitle2", "itemDescription2": These props are used to define the second item in the list of lessons, which is intermediate. The subtitle is "Intermediate", the title is "Advanced Techniques", and the description is "Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance."
+* "itemSubtitle3", "itemTitle3", "itemDescription3": These props are used to define the third item in the list of lessons, which is advanced. The subtitle is "Advanced", the title is "Performance Training", and the description is "For those looking to take their dancing to the next level, our advanced lessons focus on performance techniques and styling. Prior experience in Latin dance is required."
+* "itemSubtitle4", "itemTitle4", "itemDescription4": These props are used to define the fourth item in the list of lessons, which is private lessons. The subtitle is "Private Lessons", the title is "Customized Instruction", and the description is "Get one-on-one instruction tailored to your needs and goals. Perfect for those who want to learn at their own pace or have specific requests."
+* "link": The link prop is used to define the URL of the lessons page, which is "https://marteeeen.com/lessons/".".`;
+
+            expect(asJSON(response)).toEqual({
+                sectionSubtitle: 'Dance Lessons for All Levels',
+                sectionTitle: 'Lessons Offered',
+                itemSubtitle1: 'Beginner',
+                itemTitle1: 'Introduction to Latin Dance',
+                itemDescription1:
+                    'Learn the basics of Latin dance, including salsa, bachata, and cha cha cha. Perfect for beginners looking to get started or those who want to refresh their skills.',
+                itemSubtitle2: 'Intermediate',
+                itemTitle2: 'Advanced Techniques',
+                itemDescription2:
+                    'Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance.',
+                itemSubtitle3: 'Advanced',
+                itemTitle3: 'Performance Training',
+                itemDescription3:
+                    'For those looking to take their dancing to the next level, our advanced lessons focus on performance techniques and styling. Prior experience in Latin dance is required.',
+                itemSubtitle4: 'Private Lessons',
+                itemTitle4: 'Customized Instruction',
+                itemDescription4:
+                    'Get one-on-one instruction tailored to your needs and goals. Perfect for those who want to learn at their own pace or have specific requests.',
+                link: 'https://marteeeen.com/lessons/',
+            });
+        });
     });
 });

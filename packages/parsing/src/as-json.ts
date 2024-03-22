@@ -122,8 +122,15 @@ function isValidContext({
                 );
             }
             return true;
-        default:
+        case ':':
+            return controlChar === '}' && isPreceededBy({ char: '"', index, text });
+        case ' ':
+        case '\r':
+        case '\n':
+        case '\t':
             return true;
+        default:
+            return false;
     }
 }
 
