@@ -3,8 +3,8 @@ type Optional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Typ
 type IndexOfClosestCharFullPayload = {
     char: string;
     chars: Array<string> | Set<string>;
-    index: number;
-    step?: number;
+    index?: number; // defaults to last character in text
+    step?: number; // defaults to 1
     text: string;
 };
 
@@ -19,9 +19,9 @@ const WHITESPACE_CHARS = new Set([' ', '\n', '\r', '\t']);
 function indexOfClosestChar({
     char,
     chars,
-    index,
     step = 1,
     text,
+    index = text.length - 1,
 }: IndexOfClosestCharPayload) {
     const charsSet = chars ? new Set(chars) : null;
     for (index += step; index >= 0 && index < text.length; index += step) {
