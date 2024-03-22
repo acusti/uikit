@@ -261,6 +261,27 @@ export function parseAsJSON(
                 stack.push(']');
             } else if (char === '}' || char === ']') {
                 if (stack.length && stack.at(-1) === char) {
+                    if (char === '}' && stack.length === 1) {
+                        // if this is the last closing brace, it should be the end of the JSON.
+                        // if it is followed by a key, skip this closing brace and continue to process.
+                        const commaIndex = indexOfClosestChar({
+                            char: ',',
+                            index,
+                            text,
+                        });
+                        const startIndex = commaIndex > index ? commaIndex : index;
+                        const quoteIndex = indexOfClosestChar({
+                            char: '"',
+                            index: startIndex,
+                            text,
+                        });
+                        const maybeKey =
+                            quoteIndex > index ? text.slice(quoteIndex) : '';
+                        if (OBJECT_KEY_REGEXP.test(maybeKey)) {
+                            continue;
+                        }
+                    }
+
                     stack.pop();
                     // ensure that we have a trailing comma if needed
                     if (isFollowedBy({ chars: ['"', '{', '['], index, text })) {

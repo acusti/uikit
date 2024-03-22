@@ -533,5 +533,27 @@ Props:
                     '\nAt Cinco Design, we believe that print design is not just about creating visually appealing materials, but also about effectively communicating your message to your target audience. Our team of experienced designers works closely with you to understand your brand, your audience, and your goals, and then crafts a unique print design solution that captures your essence and resonates with your audience.\n\nOur print design services include:\n\n- Branding and identity design: We create a cohesive visual identity for your brand, including logos, business cards, letterheads, and more.\n- Marketing collateral: We design brochures, flyers, posters, and other marketing materials that effectively promote your products or services.\n- Packaging design: We design packaging that not only protects your products but also enhances their appeal and makes them stand out on the shelf.\n- Publication design: We design magazines, newspapers, books, and other publications that are visually engaging and easy to navigate.\n\nLet us help you make a lasting impression with our print design services. Contact us today to discuss your project and see how we can bring your vision to life.',
             });
         });
+
+        it('detects premature closing curly brace and ignores it', () => {
+            const response =
+                '```json\n{"heading":"Organic Produce","subheading":"The Benefits of Going Organic","description":"Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers."},"items":[{"heading":"Organic Fruits","subheading":"Nature\'s Sweet Treats"},{"heading":"Organic Vegetables","subheading":"Fresh from the Garden"}]}\n```';
+
+            expect(parseAsJSON(response)).toEqual({
+                heading: 'Organic Produce',
+                subheading: 'The Benefits of Going Organic',
+                description:
+                    'Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers.',
+                items: [
+                    {
+                        heading: 'Organic Fruits',
+                        subheading: "Nature's Sweet Treats",
+                    },
+                    {
+                        heading: 'Organic Vegetables',
+                        subheading: 'Fresh from the Garden',
+                    },
+                ],
+            });
+        });
     });
 });
