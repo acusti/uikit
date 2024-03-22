@@ -146,7 +146,10 @@ function lengthOf(item: unknown): number {
         case 'object':
             if (!item) return 0;
             if (Array.isArray(item)) {
-                return item.reduce((acc, item) => acc + lengthOf(item), 0);
+                return item.reduce(
+                    (acc: number, item) => acc + lengthOf(item),
+                    0,
+                ) as number;
             }
             return Object.keys(item).reduce(
                 (acc, key) => acc + key.length + lengthOf((item as GenericObject)[key]),
@@ -159,17 +162,17 @@ function lengthOf(item: unknown): number {
 
 const OBJECT_KEY_REGEXP = /^"[^"]+":/;
 
+type ParsedValue = string | boolean | number | GenericObject | Array<unknown>;
+
 // Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
 // MIT License
-export function parseAsJSON(
-    text: string,
-): string | boolean | number | GenericObject | Array<unknown> | null {
+export function parseAsJSON(text: string): ParsedValue | null {
     // if the input is undefined/null, return null to indicate failure
     if (text == null) return null;
 
     // attempt to parse the string as-is
     try {
-        return JSON.parse(text);
+        return JSON.parse(text) as ParsedValue;
     } catch (error) {
         // let’s try to fix it
     }
@@ -179,7 +182,7 @@ export function parseAsJSON(
     // if this is a two-column markdown table, convert it to JSON key/value pairs
     text = text.replace(
         /^\| (.+?) \| (.+?)(?: \|)+$/gm,
-        (_match, key, value) =>
+        (_match, key: string, value: string) =>
             `"${key.replace(/(^"|"$)/g, '')}": "${value.replace(/(^"|"$)/g, '')}",`,
     );
 
@@ -275,8 +278,7 @@ export function parseAsJSON(
                             index: startIndex,
                             text,
                         });
-                        const maybeKey =
-                            quoteIndex > index ? text.slice(quoteIndex) : '';
+                        const maybeKey = quoteIndex > index ? text.slice(quoteIndex) : '';
                         if (OBJECT_KEY_REGEXP.test(maybeKey)) {
                             continue;
                         }
@@ -319,7 +321,7 @@ export function parseAsJSON(
     // attempt to parse the modified string as JSON
     let result = null;
     try {
-        result = JSON.parse(newText);
+        result = JSON.parse(newText) as ParsedValue;
     } catch (error) {
         // in case of error, return null (after checking remainder of text)
     }
