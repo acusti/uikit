@@ -383,5 +383,50 @@ Props:
                 '  Here is a sample JSON output for the "Branding Portfolio"';
             expect(asJSON(response)).toEqual('');
         });
+
+        it('detects responses where the response restarts halfway through', () => {
+            const response = `\
+  Sure, here's an example JSON output for the "Contributor Profiles" section:
+{
+"sectionTitle": "Our Contributors",
+"sectionDescription": "Meet the talented team of writers, analysts, and experts who make Defector possible.",
+"itemSubtitle1": "Sports Journalist",
+"itemTitle1": "Joe Smith",
+"itemDescription1": "Joe is a veteran sports journalist with over 10 years of experience covering the NFL, NBA, and MLB. He has written for several major publications and is known for his in-depth analysis and insightful commentary.",
+"itemSubtitle2": "Data Analyst",
+"itemTitle2": "Jane Doe",
+"itemDescription2": "Jane is a data analyst with a background in statistics and computer  Sure, here's an example JSON output for the "Contributor Profiles" section:
+{
+"sectionTitle": "Our Contributors",
+"sectionDescription": "Meet the talented team of writers, analysts, and experts who make Defector possible.",
+"itemSubtitle1": "Sports Journalist",
+"itemTitle1": "Joe Smith",
+"itemDescription1": "Joe is a veteran sports journalist with over 10 years of experience covering the NFL, NBA, and MLB. He has written for several major publications and is known for his in-depth analysis and insightful commentary."
+"itemSubtitle2": "Data Analyst",
+"itemTitle2": "Jane Doe",
+"itemDescription2": "Jane is a data analyst with a background in statistics and computer science. She uses her skills to provide detailed analysis and visualizations of sports data, helping readers gain a deeper understanding of the game."
+"itemSubtitle3": "Sports Historian",
+"itemTitle3": "John Johnson",
+"itemDescription3": "John is a sports historian with a Ph.D. in American Studies. He has written several books on the history of sports and is a frequent guest on sports talk shows, providing historical context and perspective."
+}`;
+
+            expect(asJSON(response)).toEqual({
+                sectionTitle: 'Our Contributors',
+                sectionDescription:
+                    'Meet the talented team of writers, analysts, and experts who make Defector possible.',
+                itemSubtitle1: 'Sports Journalist',
+                itemTitle1: 'Joe Smith',
+                itemDescription1:
+                    'Joe is a veteran sports journalist with over 10 years of experience covering the NFL, NBA, and MLB. He has written for several major publications and is known for his in-depth analysis and insightful commentary.',
+                itemSubtitle2: 'Data Analyst',
+                itemTitle2: 'Jane Doe',
+                itemDescription2:
+                    'Jane is a data analyst with a background in statistics and computer science. She uses her skills to provide detailed analysis and visualizations of sports data, helping readers gain a deeper understanding of the game.',
+                itemSubtitle3: 'Sports Historian',
+                itemTitle3: 'John Johnson',
+                itemDescription3:
+                    'John is a sports historian with a Ph.D. in American Studies. He has written several books on the history of sports and is a frequent guest on sports talk shows, providing historical context and perspective.',
+            });
+        });
     });
 });

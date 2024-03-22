@@ -159,6 +159,7 @@ export function asJSON(text: string): ReturnValue | null {
     let isInsideString = false;
 
     // identify start of JSON
+    const originalText = text;
     let previousText;
     do {
         previousText = text;
@@ -176,6 +177,22 @@ export function asJSON(text: string): ReturnValue | null {
     // if the first character is a key, add opening curly brace
     if (OBJECT_KEY_REGEXP.test(text)) {
         text = '{' + text;
+    }
+    // if the preamble is long, check if it appears twice in the text.
+    // if it does, the model must’ve restarted part of the way through.
+    const lengthDifference = originalText.length - text.length;
+    if (lengthDifference > 25) {
+        const preamble = originalText.slice(0, lengthDifference);
+        const preambleIndex = text.indexOf(preamble, 1);
+        if (preambleIndex > -1) {
+            // use the response after the repeated preamble if it’s longer than what’s before
+            if (preambleIndex + lengthDifference < text.length / 2) {
+                text = text.slice(preambleIndex + lengthDifference);
+            } else {
+                // otherwise use the text up until the repeated preamble
+                text = text.slice(0, preambleIndex);
+            }
+        }
     }
 
     // process each character in the string one at a time
