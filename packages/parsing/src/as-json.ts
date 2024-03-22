@@ -4,6 +4,7 @@ type IndexOfClosestCharFullPayload = {
     char: string;
     chars: Array<string> | Set<string>;
     index: number;
+    step?: number;
     text: string;
 };
 
@@ -19,10 +20,11 @@ function indexOfClosestChar({
     char,
     chars,
     index,
+    step = 1,
     text,
 }: IndexOfClosestCharPayload) {
     const charsSet = chars ? new Set(chars) : null;
-    for (index += 1; index < text.length; index++) {
+    for (index += step; index >= 0 && index < text.length; index += step) {
         const nextCharacter = text[index];
         // if this is a match, return true
         if (char && nextCharacter === char) return index;
@@ -36,8 +38,18 @@ function indexOfClosestChar({
     return -1;
 }
 
-function isFollowedBy(payload: IndexOfClosestCharPayload) {
+type FollowedByFullPayload = Omit<IndexOfClosestCharFullPayload, 'step'>;
+
+type FollowedByPayload =
+    | Optional<FollowedByFullPayload, 'char'>
+    | Optional<FollowedByFullPayload, 'chars'>;
+
+function isFollowedBy(payload: FollowedByPayload) {
     return indexOfClosestChar(payload) > -1;
+}
+
+function isPreceededBy(payload: FollowedByPayload) {
+    return indexOfClosestChar({ ...payload, step: -1 }) > -1;
 }
 
 type ReturnValue = string | boolean | number | Record<string, unknown> | Array<unknown>;
