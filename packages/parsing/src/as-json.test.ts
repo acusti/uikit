@@ -271,6 +271,10 @@ Here are some of the services we offer:
                 contentLi: '',
             });
 
+            response =
+                '  Here is a sample JSON output for the "Branding Portfolio"';
+            expect(parseAsJSON(response)).toEqual('');
+
             response = `\
   Here is the JSON output for the "Meet the Team" page:
 {
@@ -391,12 +395,6 @@ Props:
                 blogPostLede3:
                     "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
             });
-        });
-
-        it('handles partial responses without getting stuck', () => {
-            const response =
-                '  Here is a sample JSON output for the "Branding Portfolio"';
-            expect(parseAsJSON(response)).toEqual('');
         });
 
         it('detects responses where the response restarts halfway through', () => {
