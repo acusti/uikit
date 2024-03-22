@@ -23,14 +23,17 @@ yarn add @acusti/date-picker
 
 ### Example
 
-To render a two-up date picker for selecting date ranges, handling date selections via the `onChange` prop and showing months using abbreviations:
+To render a two-up date picker for selecting date ranges, handling date
+selections via the `onChange` prop and showing months using abbreviations:
 
 ```tsx
 import { DatePicker } from '@acusti/date-picker';
 import { useCallback, useState } from 'react';
 
 function Popover() {
-    const [dateRangeStart, setDateRangeStart] = useState<null | string>(null);
+    const [dateRangeStart, setDateRangeStart] = useState<null | string>(
+        null,
+    );
     const [dateRangeEnd, setDateRangeEnd] = useState<null | string>(null);
 
     const handleDateRangeChange = useCallback(({ dateEnd, dateStart }) => {
@@ -47,7 +50,7 @@ function Popover() {
             onChange={handleDateRangeChange}
             useMonthAbbreviations
         />
-    )
+    );
 }
 ```
 
