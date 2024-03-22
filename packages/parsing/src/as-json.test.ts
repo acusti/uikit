@@ -74,18 +74,18 @@ Here is the JSON output for the "About Us" page based on the provided props:
 
         it('should handle JSON with trailing comma-separators', () => {
             const response = `\
-  {
-  "sectionTitle": "Meet the Team",
-  "item1Content": "Tom Ryder - Owner & Wine Director",
-  "item1AttributionLine1": "Learn more about Tom's passion for wine and his journey to opening Ryders",
-  "item1AttributionLine2": "Read about Tom's experience in the wine industry and his approach to curating Ryders' wine list",
-  "item2Content": "Sarah Johnson - Wine Educator",
-  "item2AttributionLine1": "Discover Sarah's background in wine and her role in educating customers at Ryders",
-  "item2AttributionLine2": "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
-  "item3Content": "Mike Smith - Cheese Specialist",
-  "item3AttributionLine1": "Find out more about Mike's expertise in cheese and his role in curating Ryders' selection",
-  "item3AttributionLine2": "Read about Mike's favorite cheese pairings and his recommendations for unique flavor combinations",
-  }`;
+{
+"sectionTitle": "Meet the Team",
+"item1Content": "Tom Ryder - Owner & Wine Director",
+"item1AttributionLine1": "Learn more about Tom's passion for wine and his journey to opening Ryders",
+"item1AttributionLine2": "Read about Tom's experience in the wine industry and his approach to curating Ryders' wine list",
+"item2Content": "Sarah Johnson - Wine Educator",
+"item2AttributionLine1": "Discover Sarah's background in wine and her role in educating customers at Ryders",
+"item2AttributionLine2": "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
+"item3Content": "Mike Smith - Cheese Specialist",
+"item3AttributionLine1": "Find out more about Mike's expertise in cheese and his role in curating Ryders' selection",
+"item3AttributionLine2": "Read about Mike's favorite cheese pairings and his recommendations for unique flavor combinations",
+}`;
             expect(asJSON(response)).toEqual({
                 item1AttributionLine1:
                     "Learn more about Tom's passion for wine and his journey to opening Ryders",
@@ -108,7 +108,7 @@ Here is the JSON output for the "About Us" page based on the provided props:
 
         it('should strip invalid JSON when the LLM response goes off the rails', () => {
             const response = `\
-Here is the JSON output for the "Meet the Team" page:
+  Here is the JSON output for the "Meet the Team" page:
 {
 "callToAction": "Learn More",
 "heading": "Meet the Team",
@@ -157,16 +157,43 @@ Here is the JSON output for the "Meet the Team" page:
 "description": "Redesign of a popular magazine, focusing on a clean and minimalist aesthetic, with a new layout and typography. The goal was to create a more modern and sophisticated look and feel.",
 "image": "https://pentagram.com/images/magazine.jpg",
 "altText": "Magazine"
+
 },
 {
 "description": "Website design for a non-profit organization, featuring a clean and intuitive layout, with a focus on accessibility and user experience. The goal was to create a user-friendly platform that would allow the organization to effectively communicate their mission and goals.",
 "image": "https://pentagram.com/images/non-profit.jpg",
 "altText": "Non-Profit Organization"
+
 }
+
 ]
+
 }}`;
-            const props = asJSON(response);
-            expect(Object.keys(props!).length).toBe(3);
+            expect(asJSON(response)).toEqual({
+                heading: 'Notable Projects',
+                subheading:
+                    'Explore some of our most successful and innovative designs',
+                projects: [
+                    {
+                        description:
+                            'Design for a new skyscraper in the city center, featuring a sleek and modern aesthetic. The building features a large atrium and floor-to-ceiling windows, providing an abundance of natural light and stunning views of the city skyline.',
+                        image: 'https://pentagram.com/images/skyscraper.jpg',
+                        altText: 'Skyscraper',
+                    },
+                    {
+                        description:
+                            'Redesign of a popular magazine, focusing on a clean and minimalist aesthetic, with a new layout and typography. The goal was to create a more modern and sophisticated look and feel.',
+                        image: 'https://pentagram.com/images/magazine.jpg',
+                        altText: 'Magazine',
+                    },
+                    {
+                        description:
+                            'Website design for a non-profit organization, featuring a clean and intuitive layout, with a focus on accessibility and user experience. The goal was to create a user-friendly platform that would allow the organization to effectively communicate their mission and goals.',
+                        image: 'https://pentagram.com/images/non-profit.jpg',
+                        altText: 'Non-Profit Organization',
+                    },
+                ],
+            });
         });
 
         it('should handle unterminated string values and invalid object nesting', () => {

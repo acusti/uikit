@@ -52,53 +52,137 @@ function isPreceededBy(payload: FollowedByPayload) {
     return indexOfClosestChar({ ...payload, step: -1 }) > -1;
 }
 
+const VALUE_DELIMITER_CHARS = new Set([
+    '"',
+    '0',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+]);
+
+const VALUE_START_CHARS = VALUE_DELIMITER_CHARS.add('{').add('[');
+const VALUE_END_CHARS = VALUE_DELIMITER_CHARS.add('}').add(']');
+
+function isValidContext({
+    char,
+    controlChar,
+    original,
+    originalIndex,
+    text,
+}: {
+    char: string;
+    controlChar?: string;
+    original: string;
+    originalIndex: number;
+    text: string;
+}) {
+    const index = text.length - 1 + char.length;
+    switch (char) {
+        case '{':
+        case '[':
+            if (text.length === 0) return true; // 1st character in text is a valid context
+            if (controlChar === ']') return true; // as an item inside an array is a valid context
+            // as the value of a key/value pair is a valid context
+            return isPreceededBy({ char: ':', index, text });
+        case '}':
+        case ']':
+            return char === controlChar;
+        case '"':
+            if (text.length === 0) return true; // 1st character in text is a valid context
+            if (controlChar === ']') return true; // as an item inside an array is a valid context
+            if (controlChar === '}') return true; // as key or value inside an object is a valid context
+            return false;
+        case ',':
+            // valid context for a comma in an array is in between array items
+            if (controlChar === ']') {
+                return (
+                    isPreceededBy({ chars: VALUE_END_CHARS, index, text }) &&
+                    isFollowedBy({
+                        chars: VALUE_START_CHARS,
+                        index: originalIndex,
+                        text: original,
+                    })
+                );
+            }
+            // valid context for a comma in an object is in between key/value pairs
+            if (controlChar === '}') {
+                return (
+                    isPreceededBy({ chars: VALUE_END_CHARS, index, text }) &&
+                    isFollowedBy({
+                        char: '"',
+                        index: originalIndex,
+                        text: original,
+                    })
+                );
+            }
+            return true;
+        default:
+            return true;
+    }
+}
+
 type ReturnValue = string | boolean | number | Record<string, unknown> | Array<unknown>;
 
 // Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
 // MIT License
 export const parsePartialJSON = (text: string): ReturnValue | null => {
-    // If the input is undefined/null, return null to indicate failure.
+    // if the input is undefined/null, return null to indicate failure
     if (text == null) return null;
 
-    // Attempt to parse the string as-is.
+    // attempt to parse the string as-is
     try {
         return JSON.parse(text);
     } catch (error) {
-        // Pass
+        // let’s try to fix it
     }
 
     text = text.trim();
 
-    // Initialize variables.
+    // initialize variables
     let newText = '';
     const stack = [];
     let isInsideString = false;
 
-    // Process each character in the string one at a time.
+    // identify start of JSON
+    do {
+        text = text.replace(/^[^{[]+/, '');
+    } while (
+        // if new start is [, ensure it’s an array & not part of preamble
+        text[0] === '[' &&
+        !isFollowedBy({ chars: VALUE_START_CHARS, index: 0, text })
+    );
+
+    // process each character in the string one at a time
     for (let index = 0; index < text.length; index++) {
         let char = text[index];
         if (isInsideString) {
-            if (char === '"' && text[index - 1] !== '\\') {
-                // If this quotemark starts a new string value, there was a
-                // missing closing quote + comma from the last string value.
+            if (char === '"' && newText.at(-1) !== '\\') {
+                // if this quotemark starts a new string value, there was a
+                // missing closing quote amd comma from the last string value
                 const nextChar = text[index + 1];
                 if (nextChar && /[a-z]/i.test(nextChar)) {
-                    char = '","';
+                    newText += '",';
                 } else {
                     isInsideString = false;
-                    // Ensure that the closing quote is followed by a comma
-                    // if another string key follows.
+                    // ensure the closing quote is followed by a comma if a key follows
                     if (isFollowedBy({ char: '"', index, text })) {
-                        char += ',';
+                        newText += char;
+                        char = ',';
                     }
                 }
-            } else if (char === '\n') {
-                // If not escaped, escape the newline character now.
-                if (text[index - 1] !== '\\') {
-                    char = '\\n';
-                }
+            } else if (char === '\n' && newText.at(-1) !== '\\') {
+                // if not escaped, escape the newline character now
+                char = '\\n';
             }
         } else {
+            const controlChar = stack.at(-1);
+            const previousStackLength = stack.length;
             if (char === '"') {
                 isInsideString = true;
             } else if (char === '{') {
@@ -106,62 +190,67 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
             } else if (char === '[') {
                 stack.push(']');
             } else if (char === '}' || char === ']') {
-                if (stack && stack.at(-1) === char) {
+                if (stack.length && stack.at(-1) === char) {
                     stack.pop();
-                    // Ensure that we have a trailing comma if needed.
+                    // ensure that we have a trailing comma if needed
                     if (isFollowedBy({ chars: ['"', '{', '['], index, text })) {
-                        char += ',';
+                        newText += char;
+                        char = ',';
                     }
-                } else {
-                    // Mismatched closing character; the input is malformed.
-                    char = '';
                 }
-            } else if (char === ',') {
-                // If this is a trailing comma, remove it.
-                if (!isFollowedBy({ char: '"', index, text })) {
-                    char = '';
+            }
+
+            const validContextPayload = {
+                char,
+                controlChar,
+                original: text,
+                originalIndex: index,
+                text: newText,
+            };
+            // handle invalid characters outside of a string value
+            if (!isValidContext(validContextPayload)) {
+                // if we just added to the stack, remove it
+                if (stack.length > previousStackLength) {
+                    stack.pop();
                 }
+                // if previous character was a comma, remove it
+                const trailingCommaIndex = indexOfClosestChar({
+                    char: ',',
+                    step: -1,
+                    text: newText,
+                });
+                if (trailingCommaIndex > 0) {
+                    newText = newText.substring(0, trailingCommaIndex);
+                }
+                break;
             }
         }
 
-        // Append the processed character to the new string.
+        // append the processed character to the new string
         newText += char;
     }
 
-    // If we’re still inside a string at the end of processing,
-    // we need to close the string.
+    // if we’re still inside a string, close it
     if (isInsideString) {
         newText += '"';
     }
 
-    // Close any remaining open structures in the reverse order that they were opened.
+    // if we are in the key of a key/value pair, append ': ""' to close the pair
+    if (stack.at(-1) === '}' && /[{,][^:"]*"[^"]*"$/.test(newText)) {
+        newText += ': ""';
+    }
+    // close any remaining open structures in the reverse order that they were opened
     for (let index = stack.length - 1; index >= 0; index--) {
         newText += stack[index];
     }
-
-    // Attempt to parse the modified string as JSON.
+    // attempt to parse the modified string as JSON
     try {
         return JSON.parse(newText);
     } catch (error) {
-        // Try again from before the closest delimiter.
-        let resetText = newText;
-        while (resetText && /["[\]{}]/.test(resetText.at(-1)!)) {
-            resetText = resetText.slice(0, -1);
-        }
-        const endIndex = resetText.search(/[^"[\]{}]*$/);
-        if (endIndex > 4 && endIndex < newText.length - 2) {
-            return parsePartialJSON(newText.substring(0, endIndex - 1));
-        }
-        // If we still can't parse the string as JSON,
-        // return null to indicate failure.
         return null;
     }
 };
 
 export function asJSON(result: string): ReturnValue | null {
-    result = result.substring(
-        Math.max(result.indexOf('{'), 0),
-        Math.max(result.lastIndexOf('}'), result.length),
-    );
     return parsePartialJSON(result);
 }
