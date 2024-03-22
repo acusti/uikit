@@ -301,6 +301,22 @@ Props:
                 heading1: 'News',
                 subheading2: '',
             });
+
+            response = `\
+  Here is the JSON output for the "Benefits" page:
+{
+"teamMemberName1": "Jane Smith",
+"teamMemberImage1": "/images/team-member-1.jpg",
+"teamMemberJobTitle1": "Product  Here is the JSON output for the "Testimonials" page based on the provided props:`;
+
+            expect(parseAsJSON(response)).toEqual({
+                teamMemberName1: 'Jane Smith',
+                teamMemberImage1: '/images/team-member-1.jpg',
+                // the erroneous quotemark is treated as the end of the value:
+                teamMemberJobTitle1: 'Product  Here is the JSON output for the ',
+                // "Testimonials" becomes a key, then parser hits an invalid value and bails:
+                Testimonials: '',
+            });
         });
 
         it('should detect and strip detailed pre- and post-amble text', () => {
