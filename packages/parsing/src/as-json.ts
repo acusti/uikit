@@ -131,7 +131,7 @@ type ReturnValue = string | boolean | number | Record<string, unknown> | Array<u
 
 // Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
 // MIT License
-export const parsePartialJSON = (text: string): ReturnValue | null => {
+export function asJSON(text: string): ReturnValue | null {
     // if the input is undefined/null, return null to indicate failure
     if (text == null) return null;
 
@@ -249,8 +249,4 @@ export const parsePartialJSON = (text: string): ReturnValue | null => {
     } catch (error) {
         return null;
     }
-};
-
-export function asJSON(result: string): ReturnValue | null {
-    return parsePartialJSON(result);
 }
