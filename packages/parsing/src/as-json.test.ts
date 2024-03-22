@@ -168,5 +168,100 @@ Here is the JSON output for the "Meet the Team" page:
             const props = asJSON(response);
             expect(Object.keys(props!).length).toBe(3);
         });
+
+        it('should handle unterminated string values and invalid object nesting', () => {
+            const response = `\
+  Sure, here's an example JSON output for the "Services" section based on the provided information:
+{
+"bodyCopy": "At the Cleveland Clinic Wound Center in Vero Beach, Florida, we offer a range of services to help you manage your wounds and promote healing. Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible.
+Here are some of the services we offer:
+{
+"contentList1": [
+{
+"title": "Wound Care",
+"description": "Our wound care services are designed to help you manage and treat your wounds, including cleaning and dressing the wound, managing infection, and promoting healing. We use the latest techniques and technologies to ensure the best possible outcomes.",
+"content": "Wound care"
+},
+{
+"title": "Hyperbaric Oxygen Therapy",
+
+"description": "Hyperbaric oxygen therapy is a non-invasive treatment that uses pure oxygen to promote healing and reduce inflammation. We use a state-of-the-art hyperbaric chamber to deliver the oxygen to your body, helping to speed up the healing process.",
+"content": "Hyperbaric oxygen therapy"
+},
+{
+"title": "Surgical Debridement",
+
+"description": "Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.",
+"content": "Surgical debridement"
+}
+]
+
+"contentList2": [
+
+{
+
+"title": "Other Services",
+
+"description": "In addition to our core services, we also offer a range of other services to help you manage your wounds and promote healing. These include wound assessment and monitoring, pain management, and education on wound care and prevention.",
+"content": "Other services"
+}
+]
+
+"contentList3": [
+
+{
+
+"title": "Our Team",
+
+"description": "Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible. Meet our team of experts today.",
+"content": "Our team"
+}
+]
+
+}}`;
+            expect(asJSON(response)).toEqual({
+                bodyCopy: `\
+At the Cleveland Clinic Wound Center in Vero Beach, Florida, we offer a range of services to help you manage your wounds and promote healing. Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible.
+Here are some of the services we offer:
+{
+`,
+                contentList1: [
+                    {
+                        content: 'Wound care',
+                        description:
+                            'Our wound care services are designed to help you manage and treat your wounds, including cleaning and dressing the wound, managing infection, and promoting healing. We use the latest techniques and technologies to ensure the best possible outcomes.',
+                        title: 'Wound Care',
+                    },
+                    {
+                        content: 'Hyperbaric oxygen therapy',
+                        description:
+                            'Hyperbaric oxygen therapy is a non-invasive treatment that uses pure oxygen to promote healing and reduce inflammation. We use a state-of-the-art hyperbaric chamber to deliver the oxygen to your body, helping to speed up the healing process.',
+                        title: 'Hyperbaric Oxygen Therapy',
+                    },
+                    {
+                        content: 'Surgical debridement',
+                        description:
+                            'Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.',
+                        title: 'Surgical Debridement',
+                    },
+                ],
+                contentList2: [
+                    {
+                        content: 'Other services',
+                        description:
+                            'In addition to our core services, we also offer a range of other services to help you manage your wounds and promote healing. These include wound assessment and monitoring, pain management, and education on wound care and prevention.',
+                        title: 'Other Services',
+                    },
+                ],
+                contentList3: [
+                    {
+                        content: 'Our team',
+                        description:
+                            'Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible. Meet our team of experts today.',
+                        title: 'Our Team',
+                    },
+                ],
+            });
+        });
     });
 });
