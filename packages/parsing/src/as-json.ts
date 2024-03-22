@@ -201,8 +201,24 @@ export function asJSON(text: string): ReturnValue | null {
                 char = '\\n';
             }
         } else {
-            const controlChar = stack.at(-1);
-            const previousStackLength = stack.length;
+            const validContextPayload = {
+                char,
+                controlChar: stack.at(-1),
+                original: text,
+                originalIndex: index,
+                text: newText,
+            };
+            // handle invalid characters outside of a string value
+            if (!isValidContext(validContextPayload)) {
+                // if previous character was a comma, remove it
+                const trailingPayload = { char: ',', step: -1, text: newText };
+                const trailingCommaIndex = indexOfClosestChar(trailingPayload);
+                if (trailingCommaIndex > 0) {
+                    newText = newText.substring(0, trailingCommaIndex);
+                }
+                break;
+            }
+
             if (char === '"') {
                 isInsideString = true;
             } else if (char === '{') {
@@ -218,31 +234,6 @@ export function asJSON(text: string): ReturnValue | null {
                         char = ',';
                     }
                 }
-            }
-
-            const validContextPayload = {
-                char,
-                controlChar,
-                original: text,
-                originalIndex: index,
-                text: newText,
-            };
-            // handle invalid characters outside of a string value
-            if (!isValidContext(validContextPayload)) {
-                // if we just added to the stack, remove it
-                if (stack.length > previousStackLength) {
-                    stack.pop();
-                }
-                // if previous character was a comma, remove it
-                const trailingCommaIndex = indexOfClosestChar({
-                    char: ',',
-                    step: -1,
-                    text: newText,
-                });
-                if (trailingCommaIndex > 0) {
-                    newText = newText.substring(0, trailingCommaIndex);
-                }
-                break;
             }
         }
 
