@@ -323,6 +323,19 @@ Here are some of the services we offer:
                 subheading:
                     'Our bakery is built on the foundation of passionate individuals who are dedicated to creating the best sourdough bread in North Lake Tahoe. Meet the team behind Masa Madre.',
             });
+
+            response = `\
+  Here are the props for the News Archive page based on the provided description and previous conversations:
+Props:
+"subheading1": "Explore Our News Archive",
+"heading1": "News",
+"subheading2":`;
+
+            expect(asJSON(response)).toEqual({
+                subheading1: 'Explore Our News Archive',
+                heading1: 'News',
+                subheading2: '',
+            });
         });
 
         it('should detect and strip detailed pre- and post-amble text', () => {

@@ -255,10 +255,16 @@ export function asJSON(text: string): ReturnValue | null {
         newText += '"';
     }
 
-    // if we are in the key of a key/value pair, append ': ""' to close the pair
-    if (stack.at(-1) === '}' && /[{,][^:"]*"[^"]*"$/.test(newText)) {
-        newText += ': ""';
+    if (stack.at(-1) === '}') {
+        // if we are in the key of a key/value pair, append ': ""' to close the pair
+        if (/[{,][^:"]*"[^"]*"$/.test(newText)) {
+            newText += ': ""';
+        } else if (/": ?$/.test(newText)) {
+            // if we are in between a key/value pair, append '""' to close the pair
+            newText += '""';
+        }
     }
+
     // close any remaining open structures in the reverse order that they were opened
     for (let index = stack.length - 1; index >= 0; index--) {
         newText += stack[index];
