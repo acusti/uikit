@@ -164,8 +164,6 @@ const OBJECT_KEY_REGEXP = /^"[^"]+":/;
 
 type ParsedValue = string | boolean | number | GenericObject | Array<unknown>;
 
-// Adapted from https://github.com/langchain-ai/langchainjs/blob/215dd52/langchain-core/src/output_parsers/json.ts#L58
-// MIT License
 export function parseAsJSON(text: string): ParsedValue | null {
     // if the input is undefined/null, return null to indicate failure
     if (text == null) return null;
