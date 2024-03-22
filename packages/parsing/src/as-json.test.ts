@@ -144,7 +144,7 @@ describe('@acusti/parsing', () => {
         });
 
         it('should handle too many closing curly braces', () => {
-            const response = `\
+            let response = `\
 {
 "heading": "Notable Projects",
 "subheading": "Explore some of our most successful and innovative designs",
@@ -158,11 +158,9 @@ describe('@acusti/parsing', () => {
 "description": "Website design for a non-profit organization, featuring a clean and intuitive layout, with a focus on accessibility and user experience. The goal was to create a user-friendly platform that would allow the organization to effectively communicate their mission and goals.",
 "image": "https://pentagram.com/images/non-profit.jpg",
 "altText": "Non-Profit Organization"
-
 }
 
 ]
-
 }}`;
             expect(asJSON(response)).toEqual({
                 heading: 'Notable Projects',
@@ -182,6 +180,19 @@ describe('@acusti/parsing', () => {
                         altText: 'Non-Profit Organization',
                     },
                 ],
+            });
+
+            response = `\
+               Here is the JSON output for the "Locations" page based on the provided props:
+             {"contactEmail1":"info@masamadre.com","contactPhoneNumber1":"772.555.8989","addressLine1":"123 Main St.","addressLine2":"North Lake Tahoe CA 96150","officeHours":"Monday - Friday: 9:00am - 4:30pm","officeHoursDays":"Mon - Fri"}"}`;
+
+            expect(asJSON(response)).toEqual({
+                contactEmail1: 'info@masamadre.com',
+                contactPhoneNumber1: '772.555.8989',
+                addressLine1: '123 Main St.',
+                addressLine2: 'North Lake Tahoe CA 96150',
+                officeHours: 'Monday - Friday: 9:00am - 4:30pm',
+                officeHoursDays: 'Mon - Fri',
             });
         });
 
