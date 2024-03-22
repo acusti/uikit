@@ -159,15 +159,18 @@ export function asJSON(text: string): ReturnValue | null {
     let isInsideString = false;
 
     // identify start of JSON
+    let previousText;
     do {
+        previousText = text;
         // if text starts with a control char, it didn’t pass the while condition
         text = text.replace(/^[[{"]?[^[{"]+/, '');
     } while (
+        previousText !== text &&
         // if new start is [, ensure it’s an array & not part of preamble
-        (text[0] === '[' &&
+        ((text[0] === '[' &&
             !isFollowedBy({ chars: VALUE_START_CHARS, index: 0, text })) ||
-        // if new start is ", ensure it’s a JSON string & not part of preamble
-        (text[0] === '"' && !OBJECT_KEY_REGEXP.test(text))
+            // if new start is ", ensure it’s a JSON string & not part of preamble
+            (text[0] === '"' && !OBJECT_KEY_REGEXP.test(text)))
     );
 
     // if the first character is a key, add opening curly brace

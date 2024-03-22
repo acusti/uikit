@@ -412,5 +412,11 @@ This output includes the following props:
                     "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
             });
         });
+
+        it('handles partial responses without getting stuck', () => {
+            const response =
+                '  Here is a sample JSON output for the "Branding Portfolio"';
+            expect(asJSON(response)).toEqual('');
+        });
     });
 });
