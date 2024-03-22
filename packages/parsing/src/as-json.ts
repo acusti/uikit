@@ -230,6 +230,9 @@ export function parseAsJSON(
             } else if (char === '\n' && newText.at(-1) !== '\\') {
                 // if not escaped, escape the newline character now
                 char = '\\n';
+            } else if (char === '\\' && text[index + 1] !== '"') {
+                // handle character escaping ourselves unless it’s a quote
+                continue;
             }
         } else {
             const validContextPayload = {
