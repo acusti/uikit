@@ -446,6 +446,35 @@ Props:
                 description:
                     'At New Moon Natural Foods, we are committed to providing our community with the highest quality organic produce, locally-sourced meats, and carefully curated health and wellness products. We also offer a unique selection of beer, wine, and cheese, as well as all the best in natural grocery. Our family-owned market is dedicated to supporting local growers and artisans, while providing a welcoming and supportive environment for our customers to find the healthiest and most sustainable options for their families. Join us on your journey to a healthier way of life.',
             });
+
+            response = `\
+  Here is the JSON output for the "Benefits" page:
+{
+"teamMemberName1": "John Doe",
+"teamMemberImage1": "/images/team-member-1.jpg",
+"teamMemberJobTitle1": "Senior Sales Consultant",
+"teamMemberName2": "Jane Smith",
+"teamMemberImage2": "/images/team-member-2.jpg",
+"teamMemberJobTitle2": "Product  Here is the JSON output for the "Testimonials" page based on the provided props:
+{
+"teamMemberName1": "John Doe",
+"teamMemberImage1": "/images/john-doe.jpg",
+"teamMemberJobTitle1": "Regional Manager",
+"teamMemberName2": "Jane Smith",
+"teamMemberImage2": "/images/jane-smith.jpg",
+"teamMemberJobTitle2": "Senior Consultant",
+"teamMemberName3": "Bob Johnson",
+}
+`;
+            expect(parseAsJSON(response)).toEqual({
+                teamMemberName1: 'John Doe',
+                teamMemberImage1: '/images/john-doe.jpg',
+                teamMemberJobTitle1: 'Regional Manager',
+                teamMemberName2: 'Jane Smith',
+                teamMemberImage2: '/images/jane-smith.jpg',
+                teamMemberJobTitle2: 'Senior Consultant',
+                teamMemberName3: 'Bob Johnson',
+            });
         });
 
         it('parses a markdown table of two columns into key/value pairs', () => {
