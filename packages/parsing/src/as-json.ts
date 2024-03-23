@@ -185,9 +185,9 @@ export function parseAsJSON(text: string): ParsedValue | null {
     );
 
     // initialize variables
-    let newText = '';
-    const stack = [];
+    const stack: Array<string> = [];
     let isInsideString = false;
+    let newText = '';
 
     // identify start of JSON
     let previousText;
@@ -215,7 +215,7 @@ export function parseAsJSON(text: string): ParsedValue | null {
         let char = text[index];
         if (isInsideString) {
             if (char === '"' && newText.at(-1) !== '\\') {
-                // if this quotemark starts a new string value, there was a
+                // if this quote mark starts a new string value, there was a
                 // missing closing quote amd comma from the last string value
                 const nextChar = text[index + 1];
                 if (nextChar && /[a-z]/i.test(nextChar)) {
