@@ -533,6 +533,34 @@ Props:
             });
         });
 
+        it('handles unescaped double quotes', () => {
+            const response =
+                '```json\n{"heading":"The Team","subheading":"Meet the Starters","items":[{"heading":"Offense","subheading":"Quarterbacks","items":[{"heading":"1","subheading":"Jared Goff","description":"Jared Goff is a 6\'4", 225-pound quarterback who was drafted by the Rams in the first round of the 2016 NFL Draft. He has been the starting quarterback for the Rams since his rookie season and has led the team to multiple playoff appearances.","imageURL":"/players/jared-goff.jpg","imageAlt":"Jared Goff","imageCaption":"Jared Goff in action","linkURL":"/players/jared-goff"}],';
+
+            expect(parseAsJSON(response)).toEqual({
+                heading: 'The Team',
+                subheading: 'Meet the Starters',
+                items: [
+                    {
+                        heading: 'Offense',
+                        subheading: 'Quarterbacks',
+                        items: [
+                            {
+                                heading: '1',
+                                subheading: 'Jared Goff',
+                                description:
+                                    'Jared Goff is a 6\'4", 225-pound quarterback who was drafted by the Rams in the first round of the 2016 NFL Draft. He has been the starting quarterback for the Rams since his rookie season and has led the team to multiple playoff appearances.',
+                                imageURL: '/players/jared-goff.jpg',
+                                imageAlt: 'Jared Goff',
+                                imageCaption: 'Jared Goff in action',
+                                linkURL: '/players/jared-goff',
+                            },
+                        ],
+                    },
+                ],
+            });
+        });
+
         it('detects premature closing curly brace and ignores it', () => {
             const response =
                 '```json\n{"heading":"Organic Produce","subheading":"The Benefits of Going Organic","description":"Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers."},"items":[{"heading":"Organic Fruits","subheading":"Nature\'s Sweet Treats"},{"heading":"Organic Vegetables","subheading":"Fresh from the Garden"}]}\n```';

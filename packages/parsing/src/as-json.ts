@@ -222,10 +222,37 @@ export function parseAsJSON(text: string): ParsedValue | null {
                     newText += '",';
                 } else {
                     isInsideString = false;
-                    // ensure the closing quote is followed by a comma if a key follows
-                    if (isFollowedBy({ char: '"', index, text })) {
-                        newText += char;
-                        char = ',';
+                    // determine if this is an unescaped quote mark or the end of the string
+                    // if quote mark is immediately followed by ':', ', "', or a new line, treat it as a string terminus
+                    if (!/^( ?:|, ?"|,?\n)/.test(text.substring(index + 1))) {
+                        const nextQuoteMarkIndex = text.indexOf('"', index + 1);
+                        if (nextQuoteMarkIndex > index + 1) {
+                            const lastControlChar = stack.at(-1);
+                            const nextControlCharIndex = lastControlChar
+                                ? text.indexOf(lastControlChar, index + 1)
+                                : -1;
+                            // does a closing control char occur before the next quote mark?
+                            if (
+                                !lastControlChar ||
+                                nextControlCharIndex === -1 ||
+                                nextControlCharIndex > nextQuoteMarkIndex
+                            ) {
+                                const nextNewLineIndex = text.indexOf('\n', index + 1);
+                                isInsideString =
+                                    nextNewLineIndex === -1 ||
+                                    nextNewLineIndex > nextQuoteMarkIndex;
+                                if (isInsideString) {
+                                    char = '\\"';
+                                }
+                            }
+                        }
+                    }
+
+                    if (!isInsideString) {
+                        // ensure the closing quote is followed by a comma if a key follows
+                        if (isFollowedBy({ char: '"', index, text })) {
+                            char = '",';
+                        }
                     }
                 }
             } else if (char === '\n' && newText.at(-1) !== '\\') {
