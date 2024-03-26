@@ -1,7 +1,7 @@
 /* eslint-disable sort-keys */
 import { describe, expect, it } from 'vitest';
 
-import { parseAsJSON } from './as-json.js';
+import { parseAsJSON } from './parse-as-json.js';
 
 describe('@acusti/parsing', () => {
     describe('parseAsJSON', () => {

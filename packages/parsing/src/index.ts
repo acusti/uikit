@@ -1,1 +1,1 @@
-export { parseAsJSON } from './as-json.js';
+export { parseAsJSON } from './parse-as-json.js';
