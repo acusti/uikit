@@ -215,35 +215,34 @@ Here are some of the services we offer:
 
 }}`;
             expect(parseAsJSON(response)).toEqual({
-                bodyCopy: `\
-At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.
-Here are some of the services we offer:
-{
-`,
-                contentList1: [
-                    {
-                        content: 'Surgical debridement',
-                        description:
-                            'Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.',
-                        title: 'Surgical Debridement',
-                    },
-                ],
-                contentList2: [
-                    {
-                        content: 'Other services',
-                        description:
-                            'In addition to our core services, we also offer a range of other services to help you manage your wounds and promote healing. These include wound assessment and monitoring, pain management, and education on wound care and prevention.',
-                        title: 'Other Services',
-                    },
-                ],
-                contentList3: [
-                    {
-                        content: 'Our team',
-                        description:
-                            'Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible. Meet our team of experts today.',
-                        title: 'Our Team',
-                    },
-                ],
+                bodyCopy:
+                    'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.',
+                'Here are some of the services we offer': {
+                    contentList1: [
+                        {
+                            content: 'Surgical debridement',
+                            description:
+                                'Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.',
+                            title: 'Surgical Debridement',
+                        },
+                    ],
+                    contentList2: [
+                        {
+                            content: 'Other services',
+                            description:
+                                'In addition to our core services, we also offer a range of other services to help you manage your wounds and promote healing. These include wound assessment and monitoring, pain management, and education on wound care and prevention.',
+                            title: 'Other Services',
+                        },
+                    ],
+                    contentList3: [
+                        {
+                            content: 'Our team',
+                            description:
+                                'Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible. Meet our team of experts today.',
+                            title: 'Our Team',
+                        },
+                    ],
+                },
             });
         });
 
@@ -256,12 +255,9 @@ Here are some of the services we offer:
 {
 "contentLi`;
             expect(parseAsJSON(response)).toEqual({
-                bodyCopy: `\
-At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.
-Here are some of the services we offer:
-{
-`,
-                contentLi: '',
+                bodyCopy:
+                    'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.',
+                'Here are some of the services we offer': { contentLi: '' },
             });
 
             response = '  Here is a sample JSON output for the "Branding Portfolio"';
@@ -308,10 +304,9 @@ Props:
             expect(parseAsJSON(response)).toEqual({
                 teamMemberName1: 'Jane Smith',
                 teamMemberImage1: '/images/team-member-1.jpg',
-                // the erroneous quotemark is treated as the end of the value:
-                teamMemberJobTitle1: 'Product  Here is the JSON output for the ',
-                // "Testimonials" becomes a key, then parser hits an invalid value and bails:
-                Testimonials: '',
+                // first quote mark is recognized as an unescaped character, final quote mark is treated as string terminus
+                teamMemberJobTitle1:
+                    'Product  Here is the JSON output for the "Testimonials',
             });
         });
 
