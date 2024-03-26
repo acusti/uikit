@@ -522,7 +522,7 @@ Props:
         });
 
         it('handles unescaped double quotes', () => {
-            const response =
+            let response =
                 '```json\n{"heading":"The Team","subheading":"Meet the Starters","items":[{"heading":"Offense","subheading":"Quarterbacks","items":[{"heading":"1","subheading":"Jared Goff","description":"Jared Goff is a 6\'4", 225-pound quarterback who was drafted by the Rams in the first round of the 2016 NFL Draft. He has been the starting quarterback for the Rams since his rookie season and has led the team to multiple playoff appearances.","imageURL":"/players/jared-goff.jpg","imageAlt":"Jared Goff","imageCaption":"Jared Goff in action","linkURL":"/players/jared-goff"}],';
 
             expect(parseAsJSON(response)).toEqual({
@@ -544,6 +544,21 @@ Props:
                                 linkURL: '/players/jared-goff',
                             },
                         ],
+                    },
+                ],
+            });
+
+            response =
+                '```json\n{"items":[{"heading":"Our History","description":"Something Awful was founded in 1999 by Richard "Lowtax" Kyanka, who started the website as a humble message board for fans of video games. Over the years, it has grown into a popular comedy website, featuring blog entries, forums, feature articles, digitally edited pictures, and humorous media reviews. Today, Something Awful continues to be a hub for fans of all things geeky, providing them with a unique blend of humor and community.","imageURL":"/something-awful-history.jpg","imageAlt":"Something Awful Founder Richard \'Lowtax\' Kyanka"}]}\n```';
+
+            expect(parseAsJSON(response)).toEqual({
+                items: [
+                    {
+                        heading: 'Our History',
+                        description:
+                            'Something Awful was founded in 1999 by Richard "Lowtax" Kyanka, who started the website as a humble message board for fans of video games. Over the years, it has grown into a popular comedy website, featuring blog entries, forums, feature articles, digitally edited pictures, and humorous media reviews. Today, Something Awful continues to be a hub for fans of all things geeky, providing them with a unique blend of humor and community.',
+                        imageURL: '/something-awful-history.jpg',
+                        imageAlt: "Something Awful Founder Richard 'Lowtax' Kyanka",
                     },
                 ],
             });
