@@ -160,6 +160,9 @@ function lengthOf(item: unknown): number {
     }
 }
 
+const getObjectKeyFromIndex = (index: number) =>
+    `"key${index === 1 ? '' : '-' + index}":`;
+
 const OBJECT_KEY_REGEXP = /^"[^"]+":/;
 
 type ParsedValue = string | boolean | number | GenericObject | Array<unknown>;
@@ -256,8 +259,73 @@ export function parseAsJSON(text: string): ParsedValue | null {
                     }
                 }
             } else if (char === '\n' && newText.at(-1) !== '\\') {
-                // if not escaped, escape the newline character now
-                char = '\\n';
+                const controlCharIndex = indexOfClosestChar({
+                    chars: ['{', '['],
+                    index,
+                    text,
+                });
+
+                // if not escaped, but a new control structure is next, break out
+                if (controlCharIndex > index && text[controlCharIndex]) {
+                    isInsideString = false;
+
+                    // if this is a valid context for a control char, just break out of the string
+                    if (
+                        isValidContext({
+                            char: text[controlCharIndex],
+                            controlChar: stack.at(-1),
+                            original: text,
+                            originalIndex: controlCharIndex,
+                            text: newText + '"',
+                        })
+                    ) {
+                        char = '",';
+                    } else {
+                        // if not valid context for new object/array, find an existing key or add one
+                        const lastColonIndex = indexOfClosestChar({
+                            char: ':',
+                            index,
+                            step: -1,
+                            text,
+                        });
+                        if (lastColonIndex > -1) {
+                            // convert last bit of text into a key
+                            const minimumStartIndex = newText.lastIndexOf('"') + 1;
+                            const lastLineStartIndex = newText.lastIndexOf('\\n') + 2;
+                            const lastSentenceStartIndex = newText.lastIndexOf('. ') + 2;
+                            const lastWordStartIndex = newText.lastIndexOf(' ') + 1;
+                            const keyStartIndex = Math.min(
+                                Math.max(
+                                    lastLineStartIndex,
+                                    lastSentenceStartIndex,
+                                    minimumStartIndex,
+                                ),
+                                lastWordStartIndex,
+                            );
+                            newText =
+                                newText
+                                    .substring(0, keyStartIndex)
+                                    .replace(/(\\n|\s)+$/, '') +
+                                '", "' +
+                                newText.substring(keyStartIndex, lastColonIndex + 1) +
+                                '"' +
+                                newText.substring(lastColonIndex + 1);
+                        } else {
+                            // if no key was found, add one
+                            let keyIndex = 1;
+                            while (text.includes(getObjectKeyFromIndex(keyIndex))) {
+                                keyIndex++;
+                            }
+                            char = `", ${getObjectKeyFromIndex(keyIndex)} `;
+                        }
+                    }
+                } else if (OBJECT_KEY_REGEXP.test(text.substring(index + 1))) {
+                    // if not escaped but we seem to no longer be in a string, break out
+                    char = '",\n';
+                } else {
+                    // if not escaped, escape the newline character now
+                    char = '\\n';
+                }
             } else if (char === '\\' && text[index + 1] !== '"') {
                 // handle character escaping ourselves unless it’s a quote
                 continue;
