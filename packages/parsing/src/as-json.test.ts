@@ -192,29 +192,22 @@ Here are some of the services we offer:
 "contentList1": [
 {
 "title": "Surgical Debridement",
-
 "description": "Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.",
 "content": "Surgical debridement"
 }
 ]
 
 "contentList2": [
-
 {
-
 "title": "Other Services",
-
 "description": "In addition to our core services, we also offer a range of other services to help you manage your wounds and promote healing. These include wound assessment and monitoring, pain management, and education on wound care and prevention.",
 "content": "Other services"
 }
 ]
 
 "contentList3": [
-
 {
-
 "title": "Our Team",
-
 "description": "Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible. Meet our team of experts today.",
 "content": "Our team"
 }
