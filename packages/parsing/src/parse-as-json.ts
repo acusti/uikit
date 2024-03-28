@@ -250,15 +250,15 @@ export function parseAsJSON(text: string): ParsedValue | null {
                         char = '",';
                     }
                 }
-            } else if (char === '\n' && newText.at(-1) !== '\\') {
+            } else if (char === '\n') {
                 const controlCharIndex = indexOfClosestChar({
                     chars: ['{', '['],
                     index,
                     text,
                 });
 
-                // if not escaped, but a new control structure is next, break out
                 if (controlCharIndex > index && text[controlCharIndex]) {
+                    // if not escaped, but a new control structure is next, break out
                     isInsideString = false;
 
                     // if this is a valid context for a control char, just break out of the string
@@ -317,10 +317,11 @@ export function parseAsJSON(text: string): ParsedValue | null {
                 } else {
                     // if not escaped, escape the newline character now
                     char = '\\n';
+                    // check if there is already an extraneous escape character
+                    if (newText.at(-1) === '\\') {
+                        newText = newText.slice(0, -1);
+                    }
                 }
-            } else if (char === '\\' && text[index + 1] !== '"') {
-                // handle character escaping ourselves unless it’s a quote
-                continue;
             }
         } else {
             const validContextPayload = {

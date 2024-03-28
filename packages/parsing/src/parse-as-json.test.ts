@@ -510,6 +510,37 @@ Props:
             });
         });
 
+        it('preserves escaped new lines within strings', () => {
+            const response = `\
+\`\`\`json
+{
+    "items": [
+        {
+            "heading": "The Zombie",
+            "subheading": "A Tiki Drink with a Twist",
+            "description": "Ingredients\\n\\n1 ounce fresh lime juice\n1 ounce falernum\\n1 ounce passion fruit purée\\n1 ounce pineapple juice\\n1 ounce white rum\\n1 ounce dark rum\\n1 dash Angostura bitters\\n1 dash Pernod\\n\\nInstructions\\n\\n1. Combine all ingredients in a cocktail shaker with ice.\\n2. Shake until well chilled.\\n3. Strain into a chilled tiki mug or highball glass filled with crushed ice.\\n4. Garnish with a sprig of mint and a cherry.",
+            "imageURL": "/the-zombie-tiki-drink.jpg",
+            "imageAlt": "",
+            "imageCaption": ""
+        }
+    ]
+}
+\`\`\``;
+            expect(parseAsJSON(response)).toEqual({
+                items: [
+                    {
+                        heading: 'The Zombie',
+                        subheading: 'A Tiki Drink with a Twist',
+                        description:
+                            'Ingredients\n\n1 ounce fresh lime juice\n1 ounce falernum\n1 ounce passion fruit purée\n1 ounce pineapple juice\n1 ounce white rum\n1 ounce dark rum\n1 dash Angostura bitters\n1 dash Pernod\n\nInstructions\n\n1. Combine all ingredients in a cocktail shaker with ice.\n2. Shake until well chilled.\n3. Strain into a chilled tiki mug or highball glass filled with crushed ice.\n4. Garnish with a sprig of mint and a cherry.',
+                        imageURL: '/the-zombie-tiki-drink.jpg',
+                        imageAlt: '',
+                        imageCaption: '',
+                    },
+                ],
+            });
+        });
+
         it('handles extraneous escape characters', () => {
             const response =
                 '```json\n{"heading":"Print Design","description":"\\\nAt Cinco Design, we believe that print design is not just about creating visually appealing materials, but also about effectively communicating your message to your target audience. Our team of experienced designers works closely with you to understand your brand, your audience, and your goals, and then crafts a unique print design solution that captures your essence and resonates with your audience.\n\nOur print design services include:\n\n- Branding and identity design: We create a cohesive visual identity for your brand, including logos, business cards, letterheads, and more.\n- Marketing collateral: We design brochures, flyers, posters, and other marketing materials that effectively promote your products or services.\n- Packaging design: We design packaging that not only protects your products but also enhances their appeal and makes them stand out on the shelf.\n- Publication design: We design magazines, newspapers, books, and other publications that are visually engaging and easy to navigate.\n\nLet us help you make a lasting impression with our print design services. Contact us today to discuss your project and see how we can bring your vision to life."}\n```';
