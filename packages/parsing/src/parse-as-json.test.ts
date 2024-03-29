@@ -21,6 +21,7 @@ describe('@acusti/parsing', () => {
         it('handles extraneous escape characters', extraneousEscapeCharactersTestCase);
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
         it('detects premature closing curly brace and ignores it', prematureClosingCurliesTestCase);
+        it('detects an object key with a missing value and fills it in', missingValuesTestCase);
     });
 });
 
@@ -635,6 +636,38 @@ function prematureClosingCurliesTestCase() {
                 heading: 'Organic Vegetables',
                 subheading: 'Fresh from the Garden',
             },
+        ],
+    });
+}
+
+function missingValuesTestCase() {
+    const response = `\
+\`\`\`json
+{"heading":"Digg FAQ","subheading":"Get the Answers You Need","items":[{"heading":"What is Digg?","subheading":"","description":"Digg is an American news aggregator that curates a front page of the most popular stories on the Internet. It covers topics such as science, trending political issues, and viral Internet issues.","button":""},{"heading":"How does Digg work?","subheading","description":"Digg uses a combination of editorial curation and algorithmic sorting to select the most popular stories on the Internet. Users can submit stories, which are then voted on by other users. The stories with the most votes appear on the Digg front page.","button":""},{"heading":"How do I submit a story to Digg?","subheading","description":"To submit a story to Digg, you need to create an account and then click on the 'Submit a Story' button. You will then be prompted to enter the URL of the story you want to submit. Once submitted, other users can vote on your story, and if it gains enough votes, it may appear on the Digg front page.","button":""}]}
+\`\`\``;
+
+    expect(parseAsJSON(response)).toEqual({
+        heading: 'Digg FAQ',
+        subheading: 'Get the Answers You Need',
+        items: [
+            {
+                heading: 'What is Digg?',
+                subheading: "",
+                description: 'Digg is an American news aggregator that curates a front page of the most popular stories on the Internet. It covers topics such as science, trending political issues, and viral Internet issues.',
+                button: "",
+            },
+            {
+                heading: 'How does Digg work?',
+                subheading: '',
+                description: 'Digg uses a combination of editorial curation and algorithmic sorting to select the most popular stories on the Internet. Users can submit stories, which are then voted on by other users. The stories with the most votes appear on the Digg front page.',
+                button: "",
+            },
+            {
+                heading: 'How do I submit a story to Digg?',
+                subheading: '',
+                description: 'To submit a story to Digg, you need to create an account and then click on the \'Submit a Story\' button. You will then be prompted to enter the URL of the story you want to submit. Once submitted, other users can vote on your story, and if it gains enough votes, it may appear on the Digg front page.',
+                button: "",
+            }
         ],
     });
 }

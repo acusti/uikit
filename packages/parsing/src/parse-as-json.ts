@@ -377,6 +377,25 @@ export function parseAsJSON(text: string): ParsedValue | null {
                         char = ',';
                     }
                 }
+            } else if (char === ',' && stack.at(-1) === '}') {
+                // ensure this follows a full key/value pair
+                const lastEndKeyIndexA = newText.lastIndexOf('":"');
+                const lastEndKeyIndexB = newText.lastIndexOf('": "');
+                const lastEndKeyIndex = Math.max(lastEndKeyIndexA, lastEndKeyIndexB);
+                const lastEndValueIndexA = newText.lastIndexOf('","');
+                const lastEndValueIndexB = newText.lastIndexOf('", "');
+                const lastEndValueIndex = Math.max(
+                    lastEndValueIndexA,
+                    lastEndValueIndexB,
+                );
+                // if the last string is a value (not a key), add an empty value
+                if (
+                    lastEndValueIndex > 0 &&
+                    lastEndKeyIndex > 0 &&
+                    lastEndValueIndex > lastEndKeyIndex
+                ) {
+                    char = ': "",';
+                }
             }
         }
 
