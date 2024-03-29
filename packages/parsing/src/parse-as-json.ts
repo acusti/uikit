@@ -315,6 +315,9 @@ export function parseAsJSON(text: string): ParsedValue | null {
                                 newText.substring(keyStartIndex, lastColonIndex + 1) +
                                 '"' +
                                 newText.substring(lastColonIndex + 1);
+                        } else if (getPreviousStringType(newText) === 'VALUE') {
+                            // if previous string is a value, convert current string into a key
+                            char = '":';
                         } else {
                             // if no key was found, add one
                             let keyIndex = 1;

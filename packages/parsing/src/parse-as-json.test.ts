@@ -356,6 +356,57 @@ Props:
         // first quote mark is recognized as an unescaped character, final quote mark is treated as string terminus
         teamMemberJobTitle1: 'Product  Here is the JSON output for the "Testimonials',
     });
+
+    response = `\
+\`\`\`json
+{"items":[{"heading":"Welcome to Lava","subheading":"Your One-Stop Shop for Lava Lamps and Whisky Ice Cream","description":"Lava is a unique store located in the heart of Noe Valley, San Francisco. We specialize in selling a wide variety of lava lamps, from classic designs to modern and quirky creations. But that's not all! We also offer a delicious treat that's sure to tantalize your taste buds: free whisky ice cream for those who come in before noon. Come visit us and experience the Lava magic for yourself!","\`\`\`json
+{
+    "heading": "Lava Lamps",
+    "subheading": "Choose from our wide selection of lava lamps in different sizes, colors, and features.",
+    "items": [
+      {
+        "heading": "Classic Lava Lamp",
+        "price": "$39.99",
+        "button": "Add to Cart",
+        "imageURL": "/classic-lava-lamp.jpg",
+        "imageAlt": "Classic Lava Lamp"
+      },
+      {
+        "heading": "Glowing Lava Lamp",
+        "price": "$44.99",
+        "button": "Add to Cart",
+        "imageURL": "/`;
+
+    expect(parseAsJSON(response)).toEqual({
+        items: [
+            {
+                heading: 'Welcome to Lava',
+                subheading: 'Your One-Stop Shop for Lava Lamps and Whisky Ice Cream',
+                description:
+                    "Lava is a unique store located in the heart of Noe Valley, San Francisco. We specialize in selling a wide variety of lava lamps, from classic designs to modern and quirky creations. But that's not all! We also offer a delicious treat that's sure to tantalize your taste buds: free whisky ice cream for those who come in before noon. Come visit us and experience the Lava magic for yourself!",
+                '```json': {
+                    heading: 'Lava Lamps',
+                    subheading:
+                        'Choose from our wide selection of lava lamps in different sizes, colors, and features.',
+                    items: [
+                        {
+                            heading: 'Classic Lava Lamp',
+                            price: '$39.99',
+                            button: 'Add to Cart',
+                            imageURL: '/classic-lava-lamp.jpg',
+                            imageAlt: 'Classic Lava Lamp',
+                        },
+                        {
+                            heading: 'Glowing Lava Lamp',
+                            price: '$44.99',
+                            button: 'Add to Cart',
+                            imageURL: '/',
+                        },
+                    ],
+                },
+            },
+        ],
+    });
 }
 
 function preambleTestCase() {
