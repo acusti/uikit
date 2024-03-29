@@ -134,6 +134,19 @@ function isValidContext({
     }
 }
 
+function getPreviousStringType(text: string): 'KEY' | 'VALUE' | null {
+    const lastEndKeyIndexA = text.lastIndexOf('":"');
+    const lastEndKeyIndexB = text.lastIndexOf('": "');
+    const lastEndKeyIndex = Math.max(lastEndKeyIndexA, lastEndKeyIndexB);
+    const lastEndValueIndexA = text.lastIndexOf('","');
+    const lastEndValueIndexB = text.lastIndexOf('", "');
+    const lastEndValueIndex = Math.max(lastEndValueIndexA, lastEndValueIndexB);
+    // if cannot determine the type, return null
+    if (lastEndKeyIndex <= 0 && lastEndValueIndex <= 0) return null;
+
+    return lastEndValueIndex > lastEndKeyIndex ? 'VALUE' : 'KEY';
+}
+
 type GenericObject = Record<string, unknown>;
 
 // get the length of anything (vs JSON.stringify: https://jsperf.app/qisaso/2)
@@ -378,22 +391,9 @@ export function parseAsJSON(text: string): ParsedValue | null {
                     }
                 }
             } else if (char === ',' && stack.at(-1) === '}') {
-                // ensure this follows a full key/value pair
-                const lastEndKeyIndexA = newText.lastIndexOf('":"');
-                const lastEndKeyIndexB = newText.lastIndexOf('": "');
-                const lastEndKeyIndex = Math.max(lastEndKeyIndexA, lastEndKeyIndexB);
-                const lastEndValueIndexA = newText.lastIndexOf('","');
-                const lastEndValueIndexB = newText.lastIndexOf('", "');
-                const lastEndValueIndex = Math.max(
-                    lastEndValueIndexA,
-                    lastEndValueIndexB,
-                );
-                // if the last string is a value (not a key), add an empty value
-                if (
-                    lastEndValueIndex > 0 &&
-                    lastEndKeyIndex > 0 &&
-                    lastEndValueIndex > lastEndKeyIndex
-                ) {
+                // ensure comma follows a full key/value pair
+                // if not, convert current string into a key and add an empty value
+                if (getPreviousStringType(newText) === 'VALUE') {
                     char = ': "",';
                 }
             }
