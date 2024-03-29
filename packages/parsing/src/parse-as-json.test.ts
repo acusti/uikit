@@ -5,23 +5,50 @@ import { parseAsJSON } from './parse-as-json.js';
 
 describe('@acusti/parsing', () => {
     describe('parseAsJSON', () => {
-        it('should convert a LLM response string to a JSON object', convertToJSONTestCase);
+        it(
+            'should convert a LLM response string to a JSON object',
+            convertToJSONTestCase,
+        );
         it('should handle nested JSON structures', () => nestedJSONTestCase);
         it('should handle JSON with missing comma-separators', missingCommasTestCase);
         it('should handle JSON with trailing comma-separators', trailingCommasTestCase);
-        it('should strip invalid JSON when the LLM response goes off the rails', stripInvalidJSONTestCase);
+        it(
+            'should strip invalid JSON when the LLM response goes off the rails',
+            stripInvalidJSONTestCase,
+        );
         it('should handle too many closing curly braces', extraClosingCurliesTestCase);
-        it('should handle unterminated string values and invalid object nesting', unterminatedStringsAndInvalidNestingTestCase);
-        it('should handle partial (streaming) LLM responses as they come in', partialResponsesTestCase);
+        it(
+            'should handle unterminated string values and invalid object nesting',
+            unterminatedStringsAndInvalidNestingTestCase,
+        );
+        it(
+            'should handle partial (streaming) LLM responses as they come in',
+            partialResponsesTestCase,
+        );
         it('should detect and strip detailed pre- and post-amble text', preambleTestCase);
-        it('should infer if content looks like an object and add missing curly braces if so', missingCurliesTestCase);
-        it('detects responses where the response restarts halfway through', restartsMidResponseTestCase);
-        it('parses a markdown table of two columns into key/value pairs', markdownTableTestCase);
+        it(
+            'should infer if content looks like an object and add missing curly braces if so',
+            missingCurliesTestCase,
+        );
+        it(
+            'detects responses where the response restarts halfway through',
+            restartsMidResponseTestCase,
+        );
+        it(
+            'parses a markdown table of two columns into key/value pairs',
+            markdownTableTestCase,
+        );
         it('preserves escaped new lines within strings', preservesNewLinesTestCase);
         it('handles extraneous escape characters', extraneousEscapeCharactersTestCase);
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
-        it('detects premature closing curly brace and ignores it', prematureClosingCurliesTestCase);
-        it('detects an object key with a missing value and fills it in', missingValuesTestCase);
+        it(
+            'detects premature closing curly brace and ignores it',
+            prematureClosingCurliesTestCase,
+        );
+        it(
+            'detects an object key with a missing value and fills it in',
+            missingValuesTestCase,
+        );
     });
 });
 
@@ -327,8 +354,7 @@ Props:
         teamMemberName1: 'Jane Smith',
         teamMemberImage1: '/images/team-member-1.jpg',
         // first quote mark is recognized as an unescaped character, final quote mark is treated as string terminus
-        teamMemberJobTitle1:
-            'Product  Here is the JSON output for the "Testimonials',
+        teamMemberJobTitle1: 'Product  Here is the JSON output for the "Testimonials',
     });
 }
 
@@ -652,22 +678,25 @@ function missingValuesTestCase() {
         items: [
             {
                 heading: 'What is Digg?',
-                subheading: "",
-                description: 'Digg is an American news aggregator that curates a front page of the most popular stories on the Internet. It covers topics such as science, trending political issues, and viral Internet issues.',
-                button: "",
+                subheading: '',
+                description:
+                    'Digg is an American news aggregator that curates a front page of the most popular stories on the Internet. It covers topics such as science, trending political issues, and viral Internet issues.',
+                button: '',
             },
             {
                 heading: 'How does Digg work?',
                 subheading: '',
-                description: 'Digg uses a combination of editorial curation and algorithmic sorting to select the most popular stories on the Internet. Users can submit stories, which are then voted on by other users. The stories with the most votes appear on the Digg front page.',
-                button: "",
+                description:
+                    'Digg uses a combination of editorial curation and algorithmic sorting to select the most popular stories on the Internet. Users can submit stories, which are then voted on by other users. The stories with the most votes appear on the Digg front page.',
+                button: '',
             },
             {
                 heading: 'How do I submit a story to Digg?',
                 subheading: '',
-                description: 'To submit a story to Digg, you need to create an account and then click on the \'Submit a Story\' button. You will then be prompted to enter the URL of the story you want to submit. Once submitted, other users can vote on your story, and if it gains enough votes, it may appear on the Digg front page.',
-                button: "",
-            }
+                description:
+                    "To submit a story to Digg, you need to create an account and then click on the 'Submit a Story' button. You will then be prompted to enter the URL of the story you want to submit. Once submitted, other users can vote on your story, and if it gains enough votes, it may appear on the Digg front page.",
+                button: '',
+            },
         ],
     });
 }
