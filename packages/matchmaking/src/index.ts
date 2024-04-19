@@ -34,7 +34,7 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
     }
 
     // To proportionally weight consecutive exact matches, increase bonus relative to total length
-    const bonusMultiplier = Math.min(0.25, 3 / shortestLength);
+    const bonusMultiplier = Math.min(0.4, 3 / shortestLength);
     let score = 0;
     let worstPossibleScore = 0;
     let exactMatchBonus = 0;
