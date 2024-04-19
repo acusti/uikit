@@ -6,6 +6,7 @@ const FIRST_LETTER = 65; // 'A'.charCodeAt(0);
 const MAX_DISTANCE = 15;
 const MAX_INEXACT_SCORE = 0.99999;
 const MAX_PARTIAL_EXACT_SCORE = 0.999999;
+const MIN_PARTIAL_EXACT_SCORE = 0.81;
 
 export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean) => {
     if (!isSanitized) {
@@ -29,7 +30,8 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
     if (matchStart > -1) {
         const penaltyPerStep = 0.25 / (strLonger.length - 2);
         const penalty = penaltyPerStep * matchStart;
-        return MAX_PARTIAL_EXACT_SCORE - penalty;
+        // Apply a minimum to partial exact matches
+        return Math.max(MAX_PARTIAL_EXACT_SCORE - penalty, MIN_PARTIAL_EXACT_SCORE);
     }
 
     // To proportionally weight consecutive exact matches, increase bonus relative to total length
