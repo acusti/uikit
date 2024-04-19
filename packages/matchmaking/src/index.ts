@@ -27,7 +27,6 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
     const [strLonger, strShorter] = strALength > strBLength ? [strA, strB] : [strB, strA];
     const matchStart = strLonger.indexOf(strShorter);
     if (matchStart > -1) {
-        // Maximum penalty for distance from beginning is 0.25
         const penaltyPerStep = 0.25 / (strLonger.length - 2);
         const penalty = penaltyPerStep * matchStart;
         return MAX_PARTIAL_EXACT_SCORE - penalty;
@@ -68,7 +67,7 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
 
     // If score came to 0 or less, use best possible score for an inexact match
     if (score <= 0) return MAX_INEXACT_SCORE;
-
+    // Invert score and normalize into a range based on worst possible score
     score = (worstPossibleScore - score) / worstPossibleScore;
     // Don’t allow an inexact match to get a score of 1 (reserved for an exact match)
     return Math.min(MAX_INEXACT_SCORE, score);
