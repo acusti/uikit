@@ -28,7 +28,7 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
     const [strLonger, strShorter] = strALength > strBLength ? [strA, strB] : [strB, strA];
     const matchStart = strLonger.indexOf(strShorter);
     if (matchStart > -1) {
-        const penaltyPerStep = 0.25 / (strLonger.length - 2);
+        const penaltyPerStep = 0.15 / (strLonger.length - 2);
         const penalty = penaltyPerStep * matchStart;
         // Apply a minimum to partial exact matches
         return Math.max(MAX_PARTIAL_EXACT_SCORE - penalty, MIN_PARTIAL_EXACT_SCORE);
