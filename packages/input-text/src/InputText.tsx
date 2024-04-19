@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { InputHTMLAttributes } from 'react';
 
-type InputElement = HTMLInputElement | HTMLTextAreaElement;
+export type InputElement = HTMLInputElement | HTMLTextAreaElement;
 
 export type Props = {
     autoCapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters';
