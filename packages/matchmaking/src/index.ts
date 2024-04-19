@@ -6,7 +6,7 @@ const FIRST_LETTER = 65; // 'A'.charCodeAt(0);
 const MAX_DISTANCE = 15;
 const MAX_INEXACT_SCORE = 0.99999;
 const MAX_PARTIAL_EXACT_SCORE = 0.999999;
-const MIN_PARTIAL_EXACT_SCORE = 0.81;
+const MIN_PARTIAL_EXACT_SCORE = 0.81; // cut-off for partial match vs mismatch
 
 export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean) => {
     if (!isSanitized) {
@@ -76,17 +76,22 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
 };
 
 type Payload = {
+    excludeMismatches?: boolean;
     items: Array<string>;
     text: string;
 };
 
-export const sortByBestMatch = ({ items, text }: Payload) => {
+export const sortByBestMatch = ({ excludeMismatches, items, text }: Payload) => {
     text = text.trim().toUpperCase();
     if (!text || !items.length) return items;
 
     const initialValues: [Array<string>, Array<number>] = [[], []];
     const [sortedItems] = items.reduce(([sorted, scores], item) => {
         const itemScore = getMatchScore(item.trim().toUpperCase(), text, true);
+        if (excludeMismatches && itemScore < MIN_PARTIAL_EXACT_SCORE) {
+            return [sorted, scores];
+        }
+
         let index = sorted.length;
         if (itemScore > scores[0]) {
             index = 0;

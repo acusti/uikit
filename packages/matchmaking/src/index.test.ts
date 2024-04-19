@@ -134,6 +134,38 @@ describe('@acusti/matchmaking', () => {
             expect(sortByBestMatch({ items: STATES, text: '' })).toBe(STATES);
             expect(sortByBestMatch({ items: STATES, text: '    ' })).toBe(STATES);
         });
+
+        it('excludes non-matches when excludeMismatches is true', () => {
+            expect(
+                sortByBestMatch({ excludeMismatches: true, items: STATES, text: 'ma' }),
+            ).toEqual([
+                'Maine', // exact match
+                'Maryland', // exact match
+                'Massachusetts', // exact match
+                'Kansas', // partial match
+                'Hawaii', // partial match
+                'Michigan', // partial match (further distance on 2nd letter)
+                'Minnesota', // partial match (further distance on 2nd letter)
+                'Mississippi', // partial match (further distance on 2nd letter)
+                'Missouri', // partial match (further distance on 2nd letter)
+                'Alabama', // end-of-text exact match
+                'Oklahoma', // end-of-text exact match
+                'Nebraska', // short distance from match
+                'Nevada', // short distance from match
+                'New Hampshire', // short distance from match
+                'New Jersey', // short distance from match
+                'New Mexico', // short distance from match
+                'New York', // short distance from match
+            ]);
+
+            expect(
+                sortByBestMatch({
+                    excludeMismatches: true,
+                    items: CSS_VALUES,
+                    text: '11',
+                }),
+            ).toEqual(['11px', '128px', '18px']);
+        });
     });
 
     describe('getBestMatch', () => {
