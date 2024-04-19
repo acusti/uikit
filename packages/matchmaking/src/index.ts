@@ -1,6 +1,6 @@
-const FIRST_NUMBER = '0'.charCodeAt(0);
-const LAST_NUMBER = '9'.charCodeAt(0);
-const FIRST_LETTER = 'A'.charCodeAt(0);
+const FIRST_NUMBER = 48; // '0'.charCodeAt(0);
+const LAST_NUMBER = 57; // '9'.charCodeAt(0);
+const FIRST_LETTER = 65; // 'A'.charCodeAt(0);
 
 // Consider every distance greater than or equal to 15 to be functionally equivalent
 const MAX_DISTANCE = 15;
