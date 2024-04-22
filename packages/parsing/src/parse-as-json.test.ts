@@ -357,6 +357,9 @@ Props:
         teamMemberJobTitle1: 'Product  Here is the JSON output for the "Testimonials',
     });
 
+    response = '```json\n{\n  "heading": "News",\n  "';
+    expect(parseAsJSON(response)).toEqual({ heading: 'News', '': '' });
+
     response = `\
 \`\`\`json
 {"items":[{"heading":"Welcome to Lava","subheading":"Your One-Stop Shop for Lava Lamps and Whisky Ice Cream","description":"Lava is a unique store located in the heart of Noe Valley, San Francisco. We specialize in selling a wide variety of lava lamps, from classic designs to modern and quirky creations. But that's not all! We also offer a delicious treat that's sure to tantalize your taste buds: free whisky ice cream for those who come in before noon. Come visit us and experience the Lava magic for yourself!","\`\`\`json

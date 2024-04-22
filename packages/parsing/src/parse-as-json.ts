@@ -413,7 +413,7 @@ export function parseAsJSON(text: string): ParsedValue | null {
 
     if (stack.at(-1) === '}') {
         // if we are in the key of a key/value pair, append ': ""' to close the pair
-        if (/[{,][^:"]*"[^"]+"\s*?$/.test(newText)) {
+        if (/[{,][^:"]*"[^"]*"\s*?$/.test(newText)) {
             newText += ': ""';
         } else if (/": ?$/.test(newText)) {
             // if we are in between a key/value pair, append '""' to close the pair
