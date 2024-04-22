@@ -42,7 +42,11 @@ passed in but sorted by how close they match the passed-in `text`, while
 `getBestMatch` just returns the text of the single closest match found
 (i.e. `sortByBestMatch(payload)[0]`).
 
-The `excludeMismatches` option for `sortByBestMatch` allows that function to also filter the results to only include (partial) matches, where a match include fuzzy matches that are strong enough to qualify as a partial match. For example, considering a list of all states in alphabetical order, searching for the text `"ma"` with `excludeMismatches: true` returns:
+The `excludeMismatches` option for `sortByBestMatch` allows that function
+to also filter the results to only include (partial) matches, where a match
+include fuzzy matches that are strong enough to qualify as a partial match.
+For example, considering a list of all states in alphabetical order,
+searching for the text `"ma"` with `excludeMismatches: true` returns:
 
 ```js
 [
@@ -63,5 +67,5 @@ The `excludeMismatches` option for `sortByBestMatch` allows that function to als
     'New Jersey', // short distance from match
     'New Mexico', // short distance from match
     'New York', // short distance from match
-]
+];
 ```

@@ -96,4 +96,6 @@ type Props = {
 };
 ```
 
-Note: the `InputElement` type referenced in the event handlers above is a union of `HTMLInputElement` and `HTMLTextAreaElement` and is available as an export (`import type { InputElement } from '@acusti/input-text';`).
+Note: the `InputElement` type referenced in the event handlers above is a
+union of `HTMLInputElement` and `HTMLTextAreaElement` and is available as
+an export (`import type { InputElement } from '@acusti/input-text';`).
