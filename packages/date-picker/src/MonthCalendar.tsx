@@ -3,7 +3,12 @@ import clsx from 'clsx';
 import * as React from 'react';
 
 import { ROOT_CLASS_NAME, STYLES } from './styles/month-calendar.js';
-import { getMonthFromDate, getMonthNameFromMonth, getYearFromMonth } from './utils.js';
+import {
+    getLastDateFromMonth,
+    getMonthFromDate,
+    getMonthNameFromMonth,
+    getYearFromMonth,
+} from './utils.js';
 
 export type Props = {
     className?: string;
@@ -38,9 +43,7 @@ export default function MonthCalendar({
     title = title ?? `${getMonthNameFromMonth(month)} ${year}`;
     const monthWithinYear = month % 12;
     const firstDate = new Date(year, monthWithinYear, 1);
-    const nextMonth = month + 1;
-    const lastDate = new Date(getYearFromMonth(nextMonth), nextMonth % 12, 1);
-    lastDate.setDate(lastDate.getDate() - 1);
+    const lastDate = getLastDateFromMonth(month);
     const totalDays = lastDate.getDate();
     const firstDay = firstDate.getDay();
     const spacesAfterLastDay = 7 - (lastDate.getDay() % 7); // prettier-ignore
