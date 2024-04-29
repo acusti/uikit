@@ -35,3 +35,10 @@ export const getMonthAbbreviationFromMonth = (month: number) => {
     if (monthName === 'September') return 'Sept';
     return monthName.substring(0, 3);
 };
+
+export const getLastDateFromMonth = (month: number) => {
+    const nextMonth = month + 1;
+    const lastDate = new Date(getYearFromMonth(nextMonth), Math.abs(nextMonth % 12), 1);
+    lastDate.setDate(lastDate.getDate() - 1);
+    return lastDate;
+};

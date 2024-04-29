@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest';
 
-import { getMonthFromDate, getMonthNameFromMonth, getYearFromMonth } from './utils.js';
+import {
+    getMonthFromDate,
+    getMonthNameFromMonth,
+    getLastDateFromMonth,
+    getYearFromMonth,
+} from './utils.js';
 
 const INVALID_DATE = new Date('');
 
@@ -61,6 +66,34 @@ describe('@acusti/date-picker', () => {
 
             it('returns an empty string if given NaN (e.g. if dealing with an Invalid Date)', () => {
                 expect(getMonthNameFromMonth(getMonthFromDate(INVALID_DATE))).toBe('');
+            });
+        });
+
+        describe('getLastDateFromMonth', () => {
+            it('returns the date of the last day for a post-unix epoch month', () => {
+                expect(
+                    getLastDateFromMonth(getMonthFromDate(new Date(2008, 2, 13))),
+                ).toEqual(new Date(2008, 2, 31));
+                // february in a leap year
+                expect(
+                    getLastDateFromMonth(getMonthFromDate(new Date(2024, 1, 23))),
+                ).toEqual(new Date(2024, 1, 29));
+                // february in a non-leap year
+                expect(
+                    getLastDateFromMonth(getMonthFromDate(new Date(1985, 1, 1))),
+                ).toEqual(new Date(1985, 1, 28));
+            });
+
+            it('returns the correct date for a pre-unix epoch month', () => {
+                expect(
+                    getLastDateFromMonth(getMonthFromDate(new Date(1865, 5, 2))),
+                ).toEqual(new Date(1865, 5, 30));
+            });
+
+            it('returns an invalid date if given NaN (e.g. if dealing with an Invalid Date)', () => {
+                expect(getLastDateFromMonth(getMonthFromDate(INVALID_DATE))).toEqual(
+                    INVALID_DATE,
+                );
             });
         });
     });
