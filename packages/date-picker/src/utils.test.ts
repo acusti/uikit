@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getMonthFromDate, getMonthNameFromMonth } from './utils.js';
+import { getMonthFromDate, getMonthNameFromMonth, getYearFromMonth } from './utils.js';
 
 const INVALID_DATE = new Date('');
 
@@ -19,6 +19,30 @@ describe('@acusti/date-picker', () => {
 
             it('returns NaN for an Invalid Date', () => {
                 expect(getMonthFromDate(INVALID_DATE)).toBe(NaN);
+            });
+        });
+
+        describe('getYearFromMonth', () => {
+            it('returns the correct year for a post-unix epoch date', () => {
+                expect(getYearFromMonth(getMonthFromDate(new Date(1970, 0, 1)))).toBe(
+                    1970,
+                );
+                expect(getYearFromMonth(getMonthFromDate(new Date(2048, 4, 31)))).toBe(
+                    2048,
+                );
+            });
+
+            it('returns the correct year digit for a pre-unix epoch date', () => {
+                expect(getYearFromMonth(getMonthFromDate(new Date(1970, 0, 0)))).toBe(
+                    1969,
+                );
+                expect(getYearFromMonth(getMonthFromDate(new Date(100, 11, 31)))).toBe(
+                    100,
+                );
+            });
+
+            it('returns NaN for an Invalid Date', () => {
+                expect(getYearFromMonth(getMonthFromDate(INVALID_DATE))).toBe(NaN);
             });
         });
 
