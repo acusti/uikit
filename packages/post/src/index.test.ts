@@ -4,40 +4,32 @@ import { post } from './index.js';
 
 // To find open GraphQL APIs for testing:
 // https://www.apollographql.com/blog/community/backend/8-free-to-use-graphql-apis-for-your-projects-and-demos/
+const URL = 'https://countries.trevorblades.com/graphql';
+
 describe('post', () => {
     it('performs a POST request to a GraphQL API for a List query and returns the response as JSON', async () => {
-        const url = 'https://swapi-graphql.netlify.app/.netlify/functions/index';
         const result = await post<{
             data?: {
-                allFilms: {
-                    edges: Array<{
-                        node: { director: string; episodeID: string; title: string };
-                    }>;
-                };
+                countries: Array<{ capital: string; emoji: string; name: string }>;
             };
             errors?: Array<{ message: string }>;
-        }>(url, {
-            query: `query Query {
-              allFilms {
-                edges {
-                  node {
-                    director
-                    episodeID
-                    title
-                  }
-                }
+        }>(URL, {
+            query: `query {
+              countries {
+                name
+                capital
+                emoji
               }
             }`,
         });
 
-        const firstFilm = result.data!.allFilms.edges[0].node;
-        expect(firstFilm.title).toBeTruthy();
-        expect(firstFilm.episodeID).toBeTruthy();
-        expect(firstFilm.director).toBeTruthy();
+        const first = result.data!.countries[0];
+        expect(first.name.length).toBeGreaterThan(1);
+        expect(first.capital.length).toBeGreaterThan(1);
+        expect(first.emoji).toBeTruthy();
     });
 
     it('performs a POST request to a GraphQL API for a Get query and returns the response as JSON', async () => {
-        const url = 'https://countries.trevorblades.com/graphql';
         const result = await post<{
             data?: {
                 country: {
@@ -50,8 +42,8 @@ describe('post', () => {
                 };
             };
             errors?: Array<{ message: string }>;
-        }>(url, {
-            query: `query Query {
+        }>(URL, {
+            query: `query {
               country(code: "MX") {
                 name
                 native
