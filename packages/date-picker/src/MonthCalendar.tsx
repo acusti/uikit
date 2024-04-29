@@ -138,9 +138,11 @@ export default function MonthCalendar({
                                 {DAYS.map((_, dayIndex) => {
                                     dayIndex += weekIndex * 7;
                                     const dayNumber = (dayIndex - firstDay) + 1; // prettier-ignore
-                                    const date = getDateFromMonthAndDay(month, dayNumber);
                                     const isEmpty =
                                         dayNumber < 1 || dayNumber > totalDays;
+                                    const date = isEmpty
+                                        ? null
+                                        : getDateFromMonthAndDay(month, dayNumber);
                                     const isAfterDateRangeStart =
                                         dateRangeStartDay != null &&
                                         dayNumber > dateRangeStartDay;
@@ -169,7 +171,7 @@ export default function MonthCalendar({
                                                         dayNumber === dateRangeStartDay,
                                                 },
                                             )}
-                                            data-date={date.toISOString()}
+                                            data-date={date?.toISOString()}
                                             key={`MonthDayItem-${dayNumber}`}
                                             onClick={handleClickDay}
                                             onMouseEnter={handleMouseEnterDay}
