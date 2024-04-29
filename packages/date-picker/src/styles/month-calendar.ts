@@ -79,6 +79,10 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
     background-color: transparent;
 }
 
+.${ROOT_CLASS_NAME}-month-day-item:disabled {
+    cursor: auto;
+}
+
 .${ROOT_CLASS_NAME}-month-day-item.is-selected {
     background-color: #f8f8f8;
 }

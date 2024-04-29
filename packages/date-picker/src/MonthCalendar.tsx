@@ -172,6 +172,7 @@ export default function MonthCalendar({
                                                 },
                                             )}
                                             data-date={date?.toISOString()}
+                                            disabled={isEmpty}
                                             key={`MonthDayItem-${dayNumber}`}
                                             onClick={handleClickDay}
                                             onMouseEnter={handleMouseEnterDay}
