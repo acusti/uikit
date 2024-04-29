@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 
 import {
+    getFirstDateFromMonth,
     getMonthFromDate,
     getMonthNameFromMonth,
     getLastDateFromMonth,
@@ -66,6 +67,26 @@ describe('@acusti/date-picker', () => {
 
             it('returns an empty string if given NaN (e.g. if dealing with an Invalid Date)', () => {
                 expect(getMonthNameFromMonth(getMonthFromDate(INVALID_DATE))).toBe('');
+            });
+        });
+
+        describe('getFirstDateFromMonth', () => {
+            it('returns the date of the first day for a post-unix epoch month', () => {
+                expect(
+                    getFirstDateFromMonth(getMonthFromDate(new Date(2008, 2, 13))),
+                ).toEqual(new Date(2008, 2, 1));
+            });
+
+            it('returns the correct date for a pre-unix epoch month', () => {
+                expect(
+                    getFirstDateFromMonth(getMonthFromDate(new Date(1865, 5, 2))),
+                ).toEqual(new Date(1865, 5, 1));
+            });
+
+            it('returns an invalid date if given NaN (e.g. if dealing with an Invalid Date)', () => {
+                expect(getFirstDateFromMonth(getMonthFromDate(INVALID_DATE))).toEqual(
+                    INVALID_DATE,
+                );
             });
         });
 
