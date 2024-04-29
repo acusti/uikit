@@ -4,6 +4,7 @@ import * as React from 'react';
 
 import { ROOT_CLASS_NAME, STYLES } from './styles/month-calendar.js';
 import {
+    getDateFromMonthAndDay,
     getLastDateFromMonth,
     getMonthFromDate,
     getMonthNameFromMonth,
@@ -41,8 +42,7 @@ export default function MonthCalendar({
 }: Props) {
     const year = getYearFromMonth(month);
     title = title ?? `${getMonthNameFromMonth(month)} ${year}`;
-    const monthWithinYear = month % 12;
-    const firstDate = new Date(year, monthWithinYear, 1);
+    const firstDate = getDateFromMonthAndDay(month, 1);
     const lastDate = getLastDateFromMonth(month);
     const totalDays = lastDate.getDate();
     const firstDay = firstDate.getDay();
@@ -138,6 +138,7 @@ export default function MonthCalendar({
                                 {DAYS.map((_, dayIndex) => {
                                     dayIndex += weekIndex * 7;
                                     const dayNumber = (dayIndex - firstDay) + 1; // prettier-ignore
+                                    const date = getDateFromMonthAndDay(month, dayNumber);
                                     const isEmpty =
                                         dayNumber < 1 || dayNumber > totalDays;
                                     const isAfterDateRangeStart =
@@ -168,11 +169,7 @@ export default function MonthCalendar({
                                                         dayNumber === dateRangeStartDay,
                                                 },
                                             )}
-                                            data-date={new Date(
-                                                year,
-                                                monthWithinYear,
-                                                dayNumber,
-                                            ).toISOString()}
+                                            data-date={date.toISOString()}
                                             key={`MonthDayItem-${dayNumber}`}
                                             onClick={handleClickDay}
                                             onMouseEnter={handleMouseEnterDay}
