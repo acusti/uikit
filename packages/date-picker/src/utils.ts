@@ -38,7 +38,8 @@ export const getMonthAbbreviationFromMonth = (month: number) => {
 
 export const getLastDateFromMonth = (month: number) => {
     const nextMonth = month + 1;
-    const lastDate = new Date(getYearFromMonth(nextMonth), Math.abs(nextMonth % 12), 1);
+    const nextMonthIn12 = nextMonth < 0 ? (12 - Math.abs(nextMonth % 12)) % 12 : nextMonth % 12;
+    const lastDate = new Date(getYearFromMonth(nextMonth), nextMonthIn12, 1);
     lastDate.setDate(lastDate.getDate() - 1);
     return lastDate;
 };
