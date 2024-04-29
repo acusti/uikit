@@ -36,13 +36,12 @@ export const getMonthAbbreviationFromMonth = (month: number) => {
     return monthName.substring(0, 3);
 };
 
-export const getFirstDateFromMonth = (month: number) => {
+export const getDateFromMonthAndDay = (month: number, day: number) => {
     const monthIn12 = month < 0 ? (12 - Math.abs(month % 12)) % 12 : month % 12;
-    return new Date(getYearFromMonth(month), monthIn12, 1);
+    return new Date(getYearFromMonth(month), monthIn12, day);
 };
 
 export const getLastDateFromMonth = (month: number) => {
-    const date = getFirstDateFromMonth(month + 1);
-    date.setDate(date.getDate() - 1);
-    return date;
+    // day 0 of the next month is the last day of the current month
+    return getDateFromMonthAndDay(month + 1, 0);
 };
