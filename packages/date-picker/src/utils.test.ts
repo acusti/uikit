@@ -92,6 +92,23 @@ describe('@acusti/date-picker', () => {
                 ).toEqual(new Date(100, 11, 1));
             });
 
+            it('returns date for start of day as UTC time if asUTC is true', () => {
+                expect(
+                    getDateFromMonthAndDay(
+                        getMonthFromDate(new Date(1865, 5, 2)),
+                        30,
+                        true,
+                    ),
+                ).toEqual(new Date(Date.UTC(1865, 5, 30)));
+                expect(
+                    getDateFromMonthAndDay(
+                        getMonthFromDate(new Date(101, 0, 0)),
+                        1,
+                        true,
+                    ),
+                ).toEqual(new Date(Date.UTC(100, 11, 1)));
+            });
+
             it('returns an invalid date if given NaN (e.g. if dealing with an Invalid Date)', () => {
                 expect(getDateFromMonthAndDay(getMonthFromDate(INVALID_DATE), 1)).toEqual(
                     INVALID_DATE,
@@ -118,6 +135,12 @@ describe('@acusti/date-picker', () => {
                 expect(
                     getLastDateFromMonth(getMonthFromDate(new Date(1865, 5, 2))),
                 ).toEqual(new Date(1865, 5, 30));
+            });
+
+            it('returns date for start of day as UTC time if asUTC is true', () => {
+                expect(
+                    getLastDateFromMonth(getMonthFromDate(new Date(1865, 5, 2)), true),
+                ).toEqual(new Date(Date.UTC(1865, 5, 30)));
             });
 
             it('returns an invalid date if given NaN (e.g. if dealing with an Invalid Date)', () => {
