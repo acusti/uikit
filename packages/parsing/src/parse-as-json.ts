@@ -176,7 +176,7 @@ function lengthOf(item: unknown): number {
 const getObjectKeyFromIndex = (index: number) =>
     `"key${index === 1 ? '' : '-' + index}":`;
 
-const OBJECT_KEY_REGEXP = /^"[^"]+":/;
+const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
 
 type ParsedValue = string | boolean | number | GenericObject | Array<unknown>;
 
