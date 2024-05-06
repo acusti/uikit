@@ -382,6 +382,13 @@ export function parseAsJSON(text: string): ParsedValue | null {
                         });
                         const maybeKey = quoteIndex > index ? text.slice(quoteIndex) : '';
                         if (OBJECT_KEY_REGEXP.test(maybeKey)) {
+                            // if missing a comma, add it here
+                            if (
+                                quoteIndex > startIndex &&
+                                !text.slice(startIndex, quoteIndex).includes(',')
+                            ) {
+                                newText += ',';
+                            }
                             continue;
                         }
                     }
