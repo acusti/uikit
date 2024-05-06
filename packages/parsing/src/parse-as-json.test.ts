@@ -699,7 +699,7 @@ function unescapedDoubleQuotesTestCase() {
 }
 
 function prematureClosingCurliesTestCase() {
-    const response =
+    let response =
         '```json\n{"heading":"Organic Produce","subheading":"The Benefits of Going Organic","description":"Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers."},"items":[{"heading":"Organic Fruits","subheading":"Nature\'s Sweet Treats"},{"heading":"Organic Vegetables","subheading":"Fresh from the Garden"}]}\n```';
 
     expect(parseAsJSON(response)).toEqual({
@@ -715,6 +715,19 @@ function prematureClosingCurliesTestCase() {
             {
                 heading: 'Organic Vegetables',
                 subheading: 'Fresh from the Garden',
+            },
+        ],
+    });
+
+    response =
+        '{"heading": "Get in Touch"}\n"items": [{"heading": "Contact Information","subheading": "Reach out to us using the following details."}]<|im_end|>';
+
+    expect(parseAsJSON(response)).toEqual({
+        heading: 'Get in Touch',
+        items: [
+            {
+                heading: 'Contact Information',
+                subheading: 'Reach out to us using the following details.',
             },
         ],
     });
