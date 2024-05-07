@@ -20,11 +20,11 @@ export type Props = {
     isTwoUp?: boolean;
     monthLimitFirst?: number;
     monthLimitLast?: number;
-    onChange: (payload: { dateEnd?: string; dateStart: string }) => void;
+    onChange: (payload: { dateEnd?: string | null; dateStart: string }) => void;
     useMonthAbbreviations?: boolean;
 };
 
-const { Fragment, useCallback, useEffect, useState } = React;
+const { Fragment, useCallback, useEffect, useRef, useState } = React;
 
 const getAbbreviatedMonthTitle = (month: number) =>
     `${getMonthAbbreviationFromMonth(month)} ${getYearFromMonth(month)}`;
@@ -51,6 +51,7 @@ export default function DatePicker({
             : _dateStart;
     const [dateEnd, setDateEnd] = useState<null | string>(dateEndFromProps ?? null);
     const [dateStart, setDateStart] = useState<null | string>(dateStartFromProps ?? null);
+    const updatingDateEndRef = useRef(false);
 
     useEffect(() => {
         if (dateEndFromProps == null) return;
@@ -97,8 +98,12 @@ export default function DatePicker({
 
     const handleChange = useCallback(
         (date: string) => {
-            // If we have a dateStart but no dateEnd, set dateEnd
-            if (isRange && dateStart != null && dateEnd == null) {
+            // If we last set the dateStart or we have a dateStart but no dateEnd, set dateEnd
+            if (
+                isRange &&
+                dateStart != null &&
+                (updatingDateEndRef.current || dateEnd == null)
+            ) {
                 // Ensure that dateEnd is after dateStart; if not, swap them
                 if (date < dateStart) {
                     setDateStart(date);
@@ -108,10 +113,16 @@ export default function DatePicker({
                     setDateEnd(date);
                     onChange({ dateEnd: date, dateStart });
                 }
+                updatingDateEndRef.current = false;
             } else {
                 setDateStart(date);
                 setDateEnd(null);
-                onChange({ dateStart: date });
+                if (isRange) {
+                    onChange({ dateEnd: null, dateStart: date });
+                    updatingDateEndRef.current = true;
+                } else {
+                    onChange({ dateStart: date });
+                }
             }
         },
         [dateEnd, dateStart, isRange, onChange],
