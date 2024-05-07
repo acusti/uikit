@@ -1,8 +1,11 @@
 import { DatePicker, getMonthFromDate } from '../../date-picker/src/index.js';
+import * as React from 'react';
 
 import './DatePicker.css';
 
 import type { Meta, StoryObj } from '@storybook/react';
+
+const { useState } = React;
 
 const meta: Meta<typeof DatePicker> = {
     argTypes: {
@@ -46,12 +49,34 @@ export const TwoUpDatePicker: Story = {
     },
 };
 
+const DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS = {
+    className: 'date-range-date-picker-story',
+    dateEnd: new Date(2024, 0, 6).toISOString(),
+    dateStart: new Date(2023, 11, 25).toISOString(),
+    isTwoUp: true,
+};
+
 export const DateRangeNavidadDiaDeLosReyesDatePicker: Story = {
-    args: {
-        className: 'date-range-date-picker-story',
-        dateEnd: new Date(2024, 0, 6),
-        dateStart: new Date(2023, 11, 25),
-        isTwoUp: true,
+    args: DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS,
+    render() {
+        const [dateStart, setDateStart] = useState(
+            DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.dateStart,
+        );
+        const [dateEnd, setDateEnd] = useState(
+            DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.dateEnd,
+        );
+
+        return (
+            <DatePicker
+                {...DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS}
+                dateEnd={dateEnd}
+                dateStart={dateStart}
+                onChange={(update) => {
+                    if (update.dateEnd != null) setDateEnd(update.dateEnd);
+                    if (update.dateStart != null) setDateStart(update.dateStart);
+                }}
+            />
+        );
     },
 };
 
