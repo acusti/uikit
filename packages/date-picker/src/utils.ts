@@ -16,10 +16,13 @@ const MONTH_NAMES = [
     'December',
 ];
 
-const getYearFromDate = (date: Date) => date.getFullYear() - START_YEAR;
+const getYearFromDate = (date: Date, asUTC?: boolean) =>
+    (asUTC ? date.getUTCFullYear() : date.getFullYear()) - START_YEAR;
 
-export const getMonthFromDate = (date: Date) =>
-    date.getMonth() + (getYearFromDate(date) * 12); // prettier-ignore
+export const getMonthFromDate = (date: Date, asUTC?: boolean) => {
+    const yearAsMonths = getYearFromDate(date, asUTC) * 12;
+    return yearAsMonths + (asUTC ? date.getUTCMonth() : date.getMonth());
+};
 
 export const getYearFromMonth = (month: number) => Math.floor(month / 12) + START_YEAR;
 

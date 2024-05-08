@@ -23,6 +23,16 @@ describe('@acusti/date-picker', () => {
                 expect(getMonthFromDate(new Date(1968, 3, 30))).toBe(-21); // april 30, 1968
             });
 
+            it('returns the correct month digit based on UTC time if asUTC is true', () => {
+                const date = new Date('1970-01-01T00:00:00.000Z');
+                expect(getMonthFromDate(date, true)).toBe(0);
+                // if test is run in a timezone behind UTC, ommitting asUTC returns -1
+                // if not, the month should be the same with or without asUTC flag
+                expect(getMonthFromDate(date)).toBe(
+                    date.getTimezoneOffset() >= 60 ? -1 : 0,
+                );
+            });
+
             it('returns NaN for an Invalid Date', () => {
                 expect(getMonthFromDate(INVALID_DATE)).toBe(NaN);
             });
