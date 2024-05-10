@@ -183,13 +183,16 @@ const getObjectKeyFromIndex = (index: number) =>
 
 const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
 
+const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
+
 type ParsedValue = string | boolean | number | GenericObject | Array<unknown>;
 
 export function parseAsJSON(text: string): ParsedValue | null {
     // if the input is undefined/null, return null to indicate failure
     if (text == null) return null;
 
-    // attempt to parse the string as-is
+    text = text.replace(CONTROL_TOKENS_REGEXP, '');
+    // attempt to parse the string as-is (minus control tokens)
     try {
         return JSON.parse(text) as ParsedValue;
     } catch (error) {
