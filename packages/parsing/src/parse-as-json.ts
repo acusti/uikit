@@ -143,6 +143,11 @@ export function getPreviousStringType(text: string): 'KEY' | 'VALUE' | null {
     const lastEndValueIndex = Math.max(lastEndValueIndexA, lastEndValueIndexB);
     // if cannot determine the type, return null
     if (lastEndKeyIndex <= 0 && lastEndValueIndex <= 0) return null;
+    // if last token is an array
+    const lastEndArrayIndex = text.lastIndexOf(']');
+    if (lastEndArrayIndex > lastEndKeyIndex && lastEndArrayIndex > lastEndValueIndex) {
+        return null;
+    }
 
     return lastEndValueIndex > lastEndKeyIndex ? 'VALUE' : 'KEY';
 }
