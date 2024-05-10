@@ -15,6 +15,7 @@ describe('@acusti/parsing', () => {
 
         it('returns null if the previous token isn’t a string', () => {
             expect(getPreviousStringType('{"foo": 42, "')).toBe(null);
+            expect(getPreviousStringType('{"foo": ["one", "two"]')).toBe(null);
         });
     });
 
