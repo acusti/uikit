@@ -1,9 +1,23 @@
 /* eslint-disable sort-keys */
 import { describe, expect, it } from 'vitest';
 
-import { parseAsJSON } from './parse-as-json.js';
+import { getPreviousStringType, parseAsJSON } from './parse-as-json.js';
 
 describe('@acusti/parsing', () => {
+    describe('getPreviousStringType', () => {
+        it('returns KEY if the previous string token is an object key', () => {
+            expect(getPreviousStringType('{"foo": "')).toBe('KEY');
+        });
+
+        it('returns VALUE if the previous string token is not an object key', () => {
+            expect(getPreviousStringType('{"foo": "bar", "')).toBe('VALUE');
+        });
+
+        it('returns null if the previous token isn’t a string', () => {
+            expect(getPreviousStringType('{"foo": 42, "')).toBe(null);
+        });
+    });
+
     describe('parseAsJSON', () => {
         it('converts a LLM response string to a JSON object', convertToJSONTestCase);
         it('handles nested JSON structures', () => nestedJSONTestCase);

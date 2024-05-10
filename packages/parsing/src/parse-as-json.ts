@@ -134,7 +134,7 @@ function isValidContext({
     }
 }
 
-function getPreviousStringType(text: string): 'KEY' | 'VALUE' | null {
+export function getPreviousStringType(text: string): 'KEY' | 'VALUE' | null {
     const lastEndKeyIndexA = text.lastIndexOf('":"');
     const lastEndKeyIndexB = text.lastIndexOf('": "');
     const lastEndKeyIndex = Math.max(lastEndKeyIndexA, lastEndKeyIndexB);
