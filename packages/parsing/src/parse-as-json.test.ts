@@ -61,6 +61,7 @@ describe('@acusti/parsing', () => {
             'detects an object key with a missing value and fills it in',
             missingValuesTestCase,
         );
+        it('handles nested arrays without issue', nestedArraysTestCase);
     });
 });
 
@@ -777,5 +778,34 @@ function missingValuesTestCase() {
                 button: '',
             },
         ],
+    });
+}
+
+function nestedArraysTestCase() {
+    const response = `{"heading": "Registration Form", "items": [{"heading": "Personal Information", "fields": [{"label": "Name", "name": "name", "type": "text", "placeholder": "Enter your name"}, {"label": "Gender", "name": "gender", "type": "select", "options": ["Male", "Female", "Other"], "placeholder": "Select your gender"}]}], "button": "Next: Security Details"}]}<|im_end|>`;
+
+    expect(parseAsJSON(response)).toEqual({
+        heading: 'Registration Form',
+        items: [
+            {
+                heading: 'Personal Information',
+                fields: [
+                    {
+                        label: 'Name',
+                        name: 'name',
+                        placeholder: 'Enter your name',
+                        type: 'text',
+                    },
+                    {
+                        label: 'Gender',
+                        name: 'gender',
+                        type: 'select',
+                        options: ['Male', 'Female', 'Other'],
+                        placeholder: 'Select your gender',
+                    },
+                ],
+            },
+        ],
+        button: 'Next: Security Details',
     });
 }
