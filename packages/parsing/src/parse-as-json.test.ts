@@ -5,29 +5,26 @@ import { parseAsJSON } from './parse-as-json.js';
 
 describe('@acusti/parsing', () => {
     describe('parseAsJSON', () => {
+        it('converts a LLM response string to a JSON object', convertToJSONTestCase);
+        it('handles nested JSON structures', () => nestedJSONTestCase);
+        it('handles JSON with missing comma-separators', missingCommasTestCase);
+        it('handles JSON with trailing comma-separators', trailingCommasTestCase);
         it(
-            'should convert a LLM response string to a JSON object',
-            convertToJSONTestCase,
-        );
-        it('should handle nested JSON structures', () => nestedJSONTestCase);
-        it('should handle JSON with missing comma-separators', missingCommasTestCase);
-        it('should handle JSON with trailing comma-separators', trailingCommasTestCase);
-        it(
-            'should strip invalid JSON when the LLM response goes off the rails',
+            'strips invalid JSON when the LLM response goes off the rails',
             stripInvalidJSONTestCase,
         );
-        it('should handle too many closing curly braces', extraClosingCurliesTestCase);
+        it('handles too many closing curly braces', extraClosingCurliesTestCase);
         it(
-            'should handle unterminated string values and invalid object nesting',
+            'handles unterminated string values and invalid object nesting',
             unterminatedStringsAndInvalidNestingTestCase,
         );
         it(
-            'should handle partial (streaming) LLM responses as they come in',
+            'handles partial (streaming) LLM responses as they come in',
             partialResponsesTestCase,
         );
-        it('should detect and strip detailed pre- and post-amble text', preambleTestCase);
+        it('detects and strip detailed pre- and post-amble text', preambleTestCase);
         it(
-            'should infer if content looks like an object and add missing curly braces if so',
+            'infers if content looks like an object and add missing curly braces if so',
             missingCurliesTestCase,
         );
         it(
