@@ -171,7 +171,7 @@ const uniquify = ({
             const existingValueMatch = value.match(valueIdxRegex);
             if (existingValueMatch) {
                 const existingValueIdx = parseInt(
-                    existingValueMatch[0].substr(separator.length),
+                    existingValueMatch[0].substring(separator.length),
                     10,
                 );
 
