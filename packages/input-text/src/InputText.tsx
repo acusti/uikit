@@ -209,21 +209,18 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         (event: React.KeyboardEvent<HTMLInputElement>) => {
             if (onKeyDown) onKeyDown(event);
             if (
-                multiLine &&
                 submitOnEnter &&
                 event.key === 'Enter' &&
-                !event.shiftKey &&
-                !event.altKey &&
-                !event.ctrlKey
+                // for multi-line inputs, shift/alt/ctrl-Enter should insert newlines
+                (!multiLine || (!event.shiftKey && !event.altKey && !event.ctrlKey))
             ) {
                 event.preventDefault();
                 const form = event.currentTarget.closest('form');
                 if (form) {
                     form.requestSubmit();
-                } else {
-                    // if no form to submit, trigger input blur
-                    event.currentTarget.blur();
                 }
+                // always blur input on Enter when submitOnEnter is true
+                event.currentTarget.blur();
             } else if (doubleClickToEdit && inputRef.current) {
                 if (readOnlyState) {
                     if (event.key === 'Enter') {
