@@ -18,6 +18,7 @@ export type Props = {
     doubleClickToEdit?: boolean;
     enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
     form?: string;
+    id?: string;
     /**
      * The initial value of the text input. If props.initialValue changes at
      * any point, the new value will override the local state of the input.
@@ -74,6 +75,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         doubleClickToEdit,
         enterKeyHint,
         form,
+        id,
         initialValue,
         list,
         max,
@@ -247,6 +249,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             disabled={disabled}
             enterKeyHint={enterKeyHint}
             form={form}
+            id={id}
             list={list}
             maxLength={maxLength}
             minLength={minLength}
