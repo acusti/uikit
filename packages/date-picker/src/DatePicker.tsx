@@ -21,6 +21,12 @@ export type Props = {
     monthLimitFirst?: number;
     monthLimitLast?: number;
     onChange: (payload: { dateEnd?: string | null; dateStart: string }) => void;
+    /**
+     * Boolean to specify that date picker should initially render with the
+     * end date’s month visible. The default behavior is to initially render
+     * with the start date’s month visible.
+     */
+    showEndInitially?: boolean;
     useMonthAbbreviations?: boolean;
 };
 
@@ -39,6 +45,7 @@ export default function DatePicker({
     monthLimitFirst,
     monthLimitLast,
     onChange,
+    showEndInitially,
     useMonthAbbreviations,
 }: Props) {
     const dateEndFromProps =
@@ -64,10 +71,14 @@ export default function DatePicker({
     }, [dateStartFromProps]);
 
     if (initialMonth == null) {
-        // Use dateStart if it’s set
-        const initialDate = dateStart == null ? new Date() : new Date(dateStart);
-        initialMonth = getMonthFromDate(initialDate);
-        if (isTwoUp && dateStart == null) {
+        // if no valid initial date, initially show present month as date end
+        const useDateEnd = dateStart == null || Boolean(showEndInitially && dateEnd);
+        // use date from props if set
+        const initialDate = useDateEnd ? dateEnd : dateStart;
+        initialMonth = getMonthFromDate(
+            initialDate == null ? new Date() : new Date(initialDate),
+        );
+        if (useDateEnd && isTwoUp) {
             initialMonth -= 1;
         }
     }
