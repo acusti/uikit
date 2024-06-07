@@ -87,3 +87,13 @@ export const NoFutureTwoUpDatePicker: Story = {
         monthLimitLast: getMonthFromDate(new Date()),
     },
 };
+
+export const ShowEndInitiallyDatePicker: Story = {
+    args: {
+        className: 'no-future-two-up-date-picker-story',
+        dateEnd: new Date(1234, 0, 1).toISOString(),
+        dateStart: new Date(1233, 0, 1).toISOString(),
+        isTwoUp: true,
+        showEndInitially: true,
+    },
+};
