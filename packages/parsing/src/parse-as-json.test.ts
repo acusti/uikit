@@ -62,6 +62,7 @@ describe('@acusti/parsing', () => {
             missingValuesTestCase,
         );
         it('handles nested arrays without issue', nestedArraysTestCase);
+        it('handles number values', numberValuesTestCase);
     });
 });
 
@@ -808,4 +809,9 @@ function nestedArraysTestCase() {
         ],
         button: 'Next: Security Details',
     });
+}
+
+function numberValuesTestCase() {
+    const response = '[{"foo":0}\n{"bar": 1}{"baz": "qux"}]<|im_end|>';
+    expect(parseAsJSON(response)).toEqual([{ foo: 0 }, { bar: 1 }, { baz: 'qux' }]);
 }

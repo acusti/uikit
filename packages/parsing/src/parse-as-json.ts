@@ -94,6 +94,16 @@ function isValidContext({
         case ']':
             return char === controlChar;
         case '"':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
             if (text.length === 0) return true; // 1st character in text is a valid context
             if (controlChar === ']') return true; // as an item inside an array is a valid context
             if (controlChar === '}') return true; // as key or value inside an object is a valid context
