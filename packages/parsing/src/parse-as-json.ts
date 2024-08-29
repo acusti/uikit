@@ -239,7 +239,7 @@ export function parseAsJSON(text: string): ParsedValue | null {
         let char = text[index];
         if (isInsideString) {
             if (char === '"' && newText.at(-1) !== '\\') {
-                // set state to not insideString (will set back to true if is unescaped quote mark)s
+                // set state to not insideString (will set back to true if is unescaped quote mark)
                 isInsideString = false;
                 // if quote mark is followed by ':', ', "', or new line, treat it as a string terminus
                 if (!/^( ?:|, ?"|,?\n)/.test(text.substring(index + 1))) {
