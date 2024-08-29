@@ -63,6 +63,10 @@ describe('@acusti/parsing', () => {
         );
         it('handles nested arrays without issue', nestedArraysTestCase);
         it('handles number values', numberValuesTestCase);
+        it(
+            'handles missing opening quotemarks for object keys',
+            missingOpeningQuoteTestCase,
+        );
     });
 });
 
@@ -814,4 +818,14 @@ function nestedArraysTestCase() {
 function numberValuesTestCase() {
     const response = '[{"foo":0}\n{"bar": 1}{"baz": "qux"}]<|im_end|>';
     expect(parseAsJSON(response)).toEqual([{ foo: 0 }, { bar: 1 }, { baz: 'qux' }]);
+}
+
+function missingOpeningQuoteTestCase() {
+    const response =
+        '{"heading":"The Unbreakable Bond"\ndescription":"In a world ravaged by chaos and despair, the heartwarming relationship between Big Man and Sweet Tooth stands as a beacon of hope and love. As Big Man takes the young hybrid under his wing, nurturing him with unwavering devotion, the two forge an unbreakable bond that transcends the boundaries of blood and biology."}<|im_end|>';
+    expect(parseAsJSON(response)).toEqual({
+        heading: 'The Unbreakable Bond',
+        description:
+            'In a world ravaged by chaos and despair, the heartwarming relationship between Big Man and Sweet Tooth stands as a beacon of hope and love. As Big Man takes the young hybrid under his wing, nurturing him with unwavering devotion, the two forge an unbreakable bond that transcends the boundaries of blood and biology.',
+    });
 }

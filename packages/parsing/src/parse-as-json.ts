@@ -424,6 +424,24 @@ export function parseAsJSON(text: string): ParsedValue | null {
                 if (getPreviousStringType(newText) === 'VALUE') {
                     char = ': "",';
                 }
+            } else if (char === '\n') {
+                // treat new lines outside strings as separators
+                const remainingText = text.substring(index + 1);
+                // first, check if there is a missing opening quote mark in rest of text
+                if (/^[a-zA-Z]/.test(remainingText)) {
+                    text = text.substring(0, index + 1) + '"' + remainingText;
+                }
+                // if a comma is missing but needed, add one now
+                if (
+                    (isPreceededBy({ char: '"', text: newText }) &&
+                        isFollowedBy({ char: '"', index, text })) ||
+                    (isPreceededBy({ char: '}', text: newText }) &&
+                        isFollowedBy({ char: '{', index, text })) ||
+                    (isPreceededBy({ char: ']', text: newText }) &&
+                        isFollowedBy({ char: '[', index, text }))
+                ) {
+                    char = ',';
+                }
             }
         }
 
