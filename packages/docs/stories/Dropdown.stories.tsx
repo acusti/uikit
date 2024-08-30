@@ -1,3 +1,4 @@
+import { fn } from '@storybook/test';
 import * as React from 'react';
 
 import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
@@ -171,6 +172,14 @@ export const ShowContextMenuOnMount: Story = {
         ],
         className: 'open-on-mount-context-menu',
         isOpenOnMount: true,
+        // NOTE spies are a workaround for a bug related to implicit arg detection
+        // https://github.com/storybookjs/storybook/issues/23873
+        onClick: fn(),
+        onClose: fn(),
+        onMouseDown: fn(),
+        onMouseUp: fn(),
+        onOpen: fn(),
+        onSubmitItem: fn(),
     },
 };
 
