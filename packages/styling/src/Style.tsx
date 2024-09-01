@@ -1,65 +1,25 @@
-import * as React from 'react';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import React from 'react';
 
-import {
-    getRegisteredStyles,
-    registerStyles,
-    unregisterStyles,
-    updateStyles,
-} from './style-registry.js';
-
-const { useCallback, useEffect, useMemo, useRef, useState } = React;
+import { useStyles } from './useStyles.js';
 
 type Props = {
     children: string;
+    precedence?: string;
 };
 
-const Style = ({ children }: Props) => {
+const Style = ({ children, precedence = 'medium' }: Props) => {
     // Minify CSS styles by replacing consecutive whitespace (including \n) with ' '
-    const styles = useMemo(() => children.replace(/\s+/gm, ' '), [children]);
-    const [ownerDocument, setOwnerDocument] = useState<Document | null>(null);
-    const isMountedRef = useRef<boolean>(false);
-
-    useEffect(() => {
-        isMountedRef.current = true;
-        unregisterStyles({ ownerDocument: 'global', styles });
-    }, []); // eslint-disable-line react-hooks/exhaustive-deps
-
-    useEffect(
-        () => () => {
-            if (!ownerDocument) return;
-            unregisterStyles({ ownerDocument, styles });
-        },
-        [ownerDocument], // eslint-disable-line react-hooks/exhaustive-deps
+    const styles = useStyles(children);
+    // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react/canary.d.ts
+    // https://react.dev/reference/react-dom/components/style#props
+    return (
+        // @ts-expect-error @types/react is missing new <style> props
+        // eslint-disable-next-line react/no-unknown-property
+        <style href={styles} precedence={precedence}>
+            {styles}
+        </style>
     );
-
-    const previousStylesRef = useRef<string>('');
-
-    useEffect(() => {
-        if (!ownerDocument) return;
-
-        updateStyles({
-            ownerDocument,
-            previousStyles: previousStylesRef.current,
-            styles,
-        });
-
-        previousStylesRef.current = styles;
-    }, [ownerDocument, styles]);
-
-    const handleRef = useCallback((element: HTMLElement | null) => {
-        if (!element) return;
-        setOwnerDocument(element.ownerDocument);
-    }, []);
-
-    if (ownerDocument) return null;
-
-    // Avoid duplicate style rendering during SSR via style registry
-    if (!isMountedRef.current) {
-        if (getRegisteredStyles({ ownerDocument: 'global', styles })) return null;
-        registerStyles({ ownerDocument: 'global', styles });
-    }
-
-    return <style dangerouslySetInnerHTML={{ __html: styles }} ref={handleRef} />;
 };
 
 export default Style;

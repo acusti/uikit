@@ -1,3 +1,4 @@
+/// <reference types="react/canary" />
 export { default as Style } from './Style.js';
 
 export const SYSTEM_UI_FONT =
