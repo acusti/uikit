@@ -55,7 +55,7 @@
     "dependencies": {
         "@acusti/input-text": "^1.7.2",
         "@acusti/matchmaking": "^0.7.0",
-        "@acusti/styling": "^0.7.2",
+        "@acusti/styling": "^0.7.2 || ^1.0.0-0",
         "@acusti/use-is-out-of-bounds": "^0.9.0",
         "@acusti/use-keyboard-events": "^0.6.0",
         "clsx": "^2"
