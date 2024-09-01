@@ -28,7 +28,7 @@ describe('@acusti/styling', () => {
 
             let stylesItemA = styleRegistry.get(mockStylesA);
             expect(stylesItemA?.referenceCount).toBe(2);
-            expect(stylesItemA?.styles).toBe('.test-a { color: cyan; }');
+            expect(stylesItemA?.styles).toBe('.test-a{color:cyan}');
             expect(styleRegistry.size).toBe(1);
 
             rerender(<Style>{mockStylesA}</Style>);
