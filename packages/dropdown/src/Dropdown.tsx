@@ -693,7 +693,7 @@ export default function Dropdown({
 
     return (
         <Fragment>
-            <Style>{STYLES}</Style>
+            <Style href="@acusti/dropdown/Dropdown">{STYLES}</Style>
             <div
                 className={clsx(ROOT_CLASS_NAME, className, {
                     disabled,

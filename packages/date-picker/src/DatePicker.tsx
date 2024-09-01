@@ -145,7 +145,7 @@ export default function DatePicker({
 
     return (
         <Fragment>
-            <Style>{STYLES}</Style>
+            <Style href="@acusti/date-picker/DatePicker">{STYLES}</Style>
             <div
                 className={clsx(ROOT_CLASS_NAME, className, {
                     'two-up': isTwoUp,

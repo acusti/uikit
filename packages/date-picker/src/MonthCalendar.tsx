@@ -99,7 +99,7 @@ export default function MonthCalendar({
 
     return (
         <Fragment>
-            <Style>{STYLES}</Style>
+            <Style href="@acusti/date-picker/MonthCalendar">{STYLES}</Style>
             <div className={clsx(ROOT_CLASS_NAME, className)}>
                 <div className={`${ROOT_CLASS_NAME}-month-title`}>
                     <h3 className={`${ROOT_CLASS_NAME}-month-title-text`}>{title}</h3>
