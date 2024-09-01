@@ -2,42 +2,58 @@ import { useEffect, useState } from 'react';
 
 import { minifyStyles } from './minifyStyles.js';
 
-type StyleRegistry = Map<string, { referenceCount: number; styles: string }>;
+type StyleRegistry = Map<
+    string,
+    { href: string; referenceCount: number; styles: string }
+>;
 
 const styleRegistry: StyleRegistry = new Map();
 
 export const getStyleRegistry = () => styleRegistry;
 
-export function useStyles(styles: string) {
-    const [minifiedStyles, setMinifiedStyles] = useState(() => {
-        if (!styles) return '';
+export function useStyles(styles: string, initialHref?: string) {
+    const [stylesItem, setStylesItem] = useState(() => {
+        if (!styles) return { href: '', referenceCount: 0, styles: '' };
 
-        let minified = '';
-        const existingStylesItem = styleRegistry.get(styles);
-        if (existingStylesItem) {
-            existingStylesItem.referenceCount++;
-            minified = existingStylesItem.styles;
+        const key = initialHref ?? styles;
+        let item = styleRegistry.get(key);
+
+        if (item) {
+            item.referenceCount++;
         } else {
-            minified = minifyStyles(styles);
-            styleRegistry.set(styles, { referenceCount: 1, styles: minified });
+            const minified = minifyStyles(styles);
+            item = {
+                href: sanitizeHref(initialHref ?? minified),
+                referenceCount: 1,
+                styles: minified,
+            };
+            styleRegistry.set(key, item);
         }
 
-        return minified;
+        return item;
     });
 
     useEffect(() => {
         if (!styles) return;
-        if (!styleRegistry.get(styles)) {
+
+        const key = initialHref ?? styles;
+
+        if (!styleRegistry.get(key)) {
             const minified = minifyStyles(styles);
-            styleRegistry.set(styles, { referenceCount: 1, styles: minified });
-            setMinifiedStyles(minified);
+            const item = {
+                href: sanitizeHref(initialHref ?? minified),
+                referenceCount: 1,
+                styles: minified,
+            };
+            styleRegistry.set(key, item);
+            setStylesItem(item);
         }
 
         return () => {
-            const stylesItem = styleRegistry.get(styles);
-            if (stylesItem) {
-                stylesItem.referenceCount--;
-                if (!stylesItem.referenceCount) {
+            const existingItem = styleRegistry.get(styles);
+            if (existingItem) {
+                existingItem.referenceCount--;
+                if (!existingItem.referenceCount) {
                     // TODO try scheduling this via setTimeout
                     // and add another referenceCount check
                     // to deal with instance where existing <Style>
@@ -46,9 +62,9 @@ export function useStyles(styles: string) {
                 }
             }
         };
-    }, [styles]);
+    }, [initialHref, styles]);
 
-    return minifiedStyles;
+    return stylesItem;
 }
 
 export default useStyles;
@@ -56,3 +72,9 @@ export default useStyles;
 export const clearRegistry = () => {
     styleRegistry.clear();
 };
+
+// Dashes in selectors in href prop create happy-dom / jsdom test errors:
+// Invalid regular expression (“Range out of order in character class”)
+function sanitizeHref(text: string) {
+    return text.replace(/-/g, '');
+}
