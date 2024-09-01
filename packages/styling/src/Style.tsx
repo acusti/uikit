@@ -5,10 +5,11 @@ import { useStyles } from './useStyles.js';
 
 type Props = {
     children: string;
+    href?: string;
     precedence?: string;
 };
 
-const Style = ({ children, precedence = 'medium' }: Props) => {
+const Style = ({ children, href, precedence = 'medium' }: Props) => {
     // Minify CSS styles by replacing consecutive whitespace (including \n) with ' '
     const styles = useStyles(children);
     // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react/canary.d.ts
@@ -16,7 +17,7 @@ const Style = ({ children, precedence = 'medium' }: Props) => {
     return (
         // @ts-expect-error @types/react is missing new <style> props
         // eslint-disable-next-line react/no-unknown-property
-        <style href={styles} precedence={precedence}>
+        <style href={href ?? styles} precedence={precedence}>
             {styles}
         </style>
     );
