@@ -6,9 +6,11 @@ type StyleCache = Map<string, { href: string; referenceCount: number; styles: st
 
 const styleCache: StyleCache = new Map();
 
+const EMPTY_STYLES_ITEM = { href: '', referenceCount: 0, styles: '' };
+
 export function useStyles(styles: string, initialHref?: string) {
     const [stylesItem, setStylesItem] = useState(() => {
-        if (!styles) return { href: '', referenceCount: 0, styles: '' };
+        if (!styles) return EMPTY_STYLES_ITEM;
 
         const key = initialHref ?? styles;
         let item = styleCache.get(key);
