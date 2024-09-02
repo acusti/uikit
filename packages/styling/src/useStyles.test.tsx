@@ -60,6 +60,47 @@ describe('@acusti/styling', () => {
             expect(styleCache.size).toBe(0);
         });
 
+        it('should preserve style cache across component position changes and re-keying', () => {
+            const styleCache = getStyleCache();
+
+            const { rerender } = render(
+                <React.Fragment>
+                    <Style>{mockStylesA}</Style>
+                </React.Fragment>,
+            );
+
+            const stylesItemA = styleCache.get(mockStylesA);
+            expect(stylesItemA?.referenceCount).toBe(1);
+            expect(stylesItemA?.styles).toBe('.test-a{color:cyan}');
+            expect(styleCache.size).toBe(1);
+
+            rerender(
+                <React.Fragment>
+                    <Style>{mockStylesB}</Style>
+                    <Style>{mockStylesA}</Style>
+                </React.Fragment>,
+            );
+            expect(stylesItemA?.referenceCount).toBe(1);
+            expect(stylesItemA).toBe(styleCache.get(mockStylesA));
+
+            rerender(<Style key="new-a">{mockStylesA}</Style>);
+            expect(stylesItemA?.referenceCount).toBe(1);
+            expect(stylesItemA).toBe(styleCache.get(mockStylesA));
+
+            rerender(
+                <React.Fragment>
+                    <Style>{mockStylesA}</Style>
+                    <Style key="new-a">{mockStylesA}</Style>
+                </React.Fragment>,
+            );
+            expect(stylesItemA?.referenceCount).toBe(2);
+            expect(stylesItemA).toBe(styleCache.get(mockStylesA));
+
+            rerender(<div />);
+            expect(stylesItemA?.referenceCount).toBe(0);
+            expect(styleCache.size).toBe(0);
+        });
+
         it('should sanitize styles used as href prop if no href prop provided', () => {
             render(<Style>{`div[data-foo-bar] { color: cyan; }`}</Style>);
             // the two-dash attribute selector results in “Range out of order in character class”
