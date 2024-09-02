@@ -5,13 +5,14 @@
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/styling?style=for-the-badge)](https://bundlephobia.com/package/@acusti/styling)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/styling?style=for-the-badge)](https://www.npmjs.com/package/@acusti/styling)
 
-Exports `Style`, which is a React component that renders a CSS style string
-as a `<style>` element in the `<head>` of the document optionally specified
-by `props.ownerDocument`. Keeps a per-document global registry of styles
-being rendered so that the same string of CSS will only be rendered as a
-single `<style>` element, no matter how many times the `<Style>` element
-with that string appears in the React component tree.
+This package exports `Style`, which is a React component that takes a CSS string as its children, minifies it, and renders it using the react v19+ `<style>` element’s [special rendering behavior](https://react.dev/reference/react-dom/components/style#special-rendering-behavior):
 
-Also exports useful CSS string literals, such as `SYSTEM_UI_FONT` which can
+> React will move `<style>` components to the document’s `<head>`, de-duplicate identical stylesheets, and suspend while the stylesheet is loading.
+
+This behavior is SSR-friendly (no server hydration errors), and the suspense behavior ensures any assets used by the CSS styles that must be fetched and parsed (e.g. fonts or images) can do so with a loading behavior as-good or better than the way regular CSS stylesheets or inline styles are handled by the browser.
+
+The CSS minification means that insignifant differences between styles (e.g. varying whitespace or empty declarations) won’t result in sthyle duplication. Also, the component maintains an internal global cache of the minified styles to avoid unnecessary re-calculations.
+
+Lastly, this package exports useful CSS string literals, such as `SYSTEM_UI_FONT` which can
 be used as `font-family: ${SYSTEM_UI_FONT};` to specify the appropriate UI
 font for the current OS and browser.
