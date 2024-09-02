@@ -69,10 +69,6 @@ export function useStyles(styles: string, initialHref?: string) {
 
 export default useStyles;
 
-export const clearRegistry = () => {
-    styleRegistry.clear();
-};
-
 // Dashes in selectors in href prop create happy-dom / jsdom test errors:
 // Invalid regular expression (“Range out of order in character class”)
 function sanitizeHref(text: string) {
