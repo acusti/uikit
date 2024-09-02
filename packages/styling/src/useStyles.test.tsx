@@ -59,12 +59,12 @@ describe('@acusti/styling', () => {
             rerender(<div />);
             expect(styleRegistry.size).toBe(0);
         });
-    });
 
-    it('should sanitize styles used as href prop if no href prop provided', () => {
-        render(<Style>{`div[data-foo-bar] { color: cyan; }`}</Style>);
-        // the two-dash attribute selector results in “Range out of order in character class”
-        // and render() fails with SyntaxError: Invalid regular expression if not sanitized
-        expect(true).toBeTruthy();
+        it('should sanitize styles used as href prop if no href prop provided', () => {
+            render(<Style>{`div[data-foo-bar] { color: cyan; }`}</Style>);
+            // the two-dash attribute selector results in “Range out of order in character class”
+            // and render() fails with SyntaxError: Invalid regular expression if not sanitized
+            expect(true).toBeTruthy();
+        });
     });
 });
