@@ -6,8 +6,6 @@ type StyleCache = Map<string, { href: string; referenceCount: number; styles: st
 
 const styleCache: StyleCache = new Map();
 
-export const getStyleCache = () => styleCache;
-
 export function useStyles(styles: string, initialHref?: string) {
     const [stylesItem, setStylesItem] = useState(() => {
         if (!styles) return { href: '', referenceCount: 0, styles: '' };
@@ -71,3 +69,6 @@ export default useStyles;
 function sanitizeHref(text: string) {
     return text.replace(/-/g, '');
 }
+
+// The following export is for test usage only
+export const getStyleCache = () => styleCache;
