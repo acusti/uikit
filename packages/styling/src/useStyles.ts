@@ -2,21 +2,18 @@ import { useEffect, useState } from 'react';
 
 import { minifyStyles } from './minifyStyles.js';
 
-type StyleRegistry = Map<
-    string,
-    { href: string; referenceCount: number; styles: string }
->;
+type StyleCache = Map<string, { href: string; referenceCount: number; styles: string }>;
 
-const styleRegistry: StyleRegistry = new Map();
+const styleCache: StyleCache = new Map();
 
-export const getStyleRegistry = () => styleRegistry;
+export const getStyleCache = () => styleCache;
 
 export function useStyles(styles: string, initialHref?: string) {
     const [stylesItem, setStylesItem] = useState(() => {
         if (!styles) return { href: '', referenceCount: 0, styles: '' };
 
         const key = initialHref ?? styles;
-        let item = styleRegistry.get(key);
+        let item = styleCache.get(key);
 
         if (item) {
             item.referenceCount++;
@@ -27,7 +24,7 @@ export function useStyles(styles: string, initialHref?: string) {
                 referenceCount: 1,
                 styles: minified,
             };
-            styleRegistry.set(key, item);
+            styleCache.set(key, item);
         }
 
         return item;
@@ -38,19 +35,19 @@ export function useStyles(styles: string, initialHref?: string) {
 
         const key = initialHref ?? styles;
 
-        if (!styleRegistry.get(key)) {
+        if (!styleCache.get(key)) {
             const minified = minifyStyles(styles);
             const item = {
                 href: sanitizeHref(initialHref ?? minified),
                 referenceCount: 1,
                 styles: minified,
             };
-            styleRegistry.set(key, item);
+            styleCache.set(key, item);
             setStylesItem(item);
         }
 
         return () => {
-            const existingItem = styleRegistry.get(styles);
+            const existingItem = styleCache.get(styles);
             if (existingItem) {
                 existingItem.referenceCount--;
                 if (!existingItem.referenceCount) {
@@ -58,7 +55,7 @@ export function useStyles(styles: string, initialHref?: string) {
                     // and add another referenceCount check
                     // to deal with instance where existing <Style>
                     // component is moved in the tree or re-keyed
-                    styleRegistry.delete(styles);
+                    styleCache.delete(styles);
                 }
             }
         };
