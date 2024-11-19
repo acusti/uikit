@@ -208,11 +208,12 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     );
 
     const handleKeyDown = useCallback(
-        (event: React.KeyboardEvent<HTMLInputElement>) => {
+        (event: React.KeyboardEvent<InputElement>) => {
             if (onKeyDown) onKeyDown(event);
             if (
-                submitOnEnter &&
                 event.key === 'Enter' &&
+                // for multi-line inputs, ⌘-Enter should always submit
+                (submitOnEnter || (multiLine && isPrimaryModifierPressed(event))) &&
                 // for multi-line inputs, shift/alt/ctrl-Enter should insert newlines
                 (!multiLine || (!event.shiftKey && !event.altKey && !event.ctrlKey))
             ) {
@@ -276,3 +277,10 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         />
     );
 });
+
+const IS_APPLE_REGEXP = /mac|iphone|ipad|ipod/i;
+
+function isPrimaryModifierPressed(event: React.KeyboardEvent<InputElement>) {
+    const platform = globalThis.navigator?.platform ?? '';
+    return IS_APPLE_REGEXP.test(platform) ? event.metaKey : event.ctrlKey;
+}
