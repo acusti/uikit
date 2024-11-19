@@ -46,6 +46,7 @@ export type Props = {
     placeholder?: string;
     readOnly?: boolean;
     required?: boolean;
+    rows?: number;
     /** If true, the contents of the input are selected when it’s focused. */
     selectTextOnFocus?: boolean;
     size?: number;
@@ -95,6 +96,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         placeholder,
         readOnly,
         required,
+        rows = 1,
         selectTextOnFocus,
         size,
         style,
@@ -273,7 +275,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             tabIndex={tabIndex}
             title={title}
             type={type}
-            {...(multiLine ? { onInput: setInputHeight, rows: 1 } : { max, min, step })}
+            {...(multiLine ? { onInput: setInputHeight, rows } : { max, min, step })}
         />
     );
 });
