@@ -48,6 +48,6 @@
     "devDependencies": {
         "@types/lodash.escaperegexp": "^4.1.9",
         "typescript": "5.3.3",
-        "vitest": "^1.1.0"
+        "vitest": "^2.1.8"
     }
 }

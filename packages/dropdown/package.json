@@ -50,14 +50,14 @@
         "react": "^19.0.0-0",
         "react-dom": "^19.0.0-0",
         "typescript": "5.3.3",
-        "vitest": "^1.1.0"
+        "vitest": "^2.1.8"
     },
     "dependencies": {
-        "@acusti/input-text": "^1.7.2",
+        "@acusti/input-text": "^1.8.0",
         "@acusti/matchmaking": "^0.7.0",
         "@acusti/styling": "^0.7.2 || ^1.0.0-0",
-        "@acusti/use-is-out-of-bounds": "^0.9.0",
-        "@acusti/use-keyboard-events": "^0.6.0",
+        "@acusti/use-is-out-of-bounds": "^0.11.0",
+        "@acusti/use-keyboard-events": "^0.7.0",
         "clsx": "^2"
     },
     "peerDependencies": {
