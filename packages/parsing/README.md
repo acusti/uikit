@@ -139,6 +139,6 @@ Developers Handbook][] helpful with a variety of different models (Llama 2
 7B, OpenChat 3.5, OpenHermes 2.5, Zephyr 7B).
 
 [unit tests]:
-    https://github.com/acusti/uikit/blob/main/packages/parsing/src/index.test.ts
+    https://github.com/acusti/uikit/blob/main/packages/parsing/src/parse-as-json.test.ts
 [llama 2: ai developers handbook]:
     https://www.pinecone.io/learn/llama-2/#Llama-2-Chat-Prompt-Structure
