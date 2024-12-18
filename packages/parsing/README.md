@@ -3,7 +3,7 @@
 [![latest version](https://img.shields.io/npm/v/@acusti/parsing?style=for-the-badge)](https://www.npmjs.com/package/@acusti/parsing)
 [![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/parsing?style=for-the-badge)](https://bundlephobia.com/package/@acusti/parsing)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/parsing?style=for-the-badge)](https://www.npmjs.com/package/@acusti/parsing)
-[![Socket Badge](https://socket.dev/api/badge/npm/package/@acusti/parsing/0.15.0)](https://socket.dev/npm/package/@acusti/parsing/overview/0.15.0)
+[![supply chain security](https://socket.dev/api/badge/npm/package/@acusti/parsing/0.15.0)](https://socket.dev/npm/package/@acusti/parsing/overview/0.15.0)
 
 `@acusti/parsing` exports `parseAsJSON`, a function that takes a string and
 attempts to parse it as JSON, returning the resulting JS value, or `null`
