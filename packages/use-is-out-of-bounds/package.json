@@ -1,6 +1,6 @@
 {
     "name": "@acusti/use-is-out-of-bounds",
-    "version": "0.9.0",
+    "version": "0.11.0",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/useIsOutOfBounds.js",
