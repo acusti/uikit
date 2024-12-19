@@ -31,8 +31,6 @@ export function minifyStyles(css: string) {
     const totalLength = css.length;
     let startIndex = 0,
         endIndex = 0,
-        i = 0,
-        max = 0,
         token = '',
         placeholder = '';
 
@@ -56,14 +54,13 @@ export function minifyStyles(css: string) {
     // preserve strings so their content doesn't get accidentally minified
     css = css.replace(/("([^\\"]|\\.|\\)*")|('([^\\']|\\.|\\)*')/g, function (match) {
         const quote = match.substring(0, 1);
-        let i, max;
 
         match = match.slice(1, -1);
 
         // maybe the string contains a comment-like substring?
         // one, maybe more? put'em back then
         if (match.indexOf('___PRESERVE_CANDIDATE_COMMENT_') >= 0) {
-            for (i = 0, max = comments.length; i < max; i = i + 1) {
+            for (let i = 0, max = comments.length; i < max; i++) {
                 match = match.replace(
                     '___PRESERVE_CANDIDATE_COMMENT_' + i + '___',
                     comments[i],
@@ -78,7 +75,7 @@ export function minifyStyles(css: string) {
     });
 
     // strings are safe, now wrestle the comments
-    for (i = 0, max = comments.length; i < max; i = i + 1) {
+    for (let i = 0, max = comments.length; i < max; i = i + 1) {
         token = comments[i];
         placeholder = '___PRESERVE_CANDIDATE_COMMENT_' + i + '___';
 
@@ -171,7 +168,7 @@ export function minifyStyles(css: string) {
     css = css.replace(/;;+/g, ';');
 
     // restore preserved comments and strings
-    for (i = 0, max = preservedTokens.length; i < max; i = i + 1) {
+    for (let i = 0, max = preservedTokens.length; i < max; i = i + 1) {
         css = css.replace('___PRESERVED_TOKEN_' + i + '___', preservedTokens[i]);
     }
 
