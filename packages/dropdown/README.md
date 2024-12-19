@@ -2,8 +2,8 @@
 
 [![latest version](https://img.shields.io/npm/v/@acusti/dropdown?style=for-the-badge)](https://www.npmjs.com/package/@acusti/dropdown)
 [![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/dropdown?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fdropdown)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/dropdown?style=for-the-badge)](https://bundlephobia.com/package/@acusti/dropdown)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/dropdown?style=for-the-badge)](https://www.npmjs.com/package/@acusti/dropdown)
+[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/dropdown)](https://bundlejs.com/?q=%40acusti%2Fdropdown)
 
 `Dropdown` is a React component that renders a menu-like UI with a trigger
 that the user clicks to disclose a dropdown positioned below the trigger.

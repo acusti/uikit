@@ -2,8 +2,8 @@
 
 [![latest version](https://img.shields.io/npm/v/@acusti/input-text?style=for-the-badge)](https://www.npmjs.com/package/@acusti/input-text)
 [![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/input-text?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Finput-text)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/input-text?style=for-the-badge)](https://bundlephobia.com/package/@acusti/input-text)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/input-text?style=for-the-badge)](https://www.npmjs.com/package/@acusti/input-text)
+[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/input-text)](https://bundlejs.com/?q=%40acusti%2Finput-text)
 
 `InputText` is a React component that renders a semi-controlled input,
 meaning that while it is [uncontrolled][] in the React sense, it’s value is

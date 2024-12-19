@@ -2,8 +2,8 @@
 
 [![latest version](https://img.shields.io/npm/v/@acusti/textual?style=for-the-badge)](https://www.npmjs.com/package/@acusti/textual)
 [![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/textual?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Ftextual)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/textual?style=for-the-badge)](https://bundlephobia.com/package/@acusti/textual)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/textual?style=for-the-badge)](https://www.npmjs.com/package/@acusti/textual)
+[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/textual)](https://bundlejs.com/?q=%40acusti%2Ftextual)
 
 Utilities for transforming and formatting text (i.e. strings).
 

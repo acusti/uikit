@@ -3,7 +3,7 @@
 [![latest version](https://img.shields.io/npm/v/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
 [![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/appsync-fetch?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fappsync-fetch)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
-[![install size](https://packagephobia.com/badge?p=@acusti/appsync-fetch&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/appsync-fetch)
+[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/appsync-fetch)](https://bundlejs.com/?q=%40acusti%2Fappsync-fetch)
 
 `appsync-fetch` is a lightweight node.js module that uses [@acusti/post][]
 to make requests to an AWS AppSync graphql API. It expands on

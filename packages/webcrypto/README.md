@@ -1,9 +1,9 @@
 # @acusti/webcrypto
 
 [![latest version](https://img.shields.io/npm/v/@acusti/webcrypto?style=for-the-badge)](https://www.npmjs.com/package/@acusti/webcrypto)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/webcrypto?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fwebcrypto)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/webcrypto?style=for-the-badge)](https://www.npmjs.com/package/@acusti/webcrypto)
-[![install size](https://packagephobia.com/badge?p=@acusti/webcrypto&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/webcrypto)
+[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/webcrypto)](https://bundlejs.com/?q=%40acusti%2Fwebcrypto)
+[![supply chain security](https://socket.dev/api/badge/npm/package/@acusti/webcrypto/1.1.0)](https://socket.dev/npm/package/@acusti/webcrypto/overview/1.1.0)
 
 `webcrypto` exports `window.crypto` / `self.crypto` for use in a browser
 environment (regular or worker) and the equivalent of

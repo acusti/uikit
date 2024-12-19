@@ -1,9 +1,9 @@
 # @acusti/use-keyboard-events
 
 [![latest version](https://img.shields.io/npm/v/@acusti/use-keyboard-events?style=for-the-badge)](https://www.npmjs.com/package/@acusti/use-keyboard-events)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/use-keyboard-events?style=for-the-badge)](https://bundlephobia.com/package/@acusti/use-keyboard-events)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/use-keyboard-events?style=for-the-badge)](https://www.npmjs.com/package/@acusti/use-keyboard-events)
-[![supply chain security](https://socket.dev/api/badge/npm/package/@acusti/webcrypto/1.0.2)](https://socket.dev/npm/package/@acusti/webcrypto/overview/1.0.2)
+[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/use-keyboard-events)](https://bundlejs.com/?q=%40acusti%2Fuse-keyboard-events)
+[![supply chain security](https://socket.dev/api/badge/npm/package/@acusti/use-keyboard-events/0.9.0)](https://socket.dev/npm/package/@acusti/use-keyboard-events/overview/0.9.0)
 
 `useKeyboardEvents` is a React hook that takes the following payload:
 

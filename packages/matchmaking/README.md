@@ -2,8 +2,8 @@
 
 [![latest version](https://img.shields.io/npm/v/@acusti/matchmaking?style=for-the-badge)](https://www.npmjs.com/package/@acusti/matchmaking)
 [![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/matchmaking?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fmatchmaking)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/matchmaking?style=for-the-badge)](https://bundlephobia.com/package/@acusti/matchmaking)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/matchmaking?style=for-the-badge)](https://www.npmjs.com/package/@acusti/matchmaking)
+[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/matchmaking)](https://bundlejs.com/?q=%40acusti%2Fmatchmaking)
 
 Intuitive approximate string matching (i.e. fuzzy searches). See the
 [tests][] to understand its behavior and evaluate if it’s what you are

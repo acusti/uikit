@@ -3,7 +3,7 @@
 [![latest version](https://img.shields.io/npm/v/@acusti/post?style=for-the-badge)](https://www.npmjs.com/package/@acusti/post)
 [![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/post?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fpost)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/post?style=for-the-badge)](https://www.npmjs.com/package/@acusti/post)
-[![install size](https://packagephobia.com/badge?p=@acusti/post&style=for-the-badge)](https://packagephobia.com/result?p=@acusti/post)
+[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/post)](https://bundlejs.com/?q=%40acusti%2Fpost)
 
 `post` is a super minimal fetch-inspired API wrapper around node.js’ `http`
 and `https` modules for making POST requests. It’s a lean implementation

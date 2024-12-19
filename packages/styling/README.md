@@ -2,8 +2,8 @@
 
 [![latest version](https://img.shields.io/npm/v/@acusti/styling?style=for-the-badge)](https://www.npmjs.com/package/@acusti/styling)
 [![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/styling?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fstyling)
-[![bundle size](https://img.shields.io/bundlephobia/minzip/@acusti/styling?style=for-the-badge)](https://bundlephobia.com/package/@acusti/styling)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/styling?style=for-the-badge)](https://www.npmjs.com/package/@acusti/styling)
+[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/styling)](https://bundlejs.com/?q=%40acusti%2Fstyling)
 
 This package exports `Style`, which is a React component that takes a CSS
 string as its children, minifies it, and renders it using the react v19+
