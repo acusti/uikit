@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react';
+import { fn } from '@storybook/test';
 import * as React from 'react';
 
 import InputText from '../../input-text/src/InputText.js';
@@ -28,6 +29,13 @@ export const EmptyInput: Story = {
     args: {
         className: 'input-text',
         name: 'empty',
+        // NOTE spies are a workaround for a bug related to implicit arg detection
+        onBlur: fn(),
+        onChange: fn(),
+        onChangeValue: fn(),
+        onFocus: fn(),
+        onKeyDown: fn(),
+        onKeyUp: fn(),
         placeholder: 'enter text here…',
     },
 };

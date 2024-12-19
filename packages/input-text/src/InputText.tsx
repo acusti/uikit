@@ -39,6 +39,11 @@ export type Props = {
     name?: string;
     onBlur?: (event: React.FocusEvent<InputElement>) => unknown;
     onChange?: (event: React.ChangeEvent<InputElement>) => unknown;
+    /**
+     * Custom change handler that only receives the changed value as an argument.
+     * Enables passing a state setter function directly, e.g. onChangeValue={setValue}.
+     */
+    onChangeValue?: (value: string) => unknown;
     onFocus?: (event: React.FocusEvent<InputElement>) => unknown;
     onKeyDown?: (event: React.KeyboardEvent<InputElement>) => unknown;
     onKeyUp?: (event: React.KeyboardEvent<InputElement>) => unknown;
@@ -89,6 +94,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         name,
         onBlur,
         onChange,
+        onChangeValue,
         onFocus,
         onKeyDown,
         onKeyUp,
@@ -161,6 +167,14 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
 
     // Initialize input height in useEffect
     useEffect(setInputHeight, [setInputHeight]);
+
+    const handleChange = useCallback(
+        (event: React.ChangeEvent<InputElement>) => {
+            if (onChange) onChange(event);
+            if (onChangeValue) onChangeValue(event.target.value);
+        },
+        [onChange, onChangeValue],
+    );
 
     const handleFocus = useCallback(
         (event: React.FocusEvent<HTMLInputElement>) => {
@@ -256,7 +270,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             multiple={multiple}
             name={name}
             onBlur={handleBlur}
-            onChange={onChange}
+            onChange={handleChange}
             onDoubleClick={startEditing}
             onFocus={handleFocus}
             onKeyDown={handleKeyDown}
