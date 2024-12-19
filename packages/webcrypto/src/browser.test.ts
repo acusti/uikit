@@ -5,7 +5,7 @@ import webcrypto from './browser.js';
 
 describe('@acusti/webcrypto', () => {
     describe('browser.ts', () => {
-        it('exports node:crypto’s webcrypto object', () => {
+        it('exports the browser’s global crypto object', () => {
             expect(webcrypto).toBe(window.crypto);
         });
     });
