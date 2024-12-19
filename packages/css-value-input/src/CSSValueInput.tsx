@@ -89,7 +89,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
     useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
     // props.value should be a string; if it’s a number, convert it here
     if (typeof value === 'number' && !Number.isNaN(value)) {
-        value = `${value}`; // eslint-disable-line @typescript-eslint/restrict-template-expressions
+        value = `${value}`;
     }
     const submittedValueRef = useRef<string>(value ?? '');
 
@@ -292,7 +292,9 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
             className={clsx(ROOT_CLASS_NAME, className, { disabled })}
             title={title}
         >
-            {icon ? <div className={`${ROOT_CLASS_NAME}-icon`}>{icon}</div> : null}
+            {icon == null ? null : (
+                <div className={`${ROOT_CLASS_NAME}-icon`}>{icon}</div>
+            )}
             {label ? (
                 <div className={`${ROOT_CLASS_NAME}-label`}>
                     <p className={`${ROOT_CLASS_NAME}-label-text`}>{label}</p>
