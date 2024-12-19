@@ -135,7 +135,7 @@ export default function MonthCalendar({
                                 className={`${ROOT_CLASS_NAME}-month-row`}
                                 key={`MonthRow-${weekIndex}`}
                             >
-                                {DAYS.map((_, dayIndex) => {
+                                {DAYS.map((__, dayIndex) => {
                                     dayIndex += weekIndex * 7;
                                     const dayNumber = (dayIndex - firstDay) + 1; // prettier-ignore
                                     const isEmpty =
