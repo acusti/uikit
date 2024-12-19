@@ -31,5 +31,14 @@ describe('@acusti/styling', () => {
 }`),
             ).toBe('.foo{opacity:.6}');
         });
+
+        it('strips out comments', () => {
+            expect(
+                minifyStyles(`
+.bar {
+    font-weight: 900;/*.bar is so *strong**/
+}`),
+            ).toBe('.bar{font-weight:900}');
+        });
     });
 });
