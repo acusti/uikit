@@ -76,7 +76,7 @@ const otherInstanceExists = ({
         : new RegExp(existingRegexString, 'i');
 
     return items.some((item) => {
-        if (!item) return false;
+        if (item == null) return false;
 
         let itemPropertyValue = propertyPath ? getIn(item, propertyPath) : item;
 

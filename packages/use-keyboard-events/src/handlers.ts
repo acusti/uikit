@@ -35,7 +35,7 @@ export function addHandler({
     );
 
     const handlersByPriority = handlersData[eventType];
-    if (!handlersByPriority[priority]) {
+    if (handlersByPriority[priority] == null) {
         handlersByPriority[priority] = new Set();
     }
 
@@ -44,7 +44,7 @@ export function addHandler({
 
     return () => {
         handlersData.config.delete(handler);
-        if (!handlersByPriority[priority]) return;
+        if (handlersByPriority[priority] == null) return;
 
         handlersByPriority[priority].delete(handler);
         if (!handlersByPriority[priority].size) {
@@ -53,7 +53,7 @@ export function addHandler({
             for (
                 let index = priority;
                 index > -1 &&
-                !handlersByPriority[index] &&
+                handlersByPriority[index] == null &&
                 handlersByPriority.length === index + 1;
                 index--
             ) {
@@ -99,7 +99,7 @@ export const usesKeyEvents = (target: EventTarget) =>
 
 export const isEventTargetUsingKeyEvent = (event: KeyboardEvent) => {
     const target = event.target as HTMLElement;
-    if (!target || !usesKeyEvents(target)) return false;
+    if (target == null || !usesKeyEvents(target)) return false;
     // Restrict special handling to only non-text <input> elements
     if (target.tagName !== 'INPUT') return true;
     if (!NON_TEXT_INPUT_TYPES.has((target as HTMLInputElement).type)) return true;
@@ -114,7 +114,7 @@ function handleKeyboardEvent(event: KeyboardEvent) {
     const targetUsesKeyEvents = isEventTargetUsingKeyEvent(event);
     while (index--) {
         const handlers = handlersByPriority[index];
-        if (handlers) {
+        if (handlers != null) {
             for (const handler of handlers) {
                 const config = handlersData.config.get(handler);
                 if (!targetUsesKeyEvents || config?.ignoreUsedKeyboardEvents === false) {
@@ -130,8 +130,7 @@ type DefaultView = Window & { __useKeyboardEventsAttached__?: boolean };
 
 export function addHandlers(doc: Document) {
     if (
-        !doc ||
-        !doc.defaultView ||
+        !doc?.defaultView ||
         (doc.defaultView as DefaultView).__useKeyboardEventsAttached__
     ) {
         return;
