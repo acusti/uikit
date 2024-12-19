@@ -56,7 +56,7 @@ export const post = async <ResponseJSON>(url: string, options: FetchOptions) => 
     });
 
     // Check for 4xx and 5xx responses and throw with the response
-    if (response.statusCode && response.statusCode >= 400) {
+    if (response.statusCode != null && response.statusCode >= 400) {
         const messageBase = `Received ${response.statusCode} response`;
         const error: Error & {
             response?: IncomingMessage;
@@ -72,7 +72,7 @@ export const post = async <ResponseJSON>(url: string, options: FetchOptions) => 
         try {
             error.responseJSON = JSON.parse(data) as ResponseJSON;
             const { errors } = error.responseJSON as UnknownGQLResponseJSON;
-            if (errors) {
+            if (errors != null) {
                 error.message =
                     `: ${messageBase}` +
                     errors.reduce(

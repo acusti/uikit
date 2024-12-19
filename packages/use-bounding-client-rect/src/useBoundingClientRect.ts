@@ -67,7 +67,7 @@ const initializeUpdateHandlers = (element: HTMLElement) => {
     const refs = refsByElement.get(element);
     if (!refs) return;
     // If update handlers are already initialized, there’s no more work to do
-    if (refs.scheduleUpdate && refs.scheduleUpdate !== noop) return;
+    if (refs.scheduleUpdate != null && refs.scheduleUpdate !== noop) return;
 
     refs.updateBoundingClientRect = () => {
         refs.updaterFrameID = null;
@@ -113,7 +113,7 @@ const initializeUpdateHandlers = (element: HTMLElement) => {
 
     refs.scheduleUpdate = () => {
         // Use requestAnimationFrame-based throttling to prevent ResizeObserver loop limit exceeded
-        if (refs.updaterFrameID) return;
+        if (refs.updaterFrameID != null) return;
         refs.updaterFrameID = requestAnimationFrame(refs.updateBoundingClientRect);
     };
 

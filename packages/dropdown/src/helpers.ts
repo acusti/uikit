@@ -18,7 +18,7 @@ export const getItemElements = (dropdownElement: HTMLElement | null) => {
     // use first instance of multiple children found
     items = bodyElement.children;
     while (items.length === 1) {
-        if (!items[0].children) break;
+        if (items[0].children == null) break;
         items = items[0].children;
     }
     // If unable to find an element with more than one child, treat direct child as items
@@ -30,7 +30,6 @@ export const getItemElements = (dropdownElement: HTMLElement | null) => {
 
 export const getActiveItemElement = (dropdownElement: HTMLElement | null) => {
     if (!dropdownElement) return null;
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
     return dropdownElement.querySelector('[data-ukt-active]') as HTMLElement | null;
 };
 
@@ -145,7 +144,7 @@ export const setActiveItem = ({
     clearItemElementsState(itemElements);
 
     const nextActiveItem = items[nextActiveIndex];
-    if (nextActiveItem) {
+    if (nextActiveItem != null) {
         nextActiveItem.setAttribute('data-ukt-active', '');
         // Find closest scrollable parent and ensure that next active item is visible
         let { parentElement } = nextActiveItem;
