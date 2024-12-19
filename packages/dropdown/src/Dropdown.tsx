@@ -250,12 +250,12 @@ export default function Dropdown({
                 if (inputElementRef.current?.value) return;
             }
 
-            let label = element?.innerText ?? '';
+            let itemLabel = element?.innerText ?? '';
             if (inputElementRef.current) {
                 if (!element) {
-                    label = inputElementRef.current.value;
+                    itemLabel = inputElementRef.current.value;
                 } else {
-                    inputElementRef.current.value = label;
+                    inputElementRef.current.value = itemLabel;
                 }
 
                 if (
@@ -266,12 +266,17 @@ export default function Dropdown({
                 }
             }
 
-            const nextValue = element?.dataset.uktValue ?? label;
+            const nextValue = element?.dataset.uktValue ?? itemLabel;
             // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
             if (valueRef.current && valueRef.current === nextValue) return;
 
             if (onSubmitItemRef.current) {
-                onSubmitItemRef.current({ element, event, label, value: nextValue });
+                onSubmitItemRef.current({
+                    element,
+                    event,
+                    label: itemLabel,
+                    value: nextValue,
+                });
             }
         },
         [closeDropdown],
