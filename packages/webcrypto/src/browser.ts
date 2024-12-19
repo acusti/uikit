@@ -1,4 +1,1 @@
-// eslint-disable-next-line no-restricted-globals
-const globalObject = typeof self !== 'undefined' ? self : window;
-
-export default globalObject.crypto;
+export default (typeof self === 'undefined' ? window : self).crypto;
