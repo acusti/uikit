@@ -1,6 +1,6 @@
 {
     "name": "@acusti/use-bounding-client-rect",
-    "version": "1.2.0",
+    "version": "1.4.0",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/useBoundingClientRect.js",
