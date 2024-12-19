@@ -42,7 +42,7 @@ __metadata:
     "@acusti/css-values": "npm:^1.0.2"
     "@acusti/input-text": "npm:^1.8.0"
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.0.1"
+    "@testing-library/react": "npm:^16.1.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.2"
     clsx: "npm:^2"
@@ -72,7 +72,7 @@ __metadata:
   dependencies:
     "@acusti/styling": "npm:^0.7.2 || ^1.0.0-0"
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.0.1"
+    "@testing-library/react": "npm:^16.1.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.2"
     clsx: "npm:^2"
@@ -97,7 +97,7 @@ __metadata:
     "@acusti/use-is-out-of-bounds": "npm:^0.12.0"
     "@acusti/use-keyboard-events": "npm:^0.8.0"
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.0.1"
+    "@testing-library/react": "npm:^16.1.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.2"
     clsx: "npm:^2"
@@ -117,7 +117,7 @@ __metadata:
   resolution: "@acusti/input-text@workspace:packages/input-text"
   dependencies:
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.0.1"
+    "@testing-library/react": "npm:^16.1.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.2"
     happy-dom: "npm:^15.7.3"
@@ -164,7 +164,7 @@ __metadata:
   resolution: "@acusti/styling@workspace:packages/styling"
   dependencies:
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.0.1"
+    "@testing-library/react": "npm:^16.1.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.2"
     happy-dom: "npm:^15.7.3"
@@ -292,7 +292,7 @@ __metadata:
   resolution: "@acusti/use-keyboard-events@workspace:packages/use-keyboard-events"
   dependencies:
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.0.1"
+    "@testing-library/react": "npm:^16.1.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.2"
     happy-dom: "npm:^15.7.3"
@@ -3039,7 +3039,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/react@npm:^16.0.1, @testing-library/react@npm:^16.1.0":
+"@testing-library/react@npm:^16.1.0":
   version: 16.1.0
   resolution: "@testing-library/react@npm:16.1.0"
   dependencies:

@@ -43,7 +43,7 @@
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/dropdown#readme",
     "devDependencies": {
         "@testing-library/dom": "^10.4.0",
-        "@testing-library/react": "^16.0.1",
+        "@testing-library/react": "^16.1.0",
         "@testing-library/user-event": "^14.5.2",
         "@types/react": "^19.0.2",
         "happy-dom": "^15.7.3",
