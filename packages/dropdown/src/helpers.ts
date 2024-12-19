@@ -135,7 +135,7 @@ export const setActiveItem = ({
             }
         } else {
             const bestMatch = getBestMatch({ items: itemTexts, text });
-            nextActiveIndex = itemTexts.findIndex((text) => text === bestMatch);
+            nextActiveIndex = itemTexts.findIndex((itemText) => itemText === bestMatch);
         }
     }
 
