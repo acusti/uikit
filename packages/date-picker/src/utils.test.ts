@@ -2,9 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import {
     getDateFromMonthAndDay,
+    getLastDateFromMonth,
     getMonthFromDate,
     getMonthNameFromMonth,
-    getLastDateFromMonth,
     getYearFromMonth,
 } from './utils.js';
 
