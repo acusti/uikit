@@ -175,7 +175,7 @@ function lengthOf(item: unknown): number {
             if (!item) return 0;
             if (Array.isArray(item)) {
                 return item.reduce(
-                    (acc: number, item) => acc + lengthOf(item),
+                    (acc: number, _item) => acc + lengthOf(_item),
                     0,
                 ) as number;
             }
@@ -465,8 +465,8 @@ export function parseAsJSON(text: string): ParsedValue | null {
     }
 
     // close any remaining open structures in the reverse order that they were opened
-    for (let index = stack.length - 1; index >= 0; index--) {
-        newText += stack[index];
+    for (let stackIndex = stack.length - 1; stackIndex >= 0; stackIndex--) {
+        newText += stack[stackIndex];
     }
 
     // attempt to parse the modified string as JSON
