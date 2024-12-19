@@ -36,13 +36,13 @@ export const post = async <ResponseJSON>(url: string, options: FetchOptions) => 
         const clientRequest = request(
             parsedURL,
             requestOptions,
-            (response: IncomingMessage) => {
-                response.on('data', (chunk: string) => {
+            (_response: IncomingMessage) => {
+                _response.on('data', (chunk: string) => {
                     data += chunk;
                 });
 
-                response.on('end', () => {
-                    resolve(response);
+                _response.on('end', () => {
+                    resolve(_response);
                 });
             },
         );
@@ -76,8 +76,8 @@ export const post = async <ResponseJSON>(url: string, options: FetchOptions) => 
                 error.message =
                     `: ${messageBase}` +
                     errors.reduce(
-                        (acc: string, error: { message: string } | null) =>
-                            acc + acc ? '\n' : '' + error?.message,
+                        (acc: string, _error: { message: string } | null) =>
+                            acc + acc ? '\n' : '' + _error?.message,
                         '',
                     );
             }
