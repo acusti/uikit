@@ -481,9 +481,12 @@ export function parseAsJSON(text: string): ParsedValue | null {
     // what we already parsed, the model might’ve restarted partway through.
     // try parsing the rest to see if we get a larger result and use it if so.
     const remainingText = text.substring(index);
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (remainingText.length > 5 && (!result || remainingText.length > index)) {
         const remainingResult = parseAsJSON(remainingText);
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (remainingResult) {
+            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!result) return remainingResult;
             // choose whichever has more keys (or, if equal, more characters)
             if (
