@@ -18,7 +18,7 @@ __metadata:
   dependencies:
     "@acusti/aws-signature-v4": "npm:^0.6.2"
     "@acusti/post": "npm:^0.5.1"
-    "@types/node": "npm:^22.5.1"
+    "@types/node": "npm:^22.10.2"
     typescript: "npm:5.3.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
@@ -29,7 +29,7 @@ __metadata:
   resolution: "@acusti/aws-signature-v4@workspace:packages/aws-signature-v4"
   dependencies:
     "@acusti/webcrypto": "npm:^1.0.2"
-    "@types/node": "npm:^22.5.1"
+    "@types/node": "npm:^22.10.2"
     typescript: "npm:5.3.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
@@ -153,7 +153,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/post@workspace:packages/post"
   dependencies:
-    "@types/node": "npm:^22.5.1"
+    "@types/node": "npm:^22.10.2"
     typescript: "npm:5.3.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
@@ -216,7 +216,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.1.0"
     "@testing-library/user-event": "npm:^14.5.2"
-    "@types/node": "npm:^22.5.1"
+    "@types/node": "npm:^22.10.2"
     "@types/react": "npm:^19.0.2"
     "@typescript-eslint/eslint-plugin": "npm:^8.18.1"
     "@typescript-eslint/parser": "npm:^8.18.1"
@@ -310,7 +310,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/webcrypto@workspace:packages/webcrypto"
   dependencies:
-    "@types/node": "npm:^22.5.1"
+    "@types/node": "npm:^22.10.2"
     happy-dom: "npm:^15.7.3"
     typescript: "npm:5.3.3"
     vitest: "npm:^2.1.8"
@@ -3320,12 +3320,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*, @types/node@npm:^22.5.1":
-  version: 22.5.1
-  resolution: "@types/node@npm:22.5.1"
+"@types/node@npm:*, @types/node@npm:^22.10.2":
+  version: 22.10.2
+  resolution: "@types/node@npm:22.10.2"
   dependencies:
-    undici-types: "npm:~6.19.2"
-  checksum: 10/adcec0e8a9ec9112a8cc9529b7d633356c2377fe69ca6e6de4ee39cacb8c86a18a9b7ba658e2456f8ad90d5b76767b268f517b0336c6db787cb056dcdfed107a
+    undici-types: "npm:~6.20.0"
+  checksum: 10/451adfefed4add58b069407173e616220fd4aaa3307cdde1bb701aa053b65b54ced8483db2f870dcedec7a58cb3b06101fbc19d85852716672ec1fd3660947fa
   languageName: node
   linkType: hard
 
@@ -10094,10 +10094,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"undici-types@npm:~6.19.2":
-  version: 6.19.8
-  resolution: "undici-types@npm:6.19.8"
-  checksum: 10/cf0b48ed4fc99baf56584afa91aaffa5010c268b8842f62e02f752df209e3dea138b372a60a963b3b2576ed932f32329ce7ddb9cb5f27a6c83040d8cd74b7a70
+"undici-types@npm:~6.20.0":
+  version: 6.20.0
+  resolution: "undici-types@npm:6.20.0"
+  checksum: 10/583ac7bbf4ff69931d3985f4762cde2690bb607844c16a5e2fbb92ed312fe4fa1b365e953032d469fa28ba8b224e88a595f0b10a449332f83fa77c695e567dbe
   languageName: node
   linkType: hard
 

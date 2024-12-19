@@ -41,7 +41,7 @@
         "@acusti/webcrypto": "^1.0.2"
     },
     "devDependencies": {
-        "@types/node": "^22.5.1",
+        "@types/node": "^22.10.2",
         "typescript": "5.3.3",
         "vitest": "^2.1.8"
     }

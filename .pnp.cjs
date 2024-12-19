@@ -122,7 +122,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/dom", "npm:10.4.0"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.1.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.5.2"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["@types/react", "npm:19.0.2"],\
           ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.18.1"],\
           ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.18.1"],\
@@ -170,7 +170,7 @@ const RAW_RUNTIME_STATE =
           ["@acusti/appsync-fetch", "workspace:packages/appsync-fetch"],\
           ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
           ["@acusti/post", "workspace:packages/post"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
           ["vitest", "virtual:54be9ef6f2875e5ea191d927659d88639c5383ec1cdb6eaa338a29bcc043e2d159814748837f6a0f75ac6e9d1074d142d7fab6be1ce7a3b4840d51ce619387d4#npm:2.1.8"]\
         ],\
@@ -183,7 +183,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
           ["@acusti/webcrypto", "workspace:packages/webcrypto"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
           ["vitest", "virtual:54be9ef6f2875e5ea191d927659d88639c5383ec1cdb6eaa338a29bcc043e2d159814748837f6a0f75ac6e9d1074d142d7fab6be1ce7a3b4840d51ce619387d4#npm:2.1.8"]\
         ],\
@@ -334,7 +334,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/post/",\
         "packageDependencies": [\
           ["@acusti/post", "workspace:packages/post"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
           ["vitest", "virtual:54be9ef6f2875e5ea191d927659d88639c5383ec1cdb6eaa338a29bcc043e2d159814748837f6a0f75ac6e9d1074d142d7fab6be1ce7a3b4840d51ce619387d4#npm:2.1.8"]\
         ],\
@@ -403,7 +403,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/dom", "npm:10.4.0"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.1.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.5.2"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["@types/react", "npm:19.0.2"],\
           ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.18.1"],\
           ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.18.1"],\
@@ -582,7 +582,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/webcrypto/",\
         "packageDependencies": [\
           ["@acusti/webcrypto", "workspace:packages/webcrypto"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["happy-dom", "npm:15.11.7"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
           ["vitest", "virtual:d86e9109c35931fea3fd99d40fb126c9c4e0d08179ba95ce293ca3f7653be7e7a182f33676f632c72c755f7f362d9c7779a021a379fe6973fa09ca73f19902fd#npm:2.1.8"]\
@@ -1870,7 +1870,7 @@ const RAW_RUNTIME_STATE =
           ["@jest/schemas", "npm:29.6.3"],\
           ["@types/istanbul-lib-coverage", "npm:2.0.4"],\
           ["@types/istanbul-reports", "npm:3.0.1"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["@types/yargs", "npm:17.0.24"],\
           ["chalk", "npm:4.1.2"]\
         ],\
@@ -4570,7 +4570,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@types/body-parser", "npm:1.19.3"],\
           ["@types/connect", "npm:3.4.36"],\
-          ["@types/node", "npm:22.5.1"]\
+          ["@types/node", "npm:22.10.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4580,7 +4580,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/@types-connect-npm-3.4.36-0d8f297d57-4dee3d966f.zip/node_modules/@types/connect/",\
         "packageDependencies": [\
           ["@types/connect", "npm:3.4.36"],\
-          ["@types/node", "npm:22.5.1"]\
+          ["@types/node", "npm:22.10.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4644,7 +4644,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/@types-express-serve-static-core-npm-4.17.36-87a82f5a6b-47d5c30a4a.zip/node_modules/@types/express-serve-static-core/",\
         "packageDependencies": [\
           ["@types/express-serve-static-core", "npm:4.17.36"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["@types/qs", "npm:6.9.8"],\
           ["@types/range-parser", "npm:1.2.4"],\
           ["@types/send", "npm:0.17.1"]\
@@ -4667,7 +4667,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@types/glob", "npm:7.2.0"],\
           ["@types/minimatch", "npm:5.1.2"],\
-          ["@types/node", "npm:22.5.1"]\
+          ["@types/node", "npm:22.10.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4677,7 +4677,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/@types-graceful-fs-npm-4.1.6-1eadcf742d-c3070ccdc9.zip/node_modules/@types/graceful-fs/",\
         "packageDependencies": [\
           ["@types/graceful-fs", "npm:4.1.6"],\
-          ["@types/node", "npm:22.5.1"]\
+          ["@types/node", "npm:22.10.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4799,11 +4799,11 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
-      ["npm:22.5.1", {\
-        "packageLocation": "./.yarn/cache/@types-node-npm-22.5.1-684f129d7d-adcec0e8a9.zip/node_modules/@types/node/",\
+      ["npm:22.10.2", {\
+        "packageLocation": "./.yarn/cache/@types-node-npm-22.10.2-572466b048-451adfefed.zip/node_modules/@types/node/",\
         "packageDependencies": [\
-          ["@types/node", "npm:22.5.1"],\
-          ["undici-types", "npm:6.19.8"]\
+          ["@types/node", "npm:22.10.2"],\
+          ["undici-types", "npm:6.20.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4813,7 +4813,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/@types-node-fetch-npm-2.6.5-ddf3d588ee-8a5127c866.zip/node_modules/@types/node-fetch/",\
         "packageDependencies": [\
           ["@types/node-fetch", "npm:2.6.5"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["form-data", "npm:4.0.0"]\
         ],\
         "linkType": "HARD"\
@@ -4871,7 +4871,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@types/send", "npm:0.17.1"],\
           ["@types/mime", "npm:1.3.2"],\
-          ["@types/node", "npm:22.5.1"]\
+          ["@types/node", "npm:22.10.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4883,7 +4883,7 @@ const RAW_RUNTIME_STATE =
           ["@types/serve-static", "npm:1.15.2"],\
           ["@types/http-errors", "npm:2.0.2"],\
           ["@types/mime", "npm:3.0.1"],\
-          ["@types/node", "npm:22.5.1"]\
+          ["@types/node", "npm:22.10.2"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -9435,7 +9435,7 @@ const RAW_RUNTIME_STATE =
           ["jest-haste-map", "npm:29.7.0"],\
           ["@jest/types", "npm:29.6.3"],\
           ["@types/graceful-fs", "npm:4.1.6"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["anymatch", "npm:3.1.3"],\
           ["fb-watchman", "npm:2.0.2"],\
           ["fsevents", "patch:fsevents@npm%3A2.3.3#optional!builtin<compat/fsevents>::version=2.3.3&hash=df0bf1"],\
@@ -9464,7 +9464,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["jest-util", "npm:29.7.0"],\
           ["@jest/types", "npm:29.6.3"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["chalk", "npm:4.1.2"],\
           ["ci-info", "npm:3.8.0"],\
           ["graceful-fs", "npm:4.2.11"],\
@@ -9478,7 +9478,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/jest-worker-npm-29.7.0-4d3567fed6-364cbaef00.zip/node_modules/jest-worker/",\
         "packageDependencies": [\
           ["jest-worker", "npm:29.7.0"],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["jest-util", "npm:29.7.0"],\
           ["merge-stream", "npm:2.0.0"],\
           ["supports-color", "npm:8.1.1"]\
@@ -12645,10 +12645,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["undici-types", [\
-      ["npm:6.19.8", {\
-        "packageLocation": "./.yarn/cache/undici-types-npm-6.19.8-9f12285b7a-cf0b48ed4f.zip/node_modules/undici-types/",\
+      ["npm:6.20.0", {\
+        "packageLocation": "./.yarn/cache/undici-types-npm-6.20.0-bd21e669af-583ac7bbf4.zip/node_modules/undici-types/",\
         "packageDependencies": [\
-          ["undici-types", "npm:6.19.8"]\
+          ["undici-types", "npm:6.20.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -12942,7 +12942,7 @@ const RAW_RUNTIME_STATE =
           ["vite", "virtual:30e837829db32589e19c7a7940ab2bf60ded97239eed5b93c461711941d7400deba68f8a3e8c9b6f0a2f8050e0435eeb189d939004385f5dbb53400d0773b4c8#npm:5.4.2"],\
           ["@types/less", null],\
           ["@types/lightningcss", null],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["@types/sass", null],\
           ["@types/sass-embedded", null],\
           ["@types/stylus", null],\
@@ -13123,7 +13123,7 @@ const RAW_RUNTIME_STATE =
           ["@types/jiti", null],\
           ["@types/less", null],\
           ["@types/lightningcss", null],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["@types/sass", null],\
           ["@types/sass-embedded", null],\
           ["@types/stylus", null],\
@@ -13221,7 +13221,7 @@ const RAW_RUNTIME_STATE =
           ["@types/edge-runtime__vm", null],\
           ["@types/happy-dom", null],\
           ["@types/jsdom", null],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["@types/vitest__browser", null],\
           ["@types/vitest__ui", null],\
           ["@vitest/browser", null],\
@@ -13374,7 +13374,7 @@ const RAW_RUNTIME_STATE =
           ["@types/edge-runtime__vm", null],\
           ["@types/happy-dom", null],\
           ["@types/jsdom", null],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["@types/vitest__browser", null],\
           ["@types/vitest__ui", null],\
           ["@vitest/browser", null],\
@@ -13425,7 +13425,7 @@ const RAW_RUNTIME_STATE =
           ["@types/edge-runtime__vm", null],\
           ["@types/happy-dom", null],\
           ["@types/jsdom", null],\
-          ["@types/node", "npm:22.5.1"],\
+          ["@types/node", "npm:22.10.2"],\
           ["@types/vitest__browser", null],\
           ["@types/vitest__ui", null],\
           ["@vitest/browser", null],\
