@@ -83,11 +83,6 @@ const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
     const elementRect = useBoundingClientRect(element);
     const boundingElement = getBoundingAncestor(element);
     const boundingElementRect = useBoundingClientRect(boundingElement);
-    // If boundingElement is the <body> element, use viewport height as bottom
-    if (boundingElement?.tagName === 'BODY') {
-        boundingElementRect.bottom =
-            boundingElement.ownerDocument.documentElement.clientHeight;
-    }
 
     if (element !== elementRef.current) {
         elementRef.current = element ?? null;
@@ -103,14 +98,18 @@ const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
     }
 
     const previousOutOfBounds = outOfBoundsRef.current;
-    const elementBottom = elementRect.bottom!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
-    const elementLeft = elementRect.left!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
-    const elementRight = elementRect.right!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
-    const elementTop = elementRect.top!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
-    const boundingElementBottom = boundingElementRect.bottom!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
-    const boundingElementLeft = boundingElementRect.left!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
-    const boundingElementRight = boundingElementRect.right!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
-    const boundingElementTop = boundingElementRect.top!; // eslint-disable-line @typescript-eslint/no-unnecessary-type-assertion
+    const elementBottom = elementRect.bottom!;
+    const elementLeft = elementRect.left!;
+    const elementRight = elementRect.right!;
+    const elementTop = elementRect.top!;
+    // If boundingElement is the <body> element, use viewport height as bottom
+    const boundingElementBottom =
+        boundingElement?.tagName === 'BODY'
+            ? boundingElement.ownerDocument.documentElement.clientHeight!
+            : boundingElementRect.bottom!;
+    const boundingElementLeft = boundingElementRect.left!;
+    const boundingElementRight = boundingElementRect.right!;
+    const boundingElementTop = boundingElementRect.top!;
     const elementHeight = elementBottom - elementTop;
     const elementWidth = elementRight - elementLeft;
 
