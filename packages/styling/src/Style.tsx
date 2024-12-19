@@ -14,7 +14,6 @@ const Style = ({ children, href: _href, precedence = 'medium' }: Props) => {
     // https://github.com/DefinitelyTyped/DefinitelyTyped/blob/master/types/react/canary.d.ts
     // https://react.dev/reference/react-dom/components/style#props
     return (
-        // @ts-expect-error @types/react is missing new <style> props
         <style href={href} precedence={precedence}>
             {styles}
         </style>
