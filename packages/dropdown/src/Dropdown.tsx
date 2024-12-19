@@ -682,12 +682,12 @@ export default function Dropdown({
     const style = useMemo<React.CSSProperties>(
         () => ({
             ...styleFromProps,
-            ...(outOfBounds.maxHeight
+            ...(outOfBounds.maxHeight != null && outOfBounds.maxHeight > 0
                 ? {
                       [BODY_MAX_HEIGHT_VAR]: `calc(${outOfBounds.maxHeight}px - var(--uktdd-body-buffer))`,
                   }
                 : null),
-            ...(outOfBounds.maxWidth
+            ...(outOfBounds.maxWidth != null && outOfBounds.maxWidth > 0
                 ? {
                       [BODY_MAX_WIDTH_VAR]: `calc(${outOfBounds.maxWidth}px - var(--uktdd-body-buffer))`,
                   }
