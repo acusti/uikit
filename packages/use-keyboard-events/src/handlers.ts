@@ -1,7 +1,7 @@
 export type EventType = 'keydown' | 'keypress' | 'keyup';
 export type Handler = (event: KeyboardEvent) => unknown;
-export type HandlersByPriority = Array<Set<Handler>>;
-export type HandlerConfig = { ignoreUsedKeyboardEvents: boolean; priority: number };
+type HandlersByPriority = Array<Set<Handler>>;
+type HandlerConfig = { ignoreUsedKeyboardEvents: boolean; priority: number };
 
 export const handlersData = {
     config: new Map() as Map<Handler, HandlerConfig>,
