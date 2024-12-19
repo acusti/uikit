@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { cleanup, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import React from 'react'; // eslint-disable-line @typescript-eslint/no-unused-vars
+import React from 'react';
 import { afterEach, describe, expect, it } from 'vitest';
 
 import CSSValueInput from './CSSValueInput.js';
@@ -13,7 +13,6 @@ afterEach(cleanup);
 describe('CSSValueInput.tsx', () => {
     it('renders a text input with the given props.value', () => {
         render(<CSSValueInput onSubmitValue={noop} value="24px" />);
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('24px');
     });
@@ -21,7 +20,6 @@ describe('CSSValueInput.tsx', () => {
     it('handles ↑/↓ keys to increment/decrement by 1 and ⇧↑/⇧↓ to increment/decrement by 10 (preserving the CSS unit)', async () => {
         const user = userEvent.setup();
         render(<CSSValueInput onSubmitValue={noop} value="75%" />);
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('75%');
         await user.type(input, '{ArrowUp}');
@@ -41,7 +39,6 @@ describe('CSSValueInput.tsx', () => {
     it('supports custom props.step for ↑/↓ key handling', async () => {
         const user = userEvent.setup();
         render(<CSSValueInput onSubmitValue={noop} step={0.1} value="2rem" />);
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('2rem');
         await user.type(input, '{ArrowUp}');
@@ -61,7 +58,6 @@ describe('CSSValueInput.tsx', () => {
     it('uses props.unit as default unit when unit is missing', async () => {
         const user = userEvent.setup();
         render(<CSSValueInput allowEmpty onSubmitValue={noop} unit="px" value="" />);
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('');
         await user.type(input, '14{Enter}');
@@ -71,7 +67,6 @@ describe('CSSValueInput.tsx', () => {
     it('preserves last entered unit if different from props.unit when unit is missing', async () => {
         const user = userEvent.setup();
         render(<CSSValueInput allowEmpty onSubmitValue={noop} unit="px" value="" />);
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('');
         await user.type(input, '25vw{Enter}');
@@ -83,7 +78,6 @@ describe('CSSValueInput.tsx', () => {
     it('treats value as numeric if props.unit is an empty string', async () => {
         const user = userEvent.setup();
         render(<CSSValueInput allowEmpty onSubmitValue={noop} unit="" value="100" />);
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const input = screen.getByRole('textbox') as HTMLInputElement;
         expect(input.value).toBe('100');
         await user.type(input, '1{Enter}');
@@ -101,7 +95,6 @@ describe('CSSValueInput.tsx', () => {
         const { rerender } = render(
             <CSSValueInput onSubmitValue={noop} unit="px" value="12px" />,
         );
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const input = screen.getByRole('textbox') as HTMLInputElement;
         rerender(<CSSValueInput onSubmitValue={noop} unit="" value="4" />);
         expect(input.value).toBe('4');

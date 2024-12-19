@@ -19,7 +19,6 @@ export const getRequestOptionsAndBody = (
     let { body = '', method = 'POST', query = '', variables, ...baseOptions } = options;
 
     if (query) {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
         body = getBodyFromQuery({ query, variables });
     }
 

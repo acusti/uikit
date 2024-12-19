@@ -225,7 +225,6 @@ export default function Dropdown({
         (event: Event | React.SyntheticEvent<HTMLElement>) => {
             const eventTarget = event.target as HTMLElement;
             if (isOpenRef.current && !keepOpenOnSubmitRef.current) {
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
                 const keepOpen = eventTarget.closest(
                     '[data-ukt-keep-open]',
                 ) as HTMLElement | null;
@@ -312,7 +311,6 @@ export default function Dropdown({
         if (!itemElements) return;
 
         const eventTarget = event.target as HTMLElement;
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-type-assertion
         const item = eventTarget.closest(ITEM_SELECTOR) as HTMLElement | null;
         const element = item ?? eventTarget;
         for (const itemElement of itemElements) {

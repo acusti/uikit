@@ -18,16 +18,14 @@ const SESSION_TOKEN = 'thisisafakesessiontoken';
 const DATE_TIME_STRING = '20150830T123600Z';
 
 describe('utils', () => {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/unbound-method
     const originalToISOString = Date.prototype.toISOString;
 
     beforeAll(() => {
         // ISO version of the example DATE_TIME_STRING
-        Date.prototype.toISOString = () => '2015-08-30T12:36:00.000Z'; // eslint-disable-line no-extend-native
+        Date.prototype.toISOString = () => '2015-08-30T12:36:00.000Z';
     });
 
     afterAll(() => {
-        // eslint-disable-next-line no-extend-native, @typescript-eslint/no-unsafe-assignment
         Date.prototype.toISOString = originalToISOString;
     });
 

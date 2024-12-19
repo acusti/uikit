@@ -28,7 +28,6 @@ const DATE_TIME_STRING = '20150830T123600Z';
 const QUERY_ONLY_SIGNATURE =
     '1a978b7ed853f34303cb9ca91f41a18263deacc0b97eda68e208fddeb4a963af';
 
-// eslint-disable-next-line @typescript-eslint/require-await
 const mockPost = vi.fn(async () => RESPONSE_AS_JSON);
 
 vi.mock('@acusti/post', async () => {
@@ -41,16 +40,15 @@ const { appsyncFetch } = await import('./index.js');
 
 describe('appsyncFetch', () => {
     const authorizationStart = `AWS4-HMAC-SHA256 Credential=${ACCESS_KEY_ID}/20150830/${REGION}/appsync/aws4_request`;
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/unbound-method
     const originalToISOString = Date.prototype.toISOString;
 
     beforeAll(() => {
         // ISO version of the example DATE_TIME_STRING
-        Date.prototype.toISOString = () => '2015-08-30T12:36:00.000Z'; // eslint-disable-line no-extend-native
+        Date.prototype.toISOString = () => '2015-08-30T12:36:00.000Z';
     });
 
     afterAll(() => {
-        Date.prototype.toISOString = originalToISOString; // eslint-disable-line no-extend-native
+        Date.prototype.toISOString = originalToISOString;
     });
 
     it('converts passed in query to a trimmed JSON string body', async () => {

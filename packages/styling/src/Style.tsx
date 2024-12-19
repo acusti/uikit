@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import React from 'react';
 
 import { useStyles } from './useStyles.js';
@@ -16,7 +15,6 @@ const Style = ({ children, href: _href, precedence = 'medium' }: Props) => {
     // https://react.dev/reference/react-dom/components/style#props
     return (
         // @ts-expect-error @types/react is missing new <style> props
-        // eslint-disable-next-line react/no-unknown-property
         <style href={href} precedence={precedence}>
             {styles}
         </style>
