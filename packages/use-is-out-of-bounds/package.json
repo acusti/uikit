@@ -45,7 +45,7 @@
         "@acusti/use-bounding-client-rect": "^1.2.0"
     },
     "peerDependencies": {
-        "react": "^16.8 || ^17 || ^18 || ^19.0.0-0",
-        "react-dom": "^16.8 || ^17 || ^18 || ^19.0.0-0"
+        "react": "^16.8 || ^17 || ^18 || ^19",
+        "react-dom": "^16.8 || ^17 || ^18 || ^19"
     }
 }
