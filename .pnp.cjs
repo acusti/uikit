@@ -462,8 +462,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/uniquify/",\
         "packageDependencies": [\
           ["@acusti/uniquify", "workspace:packages/uniquify"],\
-          ["@types/lodash.escaperegexp", "npm:4.1.9"],\
-          ["lodash.escaperegexp", "npm:4.1.2"],\
           ["typescript", "patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"],\
           ["vitest", "virtual:ae52462715931ea007dc50efba07d133bbd2707991d966b03dd50bc7d26895a233be9457b0dfcacf62c9e7732b6ee7fddb7ea173aaf1a49dde4d8dadb45358ba#npm:2.1.8"]\
         ],\
@@ -4744,16 +4742,6 @@ const RAW_RUNTIME_STATE =
       ["npm:4.14.198", {\
         "packageLocation": "./.yarn/cache/@types-lodash-npm-4.14.198-92ef32a77d-2bd7e82245.zip/node_modules/@types/lodash/",\
         "packageDependencies": [\
-          ["@types/lodash", "npm:4.14.198"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["@types/lodash.escaperegexp", [\
-      ["npm:4.1.9", {\
-        "packageLocation": "./.yarn/cache/@types-lodash.escaperegexp-npm-4.1.9-29f2ac7042-e73c9bb54e.zip/node_modules/@types/lodash.escaperegexp/",\
-        "packageDependencies": [\
-          ["@types/lodash.escaperegexp", "npm:4.1.9"],\
           ["@types/lodash", "npm:4.14.198"]\
         ],\
         "linkType": "HARD"\
@@ -9766,15 +9754,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/lodash-npm-4.17.21-6382451519-c08619c038.zip/node_modules/lodash/",\
         "packageDependencies": [\
           ["lodash", "npm:4.17.21"]\
-        ],\
-        "linkType": "HARD"\
-      }]\
-    ]],\
-    ["lodash.escaperegexp", [\
-      ["npm:4.1.2", {\
-        "packageLocation": "./.yarn/cache/lodash.escaperegexp-npm-4.1.2-c5b90e0e9c-6d99452b1c.zip/node_modules/lodash.escaperegexp/",\
-        "packageDependencies": [\
-          ["lodash.escaperegexp", "npm:4.1.2"]\
         ],\
         "linkType": "HARD"\
       }]\

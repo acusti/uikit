@@ -251,8 +251,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/uniquify@workspace:packages/uniquify"
   dependencies:
-    "@types/lodash.escaperegexp": "npm:^4.1.9"
-    lodash.escaperegexp: "npm:^4.1.2"
     typescript: "npm:5.3.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
@@ -3268,16 +3266,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/lodash.escaperegexp@npm:^4.1.9":
-  version: 4.1.9
-  resolution: "@types/lodash.escaperegexp@npm:4.1.9"
-  dependencies:
-    "@types/lodash": "npm:*"
-  checksum: 10/e73c9bb54ec088c9c5797cf1fd1a23208a26105695e6a65882258feae258e054f19b8e935fb48c44f8e298f1ca9216c919ad3741e32e154c5c71f9f966198ce5
-  languageName: node
-  linkType: hard
-
-"@types/lodash@npm:*, @types/lodash@npm:^4.14.167":
+"@types/lodash@npm:^4.14.167":
   version: 4.14.198
   resolution: "@types/lodash@npm:4.14.198"
   checksum: 10/2bd7e82245cf0c66169ed074a2e625da644335a29f65c0c37d501cf66d09d8a0e92408e9e0ce4ee5133343e5b27267e6a132ca38a9ded837d4341be8a3cf8008
@@ -7522,13 +7511,6 @@ __metadata:
   dependencies:
     p-locate: "npm:^5.0.0"
   checksum: 10/72eb661788a0368c099a184c59d2fee760b3831c9c1c33955e8a19ae4a21b4116e53fa736dc086cdeb9fce9f7cc508f2f92d2d3aae516f133e16a2bb59a39f5a
-  languageName: node
-  linkType: hard
-
-"lodash.escaperegexp@npm:^4.1.2":
-  version: 4.1.2
-  resolution: "lodash.escaperegexp@npm:4.1.2"
-  checksum: 10/6d99452b1cfd6073175a9b741a9b09ece159eac463f86f02ea3bee2e2092923fce812c8d2bf446309cc52d1d61bf9af51c8118b0d7421388e6cead7bd3798f0f
   languageName: node
   linkType: hard
 

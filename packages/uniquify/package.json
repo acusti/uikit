@@ -42,11 +42,7 @@
         "url": "https://github.com/acusti/uikit/issues"
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/uniquify#readme",
-    "dependencies": {
-        "lodash.escaperegexp": "^4.1.2"
-    },
     "devDependencies": {
-        "@types/lodash.escaperegexp": "^4.1.9",
         "typescript": "5.3.3",
         "vitest": "^2.1.8"
     }

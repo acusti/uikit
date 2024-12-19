@@ -1,8 +1,18 @@
-import escapeRegExp from 'lodash.escaperegexp';
-
 type GenericObject = Record<string, unknown>;
 type Items = Array<string | null | undefined> | Array<GenericObject | null | undefined>;
 type StringKeyPath = Array<string>;
+
+/**
+ * Escapes the RegExp special characters "^", "$", "\\", ".", "*", "+", "?", "(", ")", "[", "]", "{", "}", and "|" in `str`.
+ *
+ * @param {string} str The string to escape.
+ * @returns {string} Returns the escaped string.
+ *
+ * @example
+ * escapeRegExp('[uniquify](https://github.com/acusti/uikit/tree/main/packages/uniquify)'); // returns '\[uniquify\]\(https://github\.com/acusti/uikit/tree/main/packages/uniquify\)'
+ */
+export const escapeRegExp = (str: string): string =>
+    str.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 
 const getIn = (item: unknown, path: Array<string>) => {
     let value = item;

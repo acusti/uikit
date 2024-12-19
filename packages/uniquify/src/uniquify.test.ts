@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import uniquify from './uniquify.js';
+import uniquify, { escapeRegExp } from './uniquify.js';
 
 describe('uniquify', () => {
     const baseItems = ['bear', 'chickaree', 'coyote', 'marmot', 'pika'];
@@ -447,6 +447,19 @@ describe('uniquify', () => {
                     value: 'état «Œil»',
                 }),
             ).toBe('état «Œil»');
+        });
+    });
+
+    describe('escapeRegExp', () => {
+        const escaped = '\\^\\$\\.\\*\\+\\?\\(\\)\\[\\]\\{\\}\\|\\\\';
+        const unescaped = '^$.*+?()[]{}|\\';
+
+        it('escapes characters for use in a RegExp', () => {
+            expect(escapeRegExp(unescaped + unescaped)).toBe(escaped + escaped);
+        });
+
+        it('returns the string it received if there is nothing to escape', () => {
+            expect(escapeRegExp('abc')).toBe('abc');
         });
     });
 });
