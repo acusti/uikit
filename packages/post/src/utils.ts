@@ -17,7 +17,7 @@ export const getRequestOptionsAndBody = (
 ): { body: string; requestOptions: RequestOptions } => {
     // @ts-expect-error FetchOptions can only have a body OR a query
     let { body = '', method = 'POST', query = '', variables, ...baseOptions } = options;
-
+    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (query) {
         body = getBodyFromQuery({ query, variables });
     }
