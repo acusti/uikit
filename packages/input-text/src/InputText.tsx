@@ -220,10 +220,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
                 (!multiLine || (!event.shiftKey && !event.altKey && !event.ctrlKey))
             ) {
                 event.preventDefault();
-                const form = event.currentTarget.closest('form');
-                if (form) {
-                    form.requestSubmit();
-                }
+                event.currentTarget.closest('form')?.requestSubmit();
                 // always blur input on Enter when submitOnEnter is true
                 event.currentTarget.blur();
             } else if (doubleClickToEdit && inputRef.current) {
