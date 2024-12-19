@@ -166,7 +166,6 @@ describe('@acusti/use-keyboard-events', () => {
                 // expect(isUsingKeyEvent).toBe(true);
             });
 
-            // eslint-disable-next-line @typescript-eslint/require-await
             it('detects that non-interactive elements aren’t using key events triggered on them', async () => {
                 const text = 'Lorem ipsum dolor sit amet.';
                 render(<p onKeyDown={handleKeyEvent}>{text}</p>);
