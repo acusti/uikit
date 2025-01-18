@@ -97,7 +97,7 @@ describe('@acusti/use-keyboard-events', () => {
         });
 
         describe('isEventTargetUsingKeyEvent', () => {
-            let isUsingKeyEvent: null | boolean = null;
+            let isUsingKeyEvent: boolean | null = null;
             const handleKeyEvent = (event: React.KeyboardEvent<HTMLElement>) => {
                 isUsingKeyEvent = isEventTargetUsingKeyEvent(event.nativeEvent);
             };

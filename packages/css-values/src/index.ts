@@ -27,7 +27,7 @@ export const DEFAULT_UNIT_BY_CSS_VALUE_TYPE = Object.freeze({
 export type Payload = {
     cssValueType: CSSValueType;
     defaultUnit?: string;
-    value: string | number;
+    value: number | string;
 };
 
 export const roundToPrecision = (value: number, precision: number): number =>
@@ -45,7 +45,7 @@ export const getUnitFromCSSValue = ({
     return matchedUnit === null || !matchedUnit[1] ? defaultUnit : matchedUnit[1];
 };
 
-export const getCSSValueAsNumber = (value: string | number): number =>
+export const getCSSValueAsNumber = (value: number | string): number =>
     typeof value === 'number' ? value : parseFloat(value);
 
 export const getCSSValueWithUnit = (payload: Payload): string => {
@@ -56,7 +56,7 @@ export const getCSSValueWithUnit = (payload: Payload): string => {
     return `${valueAsNumber}${getUnitFromCSSValue(payload)}`;
 };
 
-export const getMillisecondsFromCSSValue = (value: string | number): number => {
+export const getMillisecondsFromCSSValue = (value: number | string): number => {
     if (!value) return 0; // eslint-disable-line @typescript-eslint/strict-boolean-expressions
     if (typeof value === 'number') return value;
     if (!CSS_UNIT_REGEX.time.test(value)) return 0;

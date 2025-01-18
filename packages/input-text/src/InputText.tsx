@@ -3,7 +3,7 @@ import * as React from 'react';
 export type InputElement = HTMLInputElement | HTMLTextAreaElement;
 
 export type Props = {
-    autoCapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters';
+    autoCapitalize?: 'characters' | 'none' | 'off' | 'sentences' | 'words';
     autoComplete?: HTMLInputElement['autocomplete'];
     autoFocus?: boolean;
     className?: string;
@@ -63,7 +63,7 @@ export type Props = {
     submitOnEnter?: boolean;
     tabIndex?: number;
     title?: string;
-    type?: 'text' | 'email' | 'number' | 'password' | 'search' | 'tel' | 'url';
+    type?: 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url';
 };
 
 type InputRef = HTMLInputElement | null;
@@ -104,8 +104,8 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         rows = 1,
         selectTextOnFocus,
         size,
-        style,
         step,
+        style,
         submitOnEnter,
         tabIndex,
         title,

@@ -1,5 +1,3 @@
-type Optional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;
-
 type IndexOfClosestCharFullPayload = {
     char: string;
     chars: Array<string> | Set<string>;
@@ -12,7 +10,15 @@ type IndexOfClosestCharPayload =
     | Optional<IndexOfClosestCharFullPayload, 'char'>
     | Optional<IndexOfClosestCharFullPayload, 'chars'>;
 
+type Optional<Type, Key extends keyof Type> = Omit<Type, Key> & Partial<Pick<Type, Key>>;
+
 const WHITESPACE_CHARS = new Set([' ', '\n', '\r', '\t']);
+
+type FollowedByFullPayload = Omit<IndexOfClosestCharFullPayload, 'step'>;
+
+type FollowedByPayload =
+    | Optional<FollowedByFullPayload, 'char'>
+    | Optional<FollowedByFullPayload, 'chars'>;
 
 // a helper function that takes a start index, a char or chars representing
 // the next non-whitespace character to look for, and the text itself.
@@ -37,12 +43,6 @@ function indexOfClosestChar({
 
     return -1;
 }
-
-type FollowedByFullPayload = Omit<IndexOfClosestCharFullPayload, 'step'>;
-
-type FollowedByPayload =
-    | Optional<FollowedByFullPayload, 'char'>
-    | Optional<FollowedByFullPayload, 'chars'>;
 
 function isFollowedBy(payload: FollowedByPayload) {
     return indexOfClosestChar(payload) > -1;
@@ -69,6 +69,26 @@ const VALUE_DELIMITER_CHARS = new Set([
 const VALUE_START_CHARS = VALUE_DELIMITER_CHARS.add('{').add('[');
 const VALUE_END_CHARS = VALUE_DELIMITER_CHARS.add('}').add(']');
 
+type GenericObject = Record<string, unknown>;
+
+export function getPreviousStringType(text: string): 'KEY' | 'VALUE' | null {
+    const lastEndKeyIndexA = text.lastIndexOf('":"');
+    const lastEndKeyIndexB = text.lastIndexOf('": "');
+    const lastEndKeyIndex = Math.max(lastEndKeyIndexA, lastEndKeyIndexB);
+    const lastEndValueIndexA = text.lastIndexOf('","');
+    const lastEndValueIndexB = text.lastIndexOf('", "');
+    const lastEndValueIndex = Math.max(lastEndValueIndexA, lastEndValueIndexB);
+    // if cannot determine the type, return null
+    if (lastEndKeyIndex <= 0 && lastEndValueIndex <= 0) return null;
+    // if last token is an array
+    const lastEndArrayIndex = text.lastIndexOf(']');
+    if (lastEndArrayIndex > lastEndKeyIndex && lastEndArrayIndex > lastEndValueIndex) {
+        return null;
+    }
+
+    return lastEndValueIndex > lastEndKeyIndex ? 'VALUE' : 'KEY';
+}
+
 function isValidContext({
     char,
     controlChar,
@@ -84,30 +104,11 @@ function isValidContext({
 }) {
     const index = text.length - 1 + char.length;
     switch (char) {
-        case '{':
-        case '[':
-            if (text.length === 0) return true; // 1st character in text is a valid context
-            if (controlChar === ']') return true; // as an item inside an array is a valid context
-            // as the value of a key/value pair is a valid context
-            return isPreceededBy({ char: ':', index, text });
-        case '}':
-        case ']':
-            return char === controlChar;
-        case '"':
-        case '0':
-        case '1':
-        case '2':
-        case '3':
-        case '4':
-        case '5':
-        case '6':
-        case '7':
-        case '8':
-        case '9':
-            if (text.length === 0) return true; // 1st character in text is a valid context
-            if (controlChar === ']') return true; // as an item inside an array is a valid context
-            if (controlChar === '}') return true; // as key or value inside an object is a valid context
-            return false;
+        case ' ':
+        case '\r':
+        case '\n':
+        case '\t':
+            return true;
         case ',':
             // valid context for a comma in an array is in between array items
             if (controlChar === ']') {
@@ -134,41 +135,38 @@ function isValidContext({
             return true;
         case ':':
             return controlChar === '}' && isPreceededBy({ char: '"', index, text });
-        case ' ':
-        case '\r':
-        case '\n':
-        case '\t':
-            return true;
+        case '"':
+        case '0':
+        case '1':
+        case '2':
+        case '3':
+        case '4':
+        case '5':
+        case '6':
+        case '7':
+        case '8':
+        case '9':
+            if (text.length === 0) return true; // 1st character in text is a valid context
+            if (controlChar === ']') return true; // as an item inside an array is a valid context
+            if (controlChar === '}') return true; // as key or value inside an object is a valid context
+            return false;
+        case '[':
+        case '{':
+            if (text.length === 0) return true; // 1st character in text is a valid context
+            if (controlChar === ']') return true; // as an item inside an array is a valid context
+            // as the value of a key/value pair is a valid context
+            return isPreceededBy({ char: ':', index, text });
+        case ']':
+        case '}':
+            return char === controlChar;
         default:
             return false;
     }
 }
 
-export function getPreviousStringType(text: string): 'KEY' | 'VALUE' | null {
-    const lastEndKeyIndexA = text.lastIndexOf('":"');
-    const lastEndKeyIndexB = text.lastIndexOf('": "');
-    const lastEndKeyIndex = Math.max(lastEndKeyIndexA, lastEndKeyIndexB);
-    const lastEndValueIndexA = text.lastIndexOf('","');
-    const lastEndValueIndexB = text.lastIndexOf('", "');
-    const lastEndValueIndex = Math.max(lastEndValueIndexA, lastEndValueIndexB);
-    // if cannot determine the type, return null
-    if (lastEndKeyIndex <= 0 && lastEndValueIndex <= 0) return null;
-    // if last token is an array
-    const lastEndArrayIndex = text.lastIndexOf(']');
-    if (lastEndArrayIndex > lastEndKeyIndex && lastEndArrayIndex > lastEndValueIndex) {
-        return null;
-    }
-
-    return lastEndValueIndex > lastEndKeyIndex ? 'VALUE' : 'KEY';
-}
-
-type GenericObject = Record<string, unknown>;
-
 // get the length of anything (vs JSON.stringify: https://jsperf.app/qisaso/2)
 function lengthOf(item: unknown): number {
     switch (typeof item) {
-        case 'string':
-            return item.length;
         case 'number':
             return 1;
         case 'object':
@@ -183,6 +181,8 @@ function lengthOf(item: unknown): number {
                 (acc, key) => acc + key.length + lengthOf((item as GenericObject)[key]),
                 0,
             );
+        case 'string':
+            return item.length;
         default:
             return 0;
     }
@@ -195,9 +195,9 @@ const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
 
 const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
 
-type ParsedValue = string | boolean | number | GenericObject | Array<unknown>;
+type ParsedValue = Array<unknown> | boolean | GenericObject | number | string;
 
-export function parseAsJSON(text: string): ParsedValue | null {
+export function parseAsJSON(text: string): null | ParsedValue {
     // if the input is undefined/null, return null to indicate failure
     if (text == null) return null;
 

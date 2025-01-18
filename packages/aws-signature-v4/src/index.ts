@@ -4,9 +4,7 @@ import type { AWSOptions as _AWSOptions, FetchHeaders, FetchOptions } from './ty
 
 export type AWSOptions = _AWSOptions;
 
-type FetchOptionsWithHeaders = Omit<FetchOptions, 'headers'> & {
-    headers: FetchHeaders;
-};
+type FetchOptionsWithHeaders = { headers: FetchHeaders } & Omit<FetchOptions, 'headers'>;
 
 const universalBtoa = (text: string) => {
     try {

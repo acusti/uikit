@@ -24,7 +24,7 @@ export type Props = {
      * Function that receives a value and converts it to its numerical equivalent
      * (i.e. '12px' → 12). Defaults to parseFloat().
      */
-    getValueAsNumber?: (value: string | number) => number;
+    getValueAsNumber?: (value: number | string) => number;
     icon?: React.ReactNode;
     label?: string;
     max?: number;
@@ -47,7 +47,7 @@ export type Props = {
     title?: string;
     unit?: string;
     /** Regex or validator function to validate non-numeric values */
-    validator?: RegExp | ((value: string) => boolean);
+    validator?: ((value: string) => boolean) | RegExp;
     value?: string;
 };
 
@@ -200,7 +200,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
             multiplier = 1,
             signum = 1,
         }: {
-            currentValue: string | number;
+            currentValue: number | string;
             multiplier?: number;
             signum?: number;
         }) => {
@@ -246,15 +246,8 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
             let nextValue = '';
 
             switch (event.key) {
-                case 'Escape':
-                case 'Enter':
-                    if (event.key === 'Escape') {
-                        input.value = submittedValueRef.current;
-                    }
-                    input.blur();
-                    return;
-                case 'ArrowUp':
                 case 'ArrowDown':
+                case 'ArrowUp':
                     nextValue = getNextValue({
                         currentValue,
                         multiplier: event.shiftKey ? 10 : 1,
@@ -267,6 +260,13 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
                     event.preventDefault();
 
                     input.value = nextValue;
+                    return;
+                case 'Enter':
+                case 'Escape':
+                    if (event.key === 'Escape') {
+                        input.value = submittedValueRef.current;
+                    }
+                    input.blur();
                     return;
                 default:
                 // No default key handling

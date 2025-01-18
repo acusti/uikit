@@ -1,7 +1,7 @@
 export type EventType = 'keydown' | 'keypress' | 'keyup';
 export type Handler = (event: KeyboardEvent) => unknown;
-type HandlersByPriority = Array<Set<Handler>>;
 type HandlerConfig = { ignoreUsedKeyboardEvents: boolean; priority: number };
+type HandlersByPriority = Array<Set<Handler>>;
 
 export const handlersData = {
     config: new Map() as Map<Handler, HandlerConfig>,
@@ -85,12 +85,12 @@ const NON_TEXT_INPUT_TYPES = new Set([
 ]);
 
 const NON_TEXT_INPUT_USES_KEYS = new Set([
+    ' ',
     'ArrowDown',
     'ArrowLeft',
     'ArrowRight',
     'ArrowUp',
     'Enter',
-    ' ',
 ]);
 
 export const usesKeyEvents = (target: EventTarget) =>
@@ -108,26 +108,7 @@ export const isEventTargetUsingKeyEvent = (event: KeyboardEvent) => {
     return NON_TEXT_INPUT_USES_KEYS.has(event.key);
 };
 
-function handleKeyboardEvent(event: KeyboardEvent) {
-    const eventType = event.type as EventType;
-    const handlersByPriority = handlersData[eventType];
-    let index = handlersByPriority.length;
-    const targetUsesKeyEvents = isEventTargetUsingKeyEvent(event);
-    while (index--) {
-        const handlers = handlersByPriority[index];
-        if (handlers != null) {
-            for (const handler of handlers) {
-                const config = handlersData.config.get(handler);
-                if (!targetUsesKeyEvents || config?.ignoreUsedKeyboardEvents === false) {
-                    const shouldPropagate = handler(event);
-                    if (shouldPropagate === false) return;
-                }
-            }
-        }
-    }
-}
-
-type DefaultView = Window & { __useKeyboardEventsAttached__?: boolean };
+type DefaultView = { __useKeyboardEventsAttached__?: boolean } & Window;
 
 export function addHandlers(doc: Document) {
     if (
@@ -150,4 +131,23 @@ export function addHandlers(doc: Document) {
         doc.removeEventListener('keypress', handleKeyboardEvent);
         doc.removeEventListener('keyup', handleKeyboardEvent);
     };
+}
+
+function handleKeyboardEvent(event: KeyboardEvent) {
+    const eventType = event.type as EventType;
+    const handlersByPriority = handlersData[eventType];
+    let index = handlersByPriority.length;
+    const targetUsesKeyEvents = isEventTargetUsingKeyEvent(event);
+    while (index--) {
+        const handlers = handlersByPriority[index];
+        if (handlers != null) {
+            for (const handler of handlers) {
+                const config = handlersData.config.get(handler);
+                if (!targetUsesKeyEvents || config?.ignoreUsedKeyboardEvents === false) {
+                    const shouldPropagate = handler(event);
+                    if (shouldPropagate === false) return;
+                }
+            }
+        }
+    }
 }

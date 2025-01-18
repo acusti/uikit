@@ -26,8 +26,6 @@ import {
     TRIGGER_CLASS_NAME,
 } from './styles.js';
 
-type ChildrenTuple = [React.ReactNode, React.ReactNode];
-
 export type Item = {
     element: HTMLElement | null;
     event: Event | React.SyntheticEvent<HTMLElement>;
@@ -49,7 +47,7 @@ export type Props = {
     /**
      * Can take a single React element or exactly two renderable children.
      */
-    children: React.JSX.Element | ChildrenTuple;
+    children: ChildrenTuple | React.JSX.Element;
     className?: string;
     disabled?: boolean;
     /**
@@ -91,9 +89,11 @@ export type Props = {
     value?: string;
 };
 
-type TimeoutID = ReturnType<typeof setTimeout>;
+type ChildrenTuple = [React.ReactNode, React.ReactNode];
 
 type MousePosition = { clientX: number; clientY: number };
+
+type TimeoutID = ReturnType<typeof setTimeout>;
 
 const { Children, Fragment, useCallback, useEffect, useMemo, useRef, useState } = React;
 
@@ -148,10 +148,10 @@ export default function Dropdown({
 
     const dropdownElementRef = useRef<HTMLDivElement | null>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
-    const closingTimerRef = useRef<TimeoutID | null>(null);
-    const isOpeningTimerRef = useRef<TimeoutID | null>(null);
-    const currentInputMethodRef = useRef<'mouse' | 'keyboard'>('mouse');
-    const clearEnteredCharactersTimerRef = useRef<TimeoutID | null>(null);
+    const closingTimerRef = useRef<null | TimeoutID>(null);
+    const isOpeningTimerRef = useRef<null | TimeoutID>(null);
+    const currentInputMethodRef = useRef<'keyboard' | 'mouse'>('mouse');
+    const clearEnteredCharactersTimerRef = useRef<null | TimeoutID>(null);
     const enteredCharactersRef = useRef<string>('');
     const mouseDownPositionRef = useRef<MousePosition | null>(null);
     const outOfBounds = useIsOutOfBounds(dropdownBodyElement);

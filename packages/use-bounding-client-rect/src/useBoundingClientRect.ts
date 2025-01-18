@@ -12,17 +12,17 @@ const RESIZE_OBSERVER_STUB = {
 
 type EmptyRect = { bottom: void; left: void; right: void; top: void };
 type Rect = { bottom: number; left: number; right: number; top: number };
-type SetRenderTime = (time: number) => void;
 type Refs = {
-    boundingClientRect: Rect | EmptyRect;
+    boundingClientRect: EmptyRect | Rect;
     maybeCleanupElement: () => void;
-    maybeCleanupTimer: ReturnType<typeof setTimeout> | null;
+    maybeCleanupTimer: null | ReturnType<typeof setTimeout>;
     renderTimeSetters: Set<SetRenderTime>;
     retryCount: number;
     scheduleUpdate: () => void;
     updateBoundingClientRect: () => void;
-    updaterFrameID: number | null;
+    updaterFrameID: null | number;
 };
+type SetRenderTime = (time: number) => void;
 
 const EMPTY_RECT: EmptyRect = Object.freeze({
     bottom: undefined,
@@ -143,13 +143,13 @@ const cleanupHookInstance = (element: HTMLElement, setRenderTime: SetRenderTime)
     refs.maybeCleanupElement();
 };
 
-const useBoundingClientRect = (element?: HTMLElement | null): Rect | EmptyRect => {
+const useBoundingClientRect = (element?: HTMLElement | null): EmptyRect | Rect => {
     // Flip the bit to trigger a new return value from this hook
     const [, setRenderTime] = useState<number>(0);
 
     // If element isn’t in our refs map, initialize it
     let isInitializing = false;
-    let refs: Refs | null = (element && refsByElement.get(element)) ?? null;
+    let refs: null | Refs = (element && refsByElement.get(element)) ?? null;
     if (element && !refs) {
         isInitializing = true;
         refs = {

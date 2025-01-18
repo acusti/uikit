@@ -7,17 +7,19 @@ import jestPlugin from 'eslint-plugin-jest';
 import jestDOMPlugin from 'eslint-plugin-jest-dom';
 import jsxA11yPlugin from 'eslint-plugin-jsx-a11y';
 import markdownPlugin from 'eslint-plugin-markdown';
+import perfectionistPlugin from 'eslint-plugin-perfectionist';
 import reactPlugin from 'eslint-plugin-react';
 import reactCompilerPlugin from 'eslint-plugin-react-compiler';
 import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
-import tsSortKeysPlugin from 'eslint-plugin-typescript-sort-keys';
 import globals from 'globals';
 
 export default [
     jsPlugin.configs.recommended,
     jsxA11yPlugin.flatConfigs.strict,
     prettierConfig,
+    perfectionistPlugin.configs['recommended-alphabetical'],
+
     // Global ignores
     {
         ignores: [
@@ -56,7 +58,7 @@ export default [
             ...reactHooksPlugin.configs.recommended.rules,
             'react-compiler/react-compiler': 'warn',
             'react/jsx-no-leaked-render': ['warn', { validStrategies: ['ternary'] }],
-            'react/jsx-sort-props': 'warn',
+            'react/jsx-sort-props': 'off',
             'react/no-unknown-property': [
                 'error',
                 {
@@ -68,7 +70,7 @@ export default [
                 { enableDangerousAutofixThisMayCauseInfiniteLoops: true },
             ],
             'no-shadow': 'error',
-            'sort-imports': ['warn', { ignoreCase: true, ignoreDeclarationSort: true }],
+            'sort-imports': 'off',
         },
     },
 
@@ -78,7 +80,6 @@ export default [
         plugins: {
             '@typescript-eslint': tsPlugin,
             import: importPlugin,
-            'typescript-sort-keys': tsSortKeysPlugin,
         },
         languageOptions: {
             parser: tsParser,
@@ -99,7 +100,6 @@ export default [
             ...tsPlugin.configs.stylistic.rules,
             ...importPlugin.configs.recommended.rules,
             ...importPlugin.configs.typescript.rules,
-            ...tsSortKeysPlugin.configs.recommended.rules,
             '@typescript-eslint/array-type': ['error', { default: 'generic' }],
             '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
             '@typescript-eslint/no-deprecated': 'warn',
@@ -124,7 +124,7 @@ export default [
             'no-duplicate-imports': 'error',
             'no-undef': 'off', // typescript handles undefined variable detection
             'prefer-const': ['error', { destructuring: 'all' }],
-            'sort-keys': 'warn',
+            'sort-keys': 'off',
         },
     },
 

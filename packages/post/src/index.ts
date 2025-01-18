@@ -8,6 +8,7 @@ import type {
     FetchOptionsWithBody,
     FetchOptionsWithQuery,
 } from './types.js';
+
 import { getRequestOptionsAndBody } from './utils.js';
 
 export { getBodyFromQuery, getRequestOptionsAndBody } from './utils.js';
@@ -58,11 +59,11 @@ export const post = async <ResponseJSON>(url: string, options: FetchOptions) => 
     // Check for 4xx and 5xx responses and throw with the response
     if (response.statusCode != null && response.statusCode >= 400) {
         const messageBase = `Received ${response.statusCode} response`;
-        const error: Error & {
+        const error: {
             response?: IncomingMessage;
             responseJSON?: ResponseJSON;
             responseText?: string;
-        } = new Error(messageBase);
+        } & Error = new Error(messageBase);
         error.response = response;
         error.responseText = data || response.statusMessage;
         if (error.responseText) {

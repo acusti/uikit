@@ -13,9 +13,9 @@ import {
 
 export type Props = {
     className?: string;
-    dateEnd?: Date | string | number | null;
-    dateEndPreview?: string | null;
-    dateStart?: Date | string | number | null;
+    dateEnd?: Date | null | number | string;
+    dateEndPreview?: null | string;
+    dateStart?: Date | null | number | string;
     isRange?: boolean;
     month: number; // a unique numerical value representing the number of months since jan 1970
     onChange?: (date: string) => void;
@@ -23,7 +23,7 @@ export type Props = {
     title?: string;
 };
 
-type DateRangeDays = [number | null, number | null, number | null];
+type DateRangeDays = [null | number, null | number, null | number];
 
 const { Fragment, useCallback } = React;
 

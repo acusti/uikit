@@ -13,14 +13,14 @@ import {
 
 export type Props = {
     className?: string;
-    dateEnd?: Date | string | number;
-    dateStart?: Date | string | number;
+    dateEnd?: Date | number | string;
+    dateStart?: Date | number | string;
     initialMonth?: number;
     isRange?: boolean;
     isTwoUp?: boolean;
     monthLimitFirst?: number;
     monthLimitLast?: number;
-    onChange: (payload: { dateEnd?: string | null; dateStart: string }) => void;
+    onChange: (payload: { dateEnd?: null | string; dateStart: string }) => void;
     /**
      * Boolean to specify that date picker should initially render with the
      * end date’s month visible. The default behavior is to initially render
@@ -39,9 +39,9 @@ export default function DatePicker({
     className,
     dateEnd: _dateEnd,
     dateStart: _dateStart,
+    initialMonth,
     isRange = _dateEnd != null,
     isTwoUp,
-    initialMonth,
     monthLimitFirst,
     monthLimitLast,
     onChange,

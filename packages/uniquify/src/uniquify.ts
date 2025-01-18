@@ -1,5 +1,5 @@
 type GenericObject = Record<string, unknown>;
-type Items = Array<string | null | undefined> | Array<GenericObject | null | undefined>;
+type Items = Array<GenericObject | null | undefined> | Array<null | string | undefined>;
 type StringKeyPath = Array<string>;
 
 /**

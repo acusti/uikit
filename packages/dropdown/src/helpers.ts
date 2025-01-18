@@ -10,7 +10,7 @@ export const getItemElements = (dropdownElement: HTMLElement | null) => {
     const bodyElement = dropdownElement.querySelector(BODY_SELECTOR);
     if (!bodyElement) return null;
 
-    let items: NodeListOf<Element> | HTMLCollection =
+    let items: HTMLCollection | NodeListOf<Element> =
         bodyElement.querySelectorAll(ITEM_SELECTOR);
 
     if (items.length) return items;

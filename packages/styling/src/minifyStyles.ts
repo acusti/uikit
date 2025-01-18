@@ -29,10 +29,10 @@ export function minifyStyles(css: string) {
     const preservedTokens: Array<string> = [];
     const comments: Array<string> = [];
     const totalLength = css.length;
-    let startIndex = 0,
-        endIndex = 0,
-        token = '',
-        placeholder = '';
+    let endIndex = 0,
+        placeholder = '',
+        startIndex = 0,
+        token = '';
 
     // collect all comment blocks...
     while ((startIndex = css.indexOf('/*', startIndex)) >= 0) {
