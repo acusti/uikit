@@ -1,6 +1,6 @@
 {
     "name": "@acusti/parsing",
-    "version": "0.16.0",
+    "version": "0.16.1",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/index.js",
