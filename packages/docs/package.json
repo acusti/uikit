@@ -16,7 +16,7 @@
         "@storybook/react-vite": "^8.5",
         "@storybook/test": "^8.5",
         "@types/react": "^19.0.7",
-        "core-js": "^3.38.1",
+        "core-js": "^3.40.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "storybook": "^8.5",
