@@ -118,7 +118,7 @@ const initializeUpdateHandlers = (element: HTMLElement) => {
     };
 
     refs.maybeCleanupElement = () => {
-        if (refs.maybeCleanupTimer) {
+        if (refs.maybeCleanupTimer != null) {
             clearTimeout(refs.maybeCleanupTimer);
             refs.maybeCleanupTimer = null;
         }
