@@ -1,5 +1,4 @@
 import * as React from 'react';
-import type { InputHTMLAttributes } from 'react';
 
 export type InputElement = HTMLInputElement | HTMLTextAreaElement;
 
@@ -16,7 +15,7 @@ export type Props = {
      * it is blurred or when the user presses enter or escape.
      */
     doubleClickToEdit?: boolean;
-    enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
+    enterKeyHint?: React.InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
     form?: string;
     id?: string;
     /**

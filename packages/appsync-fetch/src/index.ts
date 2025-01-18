@@ -1,7 +1,10 @@
-import { getHeadersWithAuthorization } from '@acusti/aws-signature-v4';
-import type { AWSOptions } from '@acusti/aws-signature-v4';
-import { getRequestOptionsAndBody, post } from '@acusti/post';
-import type { FetchOptions, FetchOptionsWithBody } from '@acusti/post';
+import { type AWSOptions, getHeadersWithAuthorization } from '@acusti/aws-signature-v4';
+import {
+    type FetchOptions,
+    type FetchOptionsWithBody,
+    getRequestOptionsAndBody,
+    post,
+} from '@acusti/post';
 
 // Reference: https://docs.aws.amazon.com/appsync/latest/devguide/troubleshooting-and-common-mistakes.html
 export type GraphQLResponseError = {

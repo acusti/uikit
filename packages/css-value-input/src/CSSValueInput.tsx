@@ -1,4 +1,5 @@
 import {
+    type CSSValueType,
     DEFAULT_CSS_VALUE_TYPE,
     DEFAULT_UNIT_BY_CSS_VALUE_TYPE,
     getCSSValueAsNumber,
@@ -6,7 +7,6 @@ import {
     getUnitFromCSSValue,
     roundToPrecision,
 } from '@acusti/css-values';
-import type { CSSValueType } from '@acusti/css-values';
 import InputText from '@acusti/input-text';
 import clsx from 'clsx';
 import * as React from 'react';

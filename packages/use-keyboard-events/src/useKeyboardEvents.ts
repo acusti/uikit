@@ -1,7 +1,6 @@
 import { useEffect } from 'react';
 
-import { addHandler, addHandlers } from './handlers.js';
-import type { Handler } from './handlers.js';
+import { addHandler, addHandlers, type Handler } from './handlers.js';
 
 export {
     isEventTargetUsingKeyEvent,

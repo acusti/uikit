@@ -121,6 +121,7 @@ export default [
             ],
             // TODO figure out why ignorePackages doesn’t work ('react-dom/client' is erroring)
             // 'import/extensions': ['error', 'always', { ignorePackages: true }],
+            'no-duplicate-imports': 'error',
             'no-undef': 'off', // typescript handles undefined variable detection
             'prefer-const': ['error', { destructuring: 'all' }],
             'sort-keys': 'warn',
