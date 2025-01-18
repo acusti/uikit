@@ -82,7 +82,7 @@ export default [
         },
         languageOptions: {
             parser: tsParser,
-            parserOptions: { project: ['./tsconfig.json'] },
+            parserOptions: { projectService: true },
         },
         settings: {
             'import/internal-regex': '^~/',
