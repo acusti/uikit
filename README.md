@@ -83,26 +83,34 @@ packages, use `yarn test`. To run them in watch mode, use
 
 ## Building and Publishing
 
-To build all packages, run `yarn build`. This will trigger `tsc --build`
-and `yarn flowgen` for all packages.
+We use changesets to maintaing a changelog and manage versioning and
+publishing. To create a new changeset for changes you have made, run:
 
-To build the storybook docs, run `yarn build:stories`, which will run
-`yarn build` and then the default storybook `build` command.
+```
+yarn changeset
+```
 
-To publish all packages, manually update each packages’s `version` field in
-their package.json. If any of the packages depends on any of the other
-packages being updated, be sure to update the dependency version as well.
-Then run `yarn publish`. Publishing will trigger a build before running
-`npm publish` to ensure that the latest changes are published. To publish
-only a single package, use
-`yarn workspace <package-name> npm publish --access public` (e.g.
-`yarn workspace @acusti/css-value-input npm publish --access public`), but
-note that in that case, you are responsible for running `yarn build`
-yourself before triggering the publish.
+When you are ready to do a release, build all packages by running
+`yarn build`. This will trigger `tsc --build` and `yarn flowgen` for all
+packages. You can then update all package versions automatically by
+running:
+
+```
+yarn changeset version
+```
+
+To publish the new versions to npm, run:
+
+```
+yarn changeset publish
+```
 
 After publishing the packages, run `yarn` to update the yarn.lock file and
 then commit the version updates with a message in the form of:
 `:arrow_up: Bump package versions to _._._`.
+
+To build the storybook docs, run `yarn build:stories`, which will run
+`yarn build` and then the default storybook `build` command.
 
 ## Developing
 
