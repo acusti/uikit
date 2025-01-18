@@ -14,7 +14,7 @@ vertically to fit their content.
 See the [storybook docs and demo][] to get a feel for what it can do.
 
 [storybook docs and demo]:
-    https://acusti-uikit.netlify.app/?path=/docs/uikit-controls-inputtext--docs
+    https://uikit.acusti.ca/?path=/docs/uikit-controls-inputtext--docs
 [uncontrolled]: https://reactjs.org/docs/uncontrolled-components.html
 
 ## Usage

@@ -13,7 +13,7 @@ Illustrator.
 See the [storybook docs and demo][] to get a feel for what it can do.
 
 [storybook docs and demo]:
-    https://acusti-uikit.netlify.app/?path=/docs/uikit-controls-CSSValueInput--docs
+    https://uikit.acusti.ca/?path=/docs/uikit-controls-CSSValueInput--docs
 
 ## Usage
 

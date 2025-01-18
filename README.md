@@ -72,7 +72,7 @@ The React components are documented and illustrated in the [storybook
 instance][], which is located at [`packages/docs/`][packages/docs] in the
 repository.
 
-[storybook instance]: https://acusti-uikit.netlify.app
+[storybook instance]: https://uikit.acusti.ca
 [packages/docs]: https://github.com/acusti/uikit/tree/main/packages/docs
 
 ## Tests
