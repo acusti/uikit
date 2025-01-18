@@ -19,7 +19,7 @@ __metadata:
     "@acusti/aws-signature-v4": "npm:^1"
     "@acusti/post": "npm:^1"
     "@types/node": "npm:^22.10.2"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -30,7 +30,7 @@ __metadata:
   dependencies:
     "@acusti/webcrypto": "npm:^1.1.0"
     "@types/node": "npm:^22.10.2"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -49,7 +49,7 @@ __metadata:
     happy-dom: "npm:^15.11.7"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   peerDependencies:
     react: ^16.8 || ^17 || ^18 || ^19
@@ -61,7 +61,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/css-values@workspace:packages/css-values"
   dependencies:
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -79,7 +79,7 @@ __metadata:
     happy-dom: "npm:^15.11.7"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   peerDependencies:
     react: ^19
@@ -104,7 +104,7 @@ __metadata:
     happy-dom: "npm:^15.11.7"
     react: "npm:^19"
     react-dom: "npm:^19"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   peerDependencies:
     react: ^19
@@ -123,7 +123,7 @@ __metadata:
     happy-dom: "npm:^15.11.7"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   peerDependencies:
     react: ^16.8 || ^17 || ^18 || ^19
@@ -135,7 +135,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/matchmaking@workspace:packages/matchmaking"
   dependencies:
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -144,7 +144,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/parsing@workspace:packages/parsing"
   dependencies:
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -154,7 +154,7 @@ __metadata:
   resolution: "@acusti/post@workspace:packages/post"
   dependencies:
     "@types/node": "npm:^22.10.2"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -170,7 +170,7 @@ __metadata:
     happy-dom: "npm:^15.11.7"
     react: "npm:^19"
     react-dom: "npm:^19"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   peerDependencies:
     react: ^19
@@ -182,7 +182,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/textual@workspace:packages/textual"
   dependencies:
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -202,7 +202,7 @@ __metadata:
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     storybook: "npm:^8.4.7"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vite: "npm:^5.4.1"
   languageName: unknown
   linkType: soft
@@ -242,7 +242,7 @@ __metadata:
     prettier: "npm:^2.8.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vite: "npm:^6.0.3"
     vitest: "npm:beta"
   languageName: unknown
@@ -252,7 +252,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/uniquify@workspace:packages/uniquify"
   dependencies:
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -264,7 +264,7 @@ __metadata:
     "@types/react": "npm:^19.0.2"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   peerDependencies:
     react: ^16.8 || ^17 || ^18 || ^19
@@ -280,7 +280,7 @@ __metadata:
     "@types/react": "npm:^19.0.2"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   peerDependencies:
     react: ^16.8 || ^17 || ^18 || ^19
@@ -299,7 +299,7 @@ __metadata:
     happy-dom: "npm:^15.11.7"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   peerDependencies:
     react: ^16.8 || ^17 || ^18 || ^19
@@ -313,7 +313,7 @@ __metadata:
   dependencies:
     "@types/node": "npm:^22.10.2"
     happy-dom: "npm:^15.11.7"
-    typescript: "npm:5.3.3"
+    typescript: "npm:5.7.3"
     vitest: "npm:^2.1.8"
   languageName: unknown
   linkType: soft
@@ -10500,13 +10500,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:5.3.3":
-  version: 5.3.3
-  resolution: "typescript@npm:5.3.3"
+"typescript@npm:5.7.3":
+  version: 5.7.3
+  resolution: "typescript@npm:5.7.3"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10/6e4e6a14a50c222b3d14d4ea2f729e79f972fa536ac1522b91202a9a65af3605c2928c4a790a4a50aa13694d461c479ba92cedaeb1e7b190aadaa4e4b96b8e18
+  checksum: 10/6a7e556de91db3d34dc51cd2600e8e91f4c312acd8e52792f243c7818dfadb27bae677175fad6947f9c81efb6c57eb6b2d0c736f196a6ee2f1f7d57b74fc92fa
   languageName: node
   linkType: hard
 
@@ -10520,13 +10520,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>":
-  version: 5.3.3
-  resolution: "typescript@patch:typescript@npm%3A5.3.3#optional!builtin<compat/typescript>::version=5.3.3&hash=e012d7"
+"typescript@patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>":
+  version: 5.7.3
+  resolution: "typescript@patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>::version=5.7.3&hash=5786d5"
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver
-  checksum: 10/c93786fcc9a70718ba1e3819bab56064ead5817004d1b8186f8ca66165f3a2d0100fee91fa64c840dcd45f994ca5d615d8e1f566d39a7470fc1e014dbb4cf15d
+  checksum: 10/dc58d777eb4c01973f7fbf1fd808aad49a0efdf545528dab9b07d94fdcb65b8751742804c3057e9619a4627f2d9cc85547fdd49d9f4326992ad0181b49e61d81
   languageName: node
   linkType: hard
 
