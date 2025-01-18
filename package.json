@@ -32,8 +32,6 @@
         "format": "prettier --write eslint.config.js package.json README.md tsconfig.json ./packages/ ./packages/docs/.storybook/",
         "lint": "eslint ./packages/*/src/**",
         "lintfix": "eslint ./packages/*/src/** --fix",
-        "publish": "run-s build publish:all",
-        "publish:all": "yarn workspaces foreach --parallel --exclude '@acusti/uikit' npm publish --access public",
         "test": "vitest"
     },
     "repository": {
