@@ -59,12 +59,7 @@ export default [
             'react-compiler/react-compiler': 'warn',
             'react/jsx-no-leaked-render': ['warn', { validStrategies: ['ternary'] }],
             'react/jsx-sort-props': 'off',
-            'react/no-unknown-property': [
-                'error',
-                {
-                    ignore: ['popoverTarget', 'popoverTargetAction', 'precedence'],
-                },
-            ],
+            'react/no-unknown-property': 'error',
             'react-hooks/exhaustive-deps': [
                 'warn',
                 { enableDangerousAutofixThisMayCauseInfiniteLoops: true },
