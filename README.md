@@ -83,7 +83,7 @@ packages, use `yarn test`. To run them in watch mode, use
 
 ## Building and Publishing
 
-We use changesets to maintaing a changelog and manage versioning and
+We use [changesets][] to maintain a changelog and manage versioning and
 publishing. To create a new changeset for changes you have made, run:
 
 ```
@@ -118,3 +118,5 @@ The two main run scripts for developing are `yarn dev:watch`, which kicks
 off the TypeScript compiler in `--watch` mode, and `yarn dev:stories`,
 which kicks off the default `storybook` command from packages/docs/. To run
 both of those in a single terminal window, use `yarn dev`.
+
+[changesets]: https://github.com/changesets/changesets
