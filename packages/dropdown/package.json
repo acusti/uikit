@@ -56,8 +56,8 @@
         "@acusti/input-text": "^1.9.1",
         "@acusti/matchmaking": "^0.8.0",
         "@acusti/styling": "^1.0.1",
-        "@acusti/use-is-out-of-bounds": "^0.13.0",
-        "@acusti/use-keyboard-events": "^0.9.1",
+        "@acusti/use-is-out-of-bounds": "^0.1.0",
+        "@acusti/use-keyboard-events": "^0.1.0",
         "clsx": "^2"
     },
     "peerDependencies": {
