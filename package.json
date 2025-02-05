@@ -57,7 +57,7 @@
         "@types/node": "^22.10.2",
         "@types/react": "^19.0.7",
         "@typescript-eslint/eslint-plugin": "^8.18.1",
-        "@typescript-eslint/parser": "^8.18.1",
+        "@typescript-eslint/parser": "^8.23.0",
         "eslint": "^9.18.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-import-resolver-typescript": "^3.7.0",
