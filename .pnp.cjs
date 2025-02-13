@@ -145,7 +145,7 @@ const RAW_RUNTIME_STATE =
           ["globals", "npm:15.14.0"],\
           ["happy-dom", "npm:15.11.7"],\
           ["npm-run-all", "npm:4.1.5"],\
-          ["prettier", "npm:2.8.8"],\
+          ["prettier", "npm:3.5.1"],\
           ["react", "npm:19.0.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.0.0"],\
           ["typescript", "patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>::version=5.7.3&hash=5786d5"],\
@@ -427,7 +427,7 @@ const RAW_RUNTIME_STATE =
           ["globals", "npm:15.14.0"],\
           ["happy-dom", "npm:15.11.7"],\
           ["npm-run-all", "npm:4.1.5"],\
-          ["prettier", "npm:2.8.8"],\
+          ["prettier", "npm:3.5.1"],\
           ["react", "npm:19.0.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.0.0"],\
           ["typescript", "patch:typescript@npm%3A5.7.3#optional!builtin<compat/typescript>::version=5.7.3&hash=5786d5"],\
@@ -10919,6 +10919,13 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/prettier-npm-2.8.8-430828a36c-00cdb6ab02.zip/node_modules/prettier/",\
         "packageDependencies": [\
           ["prettier", "npm:2.8.8"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:3.5.1", {\
+        "packageLocation": "./.yarn/unplugged/prettier-npm-3.5.1-8b3bcecc5a/node_modules/prettier/",\
+        "packageDependencies": [\
+          ["prettier", "npm:3.5.1"]\
         ],\
         "linkType": "HARD"\
       }]\
