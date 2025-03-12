@@ -151,19 +151,15 @@ describe('@acusti/use-keyboard-events', () => {
                     />,
                 );
                 const element = screen.getByTestId('contenteditable');
-                // Add missing property http://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/isContentEditable
-                // TODO had to disable these tests because the following doesn’t work any more. Erro:
-                // TypeError: Cannot set property isContentEditable of [object Object] which has only a getter
-                // (element as any).isContentEditable = true; // eslint-disable-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-member-access
                 expect(isUsingKeyEvent).toBe(null);
                 await user.type(element, 'z');
-                // expect(isUsingKeyEvent).toBe(true);
+                expect(isUsingKeyEvent).toBe(true);
                 isUsingKeyEvent = null;
 
                 rerender(<div contentEditable onKeyUp={handleKeyEvent} />);
                 expect(isUsingKeyEvent).toBe(null);
                 await user.type(element, '{Enter}');
-                // expect(isUsingKeyEvent).toBe(true);
+                expect(isUsingKeyEvent).toBe(true);
             });
 
             it('detects that non-interactive elements aren’t using key events triggered on them', async () => {
