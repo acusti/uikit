@@ -42,7 +42,7 @@
         "vitest": "^3"
     },
     "dependencies": {
-        "@acusti/use-bounding-client-rect": "^1.4.1"
+        "@acusti/use-bounding-client-rect": "^0.1.0"
     },
     "peerDependencies": {
         "react": "^16.8 || ^17 || ^18 || ^19",
