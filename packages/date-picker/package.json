@@ -53,7 +53,7 @@
         "vitest": "^3"
     },
     "dependencies": {
-        "@acusti/styling": "^1.0.1",
+        "@acusti/styling": "^0.7.2 || ^1.0.1",
         "clsx": "^2"
     },
     "peerDependencies": {
