@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions */
-import InputText from '@acusti/input-text';
 import { Style } from '@acusti/styling';
 import useIsOutOfBounds from '@acusti/use-is-out-of-bounds';
 import useKeyboardEvents, {
@@ -645,16 +644,15 @@ export default function Dropdown({
     if (!isTriggerFromProps) {
         if (isSearchable) {
             trigger = (
-                <InputText
+                <input
                     autoComplete="off"
                     className={TRIGGER_CLASS_NAME}
                     disabled={disabled}
-                    initialValue={value ?? ''}
+                    defaultValue={value ?? ''}
                     name={name}
                     onFocus={setDropdownOpenRef.current}
                     placeholder={placeholder}
                     ref={inputElementRef}
-                    selectTextOnFocus
                     tabIndex={tabIndex}
                     type="text"
                 />

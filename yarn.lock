@@ -91,7 +91,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
-    "@acusti/input-text": "npm:^1.9.1"
     "@acusti/matchmaking": "npm:^0.8.0"
     "@acusti/styling": "npm:^0.7.2 || ^1.0.1"
     "@acusti/use-is-out-of-bounds": "npm:^0.13.0"

@@ -248,7 +248,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/dropdown/",\
         "packageDependencies": [\
           ["@acusti/dropdown", "workspace:packages/dropdown"],\
-          ["@acusti/input-text", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text"],\
           ["@acusti/matchmaking", "workspace:packages/matchmaking"],\
           ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
           ["@acusti/use-is-out-of-bounds", "virtual:f63b5d00e5e296d2a6b37604d08216f6a6601b280b21deec9158ba103da36f1a3cb2312a6336d5a9bde964154aa829167ab141bb920dca79deada23d83520dda#workspace:packages/use-is-out-of-bounds"],\
