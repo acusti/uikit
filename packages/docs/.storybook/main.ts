@@ -7,7 +7,7 @@ import type { StorybookConfig } from '@storybook/react-vite';
  * It is needed in projects that use Yarn PnP or are set up within a monorepo.
  */
 function getAbsolutePath(value: string): any {
-    return dirname(require.resolve(join(value, 'package.json')));
+    return dirname(import.meta.resolve(join(value, 'package.json'))).replace(/^file:\/\//, '');
 }
 
 const config: StorybookConfig = {
