@@ -9,17 +9,17 @@
         "storybook": "storybook dev -p 6006"
     },
     "devDependencies": {
-        "@storybook/addon-essentials": "^8.5",
-        "@storybook/blocks": "^8.5",
-        "@storybook/manager-api": "^8.5",
-        "@storybook/react": "^8.5",
-        "@storybook/react-vite": "^8.5",
-        "@storybook/test": "^8.5",
+        "@storybook/addon-essentials": "^8.6",
+        "@storybook/blocks": "^8.6",
+        "@storybook/manager-api": "^8.6",
+        "@storybook/react": "^8.6",
+        "@storybook/react-vite": "^8.6",
+        "@storybook/test": "^8.6",
         "@types/react": "^19.0.7",
         "core-js": "^3.40.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
-        "storybook": "^8.5",
+        "storybook": "^8.6",
         "typescript": "5.7.3",
         "vite": "^6"
     }
