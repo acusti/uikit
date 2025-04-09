@@ -53,7 +53,6 @@
         "vitest": "^3"
     },
     "dependencies": {
-        "@acusti/input-text": "^1.9.1",
         "@acusti/matchmaking": "^0.8.0",
         "@acusti/styling": "^0.7.2 || ^1.0.1",
         "@acusti/use-is-out-of-bounds": "^0.13.0",
