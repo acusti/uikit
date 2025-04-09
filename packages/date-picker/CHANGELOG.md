@@ -4,7 +4,7 @@
 
 ### Patch Changes
 
--   3f3d39d: Switch over all eslint sorting and organizing rules to use the
-    Perfectionist plugin and enable the eslint no-duplicate-imports rule
--   Updated dependencies [3f3d39d]
-    -   @acusti/styling@1.0.1
+- 3f3d39d: Switch over all eslint sorting and organizing rules to use the
+  Perfectionist plugin and enable the eslint no-duplicate-imports rule
+- Updated dependencies [3f3d39d]
+    - @acusti/styling@1.0.1

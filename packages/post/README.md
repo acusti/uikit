@@ -39,10 +39,10 @@ And lastly, if the response is an error (4xx or 5xx), `post` will throw an
 Error object with the response HTTP error and message as the Error object
 message and with the following additional properties:
 
--   `Error.response`: the node.js response `IncomingMessage` object
--   `Error.responseJSON`: if the response body can be parsed as JSON, the
-    JSON representation returned from calling `JSON.parse()` on it
--   `Error.responseText`: the response body as text
+- `Error.response`: the node.js response `IncomingMessage` object
+- `Error.responseJSON`: if the response body can be parsed as JSON, the
+  JSON representation returned from calling `JSON.parse()` on it
+- `Error.responseText`: the response body as text
 
 [`window.fetch`]: http://developer.mozilla.org/en-US/docs/Web/API/fetch
 
