@@ -2,7 +2,7 @@ import jsPlugin from '@eslint/js';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import prettierConfig from 'eslint-config-prettier';
-// import canonicalPlugin from 'eslint-plugin-canonical';
+import canonicalPlugin from 'eslint-plugin-canonical';
 import importPlugin from 'eslint-plugin-import';
 import jestPlugin from 'eslint-plugin-jest';
 import jestDOMPlugin from 'eslint-plugin-jest-dom';
@@ -45,7 +45,7 @@ export default [
         },
         plugins: {
             '@typescript-eslint': tsPlugin,
-            // canonical: canonicalPlugin,
+            canonical: canonicalPlugin,
             import: importPlugin,
             react: reactPlugin,
             'react-compiler': reactCompilerPlugin,
@@ -78,11 +78,9 @@ export default [
                 'error',
                 { allowNullableBoolean: true, allowNullableString: true },
             ],
-            // NOTE waiting on https://github.com/gajus/eslint-plugin-canonical/issues/44
-            // 'canonical/filename-match-exported': 'error',
-            // NOTE doesn’t play well with react-routers generated ./+types/ imports
+            'canonical/filename-match-exported': 'error',
             // 'canonical/prefer-inline-type-import': 'error',
-            // 'canonical/sort-react-dependencies': 'error',
+            'canonical/sort-react-dependencies': 'error',
             // 'import/extensions': ['error', 'always', { ignorePackages: true }],
             'import/order': 'off',
             'jsx-a11y/control-has-associated-label': 'error',
