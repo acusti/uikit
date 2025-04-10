@@ -20,7 +20,7 @@ describe('@acusti/parsing', () => {
 
     describe('parseAsJSON', () => {
         it('converts a LLM response string to a JSON object', convertToJSONTestCase);
-        it('handles nested JSON structures', () => nestedJSONTestCase);
+        it('handles nested JSON structures', nestedJSONTestCase);
         it('handles JSON with missing comma-separators', missingCommasTestCase);
         it('handles JSON with trailing comma-separators', trailingCommasTestCase);
         it(
@@ -36,7 +36,7 @@ describe('@acusti/parsing', () => {
             'handles partial (streaming) LLM responses as they come in',
             partialResponsesTestCase,
         );
-        it('detects and strip detailed pre- and post-amble text', preambleTestCase);
+        it('detects and strips detailed pre- and post-amble text', preambleTestCase);
         it(
             'infers if content looks like an object and add missing curly braces if so',
             missingCurliesTestCase,
