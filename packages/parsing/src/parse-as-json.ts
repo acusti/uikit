@@ -188,6 +188,8 @@ function lengthOf(item: unknown): number {
     }
 }
 
+const hasTextContent = (text: string) => /\w/.test(text);
+
 const getObjectKeyFromIndex = (index: number) =>
     `"key${index === 1 ? '' : '-' + index}":`;
 
@@ -196,15 +198,23 @@ const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
 const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
 
 type ParsedValue = Array<unknown> | boolean | GenericObject | number | string;
+// naming from https://www.oreilly.com/library/view/prompt-engineering-for/9781098156145/ch07.html
+type ParsedResult = {
+    postscript: string;
+    preamble: string;
+    value: null | ParsedValue;
+};
 
-export function parseAsJSON(text: string): null | ParsedValue {
-    // if the input is undefined/null, return null to indicate failure
-    if (text == null) return null;
+export function parseAsJSON(text: string): ParsedResult {
+    let preamble = '';
+    let postscript = '';
+    // if the input is undefined/null, use value: null to indicate failure
+    if (text == null) return { postscript, preamble, value: null };
 
     text = text.replace(CONTROL_TOKENS_REGEXP, '');
     // attempt to parse the string as-is (minus control tokens)
     try {
-        return JSON.parse(text) as ParsedValue;
+        return { postscript, preamble, value: JSON.parse(text) as ParsedValue };
     } catch (error) {
         // let’s try to fix it
     }
@@ -226,6 +236,9 @@ export function parseAsJSON(text: string): null | ParsedValue {
     // identify start of JSON
     let previousText;
     do {
+        if (previousText) {
+            preamble += previousText.substring(0, previousText.length - text.length);
+        }
         previousText = text;
         // if text starts with a control char, it didn’t pass the while condition
         text = text.replace(/^[[{"]?[^[{"]+/, '');
@@ -237,6 +250,12 @@ export function parseAsJSON(text: string): null | ParsedValue {
             // if new start is ", ensure it’s a JSON string & not part of preamble
             (text[0] === '"' && !OBJECT_KEY_REGEXP.test(text)))
     );
+
+    const extraPreamble = previousText.substring(0, previousText.length - text.length);
+    if (hasTextContent(extraPreamble)) {
+        preamble += extraPreamble;
+    }
+    preamble = preamble.trim();
 
     // if the first character is a key, add opening curly brace
     if (OBJECT_KEY_REGEXP.test(text)) {
@@ -473,42 +492,64 @@ export function parseAsJSON(text: string): null | ParsedValue {
     }
 
     // attempt to parse the modified string as JSON
-    let result = null;
+    let value = null;
     try {
-        result = JSON.parse(newText) as ParsedValue;
+        value = JSON.parse(newText) as ParsedValue;
     } catch (error) {
-        // in case of error, return null (after checking remainder of text)
+        // in case of error, check remainder of text, else return value: null
     }
 
     // if there’s still unparsed text and parsing failed or its more than ½
     // what we already parsed, the model might’ve restarted partway through.
     // try parsing the rest to see if we get a larger result and use it if so.
+    postscript = originalText.substring(index - textLengthDelta).trim();
+    // if postscript doesn’t have any actual content, empty it
+    if (!hasTextContent(postscript)) {
+        postscript = '';
+    }
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (remainingText.length > 5 && (!result || remainingText.length > index)) {
-        const remainingResult = parseAsJSON(remainingText);
-    const remainingText = originalText.substring(index - textLengthDelta).trim();
+    if (postscript.length > 5 && (!value || postscript.length > index)) {
+        const { postscript: remainingPostscript, value: remainingValue } =
+            parseAsJSON(postscript);
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if (remainingResult) {
+        if (remainingValue) {
             // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-            if (!result) return remainingResult;
+            if (!value)
+                return {
+                    postscript: remainingPostscript,
+                    preamble,
+                    value: remainingValue,
+                };
             // choose whichever has more keys (or, if equal, more characters)
             if (
-                typeof result === 'object' &&
-                typeof remainingResult === 'object' &&
-                !Array.isArray(result) &&
-                !Array.isArray(remainingResult)
+                typeof value === 'object' &&
+                typeof remainingValue === 'object' &&
+                !Array.isArray(value) &&
+                !Array.isArray(remainingValue)
             ) {
-                const keysLength = Object.keys(result).length;
-                const remainingKeysLength = Object.keys(remainingResult).length;
-                if (keysLength > remainingKeysLength) return result;
-                if (remainingKeysLength > keysLength) return remainingResult;
+                const keysLength = Object.keys(value).length;
+                const remainingKeysLength = Object.keys(remainingValue).length;
+                if (keysLength > remainingKeysLength) {
+                    return { postscript, preamble, value };
+                }
+                if (remainingKeysLength > keysLength) {
+                    return {
+                        postscript: remainingPostscript,
+                        preamble,
+                        value: remainingValue,
+                    };
+                }
             }
             // if not objects or same number of keys, choose longer item
-            if (lengthOf(remainingResult) > lengthOf(result)) {
-                return remainingResult;
+            if (lengthOf(remainingValue) > lengthOf(value)) {
+                return {
+                    postscript: remainingPostscript,
+                    preamble,
+                    value: remainingValue,
+                };
             }
         }
     }
 
-    return result;
+    return { postscript, preamble, value };
 }

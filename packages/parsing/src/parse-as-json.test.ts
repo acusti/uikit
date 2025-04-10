@@ -79,8 +79,13 @@ function convertToJSONTestCase() {
 `;
 
     expect(parseAsJSON(response)).toEqual({
-        heading: 'Our Story',
-        subheading: 'A Passion for Sourdough',
+        postscript: '',
+        preamble:
+            'Here is the JSON output for the "About Us" page based on the provided props:',
+        value: {
+            heading: 'Our Story',
+            subheading: 'A Passion for Sourdough',
+        },
     });
 }
 
@@ -104,22 +109,26 @@ function extraClosingCurliesTestCase() {
 ]
 }}`;
     expect(parseAsJSON(response)).toEqual({
-        heading: 'Notable Projects',
-        projects: [
-            {
-                altText: 'Skyscraper',
-                description:
-                    'Design for a new skyscraper in the city center, featuring a sleek and modern aesthetic. The building features a large atrium and floor-to-ceiling windows, providing an abundance of natural light and stunning views of the city skyline.',
-                image: 'https://pentagram.com/images/skyscraper.jpg',
-            },
-            {
-                altText: 'Non-Profit Organization',
-                description:
-                    'Website design for a non-profit organization, featuring a clean and intuitive layout, with a focus on accessibility and user experience. The goal was to create a user-friendly platform that would allow the organization to effectively communicate their mission and goals.',
-                image: 'https://pentagram.com/images/non-profit.jpg',
-            },
-        ],
-        subheading: 'Explore some of our most successful and innovative designs',
+        postscript: '',
+        preamble: '',
+        value: {
+            heading: 'Notable Projects',
+            projects: [
+                {
+                    altText: 'Skyscraper',
+                    description:
+                        'Design for a new skyscraper in the city center, featuring a sleek and modern aesthetic. The building features a large atrium and floor-to-ceiling windows, providing an abundance of natural light and stunning views of the city skyline.',
+                    image: 'https://pentagram.com/images/skyscraper.jpg',
+                },
+                {
+                    altText: 'Non-Profit Organization',
+                    description:
+                        'Website design for a non-profit organization, featuring a clean and intuitive layout, with a focus on accessibility and user experience. The goal was to create a user-friendly platform that would allow the organization to effectively communicate their mission and goals.',
+                    image: 'https://pentagram.com/images/non-profit.jpg',
+                },
+            ],
+            subheading: 'Explore some of our most successful and innovative designs',
+        },
     });
 
     response = `\
@@ -127,12 +136,17 @@ function extraClosingCurliesTestCase() {
 {"contactEmail1":"info@example.net","contactPhoneNumber1":"772.555.8989","addressLine1":"123 Main St.","addressLine2":"North Lake Tahoe CA 96150","officeHours":"Monday - Friday: 9:00am - 4:30pm","officeHoursDays":"Mon - Fri"}"}`;
 
     expect(parseAsJSON(response)).toEqual({
-        addressLine1: '123 Main St.',
-        addressLine2: 'North Lake Tahoe CA 96150',
-        contactEmail1: 'info@example.net',
-        contactPhoneNumber1: '772.555.8989',
-        officeHours: 'Monday - Friday: 9:00am - 4:30pm',
-        officeHoursDays: 'Mon - Fri',
+        postscript: '',
+        preamble:
+            'Here is the JSON output for the "Locations" page based on the provided props:',
+        value: {
+            addressLine1: '123 Main St.',
+            addressLine2: 'North Lake Tahoe CA 96150',
+            contactEmail1: 'info@example.net',
+            contactPhoneNumber1: '772.555.8989',
+            officeHours: 'Monday - Friday: 9:00am - 4:30pm',
+            officeHoursDays: 'Mon - Fri',
+        },
     });
 }
 
@@ -141,9 +155,13 @@ function extraneousEscapeCharactersTestCase() {
         '```json\n{"heading":"Print Design","description":"\\\nAt Cinco Design, we believe that print design is not just about creating visually appealing materials, but also about effectively communicating your message to your target audience. Our team of experienced designers works closely with you to understand your brand, your audience, and your goals, and then crafts a unique print design solution that captures your essence and resonates with your audience.\n\nOur print design services include:\n\n- Branding and identity design: We create a cohesive visual identity for your brand, including logos, business cards, letterheads, and more.\n- Marketing collateral: We design brochures, flyers, posters, and other marketing materials that effectively promote your products or services.\n- Packaging design: We design packaging that not only protects your products but also enhances their appeal and makes them stand out on the shelf.\n- Publication design: We design magazines, newspapers, books, and other publications that are visually engaging and easy to navigate.\n\nLet us help you make a lasting impression with our print design services. Contact us today to discuss your project and see how we can bring your vision to life."}\n```';
 
     expect(parseAsJSON(response)).toEqual({
-        description:
-            '\nAt Cinco Design, we believe that print design is not just about creating visually appealing materials, but also about effectively communicating your message to your target audience. Our team of experienced designers works closely with you to understand your brand, your audience, and your goals, and then crafts a unique print design solution that captures your essence and resonates with your audience.\n\nOur print design services include:\n\n- Branding and identity design: We create a cohesive visual identity for your brand, including logos, business cards, letterheads, and more.\n- Marketing collateral: We design brochures, flyers, posters, and other marketing materials that effectively promote your products or services.\n- Packaging design: We design packaging that not only protects your products but also enhances their appeal and makes them stand out on the shelf.\n- Publication design: We design magazines, newspapers, books, and other publications that are visually engaging and easy to navigate.\n\nLet us help you make a lasting impression with our print design services. Contact us today to discuss your project and see how we can bring your vision to life.',
-        heading: 'Print Design',
+        postscript: '',
+        preamble: '```json',
+        value: {
+            description:
+                '\nAt Cinco Design, we believe that print design is not just about creating visually appealing materials, but also about effectively communicating your message to your target audience. Our team of experienced designers works closely with you to understand your brand, your audience, and your goals, and then crafts a unique print design solution that captures your essence and resonates with your audience.\n\nOur print design services include:\n\n- Branding and identity design: We create a cohesive visual identity for your brand, including logos, business cards, letterheads, and more.\n- Marketing collateral: We design brochures, flyers, posters, and other marketing materials that effectively promote your products or services.\n- Packaging design: We design packaging that not only protects your products but also enhances their appeal and makes them stand out on the shelf.\n- Publication design: We design magazines, newspapers, books, and other publications that are visually engaging and easy to navigate.\n\nLet us help you make a lasting impression with our print design services. Contact us today to discuss your project and see how we can bring your vision to life.',
+            heading: 'Print Design',
+        },
     });
 }
 
@@ -162,19 +180,23 @@ Props:
 | miniBlogPostLede2 | "Vytas' Hatha Yoga classes offer a sense of community and connection, fostering a supportive environment for all practitioners" | |`;
 
     expect(parseAsJSON(response)).toEqual({
-        blogPostHeading1: 'Hatha Yoga Classes with Vytas',
-        blogPostHeading2: 'Community and Connection',
-        blogPostImage1: '/vytas-yoga-class-background.jpg',
-        blogPostImage2: '/vytas-yoga-community-background.jpg',
-        miniBlogPostLede1:
-            'Discover the transformative power of Hatha Yoga with Vytas, a seasoned yoga teacher',
-        miniBlogPostLede2:
-            "Vytas' Hatha Yoga classes offer a sense of community and connection, fostering a supportive environment for all practitioners",
-        'Prop Name': 'Value',
-        shortBlogPostCaption1:
-            'Find inner peace and balance through physical postures and breathing techniques',
-        shortBlogPostCaption2:
-            'Join a supportive community of like-minded individuals and deepen your practice with Vytas',
+        postscript: '',
+        preamble: "Here are the props for Vytas' Hatha Yoga classes:\nProps:",
+        value: {
+            blogPostHeading1: 'Hatha Yoga Classes with Vytas',
+            blogPostHeading2: 'Community and Connection',
+            blogPostImage1: '/vytas-yoga-class-background.jpg',
+            blogPostImage2: '/vytas-yoga-community-background.jpg',
+            miniBlogPostLede1:
+                'Discover the transformative power of Hatha Yoga with Vytas, a seasoned yoga teacher',
+            miniBlogPostLede2:
+                "Vytas' Hatha Yoga classes offer a sense of community and connection, fostering a supportive environment for all practitioners",
+            'Prop Name': 'Value',
+            shortBlogPostCaption1:
+                'Find inner peace and balance through physical postures and breathing techniques',
+            shortBlogPostCaption2:
+                'Join a supportive community of like-minded individuals and deepen your practice with Vytas',
+        },
     });
 }
 
@@ -194,16 +216,21 @@ function missingCommasTestCase() {
 }
 `;
     expect(parseAsJSON(response)).toEqual({
-        heading: 'Get in Touch',
-        props: {
-            form: {
-                email: 'info@example.net',
-                message: 'Please enter your message or inquiry below',
-                name: 'Contact Form',
-                submit: 'Submit',
+        postscript: '',
+        preamble:
+            'Sure, here\'s an example of a JSON response for the "Contact Form" page:',
+        value: {
+            heading: 'Get in Touch',
+            props: {
+                form: {
+                    email: 'info@example.net',
+                    message: 'Please enter your message or inquiry below',
+                    name: 'Contact Form',
+                    submit: 'Submit',
+                },
             },
+            subheading: "We'd love to hear from you!",
         },
-        subheading: "We'd love to hear from you!",
     });
 }
 
@@ -225,28 +252,32 @@ Props:
 "blogPostLede3": "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
 `;
     expect(parseAsJSON(response)).toEqual({
-        blogPostHeading1: 'The Magic of Sourdough',
-        blogPostHeading2: 'Our Journey to Your Table',
-        blogPostHeading3: 'Learn the Basics of Artisanal Bread Making',
-        blogPostImage1: '/images/blog-post-image1.jpg',
-        blogPostImage2: '/images/blog-post-image2.jpg',
-        blogPostImage3: '/images/blog-post-image3.jpg',
-        blogPostLede1:
-            "At Masa Madre, we're passionate about creating the perfect sourdough bread. Learn more about the art and craft of this ancient tradition.",
-        blogPostLede2:
-            'Discover the journey of our sourdough bread, from the seed to the loaf.',
-        blogPostLede3:
-            "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
-        blogPostSubheading1: 'Exploring the Art of Sourdough Baking',
-        blogPostSubheading2: 'From Seed to Loaf',
-        blogPostSubheading3: 'Sourdough 101',
+        postscript: '',
+        preamble: 'Here are the props for the "Blog" page:\nProps:',
+        value: {
+            blogPostHeading1: 'The Magic of Sourdough',
+            blogPostHeading2: 'Our Journey to Your Table',
+            blogPostHeading3: 'Learn the Basics of Artisanal Bread Making',
+            blogPostImage1: '/images/blog-post-image1.jpg',
+            blogPostImage2: '/images/blog-post-image2.jpg',
+            blogPostImage3: '/images/blog-post-image3.jpg',
+            blogPostLede1:
+                "At Masa Madre, we're passionate about creating the perfect sourdough bread. Learn more about the art and craft of this ancient tradition.",
+            blogPostLede2:
+                'Discover the journey of our sourdough bread, from the seed to the loaf.',
+            blogPostLede3:
+                "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
+            blogPostSubheading1: 'Exploring the Art of Sourdough Baking',
+            blogPostSubheading2: 'From Seed to Loaf',
+            blogPostSubheading3: 'Sourdough 101',
+        },
     });
 }
 
 function missingOpeningQuoteTestCase() {
     const response =
         '{"heading":"The Unbreakable Bond"\ndescription":"In a world ravaged by chaos and despair, the heartwarming relationship between Big Man and Sweet Tooth stands as a beacon of hope and love. As Big Man takes the young hybrid under his wing, nurturing him with unwavering devotion, the two forge an unbreakable bond that transcends the boundaries of blood and biology."}<|im_end|>';
-    expect(parseAsJSON(response)).toEqual({
+    expect(parseAsJSON(response).value).toEqual({
         description:
             'In a world ravaged by chaos and despair, the heartwarming relationship between Big Man and Sweet Tooth stands as a beacon of hope and love. As Big Man takes the young hybrid under his wing, nurturing him with unwavering devotion, the two forge an unbreakable bond that transcends the boundaries of blood and biology.',
         heading: 'The Unbreakable Bond',
@@ -260,31 +291,35 @@ function missingValuesTestCase() {
 \`\`\``;
 
     expect(parseAsJSON(response)).toEqual({
-        heading: 'Digg FAQ',
-        items: [
-            {
-                button: '',
-                description:
-                    'Digg is an American news aggregator that curates a front page of the most popular stories on the Internet. It covers topics such as science, trending political issues, and viral Internet issues.',
-                heading: 'What is Digg?',
-                subheading: '',
-            },
-            {
-                button: '',
-                description:
-                    'Digg uses a combination of editorial curation and algorithmic sorting to select the most popular stories on the Internet. Users can submit stories, which are then voted on by other users. The stories with the most votes appear on the Digg front page.',
-                heading: 'How does Digg work?',
-                subheading: '',
-            },
-            {
-                button: '',
-                description:
-                    "To submit a story to Digg, you need to create an account and then click on the 'Submit a Story' button. You will then be prompted to enter the URL of the story you want to submit. Once submitted, other users can vote on your story, and if it gains enough votes, it may appear on the Digg front page.",
-                heading: 'How do I submit a story to Digg?',
-                subheading: '',
-            },
-        ],
-        subheading: 'Get the Answers You Need',
+        postscript: '',
+        preamble: '```json',
+        value: {
+            heading: 'Digg FAQ',
+            items: [
+                {
+                    button: '',
+                    description:
+                        'Digg is an American news aggregator that curates a front page of the most popular stories on the Internet. It covers topics such as science, trending political issues, and viral Internet issues.',
+                    heading: 'What is Digg?',
+                    subheading: '',
+                },
+                {
+                    button: '',
+                    description:
+                        'Digg uses a combination of editorial curation and algorithmic sorting to select the most popular stories on the Internet. Users can submit stories, which are then voted on by other users. The stories with the most votes appear on the Digg front page.',
+                    heading: 'How does Digg work?',
+                    subheading: '',
+                },
+                {
+                    button: '',
+                    description:
+                        "To submit a story to Digg, you need to create an account and then click on the 'Submit a Story' button. You will then be prompted to enter the URL of the story you want to submit. Once submitted, other users can vote on your story, and if it gains enough votes, it may appear on the Digg front page.",
+                    heading: 'How do I submit a story to Digg?',
+                    subheading: '',
+                },
+            ],
+            subheading: 'Get the Answers You Need',
+        },
     });
 }
 
@@ -292,28 +327,32 @@ function nestedArraysTestCase() {
     const response = `{"heading": "Registration Form", "items": [{"heading": "Personal Information", "fields": [{"label": "Name", "name": "name", "type": "text", "placeholder": "Enter your name"}, {"label": "Gender", "name": "gender", "type": "select", "options": ["Male", "Female", "Other"], "placeholder": "Select your gender"}]}], "button": "Next: Security Details"}]}<|im_end|>`;
 
     expect(parseAsJSON(response)).toEqual({
-        button: 'Next: Security Details',
-        heading: 'Registration Form',
-        items: [
-            {
-                fields: [
-                    {
-                        label: 'Name',
-                        name: 'name',
-                        placeholder: 'Enter your name',
-                        type: 'text',
-                    },
-                    {
-                        label: 'Gender',
-                        name: 'gender',
-                        options: ['Male', 'Female', 'Other'],
-                        placeholder: 'Select your gender',
-                        type: 'select',
-                    },
-                ],
-                heading: 'Personal Information',
-            },
-        ],
+        postscript: '',
+        preamble: '',
+        value: {
+            button: 'Next: Security Details',
+            heading: 'Registration Form',
+            items: [
+                {
+                    fields: [
+                        {
+                            label: 'Name',
+                            name: 'name',
+                            placeholder: 'Enter your name',
+                            type: 'text',
+                        },
+                        {
+                            label: 'Gender',
+                            name: 'gender',
+                            options: ['Male', 'Female', 'Other'],
+                            placeholder: 'Select your gender',
+                            type: 'select',
+                        },
+                    ],
+                    heading: 'Personal Information',
+                },
+            ],
+        },
     });
 }
 
@@ -332,20 +371,29 @@ function nestedJSONTestCase() {
 `;
 
     expect(parseAsJSON(response)).toEqual({
-        heading: 'Get in Touch',
-        props: {
-            form: {
-                email: 'info@example.net',
-                message: 'Please enter your message or inquiry below',
+        postscript: '',
+        preamble:
+            'Sure, here\'s an example of a JSON response for the "Contact Form" page:',
+        value: {
+            heading: 'Get in Touch',
+            props: {
+                form: {
+                    email: 'info@example.net',
+                    message: 'Please enter your message or inquiry below',
+                },
             },
+            subheading: "We'd love to hear from you!",
         },
-        subheading: "We'd love to hear from you!",
     });
 }
 
 function numberValuesTestCase() {
     const response = '[{"foo":0}\n{"bar": 1}{"baz": "qux"}]<|im_end|>';
-    expect(parseAsJSON(response)).toEqual([{ foo: 0 }, { bar: 1 }, { baz: 'qux' }]);
+    expect(parseAsJSON(response)).toEqual({
+        postscript: '',
+        preamble: '',
+        value: [{ foo: 0 }, { bar: 1 }, { baz: 'qux' }],
+    });
 }
 
 function partialResponsesTestCase() {
@@ -357,13 +405,22 @@ Here are some of the services we offer:
 {
 "contentLi`;
     expect(parseAsJSON(response)).toEqual({
-        bodyCopy:
-            'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.',
-        'Here are some of the services we offer': { contentLi: '' },
+        postscript: '',
+        preamble:
+            'Sure, here\'s an example JSON output for the "Services" section based on the provided information:',
+        value: {
+            bodyCopy:
+                'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.',
+            'Here are some of the services we offer': { contentLi: '' },
+        },
     });
 
     response = '  Here is a sample JSON output for the "Branding Portfolio"';
-    expect(parseAsJSON(response)).toEqual('');
+    expect(parseAsJSON(response)).toEqual({
+        postscript: '',
+        preamble: 'Here is a sample JSON output for the "Branding Portfolio',
+        value: '',
+    });
 
     response = `\
   Here is the JSON output for the "Meet the Team" page:
@@ -375,7 +432,7 @@ Here are some of the services we offer:
 "teamMembers": [
 {
 "`;
-    expect(parseAsJSON(response)).toEqual({
+    expect(parseAsJSON(response).value).toEqual({
         callToAction: 'Learn More',
         heading: 'Meet the Team',
         subheading:
@@ -390,7 +447,7 @@ Props:
 "heading1": "News",
 "subheading2":`;
 
-    expect(parseAsJSON(response)).toEqual({
+    expect(parseAsJSON(response).value).toEqual({
         heading1: 'News',
         subheading1: 'Explore Our News Archive',
         subheading2: '',
@@ -404,14 +461,22 @@ Props:
 "teamMemberJobTitle1": "Product  Here is the JSON output for the "Testimonials" page based on the provided props:`;
 
     expect(parseAsJSON(response)).toEqual({
-        teamMemberImage1: '/images/team-member-1.jpg',
-        // first quote mark is recognized as an unescaped character, final quote mark is treated as string terminus
-        teamMemberJobTitle1: 'Product  Here is the JSON output for the "Testimonials',
-        teamMemberName1: 'Jane Smith',
+        postscript: 'page based on the provided props:',
+        preamble: 'Here is the JSON output for the "Benefits" page:',
+        value: {
+            teamMemberImage1: '/images/team-member-1.jpg',
+            // first quote mark is recognized as an unescaped character, final quote mark is treated as string terminus
+            teamMemberJobTitle1: 'Product  Here is the JSON output for the "Testimonials',
+            teamMemberName1: 'Jane Smith',
+        },
     });
 
     response = '```json\n{\n  "heading": "News",\n  "';
-    expect(parseAsJSON(response)).toEqual({ '': '', heading: 'News' });
+    expect(parseAsJSON(response)).toEqual({
+        postscript: '',
+        preamble: '```json',
+        value: { '': '', heading: 'News' },
+    });
 
     response = `\
 \`\`\`json
@@ -433,7 +498,7 @@ Props:
         "button": "Add to Cart",
         "imageURL": "/`;
 
-    expect(parseAsJSON(response)).toEqual({
+    expect(parseAsJSON(response).value).toEqual({
         items: [
             {
                 '```json': {
@@ -466,8 +531,16 @@ Props:
 }
 
 function preambleTestCase() {
+    const preamble = `Sure, here's an example JSON output for the "Types of Lessons" section based on the provided props:`;
+    const postscript = `This output includes the following props:
+
+* "sectionSubtitle": A subtitle for the section, which is "Dance Lessons for All Levels".
+* "sectionTitle": The title of the section, which is "Lessons Offered".
+* "itemSubtitle1", "itemTitle1", "itemDescription1": These props are used to define the first item in the list of lessons, which is beginner. The subtitle is "Beginner", the title is "Introduction to Latin Dance", and the description is "Learn the basics of Latin dance, including salsa, bachata, and cha cha cha. Perfect for beginners looking to get started or those who want to refresh their skills."
+* "itemSubtitle2", "itemTitle2", "itemDescription2": These props are used to define the second item in the list of lessons, which is intermediate. The subtitle is "Intermediate", the title is "Advanced Techniques", and the description is "Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance."
+* "link": The link prop is used to define the URL of the lessons page, which is "https://marteeeen.com/lessons/".".`;
     const response = `\
-  Sure, here's an example JSON output for the "Types of Lessons" section based on the provided props:
+  ${preamble}
 {
 "sectionSubtitle": "Dance Lessons for All Levels",
 "sectionTitle": "Lessons Offered",
@@ -480,26 +553,24 @@ function preambleTestCase() {
 "link": "https://marteeeen.com/lessons/"
 }
 
-This output includes the following props:
-
-* "sectionSubtitle": A subtitle for the section, which is "Dance Lessons for All Levels".
-* "sectionTitle": The title of the section, which is "Lessons Offered".
-* "itemSubtitle1", "itemTitle1", "itemDescription1": These props are used to define the first item in the list of lessons, which is beginner. The subtitle is "Beginner", the title is "Introduction to Latin Dance", and the description is "Learn the basics of Latin dance, including salsa, bachata, and cha cha cha. Perfect for beginners looking to get started or those who want to refresh their skills."
-* "itemSubtitle2", "itemTitle2", "itemDescription2": These props are used to define the second item in the list of lessons, which is intermediate. The subtitle is "Intermediate", the title is "Advanced Techniques", and the description is "Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance."
-* "link": The link prop is used to define the URL of the lessons page, which is "https://marteeeen.com/lessons/".".`;
+${postscript}`;
 
     expect(parseAsJSON(response)).toEqual({
-        itemDescription1:
-            'Learn the basics of Latin dance, including salsa, bachata, and cha cha cha. Perfect for beginners looking to get started or those who want to refresh their skills.',
-        itemDescription2:
-            'Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance.',
-        itemSubtitle1: 'Beginner',
-        itemSubtitle2: 'Intermediate',
-        itemTitle1: 'Introduction to Latin Dance',
-        itemTitle2: 'Advanced Techniques',
-        link: 'https://marteeeen.com/lessons/',
-        sectionSubtitle: 'Dance Lessons for All Levels',
-        sectionTitle: 'Lessons Offered',
+        postscript,
+        preamble,
+        value: {
+            itemDescription1:
+                'Learn the basics of Latin dance, including salsa, bachata, and cha cha cha. Perfect for beginners looking to get started or those who want to refresh their skills.',
+            itemDescription2:
+                'Build on your existing skills and learn more complex moves and patterns. Suitable for those with some experience in Latin dance.',
+            itemSubtitle1: 'Beginner',
+            itemSubtitle2: 'Intermediate',
+            itemTitle1: 'Introduction to Latin Dance',
+            itemTitle2: 'Advanced Techniques',
+            link: 'https://marteeeen.com/lessons/',
+            sectionSubtitle: 'Dance Lessons for All Levels',
+            sectionTitle: 'Lessons Offered',
+        },
     });
 }
 
@@ -508,33 +579,41 @@ function prematureClosingCurliesTestCase() {
         '```json\n{"heading":"Organic Produce","subheading":"The Benefits of Going Organic","description":"Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers."},"items":[{"heading":"Organic Fruits","subheading":"Nature\'s Sweet Treats"},{"heading":"Organic Vegetables","subheading":"Fresh from the Garden"}]}\n```';
 
     expect(parseAsJSON(response)).toEqual({
-        description:
-            'Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers.',
-        heading: 'Organic Produce',
-        items: [
-            {
-                heading: 'Organic Fruits',
-                subheading: "Nature's Sweet Treats",
-            },
-            {
-                heading: 'Organic Vegetables',
-                subheading: 'Fresh from the Garden',
-            },
-        ],
-        subheading: 'The Benefits of Going Organic',
+        postscript: '',
+        preamble: '```json',
+        value: {
+            description:
+                'Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers.',
+            heading: 'Organic Produce',
+            items: [
+                {
+                    heading: 'Organic Fruits',
+                    subheading: "Nature's Sweet Treats",
+                },
+                {
+                    heading: 'Organic Vegetables',
+                    subheading: 'Fresh from the Garden',
+                },
+            ],
+            subheading: 'The Benefits of Going Organic',
+        },
     });
 
     response =
         '{"heading": "Get in Touch"}\n"items": [{"heading": "Contact Information","subheading": "Reach out to us using the following details."}]<|im_end|>';
 
     expect(parseAsJSON(response)).toEqual({
-        heading: 'Get in Touch',
-        items: [
-            {
-                heading: 'Contact Information',
-                subheading: 'Reach out to us using the following details.',
-            },
-        ],
+        postscript: '',
+        preamble: '',
+        value: {
+            heading: 'Get in Touch',
+            items: [
+                {
+                    heading: 'Contact Information',
+                    subheading: 'Reach out to us using the following details.',
+                },
+            ],
+        },
     });
 }
 
@@ -556,17 +635,21 @@ function preservesNewLinesTestCase() {
 \`\`\``;
 
     expect(parseAsJSON(response)).toEqual({
-        items: [
-            {
-                description:
-                    'Ingredients\n\n1 ounce fresh lime juice\n1 ounce falernum\n1 ounce passion fruit purée\n1 ounce pineapple juice\n1 ounce white rum\n1 ounce dark rum\n1 dash Angostura bitters\n1 dash Pernod\n\nInstructions\n\n1. Combine all ingredients in a cocktail shaker with ice.\n2. Shake until well chilled.\n3. Strain into a chilled tiki mug or highball glass filled with crushed ice.\n4. Garnish with a sprig of mint and a cherry.',
-                heading: 'The Zombie',
-                imageAlt: '',
-                imageCaption: '',
-                imageURL: '/the-zombie-tiki-drink.jpg',
-                subheading: 'A Tiki Drink with a Twist',
-            },
-        ],
+        postscript: '',
+        preamble: '```json',
+        value: {
+            items: [
+                {
+                    description:
+                        'Ingredients\n\n1 ounce fresh lime juice\n1 ounce falernum\n1 ounce passion fruit purée\n1 ounce pineapple juice\n1 ounce white rum\n1 ounce dark rum\n1 dash Angostura bitters\n1 dash Pernod\n\nInstructions\n\n1. Combine all ingredients in a cocktail shaker with ice.\n2. Shake until well chilled.\n3. Strain into a chilled tiki mug or highball glass filled with crushed ice.\n4. Garnish with a sprig of mint and a cherry.',
+                    heading: 'The Zombie',
+                    imageAlt: '',
+                    imageCaption: '',
+                    imageURL: '/the-zombie-tiki-drink.jpg',
+                    subheading: 'A Tiki Drink with a Twist',
+                },
+            ],
+        },
     });
 }
 
@@ -597,21 +680,26 @@ function restartsMidResponseTestCase() {
 }`;
 
     expect(parseAsJSON(response)).toEqual({
-        itemDescription1:
-            'Joe is a veteran sports journalist with over 10 years of experience covering the NFL, NBA, and MLB. He has written for several major publications and is known for his in-depth analysis and insightful commentary.',
-        itemDescription2:
-            'Jane is a data analyst with a background in statistics and computer science. She uses her skills to provide detailed analysis and visualizations of sports data, helping readers gain a deeper understanding of the game.',
-        itemDescription3:
-            'John is a sports historian with a Ph.D. in American Studies. He has written several books on the history of sports and is a frequent guest on sports talk shows, providing historical context and perspective.',
-        itemSubtitle1: 'Sports Journalist',
-        itemSubtitle2: 'Data Analyst',
-        itemSubtitle3: 'Sports Historian',
-        itemTitle1: 'Joe Smith',
-        itemTitle2: 'Jane Doe',
-        itemTitle3: 'John Johnson',
-        sectionDescription:
-            'Meet the talented team of writers, analysts, and experts who make Defector possible.',
-        sectionTitle: 'Our Contributors',
+        postscript: '',
+        preamble:
+            'Sure, here\'s an example JSON output for the "Contributor Profiles" section:',
+        value: {
+            itemDescription1:
+                'Joe is a veteran sports journalist with over 10 years of experience covering the NFL, NBA, and MLB. He has written for several major publications and is known for his in-depth analysis and insightful commentary.',
+            itemDescription2:
+                'Jane is a data analyst with a background in statistics and computer science. She uses her skills to provide detailed analysis and visualizations of sports data, helping readers gain a deeper understanding of the game.',
+            itemDescription3:
+                'John is a sports historian with a Ph.D. in American Studies. He has written several books on the history of sports and is a frequent guest on sports talk shows, providing historical context and perspective.',
+            itemSubtitle1: 'Sports Journalist',
+            itemSubtitle2: 'Data Analyst',
+            itemSubtitle3: 'Sports Historian',
+            itemTitle1: 'Joe Smith',
+            itemTitle2: 'Jane Doe',
+            itemTitle3: 'John Johnson',
+            sectionDescription:
+                'Meet the talented team of writers, analysts, and experts who make Defector possible.',
+            sectionTitle: 'Our Contributors',
+        },
     });
 
     response = `\`\`\`json
@@ -627,10 +715,14 @@ function restartsMidResponseTestCase() {
 \`\`\``;
 
     expect(parseAsJSON(response)).toEqual({
-        description:
-            'At New Moon Natural Foods, we are committed to providing our community with the highest quality organic produce, locally-sourced meats, and carefully curated health and wellness products. We also offer a unique selection of beer, wine, and cheese, as well as all the best in natural grocery. Our family-owned market is dedicated to supporting local growers and artisans, while providing a welcoming and supportive environment for our customers to find the healthiest and most sustainable options for their families. Join us on your journey to a healthier way of life.',
-        heading: 'New Moon Natural Foods: Your Community Market',
-        subheading: 'Welcome to a Healthier Way of Life',
+        postscript: '',
+        preamble: '```json',
+        value: {
+            description:
+                'At New Moon Natural Foods, we are committed to providing our community with the highest quality organic produce, locally-sourced meats, and carefully curated health and wellness products. We also offer a unique selection of beer, wine, and cheese, as well as all the best in natural grocery. Our family-owned market is dedicated to supporting local growers and artisans, while providing a welcoming and supportive environment for our customers to find the healthiest and most sustainable options for their families. Join us on your journey to a healthier way of life.',
+            heading: 'New Moon Natural Foods: Your Community Market',
+            subheading: 'Welcome to a Healthier Way of Life',
+        },
     });
 
     response = `\
@@ -654,14 +746,18 @@ function restartsMidResponseTestCase() {
 }
 `;
     expect(parseAsJSON(response)).toEqual({
-        teamMemberImage1: '/images/john-doe.jpg',
-        teamMemberImage2: '/images/jane-smith.jpg',
-        teamMemberImage3: '/images/bob-johnson.jpg',
-        teamMemberJobTitle1: 'Regional Manager',
-        teamMemberJobTitle2: 'Senior Consultant',
-        teamMemberName1: 'John Doe',
-        teamMemberName2: 'Jane Smith',
-        teamMemberName3: 'Bob Johnson',
+        postscript: '',
+        preamble: 'Here is the JSON output for the "Benefits" page:',
+        value: {
+            teamMemberImage1: '/images/john-doe.jpg',
+            teamMemberImage2: '/images/jane-smith.jpg',
+            teamMemberImage3: '/images/bob-johnson.jpg',
+            teamMemberJobTitle1: 'Regional Manager',
+            teamMemberJobTitle2: 'Senior Consultant',
+            teamMemberName1: 'John Doe',
+            teamMemberName2: 'Jane Smith',
+            teamMemberName3: 'Bob Johnson',
+        },
     });
 }
 
@@ -688,7 +784,7 @@ function stripInvalidJSONTestCase() {
 
 }
 `;
-    expect(parseAsJSON(response)).toEqual({
+    expect(parseAsJSON(response).value).toEqual({
         callToAction: 'Learn More',
         heading: 'Meet the Team',
         subheading:
@@ -708,17 +804,21 @@ function trailingCommasTestCase() {
 "item2AttributionLine2": "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
 }`;
     expect(parseAsJSON(response)).toEqual({
-        item1AttributionLine1:
-            "Learn more about Tom's passion for wine and his journey to opening Ryders",
-        item1AttributionLine2:
-            "Read about Tom's experience in the wine industry and his approach to curating Ryders' wine list",
-        item1Content: 'Tom Ryder - Owner & Wine Director',
-        item2AttributionLine1:
-            "Discover Sarah's background in wine and her role in educating customers at Ryders",
-        item2AttributionLine2:
-            "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
-        item2Content: 'Sarah Johnson - Wine Educator',
-        sectionTitle: 'Meet the Team',
+        postscript: '',
+        preamble: '',
+        value: {
+            item1AttributionLine1:
+                "Learn more about Tom's passion for wine and his journey to opening Ryders",
+            item1AttributionLine2:
+                "Read about Tom's experience in the wine industry and his approach to curating Ryders' wine list",
+            item1Content: 'Tom Ryder - Owner & Wine Director',
+            item2AttributionLine1:
+                "Discover Sarah's background in wine and her role in educating customers at Ryders",
+            item2AttributionLine2:
+                "Learn about Sarah's favorite wine pairings and her recommendations for beginners",
+            item2Content: 'Sarah Johnson - Wine Educator',
+            sectionTitle: 'Meet the Team',
+        },
     });
 }
 
@@ -727,41 +827,49 @@ function unescapedDoubleQuotesTestCase() {
         '```json\n{"heading":"The Team","subheading":"Meet the Starters","items":[{"heading":"Offense","subheading":"Quarterbacks","items":[{"heading":"1","subheading":"Jared Goff","description":"Jared Goff is a 6\'4", 225-pound quarterback who was drafted by the Rams in the first round of the 2016 NFL Draft. He has been the starting quarterback for the Rams since his rookie season and has led the team to multiple playoff appearances.","imageURL":"/players/jared-goff.jpg","imageAlt":"Jared Goff","imageCaption":"Jared Goff in action","linkURL":"/players/jared-goff"}],';
 
     expect(parseAsJSON(response)).toEqual({
-        heading: 'The Team',
-        items: [
-            {
-                heading: 'Offense',
-                items: [
-                    {
-                        description:
-                            'Jared Goff is a 6\'4", 225-pound quarterback who was drafted by the Rams in the first round of the 2016 NFL Draft. He has been the starting quarterback for the Rams since his rookie season and has led the team to multiple playoff appearances.',
-                        heading: '1',
-                        imageAlt: 'Jared Goff',
-                        imageCaption: 'Jared Goff in action',
-                        imageURL: '/players/jared-goff.jpg',
-                        linkURL: '/players/jared-goff',
-                        subheading: 'Jared Goff',
-                    },
-                ],
-                subheading: 'Quarterbacks',
-            },
-        ],
-        subheading: 'Meet the Starters',
+        postscript: '',
+        preamble: '```json',
+        value: {
+            heading: 'The Team',
+            items: [
+                {
+                    heading: 'Offense',
+                    items: [
+                        {
+                            description:
+                                'Jared Goff is a 6\'4", 225-pound quarterback who was drafted by the Rams in the first round of the 2016 NFL Draft. He has been the starting quarterback for the Rams since his rookie season and has led the team to multiple playoff appearances.',
+                            heading: '1',
+                            imageAlt: 'Jared Goff',
+                            imageCaption: 'Jared Goff in action',
+                            imageURL: '/players/jared-goff.jpg',
+                            linkURL: '/players/jared-goff',
+                            subheading: 'Jared Goff',
+                        },
+                    ],
+                    subheading: 'Quarterbacks',
+                },
+            ],
+            subheading: 'Meet the Starters',
+        },
     });
 
     response =
         '```json\n{"items":[{"heading":"Our History","description":"Something Awful was founded in 1999 by Richard "Lowtax" Kyanka, who started the website as a humble message board for fans of video games. Over the years, it has grown into a popular comedy website, featuring blog entries, forums, feature articles, digitally edited pictures, and humorous media reviews. Today, Something Awful continues to be a hub for fans of all things geeky, providing them with a unique blend of humor and community.","imageURL":"/something-awful-history.jpg","imageAlt":"Something Awful Founder Richard \'Lowtax\' Kyanka"}]}\n```';
 
     expect(parseAsJSON(response)).toEqual({
-        items: [
-            {
-                description:
-                    'Something Awful was founded in 1999 by Richard "Lowtax" Kyanka, who started the website as a humble message board for fans of video games. Over the years, it has grown into a popular comedy website, featuring blog entries, forums, feature articles, digitally edited pictures, and humorous media reviews. Today, Something Awful continues to be a hub for fans of all things geeky, providing them with a unique blend of humor and community.',
-                heading: 'Our History',
-                imageAlt: "Something Awful Founder Richard 'Lowtax' Kyanka",
-                imageURL: '/something-awful-history.jpg',
-            },
-        ],
+        postscript: '',
+        preamble: '```json',
+        value: {
+            items: [
+                {
+                    description:
+                        'Something Awful was founded in 1999 by Richard "Lowtax" Kyanka, who started the website as a humble message board for fans of video games. Over the years, it has grown into a popular comedy website, featuring blog entries, forums, feature articles, digitally edited pictures, and humorous media reviews. Today, Something Awful continues to be a hub for fans of all things geeky, providing them with a unique blend of humor and community.',
+                    heading: 'Our History',
+                    imageAlt: "Something Awful Founder Richard 'Lowtax' Kyanka",
+                    imageURL: '/something-awful-history.jpg',
+                },
+            ],
+        },
     });
 }
 
@@ -798,33 +906,38 @@ Here are some of the services we offer:
 
 }}`;
     expect(parseAsJSON(response)).toEqual({
-        bodyCopy:
-            'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.',
-        'Here are some of the services we offer': {
-            contentList1: [
-                {
-                    content: 'Surgical debridement',
-                    description:
-                        'Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.',
-                    title: 'Surgical Debridement',
-                },
-            ],
-            contentList2: [
-                {
-                    content: 'Other services',
-                    description:
-                        'In addition to our core services, we also offer a range of other services to help you manage your wounds and promote healing. These include wound assessment and monitoring, pain management, and education on wound care and prevention.',
-                    title: 'Other Services',
-                },
-            ],
-            contentList3: [
-                {
-                    content: 'Our team',
-                    description:
-                        'Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible. Meet our team of experts today.',
-                    title: 'Our Team',
-                },
-            ],
+        postscript: '',
+        preamble:
+            'Sure, here\'s an example JSON output for the "Services" section based on the provided information:',
+        value: {
+            bodyCopy:
+                'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.',
+            'Here are some of the services we offer': {
+                contentList1: [
+                    {
+                        content: 'Surgical debridement',
+                        description:
+                            'Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.',
+                        title: 'Surgical Debridement',
+                    },
+                ],
+                contentList2: [
+                    {
+                        content: 'Other services',
+                        description:
+                            'In addition to our core services, we also offer a range of other services to help you manage your wounds and promote healing. These include wound assessment and monitoring, pain management, and education on wound care and prevention.',
+                        title: 'Other Services',
+                    },
+                ],
+                contentList3: [
+                    {
+                        content: 'Our team',
+                        description:
+                            'Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible. Meet our team of experts today.',
+                        title: 'Our Team',
+                    },
+                ],
+            },
         },
     });
 }
