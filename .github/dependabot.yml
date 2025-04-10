@@ -5,7 +5,46 @@
 
 version: 2
 updates:
-  - package-ecosystem: "npm" # See documentation for possible values
-    directory: "/" # Location of package manifests
-    schedule:
-      interval: "daily"
+    - package-ecosystem: 'npm'
+      directory: '/' # Location of package manifests
+      open-pull-requests-limit: 20
+      schedule:
+          interval: daily
+      groups:
+          babel:
+              patterns:
+                  - '@babel/*'
+                  - '@types/babel__core'
+          eslint:
+              patterns:
+                  - 'eslint'
+                  - '@eslint/*'
+          eslint-plugins:
+              patterns:
+                  - 'eslint-plugin-*'
+          lexical:
+              patterns:
+                  - '@lexical/*'
+                  - 'lexical'
+          react-router:
+              patterns:
+                  - '@react-router/*'
+                  - 'react-router'
+          react-types:
+              patterns:
+                  - '@types/react*'
+          typescript-eslint:
+              patterns:
+                  - '@typescript-eslint/*'
+          vite:
+              patterns:
+                  - '@vite*'
+                  - 'vite*'
+    - package-ecosystem: 'github-actions'
+      directory: '/'
+      schedule:
+          interval: 'daily'
+    - package-ecosystem: 'devcontainers'
+      directory: '/' # Location of package manifests
+      schedule:
+          interval: weekly
