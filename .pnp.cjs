@@ -3301,7 +3301,7 @@ const RAW_RUNTIME_STATE =
           ["@vitest/expect", "npm:2.0.5"],\
           ["@vitest/spy", "npm:2.0.5"],\
           ["@vitest/utils", "npm:2.0.5"],\
-          ["chai", "npm:5.1.2"],\
+          ["chai", "npm:5.2.0"],\
           ["tinyrainbow", "npm:1.2.0"]\
         ],\
         "linkType": "HARD"\
@@ -3441,7 +3441,7 @@ const RAW_RUNTIME_STATE =
           ["@vitest/utils", "npm:2.0.5"],\
           ["@vitest/pretty-format", "npm:2.0.5"],\
           ["estree-walker", "npm:3.0.3"],\
-          ["loupe", "npm:3.1.2"],\
+          ["loupe", "npm:3.1.3"],\
           ["tinyrainbow", "npm:1.2.0"]\
         ],\
         "linkType": "HARD"\
@@ -3451,7 +3451,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@vitest/utils", "npm:2.1.8"],\
           ["@vitest/pretty-format", "npm:2.1.8"],\
-          ["loupe", "npm:3.1.2"],\
+          ["loupe", "npm:3.1.3"],\
           ["tinyrainbow", "npm:1.2.0"]\
         ],\
         "linkType": "HARD"\
@@ -4050,18 +4050,6 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["chai", [\
-      ["npm:5.1.2", {\
-        "packageLocation": "./.yarn/cache/chai-npm-5.1.2-6b92587dbf-e8c2bbc83c.zip/node_modules/chai/",\
-        "packageDependencies": [\
-          ["chai", "npm:5.1.2"],\
-          ["assertion-error", "npm:2.0.1"],\
-          ["check-error", "npm:2.1.1"],\
-          ["deep-eql", "npm:5.0.2"],\
-          ["loupe", "npm:3.1.2"],\
-          ["pathval", "npm:2.0.0"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
       ["npm:5.2.0", {\
         "packageLocation": "./.yarn/cache/chai-npm-5.2.0-373e52d821-2ce03671c1.zip/node_modules/chai/",\
         "packageDependencies": [\
@@ -4069,7 +4057,7 @@ const RAW_RUNTIME_STATE =
           ["assertion-error", "npm:2.0.1"],\
           ["check-error", "npm:2.1.1"],\
           ["deep-eql", "npm:5.0.2"],\
-          ["loupe", "npm:3.1.2"],\
+          ["loupe", "npm:3.1.3"],\
           ["pathval", "npm:2.0.0"]\
         ],\
         "linkType": "HARD"\
@@ -7207,13 +7195,6 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["loupe", [\
-      ["npm:3.1.2", {\
-        "packageLocation": "./.yarn/cache/loupe-npm-3.1.2-58c9dbcc10-8f5734e53f.zip/node_modules/loupe/",\
-        "packageDependencies": [\
-          ["loupe", "npm:3.1.2"]\
-        ],\
-        "linkType": "HARD"\
-      }],\
       ["npm:3.1.3", {\
         "packageLocation": "./.yarn/cache/loupe-npm-3.1.3-81625c6ef8-9e98c34daf.zip/node_modules/loupe/",\
         "packageDependencies": [\
