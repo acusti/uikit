@@ -243,6 +243,8 @@ export function parseAsJSON(text: string): null | ParsedValue {
         text = '{' + text;
     }
 
+    const originalText = text;
+    let textLengthDelta = 0;
     let index = 0;
     // process each character in the string one at a time
     for (; index < text.length; index++) {
@@ -430,6 +432,7 @@ export function parseAsJSON(text: string): null | ParsedValue {
                 // first, check if there is a missing opening quote mark in rest of text
                 if (/^[a-zA-Z]/.test(remainingText)) {
                     text = text.substring(0, index + 1) + '"' + remainingText;
+                    textLengthDelta++;
                 }
                 // if a comma is missing but needed, add one now
                 if (
@@ -480,10 +483,10 @@ export function parseAsJSON(text: string): null | ParsedValue {
     // if there’s still unparsed text and parsing failed or its more than ½
     // what we already parsed, the model might’ve restarted partway through.
     // try parsing the rest to see if we get a larger result and use it if so.
-    const remainingText = text.substring(index);
     // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
     if (remainingText.length > 5 && (!result || remainingText.length > index)) {
         const remainingResult = parseAsJSON(remainingText);
+    const remainingText = originalText.substring(index - textLengthDelta).trim();
         // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
         if (remainingResult) {
             // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
