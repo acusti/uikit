@@ -29,7 +29,7 @@
         "dev": "run-p 'dev:*'",
         "dev:stories": "yarn workspace @acusti/uikit-docs storybook",
         "dev:watch": "tsc --build --watch",
-        "format": "prettier --write eslint.config.js package.json README.md tsconfig.json ./packages/ ./packages/docs/.storybook/",
+        "format": "prettier --write eslint.config.js package.json README.md tsconfig.json ./.changeset/ ./packages/ ./packages/docs/.storybook/",
         "lint": "eslint ./packages/*/src/**",
         "lintfix": "eslint ./packages/*/src/** --fix",
         "test": "vitest"
