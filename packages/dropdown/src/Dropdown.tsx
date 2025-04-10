@@ -647,8 +647,8 @@ export default function Dropdown({
                 <input
                     autoComplete="off"
                     className={TRIGGER_CLASS_NAME}
-                    disabled={disabled}
                     defaultValue={value ?? ''}
+                    disabled={disabled}
                     name={name}
                     onFocus={setDropdownOpenRef.current}
                     placeholder={placeholder}
