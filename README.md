@@ -99,7 +99,15 @@ running:
 yarn changeset version
 ```
 
-To publish the new versions to npm, run:
+Note: changesets is supposed to handle automatically updating any packages that depend on the changed packages, but it might not be 100% accurate at that task. Yarn has its own [“Release Workflow” feature][], which will update versions and dependents with 100% accuracy and can be used like so:
+
+```
+yarn workspace @acusti/example version patch
+```
+
+In some cases, I have been using `yarn changeset version` to update the changelogs and bump the package.json version numbers, then undoing the package.json change and redoing it with `yarn version {semver type}` in order to ensure that all packages that need to be updated are handled. There is an [open issue][] in GitHub about handling changelogs from yarn’s release workflow, but it hasn’t had any updates since 2022.
+
+Lastly, to publish the new versions to npm, run:
 
 ```
 yarn changeset publish
@@ -120,3 +128,5 @@ which kicks off the default `storybook` command from packages/docs/. To run
 both of those in a single terminal window, use `yarn dev`.
 
 [changesets]: https://github.com/changesets/changesets
+[“Release Workflow” feature]: https://yarnpkg.com/features/release-workflow
+[open issue]: https://github.com/yarnpkg/berry/issues/1510
