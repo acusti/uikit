@@ -2,6 +2,7 @@ import jsPlugin from '@eslint/js';
 import tsPlugin from '@typescript-eslint/eslint-plugin';
 import tsParser from '@typescript-eslint/parser';
 import prettierConfig from 'eslint-config-prettier';
+// import canonicalPlugin from 'eslint-plugin-canonical';
 import importPlugin from 'eslint-plugin-import';
 import jestPlugin from 'eslint-plugin-jest';
 import jestDOMPlugin from 'eslint-plugin-jest-dom';
@@ -33,68 +34,31 @@ export default [
         ],
     },
 
-    // React
+    // Typescript and React
     {
         files: ['**/*.{js,jsx,ts,tsx}'],
         languageOptions: {
-            globals: { ...globals.browser },
+            parser: tsParser,
+            parserOptions: {
+                projectService: { allowDefaultProject: ['eslint.config.js'] },
+            },
         },
         plugins: {
+            '@typescript-eslint': tsPlugin,
+            // canonical: canonicalPlugin,
+            import: importPlugin,
             react: reactPlugin,
             'react-compiler': reactCompilerPlugin,
             'react-hooks': reactHooksPlugin,
-        },
-        settings: {
-            formComponents: ['Form'],
-            linkComponents: [
-                { name: 'Link', linkAttribute: 'to' },
-                { name: 'NavLink', linkAttribute: 'to' },
-            ],
-            react: { version: 'detect' },
-        },
-        rules: {
-            ...reactPlugin.configs.recommended.rules,
-            ...reactPlugin.configs['jsx-runtime'].rules,
-            ...reactHooksPlugin.configs.recommended.rules,
-            'react-compiler/react-compiler': 'warn',
-            'react/jsx-no-leaked-render': ['warn', { validStrategies: ['ternary'] }],
-            'react/jsx-sort-props': 'off',
-            'react/no-unknown-property': 'error',
-            'react-hooks/exhaustive-deps': [
-                'warn',
-                { enableDangerousAutofixThisMayCauseInfiniteLoops: true },
-            ],
-            'no-shadow': 'error',
-            'sort-imports': 'off',
-        },
-    },
-
-    // Typescript
-    {
-        files: ['**/*.{ts,tsx}'],
-        plugins: {
-            '@typescript-eslint': tsPlugin,
-            import: importPlugin,
-        },
-        languageOptions: {
-            parser: tsParser,
-            parserOptions: { projectService: true },
-        },
-        settings: {
-            'import/internal-regex': '^~/',
-            'import/parsers': {
-                '@typescript-eslint/parser': ['.ts', '.tsx'],
-            },
-            'import/resolver': {
-                node: true,
-                typescript: { alwaysTryTypes: true },
-            },
         },
         rules: {
             ...tsPlugin.configs.recommended.rules,
             ...tsPlugin.configs.stylistic.rules,
             ...importPlugin.configs.recommended.rules,
             ...importPlugin.configs.typescript.rules,
+            ...reactPlugin.configs.recommended.rules,
+            ...reactPlugin.configs['jsx-runtime'].rules,
+            ...reactHooksPlugin.configs.recommended.rules,
             '@typescript-eslint/array-type': ['error', { default: 'generic' }],
             '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
             '@typescript-eslint/no-deprecated': 'warn',
@@ -114,12 +78,46 @@ export default [
                 'error',
                 { allowNullableBoolean: true, allowNullableString: true },
             ],
-            // TODO figure out why ignorePackages doesn’t work ('react-dom/client' is erroring)
+            // NOTE waiting on https://github.com/gajus/eslint-plugin-canonical/issues/44
+            // 'canonical/filename-match-exported': 'error',
+            // NOTE doesn’t play well with react-routers generated ./+types/ imports
+            // 'canonical/prefer-inline-type-import': 'error',
+            // 'canonical/sort-react-dependencies': 'error',
             // 'import/extensions': ['error', 'always', { ignorePackages: true }],
+            'import/order': 'off',
+            'jsx-a11y/control-has-associated-label': 'error',
             'no-duplicate-imports': 'error',
+            'no-shadow': 'error',
             'no-undef': 'off', // typescript handles undefined variable detection
+            'perfectionist/sort-modules': [
+                'error',
+                {
+                    partitionByComment: true,
+                    type: 'alphabetical',
+                },
+            ],
             'prefer-const': ['error', { destructuring: 'all' }],
+            'react-compiler/react-compiler': 'warn',
+            'react-hooks/exhaustive-deps': [
+                'warn',
+                { enableDangerousAutofixThisMayCauseInfiniteLoops: true },
+            ],
+            'react/jsx-no-leaked-render': ['warn', { validStrategies: ['ternary'] }],
+            'react/jsx-sort-props': 'off',
+            'react/no-unknown-property': 'error',
+            'sort-imports': 'off',
             'sort-keys': 'off',
+        },
+        settings: {
+            formComponents: ['Form'],
+            'import/external-module-folders': ['.yarn'],
+            'import/internal-regex': '^~/',
+            'import/resolver': { typescript: { alwaysTryTypes: true } },
+            linkComponents: [
+                { linkAttribute: 'to', name: 'Link' },
+                { linkAttribute: 'to', name: 'NavLink' },
+            ],
+            react: { version: 'detect' },
         },
     },
 
