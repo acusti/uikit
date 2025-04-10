@@ -42,7 +42,7 @@ __metadata:
     "@acusti/css-values": "npm:^1.0.4"
     "@acusti/input-text": "npm:^1.9.1"
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.1.0"
+    "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.7"
     clsx: "npm:^2"
@@ -72,7 +72,7 @@ __metadata:
   dependencies:
     "@acusti/styling": "npm:^0.7.2 || ^1.0.1"
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.1.0"
+    "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.7"
     clsx: "npm:^2"
@@ -96,7 +96,7 @@ __metadata:
     "@acusti/use-is-out-of-bounds": "npm:^0.13.1"
     "@acusti/use-keyboard-events": "npm:^0.9.1"
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.1.0"
+    "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.7"
     clsx: "npm:^2"
@@ -116,7 +116,7 @@ __metadata:
   resolution: "@acusti/input-text@workspace:packages/input-text"
   dependencies:
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.1.0"
+    "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.7"
     happy-dom: "npm:^17.4.4"
@@ -163,7 +163,7 @@ __metadata:
   resolution: "@acusti/styling@workspace:packages/styling"
   dependencies:
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.1.0"
+    "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.7"
     happy-dom: "npm:^17.4.4"
@@ -214,7 +214,7 @@ __metadata:
     "@changesets/cli": "npm:^2.28.1"
     "@eslint/js": "npm:^9.17.0"
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.1.0"
+    "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/node": "npm:^22.10.2"
     "@types/react": "npm:^19.0.7"
@@ -293,7 +293,7 @@ __metadata:
   resolution: "@acusti/use-keyboard-events@workspace:packages/use-keyboard-events"
   dependencies:
     "@testing-library/dom": "npm:^10.4.0"
-    "@testing-library/react": "npm:^16.1.0"
+    "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.5.2"
     "@types/react": "npm:^19.0.7"
     happy-dom: "npm:^17.4.4"
@@ -1859,9 +1859,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@testing-library/react@npm:^16.1.0":
-  version: 16.1.0
-  resolution: "@testing-library/react@npm:16.1.0"
+"@testing-library/react@npm:^16.3.0":
+  version: 16.3.0
+  resolution: "@testing-library/react@npm:16.3.0"
   dependencies:
     "@babel/runtime": "npm:^7.12.5"
   peerDependencies:
@@ -1875,7 +1875,7 @@ __metadata:
       optional: true
     "@types/react-dom":
       optional: true
-  checksum: 10/2a20e0dbfadbc93d45a84e82281ed47deed54a6a5fc1461a523172d7fbc0481e8502cf98a2080f38aba94290b3d745671a1c9e320e6f76ad6afcca67c580b963
+  checksum: 10/0ee9e31dd0d2396a924682d0e61a4ecc6bfab8eaff23dbf8a72c3c2ce22c116fa578148baeb4de75b968ef99d22e6e6aa0a00dba40286f71184918bb6bb5b06a
   languageName: node
   linkType: hard
 
