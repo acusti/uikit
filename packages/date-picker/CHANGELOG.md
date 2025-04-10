@@ -1,5 +1,12 @@
 # @acusti/date-picker
 
+## 0.9.0
+
+### Minor Changes
+
+- 7e9f68d Allow @acusti/styling ^0.7.2 to support react previous react
+  versions (less than v19)
+
 ## 0.8.1
 
 ### Patch Changes

@@ -93,7 +93,7 @@ __metadata:
   dependencies:
     "@acusti/matchmaking": "npm:^0.8.0"
     "@acusti/styling": "npm:^0.7.2 || ^1.0.1"
-    "@acusti/use-is-out-of-bounds": "npm:^0.13.0"
+    "@acusti/use-is-out-of-bounds": "npm:^0.13.1"
     "@acusti/use-keyboard-events": "npm:^0.9.1"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.1.0"
@@ -272,7 +272,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-is-out-of-bounds@npm:^0.13.0, @acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds":
+"@acusti/use-is-out-of-bounds@npm:^0.13.1, @acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds":
   version: 0.0.0-use.local
   resolution: "@acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds"
   dependencies:
