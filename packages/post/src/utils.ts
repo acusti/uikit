@@ -1,8 +1,8 @@
-import type {
-    FetchHeaders,
-    FetchOptions,
-    FetchOptionsWithQuery,
-    RequestOptions,
+import {
+    type FetchHeaders,
+    type FetchOptions,
+    type FetchOptionsWithQuery,
+    type RequestOptions,
 } from './types.js';
 
 const trimQuery = (query: string) => query.trim().replace(/\n +/g, ' ');

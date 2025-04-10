@@ -2,13 +2,12 @@ import http, { IncomingMessage } from 'node:http';
 import https from 'node:https';
 import { URL } from 'node:url';
 
-import type {
-    FetchHeaders,
-    FetchOptions,
-    FetchOptionsWithBody,
-    FetchOptionsWithQuery,
+import {
+    type FetchHeaders,
+    type FetchOptions,
+    type FetchOptionsWithBody,
+    type FetchOptionsWithQuery,
 } from './types.js';
-
 import { getRequestOptionsAndBody } from './utils.js';
 
 export { getBodyFromQuery, getRequestOptionsAndBody } from './utils.js';

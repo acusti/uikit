@@ -1,6 +1,10 @@
 import webcrypto from '@acusti/webcrypto';
 
-import type { AWSOptions as _AWSOptions, FetchHeaders, FetchOptions } from './types.js';
+import {
+    type AWSOptions as _AWSOptions,
+    type FetchHeaders,
+    type FetchOptions,
+} from './types.js';
 
 export type AWSOptions = _AWSOptions;
 

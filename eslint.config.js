@@ -79,7 +79,7 @@ export default [
                 { allowNullableBoolean: true, allowNullableString: true },
             ],
             'canonical/filename-match-exported': 'error',
-            // 'canonical/prefer-inline-type-import': 'error',
+            'canonical/prefer-inline-type-import': 'error',
             'canonical/sort-react-dependencies': 'error',
             // 'import/extensions': ['error', 'always', { ignorePackages: true }],
             'import/order': 'off',
