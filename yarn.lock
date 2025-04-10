@@ -210,7 +210,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/uikit@workspace:."
   dependencies:
-    "@babel/core": "npm:^7.26.0"
+    "@babel/core": "npm:^7.26.10"
     "@changesets/cli": "npm:^2.27.11"
     "@eslint/js": "npm:^9.17.0"
     "@testing-library/dom": "npm:^10.4.0"
