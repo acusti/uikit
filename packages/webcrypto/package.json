@@ -50,6 +50,6 @@
         "@types/node": "^22.10.2",
         "happy-dom": "^17.4.4",
         "typescript": "5.7.3",
-        "vitest": "^3"
+        "vitest": "^3.1.1"
     }
 }
