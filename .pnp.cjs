@@ -145,7 +145,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-react-hooks", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:5.1.0"],\
           ["eslint-plugin-testing-library", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.1.1"],\
           ["flowgen", "npm:1.20.1"],\
-          ["globals", "npm:15.14.0"],\
+          ["globals", "npm:16.0.0"],\
           ["happy-dom", "npm:17.4.4"],\
           ["npm-run-all", "npm:4.1.5"],\
           ["prettier", "npm:3.5.3"],\
@@ -427,7 +427,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-react-hooks", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:5.1.0"],\
           ["eslint-plugin-testing-library", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.1.1"],\
           ["flowgen", "npm:1.20.1"],\
-          ["globals", "npm:15.14.0"],\
+          ["globals", "npm:16.0.0"],\
           ["happy-dom", "npm:17.4.4"],\
           ["npm-run-all", "npm:4.1.5"],\
           ["prettier", "npm:3.5.3"],\
@@ -5963,10 +5963,10 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
-      ["npm:15.14.0", {\
-        "packageLocation": "./.yarn/cache/globals-npm-15.14.0-1cb78aecb8-e35ffbdbc0.zip/node_modules/globals/",\
+      ["npm:16.0.0", {\
+        "packageLocation": "./.yarn/cache/globals-npm-16.0.0-7f7c56ae12-aa05d569af.zip/node_modules/globals/",\
         "packageDependencies": [\
-          ["globals", "npm:15.14.0"]\
+          ["globals", "npm:16.0.0"]\
         ],\
         "linkType": "HARD"\
       }]\
