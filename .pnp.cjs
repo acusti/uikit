@@ -131,7 +131,7 @@ const RAW_RUNTIME_STATE =
           ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.29.1"],\
           ["eslint", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:9.18.0"],\
           ["eslint-config-prettier", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:10.1.2"],\
-          ["eslint-import-resolver-typescript", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:3.7.0"],\
+          ["eslint-import-resolver-typescript", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.3.2"],\
           ["eslint-plugin-canonical", "npm:5.1.3"],\
           ["eslint-plugin-import", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:2.31.0"],\
           ["eslint-plugin-jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:28.9.0"],\
@@ -413,7 +413,7 @@ const RAW_RUNTIME_STATE =
           ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.29.1"],\
           ["eslint", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:9.18.0"],\
           ["eslint-config-prettier", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:10.1.2"],\
-          ["eslint-import-resolver-typescript", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:3.7.0"],\
+          ["eslint-import-resolver-typescript", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.3.2"],\
           ["eslint-plugin-canonical", "npm:5.1.3"],\
           ["eslint-plugin-import", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:2.31.0"],\
           ["eslint-plugin-jest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:28.9.0"],\
@@ -1214,6 +1214,37 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@emnapi/core", [\
+      ["npm:1.4.0", {\
+        "packageLocation": "./.yarn/cache/@emnapi-core-npm-1.4.0-9dd88a3590-728eb47408.zip/node_modules/@emnapi/core/",\
+        "packageDependencies": [\
+          ["@emnapi/core", "npm:1.4.0"],\
+          ["@emnapi/wasi-threads", "npm:1.0.1"],\
+          ["tslib", "npm:2.8.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@emnapi/runtime", [\
+      ["npm:1.4.0", {\
+        "packageLocation": "./.yarn/cache/@emnapi-runtime-npm-1.4.0-fff7e775af-38098887d0.zip/node_modules/@emnapi/runtime/",\
+        "packageDependencies": [\
+          ["@emnapi/runtime", "npm:1.4.0"],\
+          ["tslib", "npm:2.8.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@emnapi/wasi-threads", [\
+      ["npm:1.0.1", {\
+        "packageLocation": "./.yarn/cache/@emnapi-wasi-threads-npm-1.0.1-a3701691ed-949f8bdcb1.zip/node_modules/@emnapi/wasi-threads/",\
+        "packageDependencies": [\
+          ["@emnapi/wasi-threads", "npm:1.0.1"],\
+          ["tslib", "npm:2.8.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@esbuild/aix-ppc64", [\
       ["npm:0.25.2", {\
         "packageLocation": "./.yarn/unplugged/@esbuild-aix-ppc64-npm-0.25.2-d153dee00a/node_modules/@esbuild/aix-ppc64/",\
@@ -1759,6 +1790,18 @@ const RAW_RUNTIME_STATE =
         "packagePeers": [\
           "@types/react",\
           "react"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@napi-rs/wasm-runtime", [\
+      ["npm:0.2.8", {\
+        "packageLocation": "./.yarn/cache/@napi-rs-wasm-runtime-npm-0.2.8-1eb5e6c489-c9f9bf0f7c.zip/node_modules/@napi-rs/wasm-runtime/",\
+        "packageDependencies": [\
+          ["@emnapi/core", "npm:1.4.0"],\
+          ["@emnapi/runtime", "npm:1.4.0"],\
+          ["@napi-rs/wasm-runtime", "npm:0.2.8"],\
+          ["@tybys/wasm-util", "npm:0.9.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -2933,6 +2976,16 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@tybys/wasm-util", [\
+      ["npm:0.9.0", {\
+        "packageLocation": "./.yarn/cache/@tybys-wasm-util-npm-0.9.0-5f9b6b37b1-aa58e64753.zip/node_modules/@tybys/wasm-util/",\
+        "packageDependencies": [\
+          ["@tybys/wasm-util", "npm:0.9.0"],\
+          ["tslib", "npm:2.8.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@types/aria-query", [\
       ["npm:5.0.1", {\
         "packageLocation": "./.yarn/cache/@types-aria-query-npm-5.0.1-5c01a56741-0635081bb5.zip/node_modules/@types/aria-query/",\
@@ -3346,6 +3399,142 @@ const RAW_RUNTIME_STATE =
           ["@typescript-eslint/types", "npm:8.29.1"],\
           ["@typescript-eslint/visitor-keys", "npm:8.29.1"],\
           ["eslint-visitor-keys", "npm:4.2.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-darwin-arm64", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-darwin-arm64-npm-1.4.1-e909b5ba2f/node_modules/@unrs/resolver-binding-darwin-arm64/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-darwin-arm64", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-darwin-x64", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-darwin-x64-npm-1.4.1-62d68c65ca/node_modules/@unrs/resolver-binding-darwin-x64/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-darwin-x64", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-freebsd-x64", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-freebsd-x64-npm-1.4.1-2d15f9332a/node_modules/@unrs/resolver-binding-freebsd-x64/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-freebsd-x64", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-linux-arm-gnueabihf", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-linux-arm-gnueabihf-npm-1.4.1-ccb006bd3d/node_modules/@unrs/resolver-binding-linux-arm-gnueabihf/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-linux-arm-gnueabihf", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-linux-arm-musleabihf", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-linux-arm-musleabihf-npm-1.4.1-32c874b58c/node_modules/@unrs/resolver-binding-linux-arm-musleabihf/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-linux-arm-musleabihf", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-linux-arm64-gnu", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-linux-arm64-gnu-npm-1.4.1-28850f345d/node_modules/@unrs/resolver-binding-linux-arm64-gnu/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-linux-arm64-gnu", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-linux-arm64-musl", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-linux-arm64-musl-npm-1.4.1-50a39a515e/node_modules/@unrs/resolver-binding-linux-arm64-musl/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-linux-arm64-musl", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-linux-ppc64-gnu", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-linux-ppc64-gnu-npm-1.4.1-aaa989ac88/node_modules/@unrs/resolver-binding-linux-ppc64-gnu/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-linux-ppc64-gnu", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-linux-s390x-gnu", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-linux-s390x-gnu-npm-1.4.1-1d2244f656/node_modules/@unrs/resolver-binding-linux-s390x-gnu/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-linux-s390x-gnu", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-linux-x64-gnu", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-linux-x64-gnu-npm-1.4.1-2d2290c6be/node_modules/@unrs/resolver-binding-linux-x64-gnu/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-linux-x64-gnu", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-linux-x64-musl", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-linux-x64-musl-npm-1.4.1-f0d232dc58/node_modules/@unrs/resolver-binding-linux-x64-musl/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-linux-x64-musl", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-wasm32-wasi", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-wasm32-wasi-npm-1.4.1-2bbf78e673/node_modules/@unrs/resolver-binding-wasm32-wasi/",\
+        "packageDependencies": [\
+          ["@napi-rs/wasm-runtime", "npm:0.2.8"],\
+          ["@unrs/resolver-binding-wasm32-wasi", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-win32-arm64-msvc", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-win32-arm64-msvc-npm-1.4.1-f3996cfbef/node_modules/@unrs/resolver-binding-win32-arm64-msvc/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-win32-arm64-msvc", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-win32-ia32-msvc", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-win32-ia32-msvc-npm-1.4.1-cc37620275/node_modules/@unrs/resolver-binding-win32-ia32-msvc/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-win32-ia32-msvc", "npm:1.4.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["@unrs/resolver-binding-win32-x64-msvc", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/unplugged/@unrs-resolver-binding-win32-x64-msvc-npm-1.4.1-ec7dd61ade/node_modules/@unrs/resolver-binding-win32-x64-msvc/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-win32-x64-msvc", "npm:1.4.1"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -4922,24 +5111,29 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:3.7.0", {\
-        "packageLocation": "./.yarn/__virtual__/eslint-import-resolver-typescript-virtual-73f6f3b92e/0/cache/eslint-import-resolver-typescript-npm-3.7.0-6905869c18-8158730c11.zip/node_modules/eslint-import-resolver-typescript/",\
+      ["npm:4.3.2", {\
+        "packageLocation": "./.yarn/cache/eslint-import-resolver-typescript-npm-4.3.2-7d5e582a8b-40f4d4a888.zip/node_modules/eslint-import-resolver-typescript/",\
         "packageDependencies": [\
-          ["@nolyfill/is-core-module", "npm:1.0.39"],\
+          ["eslint-import-resolver-typescript", "npm:4.3.2"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
+      ["virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.3.2", {\
+        "packageLocation": "./.yarn/__virtual__/eslint-import-resolver-typescript-virtual-6ab3fd9f00/0/cache/eslint-import-resolver-typescript-npm-4.3.2-7d5e582a8b-40f4d4a888.zip/node_modules/eslint-import-resolver-typescript/",\
+        "packageDependencies": [\
           ["@types/eslint", null],\
           ["@types/eslint-plugin-import", null],\
           ["@types/eslint-plugin-import-x", null],\
           ["debug", "virtual:e376c6d25689d1413f13b759a5649fe969efab30320e886cab81ece2b6daf8c4c74f642faff7228a9a286b4b82bc7bac5773e45f1085910307cd111b19a8cd17#npm:4.4.0"],\
-          ["enhanced-resolve", "npm:5.17.1"],\
           ["eslint", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:9.18.0"],\
-          ["eslint-import-resolver-typescript", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:3.7.0"],\
+          ["eslint-import-resolver-typescript", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:4.3.2"],\
           ["eslint-plugin-import", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:2.31.0"],\
           ["eslint-plugin-import-x", null],\
-          ["fast-glob", "npm:3.3.2"],\
-          ["get-tsconfig", "npm:4.8.1"],\
-          ["is-bun-module", "npm:1.3.0"],\
-          ["is-glob", "npm:4.0.3"],\
-          ["stable-hash", "npm:0.0.4"]\
+          ["get-tsconfig", "npm:4.10.0"],\
+          ["is-bun-module", "npm:2.0.0"],\
+          ["stable-hash", "npm:0.0.5"],\
+          ["tinyglobby", "npm:0.2.12"],\
+          ["unrs-resolver", "npm:1.4.1"]\
         ],\
         "packagePeers": [\
           "@types/eslint-plugin-import-x",\
@@ -5913,6 +6107,14 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["get-tsconfig", [\
+      ["npm:4.10.0", {\
+        "packageLocation": "./.yarn/cache/get-tsconfig-npm-4.10.0-ee2b0a20f5-5259b5c99a.zip/node_modules/get-tsconfig/",\
+        "packageDependencies": [\
+          ["get-tsconfig", "npm:4.10.0"],\
+          ["resolve-pkg-maps", "npm:1.0.0"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
       ["npm:4.8.1", {\
         "packageLocation": "./.yarn/cache/get-tsconfig-npm-4.8.1-adab2fc965-3fb5a8ad57.zip/node_modules/get-tsconfig/",\
         "packageDependencies": [\
@@ -6402,6 +6604,14 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/is-bun-module-npm-1.3.0-7df4176ea3-b23d9ec7b4.zip/node_modules/is-bun-module/",\
         "packageDependencies": [\
           ["is-bun-module", "npm:1.3.0"],\
+          ["semver", "npm:7.7.1"]\
+        ],\
+        "linkType": "HARD"\
+      }],\
+      ["npm:2.0.0", {\
+        "packageLocation": "./.yarn/cache/is-bun-module-npm-2.0.0-820a4713ec-cded5a1a58.zip/node_modules/is-bun-module/",\
+        "packageDependencies": [\
+          ["is-bun-module", "npm:2.0.0"],\
           ["semver", "npm:7.7.1"]\
         ],\
         "linkType": "HARD"\
@@ -8750,6 +8960,13 @@ const RAW_RUNTIME_STATE =
           ["stable-hash", "npm:0.0.4"]\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["npm:0.0.5", {\
+        "packageLocation": "./.yarn/cache/stable-hash-npm-0.0.5-40ee00d7c5-9222ea2c55.zip/node_modules/stable-hash/",\
+        "packageDependencies": [\
+          ["stable-hash", "npm:0.0.5"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["stackback", [\
@@ -9193,6 +9410,13 @@ const RAW_RUNTIME_STATE =
           ["tslib", "npm:2.6.2"]\
         ],\
         "linkType": "HARD"\
+      }],\
+      ["npm:2.8.1", {\
+        "packageLocation": "./.yarn/cache/tslib-npm-2.8.1-66590b21b8-3e2e043d5c.zip/node_modules/tslib/",\
+        "packageDependencies": [\
+          ["tslib", "npm:2.8.1"]\
+        ],\
+        "linkType": "HARD"\
       }]\
     ]],\
     ["type-check", [\
@@ -9357,6 +9581,30 @@ const RAW_RUNTIME_STATE =
           ["unplugin", "npm:1.5.0"],\
           ["webpack-sources", "npm:3.2.3"],\
           ["webpack-virtual-modules", "npm:0.5.0"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["unrs-resolver", [\
+      ["npm:1.4.1", {\
+        "packageLocation": "./.yarn/cache/unrs-resolver-npm-1.4.1-c12c0da0cd-302882bd41.zip/node_modules/unrs-resolver/",\
+        "packageDependencies": [\
+          ["@unrs/resolver-binding-darwin-arm64", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-darwin-x64", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-freebsd-x64", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-linux-arm-gnueabihf", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-linux-arm-musleabihf", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-linux-arm64-gnu", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-linux-arm64-musl", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-linux-ppc64-gnu", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-linux-s390x-gnu", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-linux-x64-gnu", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-linux-x64-musl", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-wasm32-wasi", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-win32-arm64-msvc", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-win32-ia32-msvc", "npm:1.4.1"],\
+          ["@unrs/resolver-binding-win32-x64-msvc", "npm:1.4.1"],\
+          ["unrs-resolver", "npm:1.4.1"]\
         ],\
         "linkType": "HARD"\
       }]\
