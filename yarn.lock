@@ -2865,17 +2865,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"call-bind-apply-helpers@npm:^1.0.0, call-bind-apply-helpers@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "call-bind-apply-helpers@npm:1.0.1"
-  dependencies:
-    es-errors: "npm:^1.3.0"
-    function-bind: "npm:^1.1.2"
-  checksum: 10/6e30c621170e45f1fd6735e84d02ee8e02a3ab95cb109499d5308cbe5d1e84d0cd0e10b48cc43c76aa61450ae1b03a7f89c37c10fc0de8d4998b42aab0f268cc
-  languageName: node
-  linkType: hard
-
-"call-bind-apply-helpers@npm:^1.0.2":
+"call-bind-apply-helpers@npm:^1.0.0, call-bind-apply-helpers@npm:^1.0.1, call-bind-apply-helpers@npm:^1.0.2":
   version: 1.0.2
   resolution: "call-bind-apply-helpers@npm:1.0.2"
   dependencies:
@@ -2897,17 +2887,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"call-bound@npm:^1.0.2, call-bound@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "call-bound@npm:1.0.3"
-  dependencies:
-    call-bind-apply-helpers: "npm:^1.0.1"
-    get-intrinsic: "npm:^1.2.6"
-  checksum: 10/c39a8245f68cdb7c1f5eea7b3b1e3a7a90084ea6efebb78ebc454d698ade2c2bb42ec033abc35f1e596d62496b6100e9f4cdfad1956476c510130e2cda03266d
-  languageName: node
-  linkType: hard
-
-"call-bound@npm:^1.0.4":
+"call-bound@npm:^1.0.2, call-bound@npm:^1.0.3, call-bound@npm:^1.0.4":
   version: 1.0.4
   resolution: "call-bound@npm:1.0.4"
   dependencies:
@@ -3499,16 +3479,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"es-object-atoms@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "es-object-atoms@npm:1.0.0"
-  dependencies:
-    es-errors: "npm:^1.3.0"
-  checksum: 10/f8910cf477e53c0615f685c5c96210591841850871b81924fcf256bfbaa68c254457d994a4308c60d15b20805e7f61ce6abc669375e01a5349391a8c1767584f
-  languageName: node
-  linkType: hard
-
-"es-object-atoms@npm:^1.1.1":
+"es-object-atoms@npm:^1.0.0, es-object-atoms@npm:^1.1.1":
   version: 1.1.1
   resolution: "es-object-atoms@npm:1.1.1"
   dependencies:
@@ -4412,25 +4383,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-intrinsic@npm:^1.2.1, get-intrinsic@npm:^1.2.4, get-intrinsic@npm:^1.2.5, get-intrinsic@npm:^1.2.6":
-  version: 1.2.6
-  resolution: "get-intrinsic@npm:1.2.6"
-  dependencies:
-    call-bind-apply-helpers: "npm:^1.0.1"
-    dunder-proto: "npm:^1.0.0"
-    es-define-property: "npm:^1.0.1"
-    es-errors: "npm:^1.3.0"
-    es-object-atoms: "npm:^1.0.0"
-    function-bind: "npm:^1.1.2"
-    gopd: "npm:^1.2.0"
-    has-symbols: "npm:^1.1.0"
-    hasown: "npm:^2.0.2"
-    math-intrinsics: "npm:^1.0.0"
-  checksum: 10/a1ffae6d7893a6fa0f4d1472adbc85095edd6b3b0943ead97c3738539cecb19d422ff4d48009eed8c3c27ad678c2b1e38a83b1a1e96b691d13ed8ecefca1068d
-  languageName: node
-  linkType: hard
-
-"get-intrinsic@npm:^1.3.0":
+"get-intrinsic@npm:^1.2.1, get-intrinsic@npm:^1.2.4, get-intrinsic@npm:^1.2.5, get-intrinsic@npm:^1.2.6, get-intrinsic@npm:^1.3.0":
   version: 1.3.0
   resolution: "get-intrinsic@npm:1.3.0"
   dependencies:
@@ -4476,21 +4429,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"get-tsconfig@npm:^4.10.0":
+"get-tsconfig@npm:^4.10.0, get-tsconfig@npm:^4.7.5":
   version: 4.10.0
   resolution: "get-tsconfig@npm:4.10.0"
   dependencies:
     resolve-pkg-maps: "npm:^1.0.0"
   checksum: 10/5259b5c99a1957114337d9d0603b4a305ec9e29fa6cac7d2fbf634ba6754a0cc88bfd281a02416ce64e604b637d3cb239185381a79a5842b17fb55c097b38c4b
-  languageName: node
-  linkType: hard
-
-"get-tsconfig@npm:^4.7.5":
-  version: 4.8.1
-  resolution: "get-tsconfig@npm:4.8.1"
-  dependencies:
-    resolve-pkg-maps: "npm:^1.0.0"
-  checksum: 10/3fb5a8ad57b9633eaea085d81661e9e5c9f78b35d8f8689eaf8b8b45a2a3ebf3b3422266d4d7df765e308cc1e6231648d114803ab3d018332e29916f2c1de036
   languageName: node
   linkType: hard
 
@@ -5574,14 +5518,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"math-intrinsics@npm:^1.0.0":
-  version: 1.0.0
-  resolution: "math-intrinsics@npm:1.0.0"
-  checksum: 10/556c49f608c995eb639b65b4709ae4bdde953c5460ff7134458488fc41a9c7bf1dca1e3e75d7a1dd112b70369c4d5ade7ce8e919b8faadcf9880353f9a4fa14a
-  languageName: node
-  linkType: hard
-
-"math-intrinsics@npm:^1.1.0":
+"math-intrinsics@npm:^1.0.0, math-intrinsics@npm:^1.1.0":
   version: 1.1.0
   resolution: "math-intrinsics@npm:1.1.0"
   checksum: 10/11df2eda46d092a6035479632e1ec865b8134bdfc4bd9e571a656f4191525404f13a283a515938c3a8de934dbfd9c09674d9da9fa831e6eb7e22b50b197d2edd
@@ -7450,14 +7387,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tslib@npm:^2.0.1":
-  version: 2.6.2
-  resolution: "tslib@npm:2.6.2"
-  checksum: 10/bd26c22d36736513980091a1e356378e8b662ded04204453d353a7f34a4c21ed0afc59b5f90719d4ba756e581a162ecbf93118dc9c6be5acf70aa309188166ca
-  languageName: node
-  linkType: hard
-
-"tslib@npm:^2.4.0":
+"tslib@npm:^2.0.1, tslib@npm:^2.4.0":
   version: 2.8.1
   resolution: "tslib@npm:2.8.1"
   checksum: 10/3e2e043d5c2316461cb54e5c7fe02c30ef6dccb3384717ca22ae5c6b5bc95232a6241df19c622d9c73b809bea33b187f6dbc73030963e29950c2141bc32a79f7
