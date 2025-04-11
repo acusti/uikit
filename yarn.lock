@@ -235,7 +235,7 @@ __metadata:
     eslint-plugin-react-compiler: "npm:beta"
     eslint-plugin-react-hooks: "npm:^5.2.0"
     eslint-plugin-testing-library: "npm:^7.1.1"
-    flowgen: "npm:^1.20.1"
+    flowgen: "npm:^1.21.0"
     globals: "npm:^16.0.0"
     happy-dom: "npm:^17.4.4"
     npm-run-all: "npm:^4.1.5"
@@ -4267,9 +4267,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"flowgen@npm:^1.20.1":
-  version: 1.20.1
-  resolution: "flowgen@npm:1.20.1"
+"flowgen@npm:^1.21.0":
+  version: 1.21.0
+  resolution: "flowgen@npm:1.21.0"
   dependencies:
     "@babel/code-frame": "npm:^7.16.7"
     "@babel/highlight": "npm:^7.16.7"
@@ -4281,7 +4281,7 @@ __metadata:
     typescript-compiler: "npm:^1.4.1-2"
   bin:
     flowgen: lib/cli/index.js
-  checksum: 10/6c42003a2d59ea67605ad6a819d92b58084066382f07432800cacde2b097358933797394f51c5d32a99a62bb5da81a2f00c458119b2c2882a4533a6b8e62c3bf
+  checksum: 10/d068711b26a605a6640a68f8b068c40678a61305248c462267007eee1986f62779acdcebadad8459b73b4c300ab725dbb566d194ae40be80868be6a2ed8bd587
   languageName: node
   linkType: hard
 
