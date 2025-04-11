@@ -1,6 +1,6 @@
-# @acusti/css-values
+# @acusti/webcrypto
 
-## 1.1.0
+## 1.2.0
 
 ### Minor Changes
 
@@ -8,10 +8,3 @@
   typescript (v5.8.3), vitest, babel, and node-gyp, resolving all known
   security vulnerabilities, and adopt the eslint canonical plugin and
   enable new rules.
-
-## 1.0.4
-
-### Patch Changes
-
-- 3f3d39d: Switch over all eslint sorting and organizing rules to use the
-  Perfectionist plugin and enable the eslint no-duplicate-imports rule
