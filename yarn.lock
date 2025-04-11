@@ -44,7 +44,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     clsx: "npm:^2"
     happy-dom: "npm:^17.4.4"
     react: "npm:^19.0.0"
@@ -74,7 +74,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     clsx: "npm:^2"
     happy-dom: "npm:^17.4.4"
     react: "npm:^19.0.0"
@@ -98,7 +98,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     clsx: "npm:^2"
     happy-dom: "npm:^17.4.4"
     react: "npm:^19"
@@ -118,7 +118,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     happy-dom: "npm:^17.4.4"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -165,7 +165,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     happy-dom: "npm:^17.4.4"
     react: "npm:^19"
     react-dom: "npm:^19"
@@ -196,7 +196,7 @@ __metadata:
     "@storybook/react": "npm:^8.6"
     "@storybook/react-vite": "npm:^8.6"
     "@storybook/test": "npm:^8.6"
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     core-js: "npm:^3.41.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -217,7 +217,7 @@ __metadata:
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
     "@types/node": "npm:^22.14.0"
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     "@typescript-eslint/eslint-plugin": "npm:^8.29.1"
     "@typescript-eslint/parser": "npm:^8.29.1"
     eslint: "npm:^9.24.0"
@@ -261,7 +261,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect"
   dependencies:
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
@@ -277,7 +277,7 @@ __metadata:
   resolution: "@acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds"
   dependencies:
     "@acusti/use-bounding-client-rect": "npm:^1.4.1"
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
@@ -295,7 +295,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.0"
+    "@types/react": "npm:^19.1.1"
     happy-dom: "npm:^17.4.4"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -2069,12 +2069,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.1.0":
-  version: 19.1.0
-  resolution: "@types/react@npm:19.1.0"
+"@types/react@npm:^19.1.1":
+  version: 19.1.1
+  resolution: "@types/react@npm:19.1.1"
   dependencies:
     csstype: "npm:^3.0.2"
-  checksum: 10/bfa3bb7e2efe929bdf41bf36461f2598611a29647852b8b7ecde510e83f797caf7f290388d13e2b71055df10587b3c41fc4345c1d9cbc38b4e897b03ad11c02f
+  checksum: 10/f267c2a7afddd1f463bd4cf18553ddea132c609a6dc29938c5e83ae392c75e0acdbace2d03ad26178183b10da733e476324e2f25f48bd7fa6c232de708c35563
   languageName: node
   linkType: hard
 
