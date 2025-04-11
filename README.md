@@ -99,17 +99,27 @@ running:
 yarn changeset version
 ```
 
-Note: changesets is supposed to handle automatically updating any packages that depend on the changed packages, but it might not be 100% accurate at that task. Yarn has its own [“Release Workflow” feature][], which will update versions and dependents with 100% accuracy and can be used like so:
+Note: changesets is supposed to handle automatically updating any packages
+that depend on the changed packages, but it might not be 100% accurate at
+that task. Yarn has its own [“Release Workflow” feature][], which will
+update versions and dependents with 100% accuracy and can be used like so:
 
 ```
 yarn workspace @acusti/example version patch
 ```
 
-In some cases, I have been using `yarn changeset version` to update the changelogs and bump the package.json version numbers, then undoing the package.json change and redoing it with `yarn version {semver type}` in order to ensure that all packages that need to be updated are handled. There is an [open issue][] in GitHub about handling changelogs from yarn’s release workflow, but it hasn’t had any updates since 2022.
+In some cases, I have been using `yarn changeset version` to update the
+changelogs and bump the package.json version numbers, then undoing the
+package.json change and redoing it with `yarn version {semver type}` in
+order to ensure that all packages that need to be updated are handled.
+There is an [open issue][] in GitHub about handling changelogs from yarn’s
+release workflow, but it hasn’t had any updates since 2022.
 
-Lastly, to publish the new versions to npm, run:
+Lastly, to publish the new versions to npm (building all the packages
+first), run:
 
 ```
+yarn build
 yarn changeset publish
 ```
 
