@@ -144,7 +144,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-react-compiler", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.0.0-beta-201e55d-20241215"],\
           ["eslint-plugin-react-hooks", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:5.2.0"],\
           ["eslint-plugin-testing-library", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.1.1"],\
-          ["flowgen", "npm:1.20.1"],\
+          ["flowgen", "npm:1.21.0"],\
           ["globals", "npm:16.0.0"],\
           ["happy-dom", "npm:17.4.4"],\
           ["npm-run-all", "npm:4.1.5"],\
@@ -426,7 +426,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-react-compiler", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.0.0-beta-201e55d-20241215"],\
           ["eslint-plugin-react-hooks", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:5.2.0"],\
           ["eslint-plugin-testing-library", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.1.1"],\
-          ["flowgen", "npm:1.20.1"],\
+          ["flowgen", "npm:1.21.0"],\
           ["globals", "npm:16.0.0"],\
           ["happy-dom", "npm:17.4.4"],\
           ["npm-run-all", "npm:4.1.5"],\
@@ -5944,13 +5944,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["flowgen", [\
-      ["npm:1.20.1", {\
-        "packageLocation": "./.yarn/cache/flowgen-npm-1.20.1-c07612a754-6c42003a2d.zip/node_modules/flowgen/",\
+      ["npm:1.21.0", {\
+        "packageLocation": "./.yarn/cache/flowgen-npm-1.21.0-fb07372f00-d068711b26.zip/node_modules/flowgen/",\
         "packageDependencies": [\
           ["@babel/code-frame", "npm:7.26.2"],\
           ["@babel/highlight", "npm:7.24.7"],\
           ["commander", "npm:6.2.1"],\
-          ["flowgen", "npm:1.20.1"],\
+          ["flowgen", "npm:1.21.0"],\
           ["lodash", "npm:4.17.21"],\
           ["prettier", "npm:2.8.8"],\
           ["shelljs", "npm:0.8.5"],\
