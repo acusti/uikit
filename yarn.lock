@@ -18,7 +18,7 @@ __metadata:
   dependencies:
     "@acusti/aws-signature-v4": "npm:^1.1.0"
     "@acusti/post": "npm:^1.1.0"
-    "@types/node": "npm:^22.14.0"
+    "@types/node": "npm:^22.14.1"
     typescript: "npm:5.8.3"
     vitest: "npm:^3.1.1"
   languageName: unknown
@@ -29,7 +29,7 @@ __metadata:
   resolution: "@acusti/aws-signature-v4@workspace:packages/aws-signature-v4"
   dependencies:
     "@acusti/webcrypto": "npm:^1.2.0"
-    "@types/node": "npm:^22.14.0"
+    "@types/node": "npm:^22.14.1"
     typescript: "npm:5.8.3"
     vitest: "npm:^3.1.1"
   languageName: unknown
@@ -152,7 +152,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/post@workspace:packages/post"
   dependencies:
-    "@types/node": "npm:^22.14.0"
+    "@types/node": "npm:^22.14.1"
     typescript: "npm:5.8.3"
     vitest: "npm:^3.1.1"
   languageName: unknown
@@ -216,7 +216,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/node": "npm:^22.14.0"
+    "@types/node": "npm:^22.14.1"
     "@types/react": "npm:^19.1.1"
     "@typescript-eslint/eslint-plugin": "npm:^8.29.1"
     "@typescript-eslint/parser": "npm:^8.29.1"
@@ -311,7 +311,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/webcrypto@workspace:packages/webcrypto"
   dependencies:
-    "@types/node": "npm:^22.14.0"
+    "@types/node": "npm:^22.14.1"
     happy-dom: "npm:^17.4.4"
     typescript: "npm:5.8.3"
     vitest: "npm:^3.1.1"
@@ -2060,12 +2060,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.14.0":
-  version: 22.14.0
-  resolution: "@types/node@npm:22.14.0"
+"@types/node@npm:^22.14.1":
+  version: 22.14.1
+  resolution: "@types/node@npm:22.14.1"
   dependencies:
     undici-types: "npm:~6.21.0"
-  checksum: 10/d0669a8a37a18532c886ccfa51eb3fe1e46088deb4d3d27ebcd5d7d68bd6343ad1c7a3fcb85164780a57629359c33a6c917ecff748ea232bceac7692acc96537
+  checksum: 10/561b1ad98ef5176d6da856ffbbe494f16655149f6a7d561de0423c8784910c81267d7d6459f59d68a97b3cbae9b5996b3b5dfe64f4de3de2239d295dcf4a4dcc
   languageName: node
   linkType: hard
 
