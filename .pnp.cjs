@@ -120,7 +120,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@acusti/uikit", "workspace:."],\
           ["@babel/core", "npm:7.26.10"],\
-          ["@changesets/cli", "npm:2.28.1"],\
+          ["@changesets/cli", "npm:2.29.0"],\
           ["@eslint/js", "npm:9.24.0"],\
           ["@testing-library/dom", "npm:10.4.0"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
@@ -402,7 +402,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@acusti/uikit", "workspace:."],\
           ["@babel/core", "npm:7.26.10"],\
-          ["@changesets/cli", "npm:2.28.1"],\
+          ["@changesets/cli", "npm:2.29.0"],\
           ["@eslint/js", "npm:9.24.0"],\
           ["@testing-library/dom", "npm:10.4.0"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
@@ -1011,13 +1011,13 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@changesets/cli", [\
-      ["npm:2.28.1", {\
-        "packageLocation": "./.yarn/cache/@changesets-cli-npm-2.28.1-cea38e0e18-c2cb4063bf.zip/node_modules/@changesets/cli/",\
+      ["npm:2.29.0", {\
+        "packageLocation": "./.yarn/cache/@changesets-cli-npm-2.29.0-b3630abdb6-f5be026fc7.zip/node_modules/@changesets/cli/",\
         "packageDependencies": [\
           ["@changesets/apply-release-plan", "npm:7.0.10"],\
           ["@changesets/assemble-release-plan", "npm:6.0.6"],\
           ["@changesets/changelog-git", "npm:0.2.1"],\
-          ["@changesets/cli", "npm:2.28.1"],\
+          ["@changesets/cli", "npm:2.29.0"],\
           ["@changesets/config", "npm:3.1.1"],\
           ["@changesets/errors", "npm:0.2.0"],\
           ["@changesets/get-dependents-graph", "npm:2.1.3"],\
