@@ -14,11 +14,7 @@ const config: StorybookConfig = {
         options: {},
     },
     stories: ['../stories/Introduction.mdx', '../stories/**/*.stories.@(js|jsx|ts|tsx)'],
-    typescript: {
-        check: false,
-        reactDocgen: 'react-docgen',
-        skipBabel: true,
-    },
+    typescript: { check: false, reactDocgen: 'react-docgen' },
 };
 
 export default config;
