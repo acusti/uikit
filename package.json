@@ -50,7 +50,7 @@
     ],
     "devDependencies": {
         "@babel/core": "^7.26.10",
-        "@eslint/js": "^9.24.0",
+        "@eslint/js": "^9.25.1",
         "@testing-library/dom": "^10.4.0",
         "@testing-library/react": "^16.3.0",
         "@testing-library/user-event": "^14.6.1",
@@ -58,7 +58,7 @@
         "@types/react": "^19.1.2",
         "@typescript-eslint/eslint-plugin": "^8.30.1",
         "@typescript-eslint/parser": "^8.30.1",
-        "eslint": "^9.24.0",
+        "eslint": "^9.25.1",
         "eslint-config-prettier": "^10.1.2",
         "eslint-import-resolver-typescript": "^4.3.2",
         "eslint-plugin-canonical": "^5.1.3",
