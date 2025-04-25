@@ -47,7 +47,7 @@
         "node": ">=15"
     },
     "devDependencies": {
-        "@types/node": "^22.14.1",
+        "@types/node": "^22.15.2",
         "happy-dom": "^17.4.4",
         "typescript": "5.8.3",
         "vitest": "^3.1.1"
