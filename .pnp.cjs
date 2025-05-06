@@ -125,7 +125,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/dom", "npm:10.4.0"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["@types/react", "npm:19.1.2"],\
           ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.30.1"],\
           ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.30.1"],\
@@ -174,7 +174,7 @@ const RAW_RUNTIME_STATE =
           ["@acusti/appsync-fetch", "workspace:packages/appsync-fetch"],\
           ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
           ["@acusti/post", "workspace:packages/post"],\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
           ["vitest", "virtual:54be9ef6f2875e5ea191d927659d88639c5383ec1cdb6eaa338a29bcc043e2d159814748837f6a0f75ac6e9d1074d142d7fab6be1ce7a3b4840d51ce619387d4#npm:3.1.1"]\
         ],\
@@ -187,7 +187,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
           ["@acusti/webcrypto", "workspace:packages/webcrypto"],\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
           ["vitest", "virtual:54be9ef6f2875e5ea191d927659d88639c5383ec1cdb6eaa338a29bcc043e2d159814748837f6a0f75ac6e9d1074d142d7fab6be1ce7a3b4840d51ce619387d4#npm:3.1.1"]\
         ],\
@@ -337,7 +337,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/post/",\
         "packageDependencies": [\
           ["@acusti/post", "workspace:packages/post"],\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
           ["vitest", "virtual:54be9ef6f2875e5ea191d927659d88639c5383ec1cdb6eaa338a29bcc043e2d159814748837f6a0f75ac6e9d1074d142d7fab6be1ce7a3b4840d51ce619387d4#npm:3.1.1"]\
         ],\
@@ -407,7 +407,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/dom", "npm:10.4.0"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["@types/react", "npm:19.1.2"],\
           ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.30.1"],\
           ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.30.1"],\
@@ -587,7 +587,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/webcrypto/",\
         "packageDependencies": [\
           ["@acusti/webcrypto", "workspace:packages/webcrypto"],\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["happy-dom", "npm:17.4.6"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
           ["vitest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:3.1.1"]\
@@ -3112,10 +3112,10 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
-      ["npm:22.14.1", {\
-        "packageLocation": "./.yarn/cache/@types-node-npm-22.14.1-ff7e0a29d7-561b1ad98e.zip/node_modules/@types/node/",\
+      ["npm:22.15.12", {\
+        "packageLocation": "./.yarn/cache/@types-node-npm-22.15.12-97dce4b27b-5283535d63.zip/node_modules/@types/node/",\
         "packageDependencies": [\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["undici-types", "npm:6.21.0"]\
         ],\
         "linkType": "HARD"\
@@ -9794,7 +9794,7 @@ const RAW_RUNTIME_STATE =
           ["@types/jiti", null],\
           ["@types/less", null],\
           ["@types/lightningcss", null],\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["@types/sass", null],\
           ["@types/sass-embedded", null],\
           ["@types/stylus", null],\
@@ -9877,7 +9877,7 @@ const RAW_RUNTIME_STATE =
           ["@types/edge-runtime__vm", null],\
           ["@types/happy-dom", null],\
           ["@types/jsdom", null],\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["@types/vitest__browser", null],\
           ["@types/vitest__ui", null],\
           ["@vitest/browser", null],\
@@ -10036,7 +10036,7 @@ const RAW_RUNTIME_STATE =
           ["@types/edge-runtime__vm", null],\
           ["@types/happy-dom", null],\
           ["@types/jsdom", null],\
-          ["@types/node", "npm:22.14.1"],\
+          ["@types/node", "npm:22.15.12"],\
           ["@types/vitest__browser", null],\
           ["@types/vitest__ui", null],\
           ["@vitest/browser", null],\
