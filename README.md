@@ -84,10 +84,39 @@ packages, use `yarn test`. To run them in watch mode, use
 ## Building and Publishing
 
 We use [changesets][] to maintain a changelog and manage versioning and
-publishing. To create a new changeset for changes you have made, run:
+publishing. Changesets is supposed to handle automatically updating any
+packages that depend on the changed packages, but it isn’t 100% accurate at
+that task. Yarn has its own [“Release Workflow” feature][], which will
+update versions and dependents with 100% accuracy. As such, the hybrid flow
+I have come up with is to first, run the following for each package that I
+have directly changed:
+
+```
+yarn workspace @acusti/{pkg} version patch
+```
+
+Then, make a note of each package that was bumped because the package
+depends on one or more of the packages receiving direct updates.
+
+Then run `git checkout .` (or Branch › Discard All Changes…) to undo all of
+the local changes.
+
+Now, we turn to changesets. To create a new changeset, run the following
+and select all packages identified in the previous step (including ones
+that depend on the changed packages):
 
 ```
 yarn changeset
+```
+
+For the contents of the changesets, the format to document updated
+dependencies (for the packages that depend on the packages receiving direct
+updates) is:
+
+```
+- Updated dependencies
+    - @acusti/aws-signature-v4@1.1.0
+    - @acusti/post@1.1.0
 ```
 
 When you are ready to do a release, build all packages by running
@@ -99,24 +128,8 @@ running:
 yarn changeset version
 ```
 
-Note: changesets is supposed to handle automatically updating any packages
-that depend on the changed packages, but it might not be 100% accurate at
-that task. Yarn has its own [“Release Workflow” feature][], which will
-update versions and dependents with 100% accuracy and can be used like so:
-
-```
-yarn workspace @acusti/example version patch
-```
-
-In some cases, I have been using `yarn changeset version` to update the
-changelogs and bump the package.json version numbers, then undoing the
-package.json change and redoing it with `yarn version {semver type}` in
-order to ensure that all packages that need to be updated are handled.
-There is an [open issue][] in GitHub about handling changelogs from yarn’s
-release workflow, but it hasn’t had any updates since 2022.
-
-Lastly, to publish the new versions to npm (building all the packages
-first), run:
+Lastly, to publish the new versions to npm (building all the packages first
+if anything has changed), run:
 
 ```
 yarn build
