@@ -68,7 +68,7 @@
         "eslint-plugin-jsx-a11y": "^6.10.2",
         "eslint-plugin-markdown": "^5.1.0",
         "eslint-plugin-node": "^11.1.0",
-        "eslint-plugin-perfectionist": "^4.11.0",
+        "eslint-plugin-perfectionist": "^4.12.3",
         "eslint-plugin-react": "^7.37.5",
         "eslint-plugin-react-compiler": "beta",
         "eslint-plugin-react-hooks": "^5.2.0",
