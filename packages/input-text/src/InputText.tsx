@@ -116,6 +116,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     const inputRef = useRef<InputRef>(null);
     useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
     const [inputElement, _setInputElement] = useState<InputRef>(null);
+    const resizeObserverRef = useRef<null | ResizeObserver>(null);
 
     const setInputElement = useCallback((element: InputRef) => {
         inputRef.current = element;
@@ -152,7 +153,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         if (inputElement.style.height) {
             inputElement.style.height = '';
         }
-
+        // Always reset height above to handle multiLine → !multiLine prop change
         if (!multiLine) return;
 
         const height = Math.min(
@@ -164,8 +165,21 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         }
     }, [inputElement, maxHeight, multiLine]);
 
-    // Initialize input height in useEffect
-    useEffect(setInputHeight, [setInputHeight]);
+    // Setup ResizeObserver to detect when element gets layout
+    useEffect(() => {
+        if (!inputElement || !multiLine) return;
+        // Initialize input height
+        setInputHeight();
+
+        resizeObserverRef.current = new ResizeObserver(() => setInputHeight());
+        resizeObserverRef.current.observe(inputElement);
+
+        return () => {
+            if (!resizeObserverRef.current) return;
+            resizeObserverRef.current.disconnect();
+            resizeObserverRef.current = null;
+        };
+    }, [inputElement, multiLine, setInputHeight]);
 
     const handleChange = useCallback(
         (event: React.ChangeEvent<InputElement>) => {
