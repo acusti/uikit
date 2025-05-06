@@ -127,6 +127,28 @@ export const InputWithAutoFocus: Story = {
     },
 };
 
+const MULTI_LINE_INPUT_IN_POPOVER_PROPS = {
+    initialValue:
+        'This multi-line input should resize to fit its contents when the popover opens even though it initializes with display: none as a result of being inside a hidden popover element so it doesn’t have any dimensions when the component initially renders.',
+    multiLine: true,
+    name: 'multi-line-input-in-popover',
+    selectTextOnFocus: true,
+};
+
+export const MultiLineInputInPopover: Story = {
+    args: MULTI_LINE_INPUT_IN_POPOVER_PROPS,
+    render() {
+        return (
+            <>
+                <button popoverTarget="multi-line-input-popover">Open Popover</button>
+                <div id="multi-line-input-popover" popover="auto">
+                    <InputText {...MULTI_LINE_INPUT_IN_POPOVER_PROPS} />
+                </div>
+            </>
+        );
+    },
+};
+
 const MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS = {
     autoFocus: true,
     initialValue: 'This multi-line input should be focused when the popover opens',
