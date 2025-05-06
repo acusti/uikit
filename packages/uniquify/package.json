@@ -44,6 +44,6 @@
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/uniquify#readme",
     "devDependencies": {
         "typescript": "5.8.3",
-        "vitest": "^3.1.1"
+        "vitest": "^3.1.3"
     }
 }

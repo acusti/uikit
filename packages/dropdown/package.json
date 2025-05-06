@@ -50,7 +50,7 @@
         "react": "^19",
         "react-dom": "^19",
         "typescript": "5.8.3",
-        "vitest": "^3.1.1"
+        "vitest": "^3.1.3"
     },
     "dependencies": {
         "@acusti/matchmaking": "^0.9.0",
