@@ -87,7 +87,7 @@ const formatDate = new Intl.DateTimeFormat(undefined, {
 export const MultiLineInputWithSubmitOnEnter: Story = {
     args: SUBMIT_ON_ENTER_PROPS,
     render() {
-        const [lastSubmitDate, setLastSubmitDate] = React.useState(null);
+        const [lastSubmitDate, setLastSubmitDate] = React.useState<Date | null>(null);
         const lastSubmit = lastSubmitDate ? formatDate(lastSubmitDate) : 'never';
 
         return (
@@ -131,7 +131,7 @@ const MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS = {
     autoFocus: true,
     initialValue: 'This multi-line input should be focused when the popover opens',
     multiLine: true,
-    name: 'autofocus-multi-line-input',
+    name: 'multi-line-input-with-autofocus-in-popover',
     selectTextOnFocus: true,
 };
 
@@ -140,10 +140,10 @@ export const MultiLineInputWithAutoFocusInPopover: Story = {
     render() {
         return (
             <>
-                <button popoverTarget="multi-line-input-with-autofocus-in-popover">
+                <button popoverTarget="multi-line-input-with-autofocus-popover">
                     Open Popover
                 </button>
-                <div id="multi-line-input-with-autofocus-in-popover" popover="auto">
+                <div id="multi-line-input-with-autofocus-popover" popover="auto">
                     <InputText {...MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS} />
                 </div>
             </>
