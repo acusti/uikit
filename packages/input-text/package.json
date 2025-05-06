@@ -1,6 +1,6 @@
 {
     "name": "@acusti/input-text",
-    "version": "1.10.0",
+    "version": "1.10.1",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/InputText.js",

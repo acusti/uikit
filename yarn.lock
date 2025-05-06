@@ -40,7 +40,7 @@ __metadata:
   resolution: "@acusti/css-value-input@workspace:packages/css-value-input"
   dependencies:
     "@acusti/css-values": "npm:^1.1.0"
-    "@acusti/input-text": "npm:^1.10.0"
+    "@acusti/input-text": "npm:^1.10.1"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
@@ -111,7 +111,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/input-text@npm:^1.10.0, @acusti/input-text@workspace:packages/input-text":
+"@acusti/input-text@npm:^1.10.1, @acusti/input-text@workspace:packages/input-text":
   version: 0.0.0-use.local
   resolution: "@acusti/input-text@workspace:packages/input-text"
   dependencies:
