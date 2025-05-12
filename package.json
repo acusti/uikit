@@ -121,6 +121,6 @@
     },
     "packageManager": "yarn@4.9.0",
     "dependencies": {
-        "@changesets/cli": "^2.29.3"
+        "@changesets/cli": "^2.29.4"
     }
 }
