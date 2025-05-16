@@ -446,7 +446,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@acusti/uikit-docs", "workspace:packages/docs"],\
           ["@storybook/addon-essentials", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.12"],\
-          ["@storybook/blocks", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.12"],\
+          ["@storybook/blocks", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.14"],\
           ["@storybook/manager-api", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.12"],\
           ["@storybook/react", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.12"],\
           ["@storybook/react-vite", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.12"],\
@@ -2364,6 +2364,13 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "SOFT"\
       }],\
+      ["npm:8.6.14", {\
+        "packageLocation": "./.yarn/cache/@storybook-blocks-npm-8.6.14-2f85941d98-9bf85f9dd4.zip/node_modules/@storybook/blocks/",\
+        "packageDependencies": [\
+          ["@storybook/blocks", "npm:8.6.14"]\
+        ],\
+        "linkType": "SOFT"\
+      }],\
       ["virtual:368a0935a9e1036ed9f914fe3cd4b60af44b4550e9dcbb90700367201252f6892cc47beafee20e91cc434358a555dabcef128cd9d1141ebc6b1cddc743ec599f#npm:8.6.12", {\
         "packageLocation": "./.yarn/__virtual__/@storybook-blocks-virtual-8d4943b06c/0/cache/@storybook-blocks-npm-8.6.12-91ce7233c5-636172d051.zip/node_modules/@storybook/blocks/",\
         "packageDependencies": [\
@@ -2387,11 +2394,11 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
-      ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.12", {\
-        "packageLocation": "./.yarn/__virtual__/@storybook-blocks-virtual-09604b8b32/0/cache/@storybook-blocks-npm-8.6.12-91ce7233c5-636172d051.zip/node_modules/@storybook/blocks/",\
+      ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.14", {\
+        "packageLocation": "./.yarn/__virtual__/@storybook-blocks-virtual-721a6229bf/0/cache/@storybook-blocks-npm-8.6.14-2f85941d98-9bf85f9dd4.zip/node_modules/@storybook/blocks/",\
         "packageDependencies": [\
-          ["@storybook/blocks", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.12"],\
-          ["@storybook/icons", "virtual:09604b8b320dd84df3cae64eb91014853d2cc52927851d68547f3f5b9f82bf4fff8b60138ddad8c52d2dc70a9530bcdc1db27df8a3f3e80b197092b2f98c5458#npm:1.3.0"],\
+          ["@storybook/blocks", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:8.6.14"],\
+          ["@storybook/icons", "virtual:721a6229bfcc4764accff8b77a341ccfc07c20f8d3529f46dd83f725704f56d69c79da48c324c3d98be99eb74c23ee0d9dd738154bda167f6715135ec417b284#npm:1.3.0"],\
           ["@types/react", "npm:19.1.3"],\
           ["@types/react-dom", null],\
           ["@types/storybook", null],\
@@ -2535,10 +2542,10 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "SOFT"\
       }],\
-      ["virtual:09604b8b320dd84df3cae64eb91014853d2cc52927851d68547f3f5b9f82bf4fff8b60138ddad8c52d2dc70a9530bcdc1db27df8a3f3e80b197092b2f98c5458#npm:1.3.0", {\
-        "packageLocation": "./.yarn/__virtual__/@storybook-icons-virtual-5d7afb14a1/0/cache/@storybook-icons-npm-1.3.0-45438ce22e-927d7df7b1.zip/node_modules/@storybook/icons/",\
+      ["virtual:721a6229bfcc4764accff8b77a341ccfc07c20f8d3529f46dd83f725704f56d69c79da48c324c3d98be99eb74c23ee0d9dd738154bda167f6715135ec417b284#npm:1.3.0", {\
+        "packageLocation": "./.yarn/__virtual__/@storybook-icons-virtual-90008e8854/0/cache/@storybook-icons-npm-1.3.0-45438ce22e-927d7df7b1.zip/node_modules/@storybook/icons/",\
         "packageDependencies": [\
-          ["@storybook/icons", "virtual:09604b8b320dd84df3cae64eb91014853d2cc52927851d68547f3f5b9f82bf4fff8b60138ddad8c52d2dc70a9530bcdc1db27df8a3f3e80b197092b2f98c5458#npm:1.3.0"],\
+          ["@storybook/icons", "virtual:721a6229bfcc4764accff8b77a341ccfc07c20f8d3529f46dd83f725704f56d69c79da48c324c3d98be99eb74c23ee0d9dd738154bda167f6715135ec417b284#npm:1.3.0"],\
           ["@types/react", "npm:19.1.3"],\
           ["@types/react-dom", null],\
           ["react", "npm:19.1.0"],\
