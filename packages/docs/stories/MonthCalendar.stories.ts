@@ -2,7 +2,7 @@ import { getMonthFromDate, MonthCalendar } from '../../date-picker/src/index.js'
 
 import './MonthCalendar.css';
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta: Meta<typeof MonthCalendar> = {
     argTypes: {

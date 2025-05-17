@@ -1,4 +1,4 @@
-import { fn } from '@storybook/test';
+import { fn } from 'storybook/test';
 import * as React from 'react';
 
 import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
@@ -8,7 +8,7 @@ import './CSSValueInput.css';
 import './Dropdown.css';
 import './InputText.css';
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const { Fragment } = React;
 

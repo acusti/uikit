@@ -5,7 +5,7 @@ import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
 import './CSSValueInput.css';
 import './InputText.css';
 
-import type { Meta, StoryObj } from '@storybook/react';
+import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const meta: Meta<typeof CSSValueInput> = {
     component: CSSValueInput,

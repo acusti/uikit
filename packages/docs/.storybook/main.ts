@@ -8,8 +8,7 @@ const getAbsolutePath = (value: string): any =>
     dirname(_require.resolve(join(value, 'package.json'))).replace(/^file:\/\//, '');
 
 const config: StorybookConfig = {
-    addons: [getAbsolutePath('@storybook/addon-essentials')],
-    docs: { autodocs: 'tag' },
+    addons: [getAbsolutePath('@storybook/addon-docs')],
     framework: {
         name: getAbsolutePath('@storybook/react-vite'),
         options: {},
