@@ -18,8 +18,8 @@ updates:
                   - '@types/babel__core'
           eslint:
               patterns:
-                  - 'eslint'
                   - '@eslint/*'
+                  - 'eslint'
           eslint-plugins:
               patterns:
                   - 'eslint-plugin-*'
@@ -34,6 +34,10 @@ updates:
           react-types:
               patterns:
                   - '@types/react*'
+          storybook:
+              patterns:
+                  - '@storybook/*'
+                  - 'storybook'
           typescript-eslint:
               patterns:
                   - '@typescript-eslint/*'
