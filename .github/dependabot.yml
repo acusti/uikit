@@ -9,7 +9,8 @@ updates:
       directory: '/' # Location of package manifests
       open-pull-requests-limit: 20
       schedule:
-          interval: daily
+          interval: cron
+          cronjob: '0 6 * * 1,4'
       groups:
           babel:
               patterns:
