@@ -146,7 +146,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-testing-library", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.1.1"],\
           ["flowgen", "npm:1.21.0"],\
           ["globals", "npm:16.0.0"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["npm-run-all", "npm:4.1.5"],\
           ["prettier", "npm:3.5.3"],\
           ["react", "npm:19.1.0"],\
@@ -206,7 +206,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.3"],\
           ["clsx", "npm:2.1.1"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
@@ -237,7 +237,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.3"],\
           ["clsx", "npm:2.1.1"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
@@ -260,7 +260,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.3"],\
           ["clsx", "npm:2.1.1"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
@@ -279,7 +279,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.3"],\
           ["@types/react-dom", null],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
@@ -301,7 +301,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.3"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
@@ -354,7 +354,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.3"],\
           ["@types/react-dom", null],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
@@ -376,7 +376,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.3"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
@@ -428,7 +428,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-testing-library", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.1.1"],\
           ["flowgen", "npm:1.21.0"],\
           ["globals", "npm:16.0.0"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["npm-run-all", "npm:4.1.5"],\
           ["prettier", "npm:3.5.3"],\
           ["react", "npm:19.1.0"],\
@@ -551,7 +551,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.3"],\
           ["@types/react-dom", null],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
@@ -573,7 +573,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.3"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["react", "npm:19.1.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
@@ -588,7 +588,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@acusti/webcrypto", "workspace:packages/webcrypto"],\
           ["@types/node", "npm:22.15.18"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
           ["vitest", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:3.1.3"]\
         ],\
@@ -6258,10 +6258,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["happy-dom", [\
-      ["npm:17.4.6", {\
-        "packageLocation": "./.yarn/cache/happy-dom-npm-17.4.6-821c68c607-e447bb2a47.zip/node_modules/happy-dom/",\
+      ["npm:17.4.7", {\
+        "packageLocation": "./.yarn/cache/happy-dom-npm-17.4.7-28f4f832ef-8f6af6b3cf.zip/node_modules/happy-dom/",\
         "packageDependencies": [\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["webidl-conversions", "npm:7.0.0"],\
           ["whatwg-mimetype", "npm:3.0.0"]\
         ],\
@@ -9971,7 +9971,7 @@ const RAW_RUNTIME_STATE =
           ["chai", "npm:5.2.0"],\
           ["debug", "virtual:cdef168378c8f637e1a6826f3d20d2d269f4d55bb13633c52c16404abf2070f78cc8bcf2dbac627be1f954af9c0e91292f0bfe489299a3eb08d103fe49bab493#npm:4.4.0"],\
           ["expect-type", "npm:1.2.1"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["jsdom", null],\
           ["magic-string", "npm:0.30.17"],\
           ["pathe", "npm:2.0.3"],\
@@ -10025,7 +10025,7 @@ const RAW_RUNTIME_STATE =
           ["chai", "npm:5.2.0"],\
           ["debug", "virtual:cdef168378c8f637e1a6826f3d20d2d269f4d55bb13633c52c16404abf2070f78cc8bcf2dbac627be1f954af9c0e91292f0bfe489299a3eb08d103fe49bab493#npm:4.4.0"],\
           ["expect-type", "npm:1.2.1"],\
-          ["happy-dom", "npm:17.4.6"],\
+          ["happy-dom", "npm:17.4.7"],\
           ["jsdom", null],\
           ["magic-string", "npm:0.30.17"],\
           ["pathe", "npm:2.0.3"],\
