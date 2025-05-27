@@ -302,6 +302,14 @@ describe('uniquify', () => {
             }),
         ).toBe('marmot copy 2');
 
+        expect(
+            uniquify({
+                items: ['marmot copy'],
+                suffix: 'copy',
+                value: 'marmot',
+            }),
+        ).toBe('marmot copy 2');
+
         // Defaults to being case insensitive
         expect(
             uniquify({
