@@ -128,6 +128,7 @@ export const InputWithAutoFocus: Story = {
 };
 
 const MULTI_LINE_INPUT_IN_POPOVER_PROPS = {
+    className: 'multi-line-input-text',
     initialValue:
         'This multi-line input should resize to fit its contents when the popover opens even though it initializes with display: none as a result of being inside a hidden popover element so it doesn’t have any dimensions when the component initially renders.',
     multiLine: true,

@@ -1,4 +1,4 @@
-input.input-text {
+.input-text {
     width: 160px;
     padding: 3px 6px;
     font-family: system-ui, sans-serif;
@@ -12,6 +12,10 @@ input.input-text {
     &:read-only {
         cursor: pointer;
     }
+}
+
+.multi-line-input-text {
+    width: 240px;
 }
 
 [popover] {
