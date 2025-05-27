@@ -263,8 +263,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         [doubleClickToEdit, multiLine, onKeyDown, readOnlyState, submitOnEnter],
     );
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const Element: 'input' = (multiLine ? 'textarea' : 'input') as any;
+    const Element = (multiLine ? 'textarea' : 'input') as unknown as 'input';
 
     return (
         <Element
