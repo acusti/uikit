@@ -1,5 +1,16 @@
 # @acusti/use-is-out-of-bounds
 
+## 0.14.1
+
+### Patch Changes
+
+- 29e79c3: Update react peerDependencies to include experimental releases
+  of react so it can be used with the new Activity and ViewTransition
+  components
+  ([reference](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more))
+- Updated dependencies [29e79c3]
+    - @acusti/use-bounding-client-rect@1.5.1
+
 ## 0.14.0
 
 ### Minor Changes

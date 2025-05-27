@@ -1,5 +1,21 @@
 # @acusti/input-text
 
+## 1.11.0
+
+### Minor Changes
+
+- c9d2af3: Use `field-sizing: content;` when supported in the current
+  browser (progressive enhancement) instead of custom height logic and
+  event listeners to automatically resize mutliLine InputText elements to
+  fit their contents.
+
+### Patch Changes
+
+- 29e79c3: Update react peerDependencies to include experimental releases
+  of react so it can be used with the new Activity and ViewTransition
+  components
+  ([reference](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more))
+
 ## 1.10.1
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # @acusti/css-value-input
 
+## 1.1.2
+
+### Patch Changes
+
+- 29e79c3: Update react peerDependencies to include experimental releases
+  of react so it can be used with the new Activity and ViewTransition
+  components
+  ([reference](https://react.dev/blog/2025/04/23/react-labs-view-transitions-activity-and-more))
+- Updated dependencies [c9d2af3]
+- Updated dependencies [29e79c3]
+    - @acusti/input-text@1.11.0
+
 ## 1.1.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
     "name": "@acusti/date-picker",
-    "version": "0.10.0",
+    "version": "0.10.1",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/index.js",
@@ -53,7 +53,7 @@
         "vitest": "^3.1.4"
     },
     "dependencies": {
-        "@acusti/styling": "^0.7.2 || ^1.1.0",
+        "@acusti/styling": "^0.7.2 || ^1.1.1",
         "clsx": "^2"
     },
     "peerDependencies": {
