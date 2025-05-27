@@ -68,7 +68,7 @@ export type Props = {
 
 type InputRef = HTMLInputElement | null;
 
-const { useCallback, useEffect, useImperativeHandle, useRef, useState } = React;
+const { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } = React;
 
 export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     {
@@ -137,6 +137,13 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         inputRef.current.value = initialValue ?? '';
     }, [initialValue]);
 
+    const [supportsFieldSizing, setSupportsFieldSizing] = useState(true);
+
+    useEffect(() => {
+        if (typeof CSS === 'undefined') return;
+        setSupportsFieldSizing(CSS.supports('field-sizing', 'content'));
+    }, []);
+
     const [readOnlyState, setReadOnlyState] = useState<boolean | undefined>(
         readOnly ?? doubleClickToEdit,
     );
@@ -148,7 +155,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     }, [doubleClickToEdit]);
 
     const setInputHeight = useCallback(() => {
-        if (!inputElement) return;
+        if (!inputElement || supportsFieldSizing) return;
 
         if (inputElement.style.height) {
             inputElement.style.height = '';
@@ -163,11 +170,11 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         if (height) {
             inputElement.style.height = `${height}px`;
         }
-    }, [inputElement, maxHeight, multiLine]);
+    }, [inputElement, maxHeight, multiLine, supportsFieldSizing]);
 
     // Setup ResizeObserver to detect when element gets layout
     useEffect(() => {
-        if (!inputElement || !multiLine) return;
+        if (!inputElement || !multiLine || supportsFieldSizing) return;
         // Initialize input height
         setInputHeight();
 
@@ -179,7 +186,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             resizeObserverRef.current.disconnect();
             resizeObserverRef.current = null;
         };
-    }, [inputElement, multiLine, setInputHeight]);
+    }, [inputElement, multiLine, setInputHeight, supportsFieldSizing]);
 
     const handleChange = useCallback(
         (event: React.ChangeEvent<InputElement>) => {
@@ -263,6 +270,14 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         [doubleClickToEdit, multiLine, onKeyDown, readOnlyState, submitOnEnter],
     );
 
+    const inputStyle = useMemo(
+        () =>
+            multiLine && supportsFieldSizing
+                ? { ...style, fieldSizing: 'content' }
+                : style,
+        [multiLine, style, supportsFieldSizing],
+    );
+
     const Element = (multiLine ? 'textarea' : 'input') as unknown as 'input';
 
     return (
@@ -294,7 +309,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
             ref={setInputElement}
             required={required}
             size={size}
-            style={style}
+            style={inputStyle}
             tabIndex={tabIndex}
             title={title}
             type={type}
