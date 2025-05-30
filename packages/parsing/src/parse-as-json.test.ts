@@ -154,6 +154,20 @@ function extraClosingCurliesTestCase() {
     });
 }
 
+function extractPreambleTestCase() {
+    expect(
+        parseAsJSON(
+            `To create a section prompt for a block-quote section on the "Home" page at index 1, I will consider the context and existing section prompts.\n\nThe "Home" page already has a hero section that introduces Franklin Investments, a brief introduction to the company, a gallery of key projects, a features section highlighting their strategic advantages, and a call-to-action section. \n\nA block-quote section at index 1 would logically serve as a highlight or a key message that the company wants to emphasize to its visitors right after they are introduced to the company. \n\nGiven the description of the block-quote section as “Bold statement, phrase or quote,” it seems this section is meant to capture the essence of Franklin Investments' mission, philosophy, or value proposition in a concise and impactful way.\n\nHere's a JSON-formatted section prompt:\n\n\`\`\`\n{\n  "prompt": "A bold statement that encapsulates Franklin Investments' commitment to innovation and excellence in infrastructure solutions, resonating with their mission and values."\n}\n\`\`\`\n\nThis prompt is designed to elicit a concise yet powerful statement that can reinforce the company's message and leave a lasting impression on visitors.`,
+        ),
+    ).toEqual({
+        postscript: `This prompt is designed to elicit a concise yet powerful statement that can reinforce the company's message and leave a lasting impression on visitors.`,
+        preamble: `To create a section prompt for a block-quote section on the "Home" page at index 1, I will consider the context and existing section prompts.\n\nThe "Home" page already has a hero section that introduces Franklin Investments, a brief introduction to the company, a gallery of key projects, a features section highlighting their strategic advantages, and a call-to-action section. \n\nA block-quote section at index 1 would logically serve as a highlight or a key message that the company wants to emphasize to its visitors right after they are introduced to the company. \n\nGiven the description of the block-quote section as “Bold statement, phrase or quote,” it seems this section is meant to capture the essence of Franklin Investments' mission, philosophy, or value proposition in a concise and impactful way.\n\nHere's a JSON-formatted section prompt:`,
+        value: {
+            prompt: "A bold statement that encapsulates Franklin Investments' commitment to innovation and excellence in infrastructure solutions, resonating with their mission and values.",
+        },
+    });
+}
+
 function extraneousEscapeCharactersTestCase() {
     const response =
         '```json\n{"heading":"Print Design","description":"\\\nAt Cinco Design, we believe that print design is not just about creating visually appealing materials, but also about effectively communicating your message to your target audience. Our team of experienced designers works closely with you to understand your brand, your audience, and your goals, and then crafts a unique print design solution that captures your essence and resonates with your audience.\n\nOur print design services include:\n\n- Branding and identity design: We create a cohesive visual identity for your brand, including logos, business cards, letterheads, and more.\n- Marketing collateral: We design brochures, flyers, posters, and other marketing materials that effectively promote your products or services.\n- Packaging design: We design packaging that not only protects your products but also enhances their appeal and makes them stand out on the shelf.\n- Publication design: We design magazines, newspapers, books, and other publications that are visually engaging and easy to navigate.\n\nLet us help you make a lasting impression with our print design services. Contact us today to discuss your project and see how we can bring your vision to life."}\n```';
@@ -942,20 +956,6 @@ Here are some of the services we offer:
                     },
                 ],
             },
-        },
-    });
-}
-
-function extractPreambleTestCase() {
-    expect(
-        parseAsJSON(
-            `To create a section prompt for a block-quote section on the "Home" page at index 1, I will consider the context and existing section prompts.\n\nThe "Home" page already has a hero section that introduces Franklin Investments, a brief introduction to the company, a gallery of key projects, a features section highlighting their strategic advantages, and a call-to-action section. \n\nA block-quote section at index 1 would logically serve as a highlight or a key message that the company wants to emphasize to its visitors right after they are introduced to the company. \n\nGiven the description of the block-quote section as “Bold statement, phrase or quote,” it seems this section is meant to capture the essence of Franklin Investments' mission, philosophy, or value proposition in a concise and impactful way.\n\nHere's a JSON-formatted section prompt:\n\n\`\`\`\n{\n  "prompt": "A bold statement that encapsulates Franklin Investments' commitment to innovation and excellence in infrastructure solutions, resonating with their mission and values."\n}\n\`\`\`\n\nThis prompt is designed to elicit a concise yet powerful statement that can reinforce the company's message and leave a lasting impression on visitors.`,
-        ),
-    ).toEqual({
-        postscript: `This prompt is designed to elicit a concise yet powerful statement that can reinforce the company's message and leave a lasting impression on visitors.`,
-        preamble: `To create a section prompt for a block-quote section on the "Home" page at index 1, I will consider the context and existing section prompts.\n\nThe "Home" page already has a hero section that introduces Franklin Investments, a brief introduction to the company, a gallery of key projects, a features section highlighting their strategic advantages, and a call-to-action section. \n\nA block-quote section at index 1 would logically serve as a highlight or a key message that the company wants to emphasize to its visitors right after they are introduced to the company. \n\nGiven the description of the block-quote section as “Bold statement, phrase or quote,” it seems this section is meant to capture the essence of Franklin Investments' mission, philosophy, or value proposition in a concise and impactful way.\n\nHere's a JSON-formatted section prompt:`,
-        value: {
-            prompt: "A bold statement that encapsulates Franklin Investments' commitment to innovation and excellence in infrastructure solutions, resonating with their mission and values.",
         },
     });
 }
