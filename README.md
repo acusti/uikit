@@ -120,9 +120,8 @@ updates) is:
 ```
 
 When you are ready to do a release, build all packages by running
-`yarn build`. This will trigger `tsc --build` and `yarn flowgen` for all
-packages. You can then update all package versions automatically by
-running:
+`yarn build`. This will trigger `tsc --build` for all packages. You can
+then update all package versions automatically by running:
 
 ```
 yarn changeset version

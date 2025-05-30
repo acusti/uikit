@@ -20,8 +20,7 @@
         "node",
         "browser",
         "typescript",
-        "ts",
-        "flow"
+        "ts"
     ],
     "scripts": {
         "test": "vitest"

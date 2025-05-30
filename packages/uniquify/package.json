@@ -24,7 +24,6 @@
         "utilities",
         "typescript",
         "ts",
-        "flow",
         "isomorphic",
         "universal"
     ],

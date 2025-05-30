@@ -19,8 +19,7 @@
         "key-event-listening",
         "useKeyboardEvents",
         "typescript",
-        "ts",
-        "flow"
+        "ts"
     ],
     "scripts": {
         "test": "vitest"

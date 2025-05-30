@@ -19,8 +19,7 @@
         "css-in-js",
         "ssr",
         "typescript",
-        "ts",
-        "flow"
+        "ts"
     ],
     "scripts": {
         "test": "vitest"

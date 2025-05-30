@@ -24,8 +24,7 @@
         "key-navigation",
         "ssr",
         "typescript",
-        "ts",
-        "flow"
+        "ts"
     ],
     "scripts": {
         "test": "vitest"

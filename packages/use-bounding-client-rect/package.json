@@ -18,8 +18,7 @@
         "boundingClientRect",
         "useBoundingClientRect",
         "typescript",
-        "ts",
-        "flow"
+        "ts"
     ],
     "repository": {
         "type": "git",

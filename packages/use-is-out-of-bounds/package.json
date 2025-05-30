@@ -20,8 +20,7 @@
         "collision-detection",
         "overflow",
         "typescript",
-        "ts",
-        "flow"
+        "ts"
     ],
     "repository": {
         "type": "git",

@@ -18,8 +18,7 @@
         "promise",
         "graphql",
         "typescript",
-        "ts",
-        "flow"
+        "ts"
     ],
     "scripts": {
         "test": "vitest"

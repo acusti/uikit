@@ -14,17 +14,14 @@
         "aws",
         "isomorphic",
         "typescript",
-        "ts",
-        "flow"
+        "ts"
     ],
     "scripts": {
-        "build": "npm-run-all clean build:tsc --parallel lint build:flowtypes",
+        "build": "npm-run-all clean build:tsc --parallel lint",
         "buildci": "run-s clean build:tsc lint",
-        "build:flowtypes": "find . -type f -not -path './node_modules/*' -regex '.*/dist/[^/]*.d.ts' -exec sh -c 'yarn flowgen --add-flow-header --no-inexact $1 -o ${1%.*.*}.js.flow; sed -E -i \"\" \"s/React\\\\.(ReactNode|JSX\\\\.Element)/React.Node/g; s/React\\\\.SyntheticEvent/SyntheticEvent/g; s/React\\\\.ChangeEvent/SyntheticInputEvent/g; s/React\\\\.FormEvent/SyntheticEvent/g; s/React\\\\.KeyboardEvent/SyntheticKeyboardEvent/g; s/React\\\\.MouseEvent/SyntheticMouseEvent/g; s/React\\\\.FocusEvent/SyntheticFocusEvent/g; s/React\\\\.CSSProperties/{| [string]: string | number |}/g; s/React\\\\.RefAttributes<([^>]+)>/{| ref?: \\1 |}/g; s/React\\\\.ForwardRefExoticComponent/React.StatelessFunctionalComponent/g; s/React\\\\.InputHTMLAttributes<HTMLInputElement>/React.PropsOf<'input'>/g;\" ${1%.*.*}.js.flow' _ '{}' \\;",
         "build:stories": "yarn workspace @acusti/uikit-docs build",
         "build:tsc": "tsc --build",
         "clean": "run-p 'clean:*'",
-        "clean:flowtypes": "find . -type f -regex './packages/[^/]+/dist/[^/]+.flow' -delete",
         "clean:tsc": "tsc --build --clean",
         "dev": "run-p 'dev:*'",
         "dev:stories": "yarn workspace @acusti/uikit-docs storybook",
@@ -73,7 +70,6 @@
         "eslint-plugin-react-compiler": "beta",
         "eslint-plugin-react-hooks": "^5.2.0",
         "eslint-plugin-testing-library": "^7.2.1",
-        "flowgen": "^1.21.0",
         "globals": "^16.2.0",
         "happy-dom": "^17.4.7",
         "npm-run-all": "^4.1.5",

@@ -18,7 +18,6 @@
         "css-value",
         "typescript",
         "ts",
-        "flow",
         "isomorphic",
         "universal"
     ],
