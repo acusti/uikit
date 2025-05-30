@@ -120,8 +120,11 @@ updates) is:
 ```
 
 When you are ready to do a release, build all packages by running
-`yarn build`. This will trigger `tsc --build` for all packages. You can
-then update all package versions automatically by running:
+`yarn build`. This will trigger each packages’ build script in
+“topological” order, i.e. yarn will only run the command after all
+workspaces that it depends on through the `dependencies` field have
+successfully finished executing. You can then update all package versions
+automatically by running:
 
 ```
 yarn changeset version

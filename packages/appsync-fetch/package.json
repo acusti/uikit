@@ -23,7 +23,9 @@
         "ts"
     ],
     "scripts": {
-        "test": "vitest"
+        "test": "vitest",
+        "build": "tsc --build",
+        "clean": "tsc --build --clean"
     },
     "repository": {
         "type": "git",

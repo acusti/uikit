@@ -28,6 +28,8 @@
         "universal"
     ],
     "scripts": {
+        "build": "tsc --build",
+        "clean": "tsc --build --clean",
         "test": "vitest"
     },
     "repository": {
