@@ -18,5 +18,13 @@
         "storybook": "next",
         "typescript": "5.8.3",
         "vite": "^6"
+    },
+    "dependencies": {
+        "@acusti/css-value-input": "workspace:^",
+        "@acusti/date-picker": "workspace:^",
+        "@acusti/dropdown": "workspace:^",
+        "@acusti/input-text": "workspace:^",
+        "@acusti/use-is-out-of-bounds": "workspace:^",
+        "@acusti/use-keyboard-events": "workspace:^"
     }
 }

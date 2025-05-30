@@ -35,7 +35,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/css-value-input@workspace:packages/css-value-input":
+"@acusti/css-value-input@workspace:^, @acusti/css-value-input@workspace:packages/css-value-input":
   version: 0.0.0-use.local
   resolution: "@acusti/css-value-input@workspace:packages/css-value-input"
   dependencies:
@@ -66,7 +66,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/date-picker@workspace:packages/date-picker":
+"@acusti/date-picker@workspace:^, @acusti/date-picker@workspace:packages/date-picker":
   version: 0.0.0-use.local
   resolution: "@acusti/date-picker@workspace:packages/date-picker"
   dependencies:
@@ -87,7 +87,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/dropdown@workspace:packages/dropdown":
+"@acusti/dropdown@workspace:^, @acusti/dropdown@workspace:packages/dropdown":
   version: 0.0.0-use.local
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
@@ -111,7 +111,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/input-text@npm:^1.11.0, @acusti/input-text@workspace:packages/input-text":
+"@acusti/input-text@npm:^1.11.0, @acusti/input-text@workspace:^, @acusti/input-text@workspace:packages/input-text":
   version: 0.0.0-use.local
   resolution: "@acusti/input-text@workspace:packages/input-text"
   dependencies:
@@ -190,6 +190,12 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/uikit-docs@workspace:packages/docs"
   dependencies:
+    "@acusti/css-value-input": "workspace:^"
+    "@acusti/date-picker": "workspace:^"
+    "@acusti/dropdown": "workspace:^"
+    "@acusti/input-text": "workspace:^"
+    "@acusti/use-is-out-of-bounds": "workspace:^"
+    "@acusti/use-keyboard-events": "workspace:^"
     "@storybook/addon-docs": "npm:next"
     "@storybook/react-vite": "npm:next"
     "@types/react": "npm:^19.1.6"
@@ -267,7 +273,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-is-out-of-bounds@npm:^0.14.1, @acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds":
+"@acusti/use-is-out-of-bounds@npm:^0.14.1, @acusti/use-is-out-of-bounds@workspace:^, @acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds":
   version: 0.0.0-use.local
   resolution: "@acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds"
   dependencies:
@@ -283,7 +289,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-keyboard-events@npm:^0.10.1, @acusti/use-keyboard-events@workspace:packages/use-keyboard-events":
+"@acusti/use-keyboard-events@npm:^0.10.1, @acusti/use-keyboard-events@workspace:^, @acusti/use-keyboard-events@workspace:packages/use-keyboard-events":
   version: 0.0.0-use.local
   resolution: "@acusti/use-keyboard-events@workspace:packages/use-keyboard-events"
   dependencies:
