@@ -45,7 +45,7 @@
         "packages/*"
     ],
     "devDependencies": {
-        "@babel/core": "^7.27.1",
+        "@babel/core": "^7.27.4",
         "@eslint/js": "^9.27.0",
         "@testing-library/dom": "^10.4.0",
         "@testing-library/react": "^16.3.0",
