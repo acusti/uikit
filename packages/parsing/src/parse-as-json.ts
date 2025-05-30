@@ -190,6 +190,13 @@ function lengthOf(item: unknown): number {
 
 const hasTextContent = (text: string) => /\w/.test(text);
 
+// LLMs often demarcate the JSON part of the response with ``` or ```json
+const cleanThinkingText = (preamble: string) =>
+    preamble
+        .trim()
+        .replace(/^```(?:[a-z0-9]{1,9})?$/im, '')
+        .trim();
+
 const getObjectKeyFromIndex = (index: number) =>
     `"key${index === 1 ? '' : '-' + index}":`;
 
@@ -255,7 +262,7 @@ export function parseAsJSON(text: string): ParsedResult {
     if (hasTextContent(extraPreamble)) {
         preamble += extraPreamble;
     }
-    preamble = preamble.trim();
+    preamble = cleanThinkingText(preamble);
 
     // if the first character is a key, add opening curly brace
     if (OBJECT_KEY_REGEXP.test(text)) {
@@ -516,7 +523,7 @@ export function parseAsJSON(text: string): ParsedResult {
             // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
             if (!value)
                 return {
-                    postscript: remainingPostscript,
+                    postscript: cleanThinkingText(remainingPostscript),
                     preamble,
                     value: remainingValue,
                 };
@@ -530,11 +537,11 @@ export function parseAsJSON(text: string): ParsedResult {
                 const keysLength = Object.keys(value).length;
                 const remainingKeysLength = Object.keys(remainingValue).length;
                 if (keysLength > remainingKeysLength) {
-                    return { postscript, preamble, value };
+                    return { postscript: cleanThinkingText(postscript), preamble, value };
                 }
                 if (remainingKeysLength > keysLength) {
                     return {
-                        postscript: remainingPostscript,
+                        postscript: cleanThinkingText(remainingPostscript),
                         preamble,
                         value: remainingValue,
                     };
@@ -543,7 +550,7 @@ export function parseAsJSON(text: string): ParsedResult {
             // if not objects or same number of keys, choose longer item
             if (lengthOf(remainingValue) > lengthOf(value)) {
                 return {
-                    postscript: remainingPostscript,
+                    postscript: cleanThinkingText(remainingPostscript),
                     preamble,
                     value: remainingValue,
                 };
@@ -551,5 +558,5 @@ export function parseAsJSON(text: string): ParsedResult {
         }
     }
 
-    return { postscript, preamble, value };
+    return { postscript: cleanThinkingText(postscript), preamble, value };
 }
