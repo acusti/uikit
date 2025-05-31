@@ -141,15 +141,12 @@ After publishing the packages, run `yarn` to update the yarn.lock file and
 then commit the version updates with a message in the form of:
 `:arrow_up: Bump package versions to _._._`.
 
-To build the storybook docs, run `yarn build:stories`, which will run
-`yarn build` and then the default storybook `build` command.
-
 ## Developing
 
-The two main run scripts for developing are `yarn dev:watch`, which kicks
-off the TypeScript compiler in `--watch` mode, and `yarn dev:stories`,
-which kicks off the default `storybook` command from packages/docs/. To run
-both of those in a single terminal window, use `yarn dev`.
+The run script for developing is `yarn dev`, which kicks kicks off the
+default `storybook` command from packages/docs/. The repo doesn’t currently
+support a `watch` mode where the packages rebuild on changes, so you have
+to manually run `yarn build` to pick up the latest changes.
 
 [changesets]: https://github.com/changesets/changesets
 [“Release Workflow” feature]: https://yarnpkg.com/features/release-workflow

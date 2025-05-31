@@ -1,4 +1,4 @@
 [build]
-command = "yarn build && yarn build:stories"
+command = "yarn build"
 publish = "packages/docs/dist/"
 environment = { NODE_VERSION = "22" }
