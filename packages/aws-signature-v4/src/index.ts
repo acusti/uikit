@@ -22,8 +22,7 @@ const decoder = new TextDecoder();
 
 const DEFAULT_ALGORITHM = 'SHA-256';
 const DEFAULT_SERVICE = 'appsync';
-// @ts-expect-error expected type error from this simple browser/node-agnostic check
-const REGION: string = typeof process === 'undefined' ? '' : process.env.REGION;
+const REGION = typeof process === 'undefined' ? '' : (process.env.REGION ?? '');
 
 const decodeArrayBuffer = (buffer: ArrayBuffer, encoding: string) => {
     const uint8Array = new Uint8Array(buffer);
