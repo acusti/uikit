@@ -40,7 +40,6 @@
         { "path": "packages/uniquify" },
         { "path": "packages/use-bounding-client-rect" },
         { "path": "packages/use-is-out-of-bounds" },
-        { "path": "packages/use-keyboard-events" },
-        { "path": "packages/webcrypto" }
+        { "path": "packages/use-keyboard-events" }
     ]
 }

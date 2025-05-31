@@ -30,7 +30,6 @@ fetch utility, and more_
 | **[@acusti/use-bounding-client-rect][]** | [![latest version](https://img.shields.io/npm/v/@acusti/use-bounding-client-rect?style=flat-square)](https://www.npmjs.com/package/@acusti/use-bounding-client-rect) | React hook for getting an element’s `boundingClientRect`                                                 |
 | **[@acusti/use-is-out-of-bounds][]**     | [![latest version](https://img.shields.io/npm/v/@acusti/use-is-out-of-bounds?style=flat-square)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)         | React hook to check if an element overlaps its bounds                                                    |
 | **[@acusti/use-keyboard-events][]**      | [![latest version](https://img.shields.io/npm/v/@acusti/use-keyboard-events?style=flat-square)](https://www.npmjs.com/package/@acusti/use-keyboard-events)           | React hook for adding key event listeners to your UI                                                     |
-| **[@acusti/webcrypto][]**                | [![latest version](https://img.shields.io/npm/v/@acusti/webcrypto?style=flat-square)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)                    | Isomorphic method for accessing the webcrypto API                                                        |
 
 [@acusti/appsync-fetch]:
     https://github.com/acusti/uikit/tree/main/packages/appsync-fetch

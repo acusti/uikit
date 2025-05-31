@@ -81,10 +81,6 @@ const RAW_RUNTIME_STATE =
     {\
       "name": "@acusti/use-keyboard-events",\
       "reference": "workspace:packages/use-keyboard-events"\
-    },\
-    {\
-      "name": "@acusti/webcrypto",\
-      "reference": "workspace:packages/webcrypto"\
     }\
   ],\
   "enableTopLevelFallback": true,\
@@ -109,7 +105,6 @@ const RAW_RUNTIME_STATE =
     ["@acusti/use-bounding-client-rect", ["virtual:d6079ee85956877db24299ef8083cb150772878a59cebacbbd257f7c2e98320a83648920db67defd05771af31566f60cdc96212f00613b9d86dbe254a2bd01c5#workspace:packages/use-bounding-client-rect", "workspace:packages/use-bounding-client-rect"]],\
     ["@acusti/use-is-out-of-bounds", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/use-is-out-of-bounds", "workspace:packages/use-is-out-of-bounds"]],\
     ["@acusti/use-keyboard-events", ["virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/use-keyboard-events", "workspace:packages/use-keyboard-events"]],\
-    ["@acusti/webcrypto", ["workspace:packages/webcrypto"]]\
   ],\
   "fallbackPool": [\
   ],\
