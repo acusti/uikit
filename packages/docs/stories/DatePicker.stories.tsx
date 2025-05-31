@@ -1,9 +1,9 @@
-import { DatePicker, getMonthFromDate } from '../../date-picker/src/index.js';
+import type { Meta, StoryObj } from '@storybook/react-vite';
+
+import { DatePicker, getMonthFromDate } from '@acusti/date-picker';
 import * as React from 'react';
 
 import './DatePicker.css';
-
-import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const { useState } = React;
 

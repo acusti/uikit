@@ -1,3 +1,12 @@
 {
-    "extends": "../../tsconfig.json"
+    "extends": "../../tsconfig.json",
+    "references": [
+        { "path": "../css-value-input" },
+        { "path": "../date-picker" },
+        { "path": "../dropdown" },
+        { "path": "../input-text" },
+        { "path": "../styling" },
+        { "path": "../use-is-out-of-bounds" },
+        { "path": "../use-keyboard-events" }
+    ]
 }

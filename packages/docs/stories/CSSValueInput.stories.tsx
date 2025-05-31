@@ -155,7 +155,7 @@ export const NumberValue: Story = {
         cssValueType: 'integer',
         label: 'opacity',
         name: 'opacity',
-        value: 0,
+        value: '0',
     },
 };
 
@@ -166,6 +166,6 @@ export const LineHeight: Story = {
         name: 'line-height',
         step: 0.1,
         unit: '',
-        value: 1.4,
+        value: '1.4',
     },
 };

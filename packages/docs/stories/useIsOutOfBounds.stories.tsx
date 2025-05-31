@@ -1,13 +1,14 @@
 import * as React from 'react';
 
 import Dropdown from '../../dropdown/src/Dropdown.js';
+import useIsOutOfBounds from '../../use-is-out-of-bounds/src/useIsOutOfBounds.js';
 
 import './Dropdown.css';
 import './useIsOutOfBounds.css';
 
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
-const meta: Meta<typeof Dropdown> = {
+const meta: Meta<typeof useIsOutOfBounds> = {
     argTypes: {
         element: {
             description:
