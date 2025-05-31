@@ -7,8 +7,7 @@
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "files": [
-        "dist",
-        "src"
+        "dist"
     ],
     "description": "A lightweight node.js module for making requests to an AWS AppSync graphql API",
     "keywords": [
@@ -24,8 +23,7 @@
     ],
     "scripts": {
         "test": "vitest",
-        "build": "tsc --build",
-        "clean": "tsc --build --clean"
+        "build": "vite build"
     },
     "repository": {
         "type": "git",
@@ -45,6 +43,8 @@
     "devDependencies": {
         "@types/node": "^22.15.21",
         "typescript": "5.8.3",
+        "unplugin-dts": "^1.0.0-beta.0",
+        "vite": "^6.3.5",
         "vitest": "^3.1.4"
     }
 }

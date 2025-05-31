@@ -18,18 +18,16 @@
         "ts"
     ],
     "scripts": {
-        "build": "yarn clean && yarn build:packages",
-        "build:packages": "yarn workspaces foreach -Rpit --from 'packages/*' run build",
-        "buildci": "run-s clean build:packages lint",
-        "build:stories": "yarn workspace @acusti/uikit-docs build",
-        "clean": "yarn workspaces foreach -Rpit --from 'packages/*' run clean",
+        "build": "yarn workspaces foreach -Rpit --from 'packages/*' run build",
+        "buildci": "run-p lint tsc build",
         "dev": "run-p 'dev:*'",
         "dev:stories": "yarn workspace @acusti/uikit-docs storybook",
         "dev:watch": "yarn workspaces foreach -Rpit --from 'packages/*' run build --watch",
         "format": "prettier --write eslint.config.js package.json README.md tsconfig.json ./.changeset/ ./packages/ ./packages/docs/.storybook/",
         "lint": "eslint ./packages/*/src/**",
         "lintfix": "eslint ./packages/*/src/** --fix",
-        "test": "vitest"
+        "test": "vitest",
+        "tsc": "yarn workspaces foreach -Wp --from 'packages/*' run tsc --noEmit"
     },
     "repository": {
         "type": "git",
@@ -76,6 +74,7 @@
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "typescript": "5.8.3",
+        "unplugin-dts": "^1.0.0-beta.0",
         "vite": "^6",
         "vitest": "^3.1.4"
     },

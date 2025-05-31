@@ -7,8 +7,7 @@
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
     "files": [
-        "dist",
-        "src"
+        "dist"
     ],
     "description": "A lightweight isomorphic module to generate request headers that fulfill the AWS SigV4 signing process",
     "keywords": [
@@ -24,8 +23,7 @@
     ],
     "scripts": {
         "test": "vitest",
-        "build": "tsc --build",
-        "clean": "tsc --build --clean"
+        "build": "vite build"
     },
     "repository": {
         "type": "git",
@@ -38,12 +36,11 @@
         "url": "https://github.com/acusti/uikit/issues"
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/aws-signature-v4#readme",
-    "dependencies": {
-        "@acusti/webcrypto": "^1.2.0"
-    },
     "devDependencies": {
         "@types/node": "^22.15.21",
         "typescript": "5.8.3",
+        "unplugin-dts": "^1.0.0-beta.0",
+        "vite": "^6.3.5",
         "vitest": "^3.1.4"
     },
     "engines": {
