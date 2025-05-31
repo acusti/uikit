@@ -1,5 +1,3 @@
-import webcrypto from '@acusti/webcrypto';
-
 import {
     type AWSOptions as _AWSOptions,
     type FetchHeaders,
@@ -18,7 +16,7 @@ const universalBtoa = (text: string) => {
     }
 };
 
-const subtleCrypto = webcrypto.subtle;
+const subtleCrypto = globalThis.crypto.subtle;
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 

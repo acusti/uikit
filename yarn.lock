@@ -28,7 +28,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/aws-signature-v4@workspace:packages/aws-signature-v4"
   dependencies:
-    "@acusti/webcrypto": "npm:^1.2.0"
     "@types/node": "npm:^22.15.21"
     typescript: "npm:5.8.3"
     vitest: "npm:^3.1.4"

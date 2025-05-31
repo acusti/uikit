@@ -185,7 +185,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/aws-signature-v4/",\
         "packageDependencies": [\
           ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
-          ["@acusti/webcrypto", "workspace:packages/webcrypto"],\
           ["@types/node", "npm:22.15.21"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\
           ["vitest", "virtual:54be9ef6f2875e5ea191d927659d88639c5383ec1cdb6eaa338a29bcc043e2d159814748837f6a0f75ac6e9d1074d142d7fab6be1ce7a3b4840d51ce619387d4#npm:3.1.4"]\
