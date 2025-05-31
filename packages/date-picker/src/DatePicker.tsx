@@ -91,21 +91,19 @@ export default function DatePicker({
         monthLimitLast -= 1;
     }
 
+    const delta = isTwoUp ? 2 : 1;
+
     const handleClickLeftArrow = useCallback(() => {
         setMonth((existingMonth: number) =>
-            monthLimitFirst == null || existingMonth > monthLimitFirst
-                ? existingMonth - 1
-                : existingMonth,
+            Math.max(existingMonth - delta, monthLimitFirst ?? -Infinity),
         );
-    }, [monthLimitFirst]);
+    }, [delta, monthLimitFirst]);
 
     const handleClickRightArrow = useCallback(() => {
         setMonth((existingMonth: number) =>
-            monthLimitLast == null || existingMonth < monthLimitLast
-                ? existingMonth + 1
-                : existingMonth,
+            Math.min(existingMonth + delta, monthLimitLast ?? Infinity),
         );
-    }, [monthLimitLast]);
+    }, [delta, monthLimitLast]);
 
     const handleChange = useCallback(
         (date: string) => {
