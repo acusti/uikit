@@ -170,11 +170,8 @@ const useBoundingClientRect = (element?: HTMLElement | null): EmptyRect | Rect =
 
     useEffect(() => {
         if (!element) return noop;
-
-        const _element = element;
-
         return () => {
-            cleanupHookInstance(_element, setRenderTime);
+            cleanupHookInstance(element, setRenderTime);
         };
     }, [element]);
 
