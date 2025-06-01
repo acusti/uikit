@@ -581,6 +581,7 @@ const RAW_RUNTIME_STATE =
           ["@types/react", "npm:19.1.6"],\
           ["core-js", "npm:3.42.0"],\
           ["react", "npm:19.1.0"],\
+          ["react-docgen", "npm:8.0.0"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0"],\
           ["storybook", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:9.0.4"],\
           ["typescript", "patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"],\

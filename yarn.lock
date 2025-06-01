@@ -234,6 +234,7 @@ __metadata:
     "@types/react": "npm:^19.1.6"
     core-js: "npm:^3.42.0"
     react: "npm:^19.0.0"
+    react-docgen: "npm:^8.0.0"
     react-dom: "npm:^19.0.0"
     storybook: "npm:^9"
     typescript: "npm:5.8.3"
