@@ -18,8 +18,9 @@ export const defineConfig = (options = {}) => {
                     /^@acusti\//,
                     'clsx',
                     'react',
-                    'react-dom',
+                    'react/compiler-runtime',
                     'react/jsx-runtime',
+                    'react-dom',
                 ],
             },
             sourcemap: true,
@@ -27,4 +28,26 @@ export const defineConfig = (options = {}) => {
         },
         plugins: [...plugins, dts({ exclude: ['**/*.test.ts', '**/*.test.tsx'] })],
     });
+};
+
+// React Compiler https://github.com/reactwg/react-compiler/discussions/36#discussioncomment-11285011
+export const compilerOptions = {
+    environment: {
+        enableTreatRefLikeIdentifiersAsRefs: true,
+    },
+    logger: {
+        logEvent(filename, event) {
+            if (event.kind !== 'CompileError') return;
+            console.log('React Compiler logger', filename, event.detail);
+        },
+    },
+    // https://github.com/facebook/react/blob/5c56b87/compiler/packages/babel-plugin-react-compiler/src/CompilerError.ts#L11-L39
+    reportableLevels: new Set([
+        'InvalidJS',
+        'InvalidReact',
+        'InvalidConfig',
+        'CannotPreserveMemoization',
+        'Todo',
+        'Invariant',
+    ]),
 };

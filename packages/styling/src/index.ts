@@ -1,3 +1,4 @@
+export { minifyStyles } from './minifyStyles.js';
 export { default as Style } from './Style.js';
 
 export const SYSTEM_UI_FONT =

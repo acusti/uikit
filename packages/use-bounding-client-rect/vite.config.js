@@ -1,8 +1,14 @@
 import react from '@vitejs/plugin-react';
 
-import { defineConfig } from '../../vite.config.base.js';
+import { compilerOptions, defineConfig } from '../../vite.config.base.js';
 
 export default defineConfig({
     entry: ['src/useBoundingClientRect.ts'],
-    plugins: [react()],
+    plugins: [
+        react({
+            babel: {
+                plugins: [['babel-plugin-react-compiler', compilerOptions]],
+            },
+        }),
+    ],
 });

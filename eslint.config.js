@@ -15,6 +15,8 @@ import reactHooksPlugin from 'eslint-plugin-react-hooks';
 import testingLibraryPlugin from 'eslint-plugin-testing-library';
 import globals from 'globals';
 
+import { compilerOptions } from './vite.config.base.js';
+
 export default [
     jsPlugin.configs.recommended,
     jsxA11yPlugin.flatConfigs.strict,
@@ -95,7 +97,10 @@ export default [
                 },
             ],
             'prefer-const': ['error', { destructuring: 'all' }],
-            'react-compiler/react-compiler': 'warn',
+            'react-compiler/react-compiler': [
+                'warn',
+                { ...compilerOptions, logger: undefined },
+            ],
             'react-hooks/exhaustive-deps': [
                 'warn',
                 { enableDangerousAutofixThisMayCauseInfiniteLoops: true },
