@@ -68,7 +68,6 @@
         "eslint-plugin-testing-library": "^7.2.1",
         "globals": "^16.2.0",
         "happy-dom": "^17.4.7",
-        "npm-run-all": "^4.1.5",
         "prettier": "^3.5.3",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
