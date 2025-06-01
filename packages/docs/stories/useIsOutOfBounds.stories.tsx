@@ -26,7 +26,8 @@ const meta: Meta<typeof useIsOutOfBounds> = {
                 component: `\`useIsOutOfBounds\` is a React hook that returns an object indicating if the
 current component is out of the bounds of its nearest ancestor that doesn’t have overflow: visible. In other words,
 it provides collision detection between an element and its bounds. The return value is
-\`
+
+\`\`\`
 type OutOfBounds = {
     bottom: boolean;
     hasLayout: boolean;
@@ -36,8 +37,9 @@ type OutOfBounds = {
     right: boolean;
     top: boolean;
 };
-\`
-It is used by in @acusti/dropdown to automatically position the dropdown in the direction
+\`\`\`
+
+It is used in @acusti/dropdown to automatically position the dropdown in the direction
 where there is room for it to render, so this story uses \`<Dropdown>\` to illustrate that behavior.`,
             },
         },
