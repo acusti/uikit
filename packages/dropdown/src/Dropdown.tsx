@@ -155,7 +155,6 @@ export default function Dropdown({
     const mouseDownPositionRef = useRef<MousePosition | null>(null);
     const outOfBounds = useIsOutOfBounds(dropdownBodyElement);
 
-    const setDropdownOpenRef = useRef(() => setIsOpen(true));
     const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
     const hasItemsRef = useRef(hasItems);
@@ -650,7 +649,7 @@ export default function Dropdown({
                     defaultValue={value ?? ''}
                     disabled={disabled}
                     name={name}
-                    onFocus={setDropdownOpenRef.current}
+                    onFocus={() => setIsOpen(true)}
                     placeholder={placeholder}
                     ref={inputElementRef}
                     tabIndex={tabIndex}
