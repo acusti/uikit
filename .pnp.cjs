@@ -8223,7 +8223,7 @@ const RAW_RUNTIME_STATE =
     ]],\
     ["react-docgen", [\
       ["npm:8.0.0", {\
-        "packageLocation": "./.yarn/cache/react-docgen-npm-8.0.0-feb9a79bb0-1c85676a0d.zip/node_modules/react-docgen/",\
+        "packageLocation": "./.yarn/unplugged/react-docgen-npm-8.0.0-feb9a79bb0/node_modules/react-docgen/",\
         "packageDependencies": [\
           ["@babel/core", "npm:7.27.4"],\
           ["@babel/traverse", "npm:7.27.4"],\
