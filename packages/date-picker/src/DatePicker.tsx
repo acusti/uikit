@@ -40,14 +40,17 @@ export default function DatePicker({
     dateEnd: _dateEnd,
     dateStart: _dateStart,
     initialMonth,
-    isRange = _dateEnd != null,
+    isRange: _isRange,
     isTwoUp,
     monthLimitFirst,
-    monthLimitLast,
+    monthLimitLast: _monthLimitLast,
     onChange,
     showEndInitially,
     useMonthAbbreviations,
 }: Props) {
+    const isRange = _isRange ?? _dateEnd != null;
+    // In two-up view we see 1 more month, so monthLimitLast needs to be 1 less
+    const monthLimitLast = isTwoUp && _monthLimitLast != null ? _monthLimitLast - 1 : _monthLimitLast;
     const dateEndFromProps =
         _dateEnd != null && typeof _dateEnd !== 'string'
             ? new Date(_dateEnd).toISOString()
@@ -85,11 +88,6 @@ export default function DatePicker({
 
     const [dateEndPreview, setDateEndPreview] = useState<null | string>(null);
     const [month, setMonth] = useState<number>(initialMonth);
-
-    // In two-up view we see 1 more month, so monthLimitLast needs to be 1 less
-    if (isTwoUp && monthLimitLast != null) {
-        monthLimitLast -= 1;
-    }
 
     const delta = isTwoUp ? 2 : 1;
 
