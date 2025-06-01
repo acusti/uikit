@@ -146,7 +146,7 @@ then commit the version updates with a message in the form of:
 The run script for developing is `yarn dev`, which kicks kicks off the
 default `storybook` command from packages/docs/. The repo doesn’t currently
 support a `watch` mode where packages rebuild on changes, so you have to
-manually run `yarn builddev` for storybook to pick up the latest changes.
+manually run `yarn build` for storybook to pick up the latest changes.
 
 [changesets]: https://github.com/changesets/changesets
 [“Release Workflow” feature]: https://yarnpkg.com/features/release-workflow

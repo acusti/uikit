@@ -25,9 +25,15 @@ jobs:
               with:
                   node-version: ${{ matrix.node-version }}
                   cache: 'yarn'
-            - name: Install dependencies
+
+            - name: 📥 Install deps
               run: yarn
-            - name: Typecheck, build, and lint packages
-              run: yarn buildci
-            - name: Test files
+
+            - name: 🛠️ Typecheck & Build
+              run: yarn build
+
+            - name: 🔬 Lint
+              run: yarn lint
+
+            - name: ⚡ Test
               run: yarn test
