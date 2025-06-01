@@ -1,3 +1,4 @@
+/* eslint-disable react-compiler/react-compiler */
 import useBoundingClientRect from '@acusti/use-bounding-client-rect';
 import * as React from 'react';
 
