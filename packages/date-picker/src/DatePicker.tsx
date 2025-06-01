@@ -30,7 +30,7 @@ export type Props = {
     useMonthAbbreviations?: boolean;
 };
 
-const { Fragment, useCallback, useEffect, useRef, useState } = React;
+const { Fragment, useEffect, useRef, useState } = React;
 
 const getAbbreviatedMonthTitle = (month: number) =>
     `${getMonthAbbreviationFromMonth(month)} ${getYearFromMonth(month)}`;
@@ -50,7 +50,8 @@ export default function DatePicker({
 }: Props) {
     const isRange = _isRange ?? _dateEnd != null;
     // In two-up view we see 1 more month, so monthLimitLast needs to be 1 less
-    const monthLimitLast = isTwoUp && _monthLimitLast != null ? _monthLimitLast - 1 : _monthLimitLast;
+    const monthLimitLast =
+        isTwoUp && _monthLimitLast != null ? _monthLimitLast - 1 : _monthLimitLast;
     const dateEndFromProps =
         _dateEnd != null && typeof _dateEnd !== 'string'
             ? new Date(_dateEnd).toISOString()
@@ -91,53 +92,50 @@ export default function DatePicker({
 
     const delta = isTwoUp ? 2 : 1;
 
-    const handleClickLeftArrow = useCallback(() => {
+    const handleClickLeftArrow = () => {
         setMonth((existingMonth: number) =>
             Math.max(existingMonth - delta, monthLimitFirst ?? -Infinity),
         );
-    }, [delta, monthLimitFirst]);
+    };
 
-    const handleClickRightArrow = useCallback(() => {
+    const handleClickRightArrow = () => {
         setMonth((existingMonth: number) =>
             Math.min(existingMonth + delta, monthLimitLast ?? Infinity),
         );
-    }, [delta, monthLimitLast]);
+    };
 
-    const handleChange = useCallback(
-        (date: string) => {
-            // If we last set the dateStart or we have a dateStart but no dateEnd, set dateEnd
-            if (
-                isRange &&
-                dateStart != null &&
-                (updatingDateEndRef.current || dateEnd == null)
-            ) {
-                // Ensure that dateEnd is after dateStart; if not, swap them
-                if (date < dateStart) {
-                    setDateStart(date);
-                    setDateEnd(dateStart);
-                    onChange({ dateEnd: dateStart, dateStart: date });
-                } else {
-                    setDateEnd(date);
-                    onChange({ dateEnd: date, dateStart });
-                }
-                updatingDateEndRef.current = false;
-            } else {
+    const handleChange = (date: string) => {
+        // If we last set the dateStart or we have a dateStart but no dateEnd, set dateEnd
+        if (
+            isRange &&
+            dateStart != null &&
+            (updatingDateEndRef.current || dateEnd == null)
+        ) {
+            // Ensure that dateEnd is after dateStart; if not, swap them
+            if (date < dateStart) {
                 setDateStart(date);
-                setDateEnd(null);
-                if (isRange) {
-                    onChange({ dateEnd: null, dateStart: date });
-                    updatingDateEndRef.current = true;
-                } else {
-                    onChange({ dateStart: date });
-                }
+                setDateEnd(dateStart);
+                onChange({ dateEnd: dateStart, dateStart: date });
+            } else {
+                setDateEnd(date);
+                onChange({ dateEnd: date, dateStart });
             }
-        },
-        [dateEnd, dateStart, isRange, onChange],
-    );
+            updatingDateEndRef.current = false;
+        } else {
+            setDateStart(date);
+            setDateEnd(null);
+            if (isRange) {
+                onChange({ dateEnd: null, dateStart: date });
+                updatingDateEndRef.current = true;
+            } else {
+                onChange({ dateStart: date });
+            }
+        }
+    };
 
-    const handleChangeEndPreview = useCallback((date: string) => {
+    const handleChangeEndPreview = (date: string) => {
         setDateEndPreview(date);
-    }, []);
+    };
 
     return (
         <Fragment>

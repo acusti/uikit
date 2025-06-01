@@ -68,7 +68,7 @@ export type Props = {
 
 type InputRef = HTMLInputElement | null;
 
-const { useCallback, useEffect, useImperativeHandle, useMemo, useRef, useState } = React;
+const { useEffect, useImperativeHandle, useRef, useState } = React;
 
 export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     {
@@ -118,10 +118,10 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     const [inputElement, _setInputElement] = useState<InputRef>(null);
     const resizeObserverRef = useRef<null | ResizeObserver>(null);
 
-    const setInputElement = useCallback((element: InputRef) => {
+    const setInputElement = (element: InputRef) => {
         inputRef.current = element;
         _setInputElement(element);
-    }, []);
+    };
 
     // If props.initialValue changes, override input value from it
     useEffect(() => {
@@ -141,12 +141,12 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     );
     const isInitialSelectionRef = useRef<boolean>(true);
 
-    const startEditing = useCallback(() => {
+    const startEditing = () => {
         if (!doubleClickToEdit) return;
         setReadOnlyState(false);
-    }, [doubleClickToEdit]);
+    };
 
-    const setInputHeight = useCallback(() => {
+    const setInputHeight = () => {
         if (!inputRef.current || supportsFieldSizing) return;
 
         if (inputRef.current.style.height) {
@@ -162,7 +162,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         if (height) {
             inputRef.current.style.height = `${height}px`;
         }
-    }, [maxHeight, multiLine, supportsFieldSizing]);
+    };
 
     // Setup ResizeObserver to detect when element gets layout
     useEffect(() => {
@@ -180,95 +180,75 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         };
     }, [inputElement, multiLine, setInputHeight, supportsFieldSizing]);
 
-    const handleChange = useCallback(
-        (event: React.ChangeEvent<InputElement>) => {
-            if (onChange) onChange(event);
-            if (onChangeValue) onChangeValue(event.target.value);
-        },
-        [onChange, onChangeValue],
-    );
+    const handleChange = (event: React.ChangeEvent<InputElement>) => {
+        if (onChange) onChange(event);
+        if (onChangeValue) onChangeValue(event.target.value);
+    };
 
-    const handleFocus = useCallback(
-        (event: React.FocusEvent<HTMLInputElement>) => {
-            if (onFocus) onFocus(event);
-            if (multiLine) setInputHeight();
-        },
-        [multiLine, onFocus, setInputHeight],
-    );
+    const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+        if (onFocus) onFocus(event);
+        if (multiLine) setInputHeight();
+    };
 
-    const handleBlur = useCallback(
-        (event: React.FocusEvent<HTMLInputElement>) => {
-            if (onBlur) onBlur(event);
-            if (doubleClickToEdit) {
-                setReadOnlyState(true);
-            }
-            if (!selectTextOnFocus) return;
-            setInputElement(event.currentTarget);
-            // When input loses focus, reset isInitialSelection to true for next onSelect event
-            isInitialSelectionRef.current = true;
-        },
-        [doubleClickToEdit, onBlur, selectTextOnFocus, setInputElement],
-    );
+    const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+        if (onBlur) onBlur(event);
+        if (doubleClickToEdit) {
+            setReadOnlyState(true);
+        }
+        if (!selectTextOnFocus) return;
+        setInputElement(event.currentTarget);
+        // When input loses focus, reset isInitialSelection to true for next onSelect event
+        isInitialSelectionRef.current = true;
+    };
 
     // NOTE Selecting the contents of the input onFocus makes for the best UX,
     // but it doesn’t work in Safari, so we use the initial onSelect event instead
-    const handleSelect = useCallback(
-        (event: React.SyntheticEvent<HTMLInputElement>) => {
-            if (!selectTextOnFocus) return;
-            const input = event.currentTarget;
-            setInputElement(input);
-            // Do nothing if this isn’t the initial select-on-focus event
-            if (!isInitialSelectionRef.current) return;
-            // This is the initial select-on-focus event, so reset isInitialSelection to false
-            isInitialSelectionRef.current = false;
-            // Do nothing if input has no value
-            if (!input.value) return;
-            // Do nothing if input is no longer the document’s activeElement
-            if (input.ownerDocument.activeElement !== input) return;
-            // Do nothing if input’s contents are already selected
-            const valueLength = input.value.length;
-            if (input.selectionStart === 0 && input.selectionEnd === valueLength) return;
+    const handleSelect = (event: React.SyntheticEvent<HTMLInputElement>) => {
+        if (!selectTextOnFocus) return;
+        const input = event.currentTarget;
+        setInputElement(input);
+        // Do nothing if this isn't the initial select-on-focus event
+        if (!isInitialSelectionRef.current) return;
+        // This is the initial select-on-focus event, so reset isInitialSelection to false
+        isInitialSelectionRef.current = false;
+        // Do nothing if input has no value
+        if (!input.value) return;
+        // Do nothing if input is no longer the document’s activeElement
+        if (input.ownerDocument.activeElement !== input) return;
+        // Do nothing if input’s contents are already selected
+        const valueLength = input.value.length;
+        if (input.selectionStart === 0 && input.selectionEnd === valueLength) return;
 
-            input.selectionStart = 0;
-            input.selectionEnd = valueLength;
-        },
-        [selectTextOnFocus, setInputElement],
-    );
+        input.selectionStart = 0;
+        input.selectionEnd = valueLength;
+    };
 
-    const handleKeyDown = useCallback(
-        (event: React.KeyboardEvent<InputElement>) => {
-            if (onKeyDown) onKeyDown(event);
-            if (
-                event.key === 'Enter' &&
-                // for multi-line inputs, ⌘-Enter should always submit
-                (submitOnEnter || (multiLine && isPrimaryModifierPressed(event))) &&
-                // for multi-line inputs, shift/alt/ctrl-Enter should insert newlines
-                (!multiLine || (!event.shiftKey && !event.altKey && !event.ctrlKey))
-            ) {
-                event.preventDefault();
-                event.currentTarget.closest('form')?.requestSubmit();
-                // always blur input on Enter when submitOnEnter is true
-                event.currentTarget.blur();
-            } else if (doubleClickToEdit && inputRef.current) {
-                if (readOnlyState) {
-                    if (event.key === 'Enter') {
-                        setReadOnlyState(false);
-                    }
-                } else if (event.key === 'Enter' || event.key === 'Escape') {
-                    inputRef.current.blur();
+    const handleKeyDown = (event: React.KeyboardEvent<InputElement>) => {
+        if (onKeyDown) onKeyDown(event);
+        if (
+            event.key === 'Enter' &&
+            // for multi-line inputs, ⌘-Enter should always submit
+            (submitOnEnter || (multiLine && isPrimaryModifierPressed(event))) &&
+            // for multi-line inputs, shift/alt/ctrl-Enter should insert newlines
+            (!multiLine || (!event.shiftKey && !event.altKey && !event.ctrlKey))
+        ) {
+            event.preventDefault();
+            event.currentTarget.closest('form')?.requestSubmit();
+            // always blur input on Enter when submitOnEnter is true
+            event.currentTarget.blur();
+        } else if (doubleClickToEdit && inputRef.current) {
+            if (readOnlyState) {
+                if (event.key === 'Enter') {
+                    setReadOnlyState(false);
                 }
+            } else if (event.key === 'Enter' || event.key === 'Escape') {
+                inputRef.current.blur();
             }
-        },
-        [doubleClickToEdit, multiLine, onKeyDown, readOnlyState, submitOnEnter],
-    );
+        }
+    };
 
-    const inputStyle = useMemo(
-        () =>
-            multiLine && supportsFieldSizing
-                ? { ...style, fieldSizing: 'content' }
-                : style,
-        [multiLine, style, supportsFieldSizing],
-    );
+    const inputStyle =
+        multiLine && supportsFieldSizing ? { ...style, fieldSizing: 'content' } : style;
 
     const Element = (multiLine ? 'textarea' : 'input') as unknown as 'input';
 

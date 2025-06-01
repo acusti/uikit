@@ -28,7 +28,7 @@ selections via the `onChange` prop and showing months using abbreviations:
 
 ```tsx
 import { DatePicker } from '@acusti/date-picker';
-import { useCallback, useState } from 'react';
+import { useState } from 'react';
 
 function Popover() {
     const [dateRangeStart, setDateRangeStart] = useState<null | string>(
@@ -36,12 +36,12 @@ function Popover() {
     );
     const [dateRangeEnd, setDateRangeEnd] = useState<null | string>(null);
 
-    const handleDateRangeChange = useCallback(({ dateEnd, dateStart }) => {
+    const handleDateRangeChange = ({ dateEnd, dateStart }) => {
         setDateRangeStart(dateStart);
         if (dateEnd) {
             setDateRangeEnd(dateEnd);
         }
-    }, []);
+    };
 
     return (
         <DatePicker

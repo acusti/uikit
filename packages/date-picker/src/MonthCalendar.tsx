@@ -25,7 +25,7 @@ export type Props = {
 
 type DateRangeDays = [null | number, null | number, null | number];
 
-const { Fragment, useCallback } = React;
+const { Fragment } = React;
 
 const DAYS = Array(7).fill(null);
 
@@ -79,23 +79,17 @@ export default function MonthCalendar({
         [null, null, null],
     );
 
-    const handleClickDay = useCallback(
-        (event: React.SyntheticEvent<HTMLElement>) => {
-            const { date } = event.currentTarget.dataset;
-            if (date && onChange) onChange(date);
-        },
-        [onChange],
-    );
+    const handleClickDay = (event: React.SyntheticEvent<HTMLElement>) => {
+        const { date } = event.currentTarget.dataset;
+        if (date && onChange) onChange(date);
+    };
 
-    const handleMouseEnterDay = useCallback(
-        (event: React.SyntheticEvent<HTMLElement>) => {
-            if (isRange && onChangeEndPreview) {
-                const { date } = event.currentTarget.dataset;
-                if (date) onChangeEndPreview(date);
-            }
-        },
-        [isRange, onChangeEndPreview],
-    );
+    const handleMouseEnterDay = (event: React.SyntheticEvent<HTMLElement>) => {
+        if (isRange && onChangeEndPreview) {
+            const { date } = event.currentTarget.dataset;
+            if (date) onChangeEndPreview(date);
+        }
+    };
 
     return (
         <Fragment>
