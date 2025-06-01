@@ -114,10 +114,5 @@
             }
         ]
     },
-    "packageManager": "yarn@4.9.0",
-    "dependenciesMeta": {
-        "react-docgen@8.0.0": {
-            "unplugged": true
-        }
-    }
+    "packageManager": "yarn@4.9.0"
 }
