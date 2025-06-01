@@ -58,7 +58,6 @@
     "dependencies": {
         "@acusti/matchmaking": "^0.10.0",
         "@acusti/styling": "^2.0.0",
-        "@acusti/use-is-out-of-bounds": "^0.15.0",
         "@acusti/use-keyboard-events": "^0.11.0",
         "clsx": "^2"
     },

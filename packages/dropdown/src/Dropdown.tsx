@@ -1,6 +1,5 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions */
 import { Style } from '@acusti/styling';
-import useIsOutOfBounds from '@acusti/use-is-out-of-bounds';
 import useKeyboardEvents, {
     isEventTargetUsingKeyEvent,
 } from '@acusti/use-keyboard-events';
@@ -15,8 +14,6 @@ import {
 } from './helpers.js';
 import {
     BODY_CLASS_NAME,
-    BODY_MAX_HEIGHT_VAR,
-    BODY_MAX_WIDTH_VAR,
     BODY_SELECTOR,
     LABEL_CLASS_NAME,
     LABEL_TEXT_CLASS_NAME,
@@ -122,7 +119,7 @@ export default function Dropdown({
     onOpen,
     onSubmitItem,
     placeholder,
-    style: styleFromProps,
+    style,
     tabIndex,
     value,
 }: Props) {
@@ -139,11 +136,9 @@ export default function Dropdown({
         trigger = (children as ChildrenTuple)[0];
     }
     const isTriggerFromProps = React.isValidElement(trigger);
+
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
-    const [dropdownBodyElement, setDropdownBodyElement] = useState<HTMLDivElement | null>(
-        null,
-    );
 
     const dropdownElementRef = useRef<HTMLDivElement | null>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
@@ -153,7 +148,6 @@ export default function Dropdown({
     const clearEnteredCharactersTimerRef = useRef<null | TimeoutID>(null);
     const enteredCharactersRef = useRef<string>('');
     const mouseDownPositionRef = useRef<MousePosition | null>(null);
-    const outOfBounds = useIsOutOfBounds(dropdownBodyElement);
 
     const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
@@ -653,20 +647,6 @@ export default function Dropdown({
         );
     }
 
-    const style = {
-        ...styleFromProps,
-        ...(outOfBounds.maxHeight != null && outOfBounds.maxHeight > 0
-            ? {
-                  [BODY_MAX_HEIGHT_VAR]: `calc(${outOfBounds.maxHeight}px - var(--uktdd-body-buffer))`,
-              }
-            : null),
-        ...(outOfBounds.maxWidth != null && outOfBounds.maxWidth > 0
-            ? {
-                  [BODY_MAX_WIDTH_VAR]: `calc(${outOfBounds.maxWidth}px - var(--uktdd-body-buffer))`,
-              }
-            : null),
-    };
-
     return (
         <Fragment>
             <Style href="@acusti/dropdown/Dropdown">{STYLES}</Style>
@@ -687,18 +667,7 @@ export default function Dropdown({
             >
                 {trigger}
                 {isOpen ? (
-                    <div
-                        className={clsx(BODY_CLASS_NAME, {
-                            'calculating-position': !outOfBounds.hasLayout,
-                            'has-items': hasItems,
-                            'out-of-bounds-bottom':
-                                outOfBounds.bottom && !outOfBounds.top,
-                            'out-of-bounds-left': outOfBounds.left && !outOfBounds.right,
-                            'out-of-bounds-right': outOfBounds.right && !outOfBounds.left,
-                            'out-of-bounds-top': outOfBounds.top && !outOfBounds.bottom,
-                        })}
-                        ref={setDropdownBodyElement}
-                    >
+                    <div className={BODY_CLASS_NAME}>
                         {childrenCount > 1 ? (children as ChildrenTuple)[1] : children}
                     </div>
                 ) : null}
