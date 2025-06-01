@@ -1,5 +1,13 @@
 # @acusti/parsing
 
+## 0.20.0
+
+### Minor Changes
+
+- e42f474: Use vite in library mode to build all packages and cleanup the
+  build artifacts to only include required files. This means no more test
+  files in the build and no more src/ directory.
+
 ## 0.19.0
 
 ### Minor Changes

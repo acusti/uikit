@@ -1,5 +1,13 @@
 # @acusti/css-values
 
+## 1.2.0
+
+### Minor Changes
+
+- e42f474: Use vite in library mode to build all packages and cleanup the
+  build artifacts to only include required files. This means no more test
+  files in the build and no more src/ directory.
+
 ## 1.1.0
 
 ### Minor Changes

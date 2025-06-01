@@ -1,5 +1,19 @@
 # @acusti/use-is-out-of-bounds
 
+## 0.15.0
+
+### Minor Changes
+
+- e42f474: Use vite in library mode to build all packages and cleanup the
+  build artifacts to only include required files. This means no more test
+  files in the build and no more src/ directory.
+
+### Patch Changes
+
+- Updated dependencies [e42f474]
+- Updated dependencies [d328a73]
+    - @acusti/use-bounding-client-rect@2.0.0
+
 ## 0.14.1
 
 ### Patch Changes

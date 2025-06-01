@@ -1,5 +1,33 @@
 # @acusti/css-value-input
 
+## 2.0.0
+
+### Major Changes
+
+- d328a73: Adapt package to use react-compiler as part of vite build
+  process and to remove all manual memoization. Also includes some small
+  changes to strictly follow react-compiler’s rules of react and to
+  workaround as-of-yet unimplemented features involving mutating
+  destructured component props and the nullish coalescing assignment
+  operator.
+
+    **Note:** this is a breaking change because the packages now depend on
+    react v19+ and are no longer compatible with anything before the
+    introduction of the react/compiler-runtime.
+
+### Minor Changes
+
+- e42f474: Use vite in library mode to build all packages and cleanup the
+  build artifacts to only include required files. This means no more test
+  files in the build and no more src/ directory.
+
+### Patch Changes
+
+- Updated dependencies [e42f474]
+- Updated dependencies [d328a73]
+    - @acusti/css-values@1.2.0
+    - @acusti/input-text@2.0.0
+
 ## 1.1.2
 
 ### Patch Changes
