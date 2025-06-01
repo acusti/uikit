@@ -81,16 +81,17 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
         title,
         unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
         validator,
-        value,
+        value: valueFromProps,
     }: Props,
     ref,
 ) {
     const inputRef = useRef<InputRef>(null);
     useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
     // props.value should be a string; if it’s a number, convert it here
-    if (typeof value === 'number' && !Number.isNaN(value)) {
-        value = `${value}`;
-    }
+    const value =
+        typeof valueFromProps === 'number' && !Number.isNaN(valueFromProps)
+            ? `${valueFromProps}`
+            : valueFromProps;
     const submittedValueRef = useRef<string>(value ?? '');
 
     useEffect(() => {
