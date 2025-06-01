@@ -147,22 +147,22 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
     }, [doubleClickToEdit]);
 
     const setInputHeight = useCallback(() => {
-        if (!inputElement || supportsFieldSizing) return;
+        if (!inputRef.current || supportsFieldSizing) return;
 
-        if (inputElement.style.height) {
-            inputElement.style.height = '';
+        if (inputRef.current.style.height) {
+            inputRef.current.style.height = '';
         }
         // Always reset height above to handle multiLine → !multiLine prop change
         if (!multiLine) return;
 
         const height = Math.min(
-            inputElement.scrollHeight,
+            inputRef.current.scrollHeight,
             typeof maxHeight === 'string' ? parseFloat(maxHeight) : maxHeight,
         );
         if (height) {
-            inputElement.style.height = `${height}px`;
+            inputRef.current.style.height = `${height}px`;
         }
-    }, [inputElement, maxHeight, multiLine, supportsFieldSizing]);
+    }, [maxHeight, multiLine, supportsFieldSizing]);
 
     // Setup ResizeObserver to detect when element gets layout
     useEffect(() => {
