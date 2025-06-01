@@ -41,6 +41,9 @@
     "workspaces": [
         "packages/*"
     ],
+    "dependencies": {
+        "@changesets/cli": "^2.29.4"
+    },
     "devDependencies": {
         "@babel/core": "^7.27.1",
         "@eslint/js": "^9.27.0",
@@ -112,9 +115,6 @@
         ]
     },
     "packageManager": "yarn@4.9.0",
-    "dependencies": {
-        "@changesets/cli": "^2.29.4"
-    },
     "dependenciesMeta": {
         "react-docgen@8.0.0": {
             "unplugged": true
