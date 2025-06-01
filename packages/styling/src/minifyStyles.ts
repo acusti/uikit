@@ -174,5 +174,3 @@ export function minifyStyles(css: string) {
 
     return css.trim();
 }
-
-export default minifyStyles;
