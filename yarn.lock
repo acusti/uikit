@@ -51,7 +51,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.5.0"
     babel-plugin-react-compiler: "npm:rc"
     clsx: "npm:^2"
-    happy-dom: "npm:^17.4.7"
+    happy-dom: "npm:^17.5.6"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
@@ -87,7 +87,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.5.0"
     babel-plugin-react-compiler: "npm:rc"
     clsx: "npm:^2"
-    happy-dom: "npm:^17.4.7"
+    happy-dom: "npm:^17.5.6"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
@@ -115,7 +115,7 @@ __metadata:
     "@vitejs/plugin-react": "npm:^4.5.0"
     babel-plugin-react-compiler: "npm:rc"
     clsx: "npm:^2"
-    happy-dom: "npm:^17.4.7"
+    happy-dom: "npm:^17.5.6"
     react: "npm:^19"
     react-dom: "npm:^19"
     typescript: "npm:5.8.3"
@@ -138,7 +138,7 @@ __metadata:
     "@types/react": "npm:^19.1.6"
     "@vitejs/plugin-react": "npm:^4.5.0"
     babel-plugin-react-compiler: "npm:rc"
-    happy-dom: "npm:^17.4.7"
+    happy-dom: "npm:^17.5.6"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
@@ -195,7 +195,7 @@ __metadata:
     "@types/react": "npm:^19.1.6"
     "@vitejs/plugin-react": "npm:^4.5.0"
     babel-plugin-react-compiler: "npm:rc"
-    happy-dom: "npm:^17.4.7"
+    happy-dom: "npm:^17.5.6"
     react: "npm:^19"
     react-dom: "npm:^19"
     typescript: "npm:5.8.3"
@@ -271,7 +271,7 @@ __metadata:
     eslint-plugin-react-hooks: "npm:rc"
     eslint-plugin-testing-library: "npm:^7.2.1"
     globals: "npm:^16.2.0"
-    happy-dom: "npm:^17.4.7"
+    happy-dom: "npm:^17.5.6"
     prettier: "npm:^3.5.3"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -341,7 +341,7 @@ __metadata:
     "@types/react": "npm:^19.1.6"
     "@vitejs/plugin-react": "npm:^4.5.0"
     babel-plugin-react-compiler: "npm:rc"
-    happy-dom: "npm:^17.4.7"
+    happy-dom: "npm:^17.5.6"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
@@ -4682,13 +4682,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"happy-dom@npm:^17.4.7":
-  version: 17.4.7
-  resolution: "happy-dom@npm:17.4.7"
+"happy-dom@npm:^17.5.6":
+  version: 17.5.6
+  resolution: "happy-dom@npm:17.5.6"
   dependencies:
     webidl-conversions: "npm:^7.0.0"
     whatwg-mimetype: "npm:^3.0.0"
-  checksum: 10/8f6af6b3cfea459805fc2db7329ecdf9c7760d29cae20dde85983896de02f7bfcf265533850848a501c9813d94211c0737534c54d28b6c5b2c1bb13daa344211
+  checksum: 10/dcec81d51aa95a0d145e954e4ff14a507cc6757007c8b1b5146e66934ccabbca57f7e01cd8c1e4e6229bd85fd4528511ce2968feffa28bda7dbb7a420779d4af
   languageName: node
   linkType: hard
 
