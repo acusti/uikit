@@ -25,6 +25,6 @@ export const defineConfig = (options = {}) => {
             sourcemap: true,
             ...(target ? { target } : {}),
         },
-        plugins: [dts({ exclude: ['**/*.test.ts', '**/*.test.tsx'] }), ...plugins],
+        plugins: [...plugins, dts({ exclude: ['**/*.test.ts', '**/*.test.tsx'] })],
     });
 };
