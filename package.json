@@ -26,7 +26,7 @@
         "lint": "eslint ./packages/*/src/**",
         "lintfix": "eslint ./packages/*/src/** --fix",
         "test": "vitest",
-        "tsc": "yarn workspaces foreach -Wp --from 'packages/*' run tsc --noEmit"
+        "tsc": "yarn workspaces foreach -Rp --from 'packages/*' run tsc --noEmit"
     },
     "repository": {
         "type": "git",
