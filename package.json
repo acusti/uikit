@@ -20,6 +20,7 @@
     "scripts": {
         "build": "yarn workspaces foreach -Rit --from 'packages/*' run build",
         "buildci": "run-p lint build",
+        "builddev": "yarn workspaces foreach -Rit --exclude '@acusti/uikit-docs' --from 'packages/*' run build",
         "dev": "yarn workspace @acusti/uikit-docs storybook",
         "format": "prettier --write eslint.config.js package.json README.md tsconfig.json ./.changeset/ ./packages/ ./packages/docs/.storybook/",
         "lint": "eslint ./packages/*/src/**",
