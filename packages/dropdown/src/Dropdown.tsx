@@ -214,20 +214,10 @@ export default function Dropdown({
     };
 
     const handleSubmitItem = (event: Event | React.SyntheticEvent<HTMLElement>) => {
-        const eventTarget = event.target as HTMLElement;
         if (isOpenRef.current && !keepOpenOnSubmitRef.current) {
-            const keepOpen = eventTarget.closest(
-                '[data-ukt-keep-open]',
-            ) as HTMLElement | null;
-            // Don’t close dropdown if event occurs w/in data-ukt-keep-open element
-            if (
-                !keepOpen?.dataset.uktKeepOpen ||
-                keepOpen.dataset.uktKeepOpen === 'false'
-            ) {
-                // A short timeout before closing is better UX when user selects an item so dropdown
-                // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
-                closingTimerRef.current = setTimeout(closeDropdown, 90);
-            }
+            // A short timeout before closing is better UX when user selects an item so dropdown
+            // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
+            closingTimerRef.current = setTimeout(closeDropdown, 90);
         }
 
         if (!hasItemsRef.current) return;
