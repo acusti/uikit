@@ -113,28 +113,8 @@
     color: #fff;
 }
 
-.searchable-with-label input,
-.searchable-with-label .uktdropdown-body {
-    min-width: 0px;
-    width: 85px;
-}
-
 .dropdown-without-items .uktdropdown-body {
     width: 300px;
-}
-
-.css-value-input-trigger {
-    width: max-content;
-    position: relative;
-
-    .uktdropdown-label-text {
-        display: flex;
-        align-self: center;
-    }
-
-    .uktdropdown-body {
-        width: 100%;
-    }
 }
 
 .textarea-trigger .uktdropdown-body {
