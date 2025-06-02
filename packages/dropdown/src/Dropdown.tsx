@@ -656,23 +656,20 @@ export default function Dropdown({
     const dropdownBodyRect = useBoundingClientRect(dropdownBodyElement);
     const boundingElement = getBoundingAncestor(dropdownBodyElement);
     const boundingElementRect = useBoundingClientRect(boundingElement);
-    let isBodyNarrowerThanDropdown = false;
     let maxHeight;
     let maxWidth;
-    if (dropdownBodyRect.top != null && dropdownRect.top != null) {
-        isBodyNarrowerThanDropdown =
-            dropdownBodyRect.right - dropdownBodyRect.left <
-            dropdownRect.right - dropdownRect.left;
-        if (boundingElementRect.top != null) {
-            const maxHeightUp = dropdownBodyRect.bottom - boundingElementRect.top;
-            const maxHeightDown = boundingElementRect.bottom - dropdownBodyRect.top;
-            maxHeight =
-                dropdownBodyRect.top > dropdownRect.top ? maxHeightDown : maxHeightUp;
-            const maxWidthLeft = dropdownBodyRect.right - boundingElementRect.left;
-            const maxWidthRight = boundingElementRect.right - dropdownBodyRect.left;
-            maxWidth =
-                dropdownBodyRect.left > dropdownRect.left ? maxWidthRight : maxWidthLeft;
-        }
+    if (
+        dropdownBodyRect.top != null &&
+        dropdownRect.top != null &&
+        boundingElementRect.top != null
+    ) {
+        const maxHeightUp = dropdownBodyRect.bottom - boundingElementRect.top;
+        const maxHeightDown = boundingElementRect.bottom - dropdownBodyRect.top;
+        maxHeight = dropdownBodyRect.top > dropdownRect.top ? maxHeightDown : maxHeightUp;
+        const maxWidthLeft = dropdownBodyRect.right - boundingElementRect.left;
+        const maxWidthRight = boundingElementRect.right - dropdownBodyRect.left;
+        maxWidth =
+            dropdownBodyRect.left > dropdownRect.left ? maxWidthRight : maxWidthLeft;
     }
 
     const style = {
@@ -694,7 +691,6 @@ export default function Dropdown({
 }
 [data-ukt-id="${id}"] ${BODY_SELECTOR} {
   position-anchor: --uktdd-anchor${id};
-  ${isBodyNarrowerThanDropdown ? 'right: anchor(right);' : ''}
 }
 `}</Style>
             <div
