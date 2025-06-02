@@ -10,7 +10,7 @@ const RESIZE_OBSERVER_STUB = {
     unobserve: noop,
 } as ResizeObserver;
 
-type EmptyRect = { bottom: void; left: void; right: void; top: void };
+type EmptyRect = { bottom: undefined; left: undefined; right: undefined; top: undefined };
 type Rect = { bottom: number; left: number; right: number; top: number };
 type Refs = {
     boundingClientRect: EmptyRect | Rect;
