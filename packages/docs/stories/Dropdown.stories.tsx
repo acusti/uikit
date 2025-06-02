@@ -425,7 +425,7 @@ export const OutOfBoundsAtRight: Story = {
         className: 'out-of-bounds-example position-right',
         isSearchable: true,
         name: 'outofboundsatright',
-        placeholder: 'Show above & to the left',
+        placeholder: 'Fill available space',
     },
 };
 
