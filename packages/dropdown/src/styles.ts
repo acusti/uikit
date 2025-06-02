@@ -30,7 +30,6 @@ ${TRIGGER_SELECTOR} {
   font-family: var(--uktdd-font-family);
 }
 ${ROOT_SELECTOR} {
-  position: relative;
   display: inline-block;
 }
 ${ROOT_SELECTOR}.disabled {
@@ -48,7 +47,9 @@ ${LABEL_TEXT_SELECTOR} {
 ${BODY_SELECTOR} {
   box-sizing: border-box;
   position: absolute;
-  top: 100%;
+  top: anchor(bottom);
+  left: anchor(left);
+  position-try-fallbacks: --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
   min-height: 50px;
   min-width: min(50px, 100%);
   overflow: auto;
@@ -56,6 +57,24 @@ ${BODY_SELECTOR} {
   padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right) var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
   background-color: var(--uktdd-body-bg-color);
   box-shadow: 0 8px 18px rgba(0,0,0,0.25);
+}
+@position-try --uktdd-top-left {
+  bottom: anchor(top);
+  left: anchor(left);
+  top: revert;
+  right: revert;
+}
+@position-try --uktdd-bottom-right {
+  top: anchor(bottom);
+  right: anchor(right);
+  bottom: revert;
+  left: revert;
+}
+@position-try --uktdd-top-right {
+  bottom: anchor(top);
+  right: anchor(right);
+  top: revert;
+  left: revert;
 }
 ${LABEL_SELECTOR} + ${BODY_SELECTOR} {
   left: auto;

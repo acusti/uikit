@@ -100,6 +100,8 @@ const CHILDREN_ERROR =
 const TEXT_INPUT_SELECTOR =
     'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea';
 
+let idCounter = 0;
+
 export default function Dropdown({
     allowCreate,
     allowEmpty = true,
@@ -139,6 +141,10 @@ export default function Dropdown({
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
+    const [id] = useState(() => {
+        idCounter = idCounter >= 999_999 ? 0 : idCounter + 1;
+        return idCounter;
+    });
 
     const dropdownElementRef = useRef<HTMLDivElement | null>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
@@ -640,12 +646,21 @@ export default function Dropdown({
     return (
         <Fragment>
             <Style href="@acusti/dropdown/Dropdown">{STYLES}</Style>
+            <Style>{`
+[data-ukt-id="${id}"] > :first-child {
+  anchor-name: --uktdd-anchor${id};
+}
+[data-ukt-id="${id}"] ${BODY_SELECTOR} {
+  position-anchor: --uktdd-anchor${id};
+}
+`}</Style>
             <div
                 className={clsx(ROOT_CLASS_NAME, className, {
                     disabled,
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
                 })}
+                data-ukt-id={id}
                 onClick={onClick}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}
