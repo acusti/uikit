@@ -25,8 +25,6 @@ import {
     TRIGGER_CLASS_NAME,
 } from './styles.js';
 
-type MaybeHTMLElement = HTMLElement | null;
-
 export type Item = {
     element: MaybeHTMLElement;
     event: Event | React.SyntheticEvent<HTMLElement>;
@@ -91,6 +89,8 @@ export type Props = {
 };
 
 type ChildrenTuple = [React.ReactNode, React.ReactNode];
+
+type MaybeHTMLElement = HTMLElement | null;
 
 type MousePosition = { clientX: number; clientY: number };
 
@@ -164,7 +164,6 @@ export default function Dropdown({
 
     const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
-    const dropdownElementRef = useRef(dropdownElement);
     const hasItemsRef = useRef(hasItems);
     const isOpenRef = useRef(isOpen);
     const isOpeningRef = useRef(isOpening);
@@ -236,7 +235,7 @@ export default function Dropdown({
 
         if (!hasItemsRef.current) return;
 
-        const element = getActiveItemElement(dropdownElementRef.current);
+        const element = getActiveItemElement(dropdownElement);
         if (!element && !allowCreateRef.current) {
             // If not allowEmpty, don’t allow submitting an empty item
             if (!allowEmptyRef.current) return;
@@ -294,7 +293,6 @@ export default function Dropdown({
         if (currentInputMethodRef.current !== 'mouse') return;
 
         // Ensure we have the dropdown root HTMLElement
-        const dropdownElement = dropdownElementRef.current;
         if (!dropdownElement) return;
 
         const itemElements = getItemElements(dropdownElement);
@@ -313,7 +311,7 @@ export default function Dropdown({
 
     const handleMouseOut = (event: React.MouseEvent<HTMLElement>) => {
         if (!hasItemsRef.current) return;
-        const activeItem = getActiveItemElement(dropdownElementRef.current);
+        const activeItem = getActiveItemElement(dropdownElement);
         if (!activeItem) return;
         const eventRelatedTarget = event.relatedTarget as HTMLElement;
         if (activeItem !== event.target || activeItem.contains(eventRelatedTarget)) {
@@ -368,7 +366,6 @@ export default function Dropdown({
     const handleKeyDown = (event: KeyboardEvent) => {
         const { altKey, ctrlKey, key, metaKey } = event;
         const eventTarget = event.target as HTMLElement;
-        const dropdownElement = dropdownElementRef.current;
         if (!dropdownElement) return;
 
         const onEventHandled = () => {
@@ -485,7 +482,6 @@ export default function Dropdown({
     const cleanupEventListenersRef = useRef<() => void>(noop);
 
     const handleRef = (ref: HTMLDivElement | null) => {
-        dropdownElementRef.current = ref;
         setDropdownElement(ref);
         if (!ref) {
             // If component was unmounted, cleanup handlers
@@ -508,10 +504,7 @@ export default function Dropdown({
 
         const handleGlobalMouseDown = ({ target }: MouseEvent) => {
             const eventTarget = target as HTMLElement;
-            if (
-                dropdownElementRef.current &&
-                !dropdownElementRef.current.contains(eventTarget)
-            ) {
+            if (!ref.contains(eventTarget)) {
                 // Close dropdown on an outside click
                 closeDropdown();
             }
@@ -532,7 +525,7 @@ export default function Dropdown({
 
             const eventTarget = target as HTMLElement;
             // Only handle mouseup events from outside the dropdown here
-            if (!dropdownElementRef.current?.contains(eventTarget)) {
+            if (!ref.contains(eventTarget)) {
                 closeDropdown();
             }
         };
@@ -543,11 +536,7 @@ export default function Dropdown({
 
             const eventTarget = target as HTMLElement;
             // If focused element is a descendant or a parent of the dropdown, do nothing
-            if (
-                !dropdownElementRef.current ||
-                dropdownElementRef.current.contains(eventTarget) ||
-                eventTarget.contains(dropdownElementRef.current)
-            ) {
+            if (ref.contains(eventTarget) || eventTarget.contains(ref)) {
                 return;
             }
 
@@ -570,9 +559,6 @@ export default function Dropdown({
         }
 
         const handleInput = (event: Event) => {
-            const dropdownElement = dropdownElementRef.current;
-            if (!dropdownElement) return;
-
             if (!isOpenRef.current) setIsOpen(true);
 
             const input = event.target as HTMLInputElement;
@@ -580,16 +566,12 @@ export default function Dropdown({
             enteredCharactersRef.current = input.value;
             // When deleting text, if there’s already an active item and
             // input isn’t empty, preserve the active item, else update it
-            if (
-                isDeleting &&
-                input.value.length &&
-                getActiveItemElement(dropdownElement)
-            ) {
+            if (isDeleting && input.value.length && getActiveItemElement(ref)) {
                 return;
             }
 
             setActiveItem({
-                dropdownElement,
+                dropdownElement: ref,
                 // If props.allowCreate, only override the input’s value with an
                 // exact text match so user can enter a value not in items
                 isExactMatch: allowCreateRef.current,
