@@ -1,5 +1,6 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions */
 import { Style } from '@acusti/styling';
+import useBoundingClientRect from '@acusti/use-bounding-client-rect';
 import useKeyboardEvents, {
     isEventTargetUsingKeyEvent,
 } from '@acusti/use-keyboard-events';
@@ -22,8 +23,10 @@ import {
     TRIGGER_CLASS_NAME,
 } from './styles.js';
 
+type MaybeHTMLElement = HTMLElement | null;
+
 export type Item = {
-    element: HTMLElement | null;
+    element: MaybeHTMLElement;
     event: Event | React.SyntheticEvent<HTMLElement>;
     label: string;
     value: string;
@@ -141,12 +144,14 @@ export default function Dropdown({
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
+    const [dropdownElement, setDropdownElement] = useState<MaybeHTMLElement>(null);
+    const [dropdownBodyElement, setDropdownBodyElement] =
+        useState<MaybeHTMLElement>(null);
     const [id] = useState(() => {
         idCounter = idCounter >= 999_999 ? 0 : idCounter + 1;
         return idCounter;
     });
 
-    const dropdownElementRef = useRef<HTMLDivElement | null>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
     const closingTimerRef = useRef<null | TimeoutID>(null);
     const isOpeningTimerRef = useRef<null | TimeoutID>(null);
@@ -157,6 +162,7 @@ export default function Dropdown({
 
     const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
+    const dropdownElementRef = useRef(dropdownElement);
     const hasItemsRef = useRef(hasItems);
     const isOpenRef = useRef(isOpen);
     const isOpeningRef = useRef(isOpening);
@@ -169,6 +175,7 @@ export default function Dropdown({
     useEffect(() => {
         allowCreateRef.current = allowCreate;
         allowEmptyRef.current = allowEmpty;
+        dropdownElementRef.current = dropdownElement;
         hasItemsRef.current = hasItems;
         isOpenRef.current = isOpen;
         isOpeningRef.current = isOpening;
@@ -180,6 +187,7 @@ export default function Dropdown({
     }, [
         allowCreate,
         allowEmpty,
+        dropdownElement,
         hasItems,
         isOpen,
         isOpening,
@@ -293,7 +301,7 @@ export default function Dropdown({
         if (!itemElements) return;
 
         const eventTarget = event.target as HTMLElement;
-        const item = eventTarget.closest(ITEM_SELECTOR) as HTMLElement | null;
+        const item = eventTarget.closest(ITEM_SELECTOR) as MaybeHTMLElement;
         const element = item ?? eventTarget;
         for (const itemElement of itemElements) {
             if (itemElement === element) {
@@ -477,7 +485,7 @@ export default function Dropdown({
     const cleanupEventListenersRef = useRef<() => void>(noop);
 
     const handleRef = (ref: HTMLDivElement | null) => {
-        dropdownElementRef.current = ref;
+        setDropdownElement(ref);
         if (!ref) {
             // If component was unmounted, cleanup handlers
             cleanupEventListenersRef.current();
@@ -643,6 +651,14 @@ export default function Dropdown({
         );
     }
 
+    const dropdownRect = useBoundingClientRect(dropdownElement);
+    const dropdownBodyRect = useBoundingClientRect(dropdownBodyElement);
+    const isBodyNarrowerThanDropdown =
+        dropdownBodyRect.right == null || dropdownRect.right == null
+            ? false
+            : dropdownBodyRect.right - dropdownBodyRect.left <
+              dropdownRect.right - dropdownRect.left;
+
     return (
         <Fragment>
             <Style href="@acusti/dropdown/Dropdown">{STYLES}</Style>
@@ -652,6 +668,7 @@ export default function Dropdown({
 }
 [data-ukt-id="${id}"] ${BODY_SELECTOR} {
   position-anchor: --uktdd-anchor${id};
+  ${isBodyNarrowerThanDropdown ? 'right: anchor(right);' : ''}
 }
 `}</Style>
             <div
@@ -672,7 +689,7 @@ export default function Dropdown({
             >
                 {trigger}
                 {isOpen ? (
-                    <div className={BODY_CLASS_NAME}>
+                    <div className={BODY_CLASS_NAME} ref={setDropdownBodyElement}>
                         {childrenCount > 1 ? (children as ChildrenTuple)[1] : children}
                     </div>
                 ) : null}

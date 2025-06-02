@@ -30,7 +30,7 @@ ${TRIGGER_SELECTOR} {
   font-family: var(--uktdd-font-family);
 }
 ${ROOT_SELECTOR} {
-  display: inline-block;
+  width: max-content;
 }
 ${ROOT_SELECTOR}.disabled {
   pointer-events: none;
