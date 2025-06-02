@@ -40,6 +40,7 @@ ${ROOT_SELECTOR} > * {
 }
 ${LABEL_SELECTOR} {
   display: flex;
+  align-items: center;
 }
 ${LABEL_TEXT_SELECTOR} {
   padding-right: var(--uktdd-label-pad-right);
@@ -75,10 +76,6 @@ ${BODY_SELECTOR} {
   right: anchor(right);
   top: revert;
   left: revert;
-}
-${LABEL_SELECTOR} + ${BODY_SELECTOR} {
-  left: auto;
-  right: 0;
 }
 ${BODY_SELECTOR}.has-items {
   user-select: none;
