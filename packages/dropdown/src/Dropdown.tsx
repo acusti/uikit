@@ -15,6 +15,8 @@ import {
 } from './helpers.js';
 import {
     BODY_CLASS_NAME,
+    BODY_MAX_HEIGHT_VAR,
+    BODY_MAX_WIDTH_VAR,
     BODY_SELECTOR,
     LABEL_CLASS_NAME,
     LABEL_TEXT_CLASS_NAME,
@@ -124,7 +126,7 @@ export default function Dropdown({
     onOpen,
     onSubmitItem,
     placeholder,
-    style,
+    style: styleFromProps,
     tabIndex,
     value,
 }: Props) {
@@ -175,7 +177,6 @@ export default function Dropdown({
     useEffect(() => {
         allowCreateRef.current = allowCreate;
         allowEmptyRef.current = allowEmpty;
-        dropdownElementRef.current = dropdownElement;
         hasItemsRef.current = hasItems;
         isOpenRef.current = isOpen;
         isOpeningRef.current = isOpening;
@@ -187,7 +188,6 @@ export default function Dropdown({
     }, [
         allowCreate,
         allowEmpty,
-        dropdownElement,
         hasItems,
         isOpen,
         isOpening,
@@ -485,6 +485,7 @@ export default function Dropdown({
     const cleanupEventListenersRef = useRef<() => void>(noop);
 
     const handleRef = (ref: HTMLDivElement | null) => {
+        dropdownElementRef.current = ref;
         setDropdownElement(ref);
         if (!ref) {
             // If component was unmounted, cleanup handlers
@@ -653,11 +654,36 @@ export default function Dropdown({
 
     const dropdownRect = useBoundingClientRect(dropdownElement);
     const dropdownBodyRect = useBoundingClientRect(dropdownBodyElement);
-    const isBodyNarrowerThanDropdown =
-        dropdownBodyRect.right == null || dropdownRect.right == null
-            ? false
-            : dropdownBodyRect.right - dropdownBodyRect.left <
-              dropdownRect.right - dropdownRect.left;
+    const boundingElement = getBoundingAncestor(dropdownBodyElement);
+    const boundingElementRect = useBoundingClientRect(boundingElement);
+    let isBodyNarrowerThanDropdown = false;
+    let maxHeight;
+    let maxWidth;
+    if (dropdownBodyRect.top != null && dropdownRect.top != null) {
+        isBodyNarrowerThanDropdown =
+            dropdownBodyRect.right - dropdownBodyRect.left <
+            dropdownRect.right - dropdownRect.left;
+        if (boundingElementRect.top != null) {
+            const maxHeightUp = dropdownBodyRect.bottom - boundingElementRect.top;
+            const maxHeightDown = boundingElementRect.bottom - dropdownBodyRect.top;
+            maxHeight =
+                dropdownBodyRect.top > dropdownRect.top ? maxHeightDown : maxHeightUp;
+            const maxWidthLeft = dropdownBodyRect.right - boundingElementRect.left;
+            const maxWidthRight = boundingElementRect.right - dropdownBodyRect.left;
+            maxWidth =
+                dropdownBodyRect.left > dropdownRect.left ? maxWidthRight : maxWidthLeft;
+        }
+    }
+
+    const style = {
+        ...styleFromProps,
+        ...(maxHeight != null && maxHeight > 0
+            ? { [BODY_MAX_HEIGHT_VAR]: `calc(${maxHeight}px - var(--uktdd-body-buffer))` }
+            : null),
+        ...(maxWidth != null && maxWidth > 0
+            ? { [BODY_MAX_WIDTH_VAR]: `calc(${maxWidth}px - var(--uktdd-body-buffer))` }
+            : null),
+    };
 
     return (
         <Fragment>
@@ -696,4 +722,20 @@ export default function Dropdown({
             </div>
         </Fragment>
     );
+}
+
+function getBoundingAncestor(element?: MaybeHTMLElement): MaybeHTMLElement {
+    while (element?.parentElement) {
+        // If we’ve reached the body, use that as boundingElement
+        if (element.parentElement.tagName === 'BODY') return element.parentElement;
+        // Only need to check one overflow direction, because if either direction
+        // is not visible, neither can be visible
+        if (getComputedStyle(element.parentElement).overflowX !== 'visible') {
+            return element.parentElement;
+        }
+
+        element = element.parentElement as MaybeHTMLElement;
+    }
+
+    return null;
 }

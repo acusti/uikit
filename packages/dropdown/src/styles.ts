@@ -13,12 +13,18 @@ export const LABEL_SELECTOR = `.${LABEL_CLASS_NAME}`;
 export const LABEL_TEXT_SELECTOR = `.${LABEL_TEXT_CLASS_NAME}`;
 export const TRIGGER_SELECTOR = `.${TRIGGER_CLASS_NAME}`;
 
+export const BODY_MAX_HEIGHT_VAR = '--uktdd-body-max-height';
+export const BODY_MAX_WIDTH_VAR = '--uktdd-body-max-width';
+
 export const STYLES = `
 :root {
   --uktdd-font-family: ${SYSTEM_UI_FONT};
   --uktdd-body-bg-color: #fff;
   --uktdd-body-bg-color-hover: rgb(105,162,249);
   --uktdd-body-color-hover: #fff;
+  --uktdd-body-buffer: 10px;
+  ${BODY_MAX_HEIGHT_VAR}: calc(100vh - var(--uktdd-body-buffer));
+  ${BODY_MAX_WIDTH_VAR}: calc(100vw - var(--uktdd-body-buffer));
   --uktdd-body-pad-bottom: 9px;
   --uktdd-body-pad-left: 12px;
   --uktdd-body-pad-right: 12px;
@@ -52,7 +58,9 @@ ${BODY_SELECTOR} {
   left: anchor(left);
   position-try-fallbacks: --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
   min-height: 50px;
+  max-height: var(${BODY_MAX_HEIGHT_VAR});
   min-width: min(50px, 100%);
+  max-width: var(${BODY_MAX_WIDTH_VAR});
   overflow: auto;
   z-index: 2;
   padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right) var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
