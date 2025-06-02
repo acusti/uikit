@@ -1,5 +1,12 @@
 # @acusti/use-bounding-client-rect
 
+## 2.0.1
+
+### Patch Changes
+
+- 3f2cee2: Make the useBoundingClientRect return type a proper
+  discriminated union to improve the ergonomics of consuming it.
+
 ## 2.0.0
 
 ### Major Changes
