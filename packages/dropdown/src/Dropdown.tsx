@@ -664,17 +664,18 @@ export default function Dropdown({
             : null),
     };
 
-    return (
-        <Fragment>
-            <Style href="@acusti/dropdown/Dropdown">{STYLES}</Style>
-            <Style>{`
+    const anchorStyles = `\
 [data-ukt-id="${id}"] > :first-child {
   anchor-name: --uktdd-anchor${id};
 }
 [data-ukt-id="${id}"] ${BODY_SELECTOR} {
   position-anchor: --uktdd-anchor${id};
-}
-`}</Style>
+}`;
+
+    return (
+        <Fragment>
+            <Style href="@acusti/dropdown/Dropdown">{STYLES}</Style>
+            <Style href={`@acusti/dropdown/Dropdown/${id}`}>{anchorStyles}</Style>
             <div
                 className={clsx(ROOT_CLASS_NAME, className, {
                     disabled,
