@@ -68,8 +68,12 @@ export default useStyles;
 
 // Dashes in selectors in href prop create happy-dom / jsdom test errors:
 // Invalid regular expression (“Range out of order in character class”)
+// Spaces create react errors: React expected the `href` prop for a <style> tag
+// opting into hoisting semantics using the `precedence` prop to not have any
+// spaces but ecountered spaces instead. using spaces in this prop will cause
+// hydration of this style to fail on the client.
 function sanitizeHref(text: string) {
-    return text.replace(/-/g, '');
+    return text.replace(/[- ]/g, '');
 }
 
 // The following export is for test usage only
