@@ -2,7 +2,7 @@
     "name": "@acusti/uikit-docs",
     "version": "0.3.1",
     "engines": {
-        "node": ">=14"
+        "node": ">=20"
     },
     "scripts": {
         "build": "storybook build -o dist",
