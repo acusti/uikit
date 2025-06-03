@@ -1,5 +1,13 @@
 # @acusti/uikit-docs
 
+## 0.3.2
+
+### Patch Changes
+
+- Updated dependencies
+    - @acusti/date-picker@0.11.1
+    - @acusti/dropdown@0.48.1
+
 ## 0.3.1
 
 ### Patch Changes

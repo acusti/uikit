@@ -1,5 +1,12 @@
 # @acusti/date-picker
 
+## 0.11.1
+
+### Patch Changes
+
+-   - Updated dependencies
+        - @acusti/styling@2.0.1
+
 ## 0.11.0
 
 ### Minor Changes

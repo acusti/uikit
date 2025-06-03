@@ -1,5 +1,12 @@
 # @acusti/styling
 
+## 2.0.1
+
+### Patch Changes
+
+- ad59acd: Strip spaces out of the auto-generated `href` prop for `<style>`
+  elements to prevent hydration mismatch failures on the client.
+
 ## 2.0.0
 
 ### Major Changes

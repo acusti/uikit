@@ -1,5 +1,12 @@
 # @acusti/dropdown
 
+## 0.48.1
+
+### Patch Changes
+
+-   - Updated dependencies
+        - @acusti/styling@2.0.1
+
 ## 0.48.0
 
 ### Minor Changes
