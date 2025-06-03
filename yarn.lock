@@ -106,7 +106,7 @@ __metadata:
   dependencies:
     "@acusti/matchmaking": "npm:^0.10.0"
     "@acusti/styling": "npm:^2.0.0"
-    "@acusti/use-bounding-client-rect": "npm:^2.0.0"
+    "@acusti/use-bounding-client-rect": "npm:^2.0.1"
     "@acusti/use-keyboard-events": "npm:^0.11.0"
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
@@ -293,7 +293,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/use-bounding-client-rect@npm:^2.0.0, @acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect":
+"@acusti/use-bounding-client-rect@npm:^2.0.0, @acusti/use-bounding-client-rect@npm:^2.0.1, @acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect":
   version: 0.0.0-use.local
   resolution: "@acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect"
   dependencies:
