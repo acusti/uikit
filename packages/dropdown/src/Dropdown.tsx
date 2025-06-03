@@ -88,7 +88,9 @@ export type Props = {
     value?: string;
 };
 
-type ChildrenTuple = [React.ReactNode, React.ReactNode];
+type ChildrenTuple =
+    | [React.ReactNode, React.ReactNode]
+    | readonly [React.ReactNode, React.ReactNode];
 
 type MaybeHTMLElement = HTMLElement | null;
 
