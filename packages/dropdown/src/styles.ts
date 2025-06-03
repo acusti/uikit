@@ -56,6 +56,8 @@ ${BODY_SELECTOR} {
   position: absolute;
   top: anchor(bottom);
   left: anchor(left);
+  bottom: auto;
+  right: auto;
   position-try-fallbacks: --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
   min-height: 50px;
   max-height: var(${BODY_MAX_HEIGHT_VAR});
@@ -70,20 +72,20 @@ ${BODY_SELECTOR} {
 @position-try --uktdd-top-left {
   bottom: anchor(top);
   left: anchor(left);
-  top: revert;
-  right: revert;
+  top: auto;
+  right: auto;
 }
 @position-try --uktdd-bottom-right {
   top: anchor(bottom);
   right: anchor(right);
-  bottom: revert;
-  left: revert;
+  bottom: auto;
+  left: auto;
 }
 @position-try --uktdd-top-right {
   bottom: anchor(top);
   right: anchor(right);
-  top: revert;
-  left: revert;
+  top: auto;
+  left: auto;
 }
 ${BODY_SELECTOR}.has-items {
   user-select: none;
