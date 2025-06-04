@@ -649,11 +649,14 @@ export default function Dropdown({
     ) {
         const maxHeightUp = dropdownBodyRect.bottom - boundingElementRect.top;
         const maxHeightDown = boundingElementRect.bottom - dropdownBodyRect.top;
-        maxHeight = dropdownBodyRect.top > dropdownRect.top ? maxHeightDown : maxHeightUp;
+        maxHeight = Math.round(
+            dropdownBodyRect.top > dropdownRect.top ? maxHeightDown : maxHeightUp,
+        );
         const maxWidthLeft = dropdownBodyRect.right - boundingElementRect.left;
         const maxWidthRight = boundingElementRect.right - dropdownBodyRect.left;
-        maxWidth =
-            dropdownBodyRect.left > dropdownRect.left ? maxWidthRight : maxWidthLeft;
+        maxWidth = Math.round(
+            dropdownBodyRect.left > dropdownRect.left ? maxWidthRight : maxWidthLeft,
+        );
     }
 
     const style = {
