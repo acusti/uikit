@@ -13,6 +13,14 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 const { Fragment } = React;
 
 const meta: Meta<typeof Dropdown> = {
+    args: {
+        onClick: fn(),
+        onClose: fn(),
+        onMouseDown: fn(),
+        onMouseUp: fn(),
+        onOpen: fn(),
+        onSubmitItem: fn(),
+    },
     component: Dropdown,
     parameters: {
         docs: {
@@ -172,14 +180,6 @@ export const ShowContextMenuOnMount: Story = {
         ],
         className: 'open-on-mount-context-menu',
         isOpenOnMount: true,
-        // NOTE spies are a workaround for a bug related to implicit arg detection
-        // https://github.com/storybookjs/storybook/issues/23873
-        onClick: fn(),
-        onClose: fn(),
-        onMouseDown: fn(),
-        onMouseUp: fn(),
-        onOpen: fn(),
-        onSubmitItem: fn(),
     },
 };
 
