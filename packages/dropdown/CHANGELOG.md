@@ -1,5 +1,24 @@
 # @acusti/dropdown
 
+## 0.49.0
+
+### Minor Changes
+
+- f16767f: Introduce optional `minHeightBody` and `minWidthBody` props to
+  limit how small the automatically calculated max-width and max-height
+  dimensions can be, and default them to 30 (min-height) and 100
+  (min-width)
+- adb5bc9: Round the dropdown body max-width and max-height to the nearest
+  integer
+- ed100d7: Improve positioning reliability and flexibility by explicitly
+  setting the values for top, bottom, left, and right for all anchored
+  positions
+- c8f92a8: Improve type ergonomics by allowing Dropdown’s `props.children`
+  to be a readonly array (enables `['trigger', 'body'] as const`)
+- 86b1448: Pass-in an explicit `href` prop for the anchoring `<style>`
+  element to avoid the need to dynamically calculate one based on the style
+  contents
+
 ## 0.48.1
 
 ### Patch Changes
