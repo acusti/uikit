@@ -1,6 +1,6 @@
 import { Style } from '@acusti/styling';
 import clsx from 'clsx';
-import * as React from 'react';
+import { Fragment } from 'react';
 
 import { ROOT_CLASS_NAME, STYLES } from './styles/month-calendar.js';
 import {
@@ -24,8 +24,6 @@ export type Props = {
 };
 
 type DateRangeDays = [null | number, null | number, null | number];
-
-const { Fragment } = React;
 
 const DAYS = Array(7).fill(null);
 

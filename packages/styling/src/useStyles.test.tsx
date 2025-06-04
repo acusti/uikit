@@ -1,6 +1,6 @@
 // @vitest-environment happy-dom
 import { render } from '@testing-library/react';
-import React from 'react';
+import { Fragment } from 'react';
 import { beforeEach, describe, expect, it } from 'vitest';
 
 import Style from './Style.js';
@@ -20,10 +20,10 @@ describe('@acusti/styling', () => {
             const styleCache = getStyleCache();
 
             const { rerender } = render(
-                <React.Fragment>
+                <Fragment>
                     <Style>{mockStylesA}</Style>
                     <Style>{mockStylesA}</Style>
-                </React.Fragment>,
+                </Fragment>,
             );
 
             let stylesItemA = styleCache.get(mockStylesA);
@@ -44,10 +44,10 @@ describe('@acusti/styling', () => {
             expect(styleCache.size).toBe(1);
 
             rerender(
-                <React.Fragment>
+                <Fragment>
                     <Style>{mockStylesA}</Style>
                     <Style>{mockStylesB}</Style>
-                </React.Fragment>,
+                </Fragment>,
             );
             stylesItemA = styleCache.get(mockStylesA);
             expect(stylesItemA?.referenceCount).toBe(1);
@@ -64,9 +64,9 @@ describe('@acusti/styling', () => {
             const styleCache = getStyleCache();
 
             const { rerender } = render(
-                <React.Fragment>
+                <Fragment>
                     <Style>{mockStylesA}</Style>
-                </React.Fragment>,
+                </Fragment>,
             );
 
             const stylesItemA = styleCache.get(mockStylesA);
@@ -75,10 +75,10 @@ describe('@acusti/styling', () => {
             expect(styleCache.size).toBe(1);
 
             rerender(
-                <React.Fragment>
+                <Fragment>
                     <Style>{mockStylesB}</Style>
                     <Style>{mockStylesA}</Style>
-                </React.Fragment>,
+                </Fragment>,
             );
             expect(stylesItemA?.referenceCount).toBe(1);
             expect(stylesItemA).toBe(styleCache.get(mockStylesA));
@@ -88,10 +88,10 @@ describe('@acusti/styling', () => {
             expect(stylesItemA).toBe(styleCache.get(mockStylesA));
 
             rerender(
-                <React.Fragment>
+                <Fragment>
                     <Style>{mockStylesA}</Style>
                     <Style key="new-a">{mockStylesA}</Style>
-                </React.Fragment>,
+                </Fragment>,
             );
             expect(stylesItemA?.referenceCount).toBe(2);
             expect(stylesItemA).toBe(styleCache.get(mockStylesA));

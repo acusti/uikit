@@ -5,7 +5,19 @@ import useKeyboardEvents, {
     isEventTargetUsingKeyEvent,
 } from '@acusti/use-keyboard-events';
 import clsx from 'clsx';
-import * as React from 'react';
+import {
+    Children,
+    type CSSProperties,
+    Fragment,
+    isValidElement,
+    type JSX,
+    type MouseEvent as ReactMouseEvent,
+    type ReactNode,
+    type SyntheticEvent,
+    useEffect,
+    useRef,
+    useState,
+} from 'react';
 
 import {
     getActiveItemElement,
@@ -27,7 +39,7 @@ import {
 
 export type Item = {
     element: MaybeHTMLElement;
-    event: Event | React.SyntheticEvent<HTMLElement>;
+    event: Event | SyntheticEvent<HTMLElement>;
     label: string;
     value: string;
 };
@@ -46,7 +58,7 @@ export type Props = {
     /**
      * Can take a single React element or exactly two renderable children.
      */
-    children: ChildrenTuple | React.JSX.Element;
+    children: ChildrenTuple | JSX.Element;
     className?: string;
     disabled?: boolean;
     /**
@@ -66,10 +78,10 @@ export type Props = {
      * Used as search input’s name.
      */
     name?: string;
-    onClick?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    onClick?: (event: ReactMouseEvent<HTMLElement>) => unknown;
     onClose?: () => unknown;
-    onMouseDown?: (event: React.MouseEvent<HTMLElement>) => unknown;
-    onMouseUp?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    onMouseDown?: (event: ReactMouseEvent<HTMLElement>) => unknown;
+    onMouseUp?: (event: ReactMouseEvent<HTMLElement>) => unknown;
     onOpen?: () => unknown;
     onSubmitItem?: (payload: Item) => void;
     /**
@@ -77,7 +89,7 @@ export type Props = {
      * Used as search input’s placeholder.
      */
     placeholder?: string;
-    style?: React.CSSProperties;
+    style?: CSSProperties;
     /**
      * Only usable in conjunction with {isSearchable: true}.
      * Used as search input’s tabIndex.
@@ -90,17 +102,13 @@ export type Props = {
     value?: string;
 };
 
-type ChildrenTuple =
-    | [React.ReactNode, React.ReactNode]
-    | readonly [React.ReactNode, React.ReactNode];
+type ChildrenTuple = [ReactNode, ReactNode] | readonly [ReactNode, ReactNode];
 
 type MaybeHTMLElement = HTMLElement | null;
 
 type MousePosition = { clientX: number; clientY: number };
 
 type TimeoutID = ReturnType<typeof setTimeout>;
-
-const { Children, Fragment, useEffect, useRef, useState } = React;
 
 const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
 
@@ -148,7 +156,7 @@ export default function Dropdown({
     if (childrenCount > 1) {
         trigger = (children as ChildrenTuple)[0];
     }
-    const isTriggerFromProps = React.isValidElement(trigger);
+    const isTriggerFromProps = isValidElement(trigger);
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
@@ -279,7 +287,7 @@ export default function Dropdown({
         }
     };
 
-    const handleMouseMove = ({ clientX, clientY }: React.MouseEvent<HTMLElement>) => {
+    const handleMouseMove = ({ clientX, clientY }: ReactMouseEvent<HTMLElement>) => {
         currentInputMethodRef.current = 'mouse';
         const initialPosition = mouseDownPositionRef.current;
         if (!initialPosition) return;
@@ -292,7 +300,7 @@ export default function Dropdown({
         setIsOpening(false);
     };
 
-    const handleMouseOver = (event: React.MouseEvent<HTMLElement>) => {
+    const handleMouseOver = (event: ReactMouseEvent<HTMLElement>) => {
         if (!hasItemsRef.current) return;
 
         // If user isn’t currently using the mouse to navigate the dropdown, do nothing
@@ -315,7 +323,7 @@ export default function Dropdown({
         }
     };
 
-    const handleMouseOut = (event: React.MouseEvent<HTMLElement>) => {
+    const handleMouseOut = (event: ReactMouseEvent<HTMLElement>) => {
         if (!hasItemsRef.current) return;
         const activeItem = getActiveItemElement(dropdownElement);
         if (!activeItem) return;
@@ -327,7 +335,7 @@ export default function Dropdown({
         delete activeItem.dataset.uktActive;
     };
 
-    const handleMouseDown = (event: React.MouseEvent<HTMLElement>) => {
+    const handleMouseDown = (event: ReactMouseEvent<HTMLElement>) => {
         if (onMouseDown) onMouseDown(event);
         if (isOpenRef.current) return;
 
@@ -343,7 +351,7 @@ export default function Dropdown({
         }, 1000);
     };
 
-    const handleMouseUp = (event: React.MouseEvent<HTMLElement>) => {
+    const handleMouseUp = (event: ReactMouseEvent<HTMLElement>) => {
         if (onMouseUp) onMouseUp(event);
         // If dropdown is still opening or isn’t open or is closing, do nothing
         if (isOpeningRef.current || !isOpenRef.current || closingTimerRef.current) {
@@ -702,6 +710,7 @@ export default function Dropdown({
                 style={style}
             >
                 {trigger}
+                {/* TODO next version of Dropdown should use <Activity> for body https://react.dev/reference/react/Activity */}
                 {isOpen ? (
                     <div className={BODY_CLASS_NAME} ref={setDropdownBodyElement}>
                         {childrenCount > 1 ? (children as ChildrenTuple)[1] : children}

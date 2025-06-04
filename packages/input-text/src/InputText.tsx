@@ -1,4 +1,16 @@
-import * as React from 'react';
+import {
+    type ChangeEvent,
+    type CSSProperties,
+    type FocusEvent,
+    forwardRef,
+    type InputHTMLAttributes,
+    type KeyboardEvent,
+    type SyntheticEvent,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+    useState,
+} from 'react';
 
 export type InputElement = HTMLInputElement | HTMLTextAreaElement;
 
@@ -15,7 +27,7 @@ export type Props = {
      * it is blurred or when the user presses enter or escape.
      */
     doubleClickToEdit?: boolean;
-    enterKeyHint?: React.InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
+    enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
     form?: string;
     id?: string;
     /**
@@ -36,16 +48,16 @@ export type Props = {
     multiLine?: boolean;
     multiple?: boolean;
     name?: string;
-    onBlur?: (event: React.FocusEvent<InputElement>) => unknown;
-    onChange?: (event: React.ChangeEvent<InputElement>) => unknown;
+    onBlur?: (event: FocusEvent<InputElement>) => unknown;
+    onChange?: (event: ChangeEvent<InputElement>) => unknown;
     /**
      * Custom change handler that only receives the changed value as an argument.
      * Enables passing a state setter function directly, e.g. onChangeValue={setValue}.
      */
     onChangeValue?: (value: string) => unknown;
-    onFocus?: (event: React.FocusEvent<InputElement>) => unknown;
-    onKeyDown?: (event: React.KeyboardEvent<InputElement>) => unknown;
-    onKeyUp?: (event: React.KeyboardEvent<InputElement>) => unknown;
+    onFocus?: (event: FocusEvent<InputElement>) => unknown;
+    onKeyDown?: (event: KeyboardEvent<InputElement>) => unknown;
+    onKeyUp?: (event: KeyboardEvent<InputElement>) => unknown;
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
@@ -55,7 +67,7 @@ export type Props = {
     selectTextOnFocus?: boolean;
     size?: number;
     step?: number;
-    style?: React.CSSProperties;
+    style?: CSSProperties;
     /**
      * If true, pressing enter/return submits the <form> that the input is a
      * part of, or else blurs the input if no form is found.
@@ -68,9 +80,7 @@ export type Props = {
 
 type InputRef = HTMLInputElement | null;
 
-const { useEffect, useImperativeHandle, useRef, useState } = React;
-
-export default React.forwardRef<HTMLInputElement, Props>(function InputText(
+export default forwardRef<HTMLInputElement, Props>(function InputText(
     {
         autoCapitalize,
         autoComplete,
@@ -180,17 +190,17 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         };
     }, [inputElement, multiLine, setInputHeight, supportsFieldSizing]);
 
-    const handleChange = (event: React.ChangeEvent<InputElement>) => {
+    const handleChange = (event: ChangeEvent<InputElement>) => {
         if (onChange) onChange(event);
         if (onChangeValue) onChangeValue(event.target.value);
     };
 
-    const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+    const handleFocus = (event: FocusEvent<HTMLInputElement>) => {
         if (onFocus) onFocus(event);
         if (multiLine) setInputHeight();
     };
 
-    const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
         if (onBlur) onBlur(event);
         if (doubleClickToEdit) {
             setReadOnlyState(true);
@@ -203,7 +213,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
 
     // NOTE Selecting the contents of the input onFocus makes for the best UX,
     // but it doesn’t work in Safari, so we use the initial onSelect event instead
-    const handleSelect = (event: React.SyntheticEvent<HTMLInputElement>) => {
+    const handleSelect = (event: SyntheticEvent<HTMLInputElement>) => {
         if (!selectTextOnFocus) return;
         const input = event.currentTarget;
         setInputElement(input);
@@ -223,7 +233,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
         input.selectionEnd = valueLength;
     };
 
-    const handleKeyDown = (event: React.KeyboardEvent<InputElement>) => {
+    const handleKeyDown = (event: KeyboardEvent<InputElement>) => {
         if (onKeyDown) onKeyDown(event);
         if (
             event.key === 'Enter' &&
@@ -292,7 +302,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function InputText(
 
 const IS_APPLE_REGEXP = /mac|iphone|ipad|ipod/i;
 
-function isPrimaryModifierPressed(event: React.KeyboardEvent<InputElement>) {
+function isPrimaryModifierPressed(event: KeyboardEvent<InputElement>) {
     // eslint-disable-next-line @typescript-eslint/no-deprecated
     const platform = globalThis.navigator?.platform ?? '';
     return IS_APPLE_REGEXP.test(platform) ? event.metaKey : event.ctrlKey;

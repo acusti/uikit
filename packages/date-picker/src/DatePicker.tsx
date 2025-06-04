@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 import { Style } from '@acusti/styling';
 import clsx from 'clsx';
-import * as React from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 
 import MonthCalendar from './MonthCalendar.js';
 import { ROOT_CLASS_NAME, STYLES } from './styles/date-picker.js';
@@ -29,8 +29,6 @@ export type Props = {
     showEndInitially?: boolean;
     useMonthAbbreviations?: boolean;
 };
-
-const { Fragment, useEffect, useRef, useState } = React;
 
 const getAbbreviatedMonthTitle = (month: number) =>
     `${getMonthAbbreviationFromMonth(month)} ${getYearFromMonth(month)}`;

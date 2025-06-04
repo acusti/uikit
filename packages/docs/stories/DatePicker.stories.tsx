@@ -1,11 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import { DatePicker, getMonthFromDate } from '@acusti/date-picker';
-import * as React from 'react';
+import { useState } from 'react';
 
 import './DatePicker.css';
-
-const { useState } = React;
 
 const meta: Meta<typeof DatePicker> = {
     argTypes: {

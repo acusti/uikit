@@ -9,7 +9,17 @@ import {
 } from '@acusti/css-values';
 import InputText from '@acusti/input-text';
 import clsx from 'clsx';
-import * as React from 'react';
+import {
+    type ChangeEvent,
+    type FocusEvent,
+    forwardRef,
+    type KeyboardEvent,
+    type ReactNode,
+    type SyntheticEvent,
+    useEffect,
+    useImperativeHandle,
+    useRef,
+} from 'react';
 
 export type Props = {
     /**
@@ -25,16 +35,16 @@ export type Props = {
      * (i.e. '12px' → 12). Defaults to parseFloat().
      */
     getValueAsNumber?: (value: number | string) => number;
-    icon?: React.ReactNode;
+    icon?: ReactNode;
     label?: string;
     max?: number;
     min?: number;
     name?: string;
-    onBlur?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
-    onChange?: (event: React.ChangeEvent<HTMLInputElement>) => unknown;
-    onFocus?: (event: React.FocusEvent<HTMLInputElement>) => unknown;
-    onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
-    onKeyUp?: (event: React.KeyboardEvent<HTMLInputElement>) => unknown;
+    onBlur?: (event: FocusEvent<HTMLInputElement>) => unknown;
+    onChange?: (event: ChangeEvent<HTMLInputElement>) => unknown;
+    onFocus?: (event: FocusEvent<HTMLInputElement>) => unknown;
+    onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => unknown;
+    onKeyUp?: (event: KeyboardEvent<HTMLInputElement>) => unknown;
     /**
      * Custom event handler triggered when the user presses enter/return
      * or blurs the input after making a change. Hitting esc will restore
@@ -53,11 +63,9 @@ export type Props = {
 
 type InputRef = HTMLInputElement | null;
 
-const { useEffect, useImperativeHandle, useRef } = React;
-
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
-export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
+export default forwardRef<HTMLInputElement, Props>(function CSSValueInput(
     {
         allowEmpty = true,
         className,
@@ -98,14 +106,14 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
         submittedValueRef.current = value ?? '';
     }, [value]);
 
-    const handleSubmitValue = (event: React.SyntheticEvent<HTMLInputElement>) => {
+    const handleSubmitValue = (event: SyntheticEvent<HTMLInputElement>) => {
         const currentValue = event.currentTarget.value;
         // Store last submittedValue (used to reset value on invalid input)
         submittedValueRef.current = currentValue;
         onSubmitValue(currentValue);
     };
 
-    const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
+    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
         const input = event.currentTarget;
         inputRef.current = input;
         if (onBlur) onBlur(event);
@@ -218,7 +226,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
         return `${nextValue}${nextUnit}`;
     };
 
-    const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         const input = event.currentTarget;
         inputRef.current = input;
         if (onKeyDown) onKeyDown(event);
@@ -254,7 +262,7 @@ export default React.forwardRef<HTMLInputElement, Props>(function CSSValueInput(
         }
     };
 
-    const handleKeyUp = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyUp = (event: KeyboardEvent<HTMLInputElement>) => {
         if (onKeyUp) onKeyUp(event);
         // If this is the key up from ↑ or ↓ keys, time to handleSubmitValue
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {

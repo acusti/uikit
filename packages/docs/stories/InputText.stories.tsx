@@ -1,6 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { type FormEvent, useState } from 'react';
 import { fn } from 'storybook/test';
-import * as React from 'react';
 
 import InputText from '../../input-text/src/InputText.js';
 
@@ -87,12 +87,12 @@ const formatDate = new Intl.DateTimeFormat(undefined, {
 export const MultiLineInputWithSubmitOnEnter: Story = {
     args: SUBMIT_ON_ENTER_PROPS,
     render() {
-        const [lastSubmitDate, setLastSubmitDate] = React.useState<Date | null>(null);
+        const [lastSubmitDate, setLastSubmitDate] = useState<Date | null>(null);
         const lastSubmit = lastSubmitDate ? formatDate(lastSubmitDate) : 'never';
 
         return (
             <form
-                onSubmit={(event: React.FormEvent<HTMLFormElement>) => {
+                onSubmit={(event: FormEvent<HTMLFormElement>) => {
                     event.preventDefault();
                     setLastSubmitDate(new Date());
                 }}

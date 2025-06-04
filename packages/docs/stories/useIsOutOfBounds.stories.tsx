@@ -1,5 +1,3 @@
-import * as React from 'react';
-
 import Dropdown from '../../dropdown/src/Dropdown.js';
 import useIsOutOfBounds from '../../use-is-out-of-bounds/src/useIsOutOfBounds.js';
 
