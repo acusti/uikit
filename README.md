@@ -129,18 +129,20 @@ automatically by running:
 yarn changeset version
 ```
 
+Next, run `yarn` to update the yarn.lock file and then commit the version
+updates with a message in the form of
+`:arrow_up: Bump package versions to _._._` if only one package (plus
+dependents if applicable) was updated or
+`Create new versions via changeset version` if many packages were updated.
+
 Lastly, to publish the new versions to npm (building all the packages first
 if anything has changed), run:
 
 ```
 yarn build
 yarn changeset publish
+git push --follow-tags
 ```
-
-After publishing the packages, run `git push --follow-tags` to push the git
-tag(s) up and run `yarn` to update the yarn.lock file and then commit the
-version updates with a message in the form of:
-`:arrow_up: Bump package versions to _._._`.
 
 ## Developing
 
