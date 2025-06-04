@@ -110,8 +110,6 @@ type MousePosition = { clientX: number; clientY: number };
 
 type TimeoutID = ReturnType<typeof setTimeout>;
 
-const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
-
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 const TEXT_INPUT_SELECTOR =
@@ -492,16 +490,9 @@ export default function Dropdown({
 
     useKeyboardEvents({ ignoreUsedKeyboardEvents: false, onKeyDown: handleKeyDown });
 
-    const cleanupEventListenersRef = useRef<() => void>(noop);
-
-    const handleRef = (ref: HTMLDivElement | null) => {
+    const handleRef = (ref: HTMLDivElement | null): (() => void) | void => {
         setDropdownElement(ref);
-        if (!ref) {
-            // If component was unmounted, cleanup handlers
-            cleanupEventListenersRef.current();
-            cleanupEventListenersRef.current = noop;
-            return;
-        }
+        if (!ref) return;
 
         const { ownerDocument } = ref;
         let inputElement = inputElementRef.current;
@@ -596,7 +587,7 @@ export default function Dropdown({
             inputElement.addEventListener('input', handleInput);
         }
 
-        cleanupEventListenersRef.current = () => {
+        return () => {
             document.removeEventListener('focusin', handleGlobalFocusIn);
             document.removeEventListener('mousedown', handleGlobalMouseDown);
             document.removeEventListener('mouseup', handleGlobalMouseUp);
