@@ -137,8 +137,9 @@ yarn build
 yarn changeset publish
 ```
 
-After publishing the packages, run `yarn` to update the yarn.lock file and
-then commit the version updates with a message in the form of:
+After publishing the packages, run `git push --follow-tags` to push the git
+tag(s) up and run `yarn` to update the yarn.lock file and then commit the
+version updates with a message in the form of:
 `:arrow_up: Bump package versions to _._._`.
 
 ## Developing
