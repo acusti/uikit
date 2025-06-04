@@ -367,16 +367,20 @@ const FIXED_HEADER_PROPS = {
     children: [
         <button
             aria-label="Open user menu"
-            className="avatar-profile"
+            className="avatar-profile has-avatar"
             popoverTarget="avatar-menu-popover"
+            style={{ backgroundImage: `url("https://picsum.photos/id/40/100/100")` }}
         >
             AP
         </button>,
         <ul className="menu-list avatar-dropdown">
-            <div className="avatar-edit-wrap">
-                <span className="avatar-edit has-avatar">
-                    <div className="avatar-initials">AP</div>
-                </span>
+            <div
+                className="avatar-edit has-avatar"
+                style={{
+                    backgroundImage: `url("https://picsum.photos/id/40/100/100")`,
+                }}
+            >
+                <div className="avatar-initials">AP</div>
             </div>
             <div className="profile-email-wrap">
                 <p className="profile-email">andrew@example.com</p>
