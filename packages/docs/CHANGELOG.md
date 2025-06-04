@@ -1,5 +1,20 @@
 # @acusti/uikit-docs
 
+## 0.4.0
+
+### Minor Changes
+
+- b587309: Update all React components to use the modern (v17+)
+  [React JSX transform](https://legacy.reactjs.org/blog/2020/09/22/introducing-the-new-jsx-transform.html)
+
+### Patch Changes
+
+- Updated dependencies [b587309]
+    - @acusti/css-value-input@2.1.0
+    - @acusti/date-picker@0.12.0
+    - @acusti/input-text@2.1.0
+    - @acusti/dropdown@0.50.0
+
 ## 0.3.3
 
 ### Patch Changes
