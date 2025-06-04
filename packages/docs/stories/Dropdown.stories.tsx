@@ -363,6 +363,79 @@ export const CheckboxesDropdown: Story = {
     },
 };
 
+const FIXED_HEADER_PROPS = {
+    children: [
+        <button
+            aria-label="Open user menu"
+            className="avatar-profile"
+            popoverTarget="avatar-menu-popover"
+        >
+            AP
+        </button>,
+        <ul className="menu-list avatar-dropdown">
+            <div className="avatar-edit-wrap">
+                <span className="avatar-edit has-avatar">
+                    <div className="avatar-initials">AP</div>
+                </span>
+            </div>
+            <div className="profile-email-wrap">
+                <p className="profile-email">andrew@example.com</p>
+            </div>
+            <form method="post" action="/logout" className="sign-out-wrap">
+                <button className="btn-ghost" type="submit">
+                    Sign Out
+                </button>
+            </form>
+        </ul>,
+    ] as const,
+    className: 'avatar-menu',
+};
+
+export const FixedHeader: Story = {
+    args: FIXED_HEADER_PROPS,
+    render() {
+        // const [dateStart, setDateStart] = useState(
+        //     FIXED_HEADER_PROPS.dateStart,
+        // );
+        // const [dateEnd, setDateEnd] = useState(
+        //     FIXED_HEADER_PROPS.dateEnd,
+        // );
+
+        return (
+            <>
+                <header className="mk-header">
+                    <nav className="mk-nav a1">
+                        <a className="logo" href="/"></a>
+                        <a className="btn-text logo-text" href="/">
+                            UIKit
+                        </a>
+                    </nav>
+                    <div className="mk-nav center">
+                        <h5 className="mk subtitle">
+                            Welcome! Join our{' '}
+                            <a
+                                className="home-link"
+                                rel="noreferrer"
+                                href="https://discord.gg/dTpXZpQ9Rz"
+                                target="_blank"
+                            >
+                                Discord.
+                            </a>
+                        </h5>
+                    </div>
+                    <nav className="mk-nav a2">
+                        <a className="btn-text" href="/projects">
+                            Projects
+                        </a>
+                        <Dropdown {...FIXED_HEADER_PROPS} />
+                    </nav>
+                </header>
+                <h1>Lorem ipsum</h1>
+            </>
+        );
+    },
+};
+
 export const DisabledDropdown: Story = {
     args: {
         children: (
