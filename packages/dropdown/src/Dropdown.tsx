@@ -59,6 +59,8 @@ export type Props = {
     isSearchable?: boolean;
     keepOpenOnSubmit?: boolean;
     label?: string;
+    minHeightBody?: number;
+    minWidthBody?: number;
     /**
      * Only usable in conjunction with {isSearchable: true}.
      * Used as search input’s name.
@@ -120,6 +122,8 @@ export default function Dropdown({
     isSearchable,
     keepOpenOnSubmit = !hasItems,
     label,
+    minHeightBody = 30,
+    minWidthBody = 100,
     name,
     onClick,
     onClose,
@@ -661,10 +665,10 @@ export default function Dropdown({
 
     const style = {
         ...styleFromProps,
-        ...(maxHeight != null && maxHeight > 0
+        ...(maxHeight != null && maxHeight > minHeightBody
             ? { [BODY_MAX_HEIGHT_VAR]: `calc(${maxHeight}px - var(--uktdd-body-buffer))` }
             : null),
-        ...(maxWidth != null && maxWidth > 0
+        ...(maxWidth != null && maxWidth > minWidthBody
             ? { [BODY_MAX_WIDTH_VAR]: `calc(${maxWidth}px - var(--uktdd-body-buffer))` }
             : null),
     };
