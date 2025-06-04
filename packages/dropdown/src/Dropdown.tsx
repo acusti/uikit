@@ -156,7 +156,6 @@ export default function Dropdown({
     if (childrenCount > 1) {
         trigger = (children as ChildrenTuple)[0];
     }
-    const isTriggerFromProps = isValidElement(trigger);
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
@@ -506,8 +505,8 @@ export default function Dropdown({
 
         const { ownerDocument } = ref;
         let inputElement = inputElementRef.current;
-        // Check if trigger from props is a textual input or textarea element
-        if (isTriggerFromProps && !inputElement && ref.firstElementChild) {
+        // Check if trigger is a textual input or textarea element
+        if (!inputElement && ref.firstElementChild) {
             if (ref.firstElementChild.matches(TEXT_INPUT_SELECTOR)) {
                 inputElement = ref.firstElementChild as HTMLInputElement;
             } else {
@@ -614,7 +613,7 @@ export default function Dropdown({
         };
     };
 
-    if (!isTriggerFromProps) {
+    if (!isValidElement(trigger)) {
         if (isSearchable) {
             trigger = (
                 <input
