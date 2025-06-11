@@ -75,11 +75,8 @@
         "react-dom": "^19.0.0",
         "typescript": "5.8.3",
         "unplugin-dts": "^1.0.0-beta.0",
-        "vite": "npm:rolldown-vite@latest",
+        "vite": "^6",
         "vitest": "^3.1.4"
-    },
-    "resolutions": {
-        "vite": "npm:rolldown-vite@latest"
     },
     "eslintIgnore": [
         "/node_modules",
