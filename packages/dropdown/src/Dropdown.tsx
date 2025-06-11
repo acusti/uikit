@@ -15,6 +15,7 @@ import {
     type ReactNode,
     type SyntheticEvent,
     useEffect,
+    useId,
     useRef,
     useState,
 } from 'react';
@@ -115,8 +116,6 @@ const CHILDREN_ERROR =
 const TEXT_INPUT_SELECTOR =
     'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea';
 
-let idCounter = 0;
-
 export default function Dropdown({
     allowCreate,
     allowEmpty = true,
@@ -160,10 +159,8 @@ export default function Dropdown({
     const [dropdownElement, setDropdownElement] = useState<MaybeHTMLElement>(null);
     const [dropdownBodyElement, setDropdownBodyElement] =
         useState<MaybeHTMLElement>(null);
-    const [id] = useState(() => {
-        idCounter = idCounter >= 999_999 ? 0 : idCounter + 1;
-        return idCounter;
-    });
+    const id = useId();
+    const popoverID = `uktddbody-${id}`;
 
     const inputElementRef = useRef<HTMLInputElement | null>(null);
     const closingTimerRef = useRef<null | TimeoutID>(null);
