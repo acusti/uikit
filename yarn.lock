@@ -47,7 +47,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     "@vitejs/plugin-react": "npm:^4.6.0"
     babel-plugin-react-compiler: "npm:rc"
     clsx: "npm:^2"
@@ -83,7 +83,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     "@vitejs/plugin-react": "npm:^4.6.0"
     babel-plugin-react-compiler: "npm:rc"
     clsx: "npm:^2"
@@ -111,7 +111,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     "@vitejs/plugin-react": "npm:^4.6.0"
     babel-plugin-react-compiler: "npm:rc"
     clsx: "npm:^2"
@@ -135,7 +135,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     "@vitejs/plugin-react": "npm:^4.6.0"
     babel-plugin-react-compiler: "npm:rc"
     happy-dom: "npm:^17.5.6"
@@ -192,7 +192,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     "@vitejs/plugin-react": "npm:^4.6.0"
     babel-plugin-react-compiler: "npm:rc"
     happy-dom: "npm:^17.5.6"
@@ -231,7 +231,7 @@ __metadata:
     "@acusti/use-keyboard-events": "workspace:^"
     "@storybook/addon-docs": "npm:^9"
     "@storybook/react-vite": "npm:^9"
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     core-js: "npm:^3.42.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -252,7 +252,7 @@ __metadata:
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
     "@types/node": "npm:^22.15.29"
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     "@typescript-eslint/eslint-plugin": "npm:^8.34.1"
     "@typescript-eslint/parser": "npm:^8.34.1"
     eslint: "npm:^9.28.0"
@@ -297,7 +297,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect"
   dependencies:
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     "@vitejs/plugin-react": "npm:^4.6.0"
     babel-plugin-react-compiler: "npm:rc"
     react: "npm:^19.0.0"
@@ -317,7 +317,7 @@ __metadata:
   resolution: "@acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds"
   dependencies:
     "@acusti/use-bounding-client-rect": "npm:^2.0.0"
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     "@vitejs/plugin-react": "npm:^4.6.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
@@ -338,7 +338,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.0"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.1.6"
+    "@types/react": "npm:^19.1.8"
     "@vitejs/plugin-react": "npm:^4.6.0"
     babel-plugin-react-compiler: "npm:rc"
     happy-dom: "npm:^17.5.6"
@@ -2014,12 +2014,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.1.6":
-  version: 19.1.6
-  resolution: "@types/react@npm:19.1.6"
+"@types/react@npm:^19.1.8":
+  version: 19.1.8
+  resolution: "@types/react@npm:19.1.8"
   dependencies:
     csstype: "npm:^3.0.2"
-  checksum: 10/722a8efb36dedaf5cfe226287214df0982d612ff33ebf005dbbb646279647e5987da661f2d9fe6b8a4516d3b29dd6cb3a708641265861251abb682e8e90540cf
+  checksum: 10/a3e6fe0f60f22828ef887f30993aa147b71532d7b1219dd00d246277eb7a9ca01ec533096237fa21ca1bccb3653373b4e8e59e5ae59f9c793058384bbc1f4d5c
   languageName: node
   linkType: hard
 
