@@ -17,7 +17,7 @@
         "react-dom": "^19.0.0",
         "storybook": "^9",
         "typescript": "5.8.3",
-        "vite": "^6"
+        "vite": "^7.0.0-0"
     },
     "dependencies": {
         "@acusti/css-value-input": "workspace:^",
