@@ -1,5 +1,11 @@
 # @acusti/parsing
 
+## 0.20.1
+
+### Patch Changes
+
+- 19052b1: Improve parseAsJSON’s handling of empty inputs
+
 ## 0.20.0
 
 ### Minor Changes

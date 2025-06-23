@@ -1,5 +1,11 @@
 # @acusti/dropdown
 
+## 0.50.1
+
+### Patch Changes
+
+- e4f91f3: Fix dropdown hydration errors by using react’s useId hook
+
 ## 0.50.0
 
 ### Minor Changes
