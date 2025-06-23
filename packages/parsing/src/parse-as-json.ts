@@ -215,18 +215,20 @@ type ParsedResult = {
 export function parseAsJSON(text: string): ParsedResult {
     let preamble = '';
     let postscript = '';
-    // if the input is undefined/null, use value: null to indicate failure
-    if (text == null) return { postscript, preamble, value: null };
+    if (text == null) {
+        text = '';
+    } else {
+        text = text.replace(CONTROL_TOKENS_REGEXP, '').trim();
+    }
+    // if the input is empty, use value: null to indicate failure
+    if (text === '') return { postscript, preamble, value: null };
 
-    text = text.replace(CONTROL_TOKENS_REGEXP, '');
     // attempt to parse the string as-is (minus control tokens)
     try {
         return { postscript, preamble, value: JSON.parse(text) as ParsedValue };
     } catch (error) {
         // let’s try to fix it
     }
-
-    text = text.trim();
 
     // if this is a two-column markdown table, convert it to JSON key/value pairs
     text = text.replace(

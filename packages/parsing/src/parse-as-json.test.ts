@@ -19,6 +19,13 @@ describe('@acusti/parsing', () => {
     });
 
     describe('parseAsJSON', () => {
+        it('returns value as null when input is empty', () => {
+            // @ts-expect-error testing invalid input
+            expect(parseAsJSON()).toEqual({ postscript: '', preamble: '', value: null });
+            // @ts-expect-error testing invalid input
+            expect(parseAsJSON(null)).toEqual({ postscript: '', preamble: '', value: null });
+            expect(parseAsJSON('')).toEqual({ postscript: '', preamble: '', value: null });
+        });
         it('converts a LLM response string to a JSON object', convertToJSONTestCase);
         it('handles nested JSON structures', nestedJSONTestCase);
         it('handles JSON with missing comma-separators', missingCommasTestCase);
