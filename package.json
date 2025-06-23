@@ -70,7 +70,7 @@
         "eslint-plugin-testing-library": "^7.3.0",
         "globals": "^16.2.0",
         "happy-dom": "^17.5.6",
-        "prettier": "^3.5.3",
+        "prettier": "^3.6.0",
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "typescript": "5.8.3",
