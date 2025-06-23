@@ -37,7 +37,7 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/aws-signature-v4#readme",
     "devDependencies": {
-        "@types/node": "^22.15.29",
+        "@types/node": "^24.0.3",
         "typescript": "5.8.3",
         "unplugin-dts": "^1.0.0-beta.2",
         "vite": "^7.0.0-0",
