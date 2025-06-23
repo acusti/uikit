@@ -20,7 +20,7 @@ __metadata:
     "@acusti/post": "npm:^1.2.0"
     "@types/node": "npm:^22.15.29"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -32,7 +32,7 @@ __metadata:
   dependencies:
     "@types/node": "npm:^22.15.29"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -55,7 +55,7 @@ __metadata:
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   peerDependencies:
@@ -69,7 +69,7 @@ __metadata:
   resolution: "@acusti/css-values@workspace:packages/css-values"
   dependencies:
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -91,7 +91,7 @@ __metadata:
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   peerDependencies:
@@ -119,7 +119,7 @@ __metadata:
     react: "npm:^19"
     react-dom: "npm:^19"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   peerDependencies:
@@ -142,7 +142,7 @@ __metadata:
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   peerDependencies:
@@ -156,7 +156,7 @@ __metadata:
   resolution: "@acusti/matchmaking@workspace:packages/matchmaking"
   dependencies:
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -167,7 +167,7 @@ __metadata:
   resolution: "@acusti/parsing@workspace:packages/parsing"
   dependencies:
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -179,7 +179,7 @@ __metadata:
   dependencies:
     "@types/node": "npm:^22.15.29"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -199,7 +199,7 @@ __metadata:
     react: "npm:^19"
     react-dom: "npm:^19"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   peerDependencies:
@@ -213,7 +213,7 @@ __metadata:
   resolution: "@acusti/textual@workspace:packages/textual"
   dependencies:
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -276,7 +276,7 @@ __metadata:
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -287,7 +287,7 @@ __metadata:
   resolution: "@acusti/uniquify@workspace:packages/uniquify"
   dependencies:
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   languageName: unknown
@@ -303,7 +303,7 @@ __metadata:
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   peerDependencies:
@@ -322,7 +322,7 @@ __metadata:
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   peerDependencies:
@@ -345,7 +345,7 @@ __metadata:
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     typescript: "npm:5.8.3"
-    unplugin-dts: "npm:^1.0.0-beta.0"
+    unplugin-dts: "npm:^1.0.0-beta.2"
     vite: "npm:^7.0.0-0"
     vitest: "npm:^3.2.4"
   peerDependencies:
@@ -7536,9 +7536,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"unplugin-dts@npm:^1.0.0-beta.0":
-  version: 1.0.0-beta.0
-  resolution: "unplugin-dts@npm:1.0.0-beta.0"
+"unplugin-dts@npm:^1.0.0-beta.2":
+  version: 1.0.0-beta.2
+  resolution: "unplugin-dts@npm:1.0.0-beta.2"
   dependencies:
     "@rollup/pluginutils": "npm:^5.1.4"
     "@volar/typescript": "npm:^2.4.13"
@@ -7573,7 +7573,7 @@ __metadata:
       optional: true
     webpack:
       optional: true
-  checksum: 10/26adc5e2219bab60ab553054633fe0120683cfca283a1dd487e9881e528b2e6236c36a9a6688d5defec77dc1f00f221e3c31cd78542fdc9f092a74d029bc4630
+  checksum: 10/dfc0cb50fb62c340d14fedb45935488ad7519204b87b3f5ec3e24917551f5281e4821020739980bb7765c500eca2411c5494ff5b080ab249ae66c93f154a6773
   languageName: node
   linkType: hard
 
