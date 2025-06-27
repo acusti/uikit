@@ -54,7 +54,7 @@
     },
     "dependencies": {
         "@acusti/css-values": "^1.2.0",
-        "@acusti/input-text": "^2.1.0",
+        "@acusti/input-text": "^2.1.1",
         "clsx": "^2"
     },
     "peerDependencies": {
