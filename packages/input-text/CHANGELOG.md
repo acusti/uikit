@@ -1,5 +1,12 @@
 # @acusti/input-text
 
+## 2.1.1
+
+### Patch Changes
+
+- 75d5c35: Make multi-line input auto-height resizing logic work with
+  textareas that have a CSS transition on their height.
+
 ## 2.1.0
 
 ### Minor Changes
