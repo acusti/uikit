@@ -127,6 +127,16 @@ export const InputWithAutoFocus: Story = {
     },
 };
 
+export const MultiLineInputWithCSSTransition: Story = {
+    args: {
+        className: 'multi-line-input-css-transition',
+        multiLine: true,
+        name: 'multi-line-input-css-transition',
+        placeholder: 'Write a quick note here',
+        rows: 4,
+    },
+};
+
 const MULTI_LINE_INPUT_IN_POPOVER_PROPS = {
     className: 'multi-line-input-text',
     initialValue:

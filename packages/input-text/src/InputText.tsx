@@ -159,19 +159,35 @@ export default forwardRef<HTMLInputElement, Props>(function InputText(
     const setInputHeight = () => {
         if (!inputRef.current || supportsFieldSizing) return;
 
-        if (inputRef.current.style.height) {
+        if (!multiLine) {
+            // Reset height to handle multiLine → !multiLine prop change
             inputRef.current.style.height = '';
+            return;
         }
-        // Always reset height above to handle multiLine → !multiLine prop change
-        if (!multiLine) return;
+
+        const { transitionDelay, transitionDuration } = inputRef.current.style;
+        // Set all CSS transition timings to 0s to prevent endless growing bug
+        inputRef.current.style.transitionDelay = '0s';
+        inputRef.current.style.transitionDuration = '0s';
+        inputRef.current.style.height = '';
 
         const height = Math.min(
             inputRef.current.scrollHeight,
             typeof maxHeight === 'string' ? parseFloat(maxHeight) : maxHeight,
         );
+
         if (height) {
             inputRef.current.style.height = `${height}px`;
         }
+
+        // Restore original transition timings asynchronously to prevent ResizeObserver loop
+        setTimeout(() => {
+            if (!inputRef.current) return;
+            inputRef.current.style.transitionDelay =
+                transitionDelay === '0s' ? '' : transitionDelay;
+            inputRef.current.style.transitionDuration =
+                transitionDuration === '0s' ? '' : transitionDuration;
+        }, 0);
     };
 
     // Setup ResizeObserver to detect when element gets layout
