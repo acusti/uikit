@@ -1,5 +1,11 @@
 # @acusti/css-value-input
 
+## 2.1.2
+
+### Patch Changes
+
+- 046a34a: Upgraded dependencies (missed in last patch version bump)
+
 ## 2.1.1
 
 ### Patch Changes
