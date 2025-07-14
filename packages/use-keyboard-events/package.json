@@ -46,7 +46,7 @@
         "react": "^19.0.0",
         "react-dom": "^19.0.0",
         "typescript": "5.8.3",
-        "unplugin-dts": "^1.0.0-beta.2",
+        "unplugin-dts": "^1.0.0-beta.4",
         "vite": "^7.0.0",
         "vitest": "^3.2.4"
     },
