@@ -232,7 +232,7 @@ __metadata:
     "@storybook/addon-docs": "npm:^9"
     "@storybook/react-vite": "npm:^9"
     "@types/react": "npm:^19.1.8"
-    core-js: "npm:^3.43.0"
+    core-js: "npm:^3.45.0"
     react: "npm:^19.0.0"
     react-dom: "npm:^19.0.0"
     storybook: "npm:^9"
@@ -3117,10 +3117,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^3.43.0":
-  version: 3.43.0
-  resolution: "core-js@npm:3.43.0"
-  checksum: 10/514952992863266b1a6a2d3c985e905461d37fe72d131d9320d5dbf01ac7e746f6fc53004b548347518cc832f7d2602b9a228acf6b5183e5cbede9dd296d73d3
+"core-js@npm:^3.45.0":
+  version: 3.45.0
+  resolution: "core-js@npm:3.45.0"
+  checksum: 10/162cd63b4d4cb2fed7a8635e69b760f4247e5d39ea99348e0b66af8e8899395a34de1b93504eb8db2adf4c47a0756475545c3da9c24875c7c33396fa8dc061c1
   languageName: node
   linkType: hard
 
