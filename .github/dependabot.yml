@@ -27,6 +27,10 @@ updates:
               patterns:
                   - '@lexical/*'
                   - 'lexical'
+          react:
+              patterns:
+                  - 'react'
+                  - 'react-dom'
           react-router:
               patterns:
                   - '@react-router/*'
