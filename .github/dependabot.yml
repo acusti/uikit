@@ -31,13 +31,11 @@ updates:
               patterns:
                   - 'react'
                   - 'react-dom'
+                  - '@types/react*'
           react-router:
               patterns:
                   - '@react-router/*'
                   - 'react-router'
-          react-types:
-              patterns:
-                  - '@types/react*'
           storybook:
               patterns:
                   - '@storybook/*'
