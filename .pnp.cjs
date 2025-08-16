@@ -117,7 +117,7 @@ const RAW_RUNTIME_STATE =
           ["@babel/core", "npm:7.27.7"],\
           ["@changesets/cli", "npm:2.29.5"],\
           ["@eslint/js", "npm:9.30.0"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/node", "npm:24.3.0"],\
@@ -198,7 +198,7 @@ const RAW_RUNTIME_STATE =
           ["@acusti/css-value-input", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/css-value-input"],\
           ["@acusti/css-values", "workspace:packages/css-values"],\
           ["@acusti/input-text", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -227,7 +227,7 @@ const RAW_RUNTIME_STATE =
           ["@acusti/css-value-input", "workspace:packages/css-value-input"],\
           ["@acusti/css-values", "workspace:packages/css-values"],\
           ["@acusti/input-text", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -264,7 +264,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@acusti/date-picker", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/date-picker"],\
           ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -292,7 +292,7 @@ const RAW_RUNTIME_STATE =
         "packageDependencies": [\
           ["@acusti/date-picker", "workspace:packages/date-picker"],\
           ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -319,7 +319,7 @@ const RAW_RUNTIME_STATE =
           ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
           ["@acusti/use-bounding-client-rect", "virtual:91419db2b75dba6373d1dcd664037a13a50cb8ad0c3c817040cf1c87f08000928f92bda28196eef227b714886c83c7008b731e73f3b4af88dcf66eb213a28434#workspace:packages/use-bounding-client-rect"],\
           ["@acusti/use-keyboard-events", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/use-keyboard-events"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -350,7 +350,7 @@ const RAW_RUNTIME_STATE =
           ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
           ["@acusti/use-bounding-client-rect", "virtual:91419db2b75dba6373d1dcd664037a13a50cb8ad0c3c817040cf1c87f08000928f92bda28196eef227b714886c83c7008b731e73f3b4af88dcf66eb213a28434#workspace:packages/use-bounding-client-rect"],\
           ["@acusti/use-keyboard-events", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/use-keyboard-events"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -373,7 +373,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/__virtual__/@acusti-input-text-virtual-584d3a4a59/1/packages/input-text/",\
         "packageDependencies": [\
           ["@acusti/input-text", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#workspace:packages/input-text"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -399,7 +399,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/input-text/",\
         "packageDependencies": [\
           ["@acusti/input-text", "workspace:packages/input-text"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -461,7 +461,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/__virtual__/@acusti-styling-virtual-1ab26d9af6/1/packages/styling/",\
         "packageDependencies": [\
           ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -487,7 +487,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/styling/",\
         "packageDependencies": [\
           ["@acusti/styling", "workspace:packages/styling"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -525,7 +525,7 @@ const RAW_RUNTIME_STATE =
           ["@babel/core", "npm:7.27.7"],\
           ["@changesets/cli", "npm:2.29.5"],\
           ["@eslint/js", "npm:9.30.0"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/node", "npm:24.3.0"],\
@@ -682,7 +682,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/__virtual__/@acusti-use-keyboard-events-virtual-52818747d6/1/packages/use-keyboard-events/",\
         "packageDependencies": [\
           ["@acusti/use-keyboard-events", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/use-keyboard-events"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -708,7 +708,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/use-keyboard-events/",\
         "packageDependencies": [\
           ["@acusti/use-keyboard-events", "workspace:packages/use-keyboard-events"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/react", "npm:19.1.8"],\
@@ -2674,17 +2674,17 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@testing-library/dom", [\
-      ["npm:10.4.0", {\
-        "packageLocation": "./.yarn/cache/@testing-library-dom-npm-10.4.0-a0d2ca848e-05825ee9a1.zip/node_modules/@testing-library/dom/",\
+      ["npm:10.4.1", {\
+        "packageLocation": "./.yarn/cache/@testing-library-dom-npm-10.4.1-928d6cd2a7-7f93e09ea0.zip/node_modules/@testing-library/dom/",\
         "packageDependencies": [\
           ["@babel/code-frame", "npm:7.27.1"],\
           ["@babel/runtime", "npm:7.27.0"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@types/aria-query", "npm:5.0.1"],\
           ["aria-query", "npm:5.3.0"],\
-          ["chalk", "npm:4.1.2"],\
           ["dom-accessibility-api", "npm:0.5.14"],\
           ["lz-string", "npm:1.5.0"],\
+          ["picocolors", "npm:1.1.1"],\
           ["pretty-format", "npm:27.5.1"]\
         ],\
         "linkType": "HARD"\
@@ -2718,7 +2718,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/__virtual__/@testing-library-react-virtual-843cbf7aa2/0/cache/@testing-library-react-npm-16.3.0-fcde6d23a2-0ee9e31dd0.zip/node_modules/@testing-library/react/",\
         "packageDependencies": [\
           ["@babel/runtime", "npm:7.27.0"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@types/react", "npm:19.1.8"],\
           ["@types/react-dom", null],\
@@ -2761,7 +2761,7 @@ const RAW_RUNTIME_STATE =
       ["virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1", {\
         "packageLocation": "./.yarn/__virtual__/@testing-library-user-event-virtual-5221c0ae05/0/cache/@testing-library-user-event-npm-14.6.1-5da7e1d4e2-34b74fff56.zip/node_modules/@testing-library/user-event/",\
         "packageDependencies": [\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
           ["@types/testing-library__dom", null]\
         ],\
@@ -5391,7 +5391,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/__virtual__/eslint-plugin-jest-dom-virtual-b1997ec380/0/cache/eslint-plugin-jest-dom-npm-5.5.0-2554d97d16-73aaaa6117.zip/node_modules/eslint-plugin-jest-dom/",\
         "packageDependencies": [\
           ["@babel/runtime", "npm:7.27.0"],\
-          ["@testing-library/dom", "npm:10.4.0"],\
+          ["@testing-library/dom", "npm:10.4.1"],\
           ["@types/eslint", null],\
           ["@types/testing-library__dom", null],\
           ["eslint", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:9.30.0"],\

@@ -36,7 +36,7 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/styling#readme",
     "devDependencies": {
-        "@testing-library/dom": "^10.4.0",
+        "@testing-library/dom": "^10.4.1",
         "@testing-library/react": "^16.3.0",
         "@testing-library/user-event": "^14.6.1",
         "@types/react": "^19.1.8",
