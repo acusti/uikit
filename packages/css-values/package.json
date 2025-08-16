@@ -36,7 +36,7 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/css-values#readme",
     "devDependencies": {
-        "typescript": "5.8.3",
+        "typescript": "5.9.2",
         "unplugin-dts": "^1.0.0-beta.6",
         "vite": "^7.0.0",
         "vitest": "^3.2.4"
