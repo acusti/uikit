@@ -208,6 +208,6 @@ yarn build
 - [ ] `yarn build` completes successfully (NEVER CANCEL - ~57 seconds)
 - [ ] `yarn test` passes (ignore 2 network failures)
 - [ ] `yarn lint` shows 0 errors (warnings acceptable)
+- [ ] `yarn tsc` shows 0 errors
 - [ ] `yarn format` completes successfully
 - [ ] Manual testing of affected functionality
-- [ ] TypeScript compilation succeeds for your packages
