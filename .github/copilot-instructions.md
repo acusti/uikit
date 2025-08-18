@@ -49,12 +49,12 @@ yarn test:watch  # Watch mode for development
 
 **Type checking:**
 ```bash
-yarn tsc  # Takes ~26 seconds - EXPECT FAILURE in aws-signature-v4 package
+yarn tsc  # Takes ~26 seconds - should pass successfully
 ```
 
-**Known TypeScript issues (EXPECTED):**
-- `packages/aws-signature-v4/src/index.ts` has type errors related to `Uint8Array<ArrayBufferLike>` - this is a known issue
-- All other packages should type-check successfully
+**TypeScript compilation:**
+- All packages should type-check successfully
+- If compilation fails, investigate and fix the type errors before proceeding
 
 **Linting:**
 ```bash
@@ -109,7 +109,7 @@ packages/
 │   └── styling/            # CSS-in-JS utilities
 ├── AWS/Network:
 │   ├── appsync-fetch/      # AWS AppSync GraphQL client
-│   ├── aws-signature-v4/   # AWS SigV4 signing (HAS TYPE ERRORS)
+│   ├── aws-signature-v4/   # AWS SigV4 signing
 │   └── post/               # GraphQL request utility
 └── docs/                   # Storybook documentation (CURRENTLY BROKEN)
 ```
@@ -152,8 +152,8 @@ packages/
 4. Manual test: Run `yarn dev` to start Storybook and test components via their stories (add stories when fixing bugs or changing behavior)
 
 **When working with TypeScript:**
-- Run `yarn tsc` but expect aws-signature-v4 to fail (known issue)
-- Focus on your package's type checking success
+- Run `yarn tsc` and ensure all packages type-check successfully
+- Fix any type errors before proceeding
 - Use `yarn workspace @acusti/{package-name} run tsc` for individual packages
 
 **Before committing:**
@@ -197,7 +197,7 @@ yarn build
 **If build fails:**
 - Run `yarn tsc` to see TypeScript errors
 - Check individual package builds: `yarn workspace @acusti/{pkg} run build`
-- Known failure in aws-signature-v4 is expected
+- All packages should build successfully
 
 **If tests fail beyond the 2 network errors:**
 - Run individual package tests: `yarn workspace @acusti/{pkg} run test`
