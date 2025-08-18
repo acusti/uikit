@@ -1,6 +1,6 @@
 # UIKit Monorepo Development Guide
 
-UIKit is a TypeScript-based React component library and utilities monorepo containing 17+ packages including UI components, React hooks, AWS utilities, text processing tools, and more. The repository uses Yarn 4.9.2 with Plug'n'Play (PnP), Vite for building, Vitest for testing, and Storybook for documentation.
+UIKit is a TypeScript-based React component library and utilities monorepo containing 17+ packages including UI components, React hooks, AWS utilities, text processing tools, and more. The repository uses Yarn 4 with Plug'n'Play (PnP), Vite for building, Vitest for testing, and Storybook for documentation.
 
 **Always reference these instructions first and fallback to search or bash commands only when you encounter unexpected information that does not match the info here.**
 
@@ -14,13 +14,13 @@ UIKit is a TypeScript-based React component library and utilities monorepo conta
 - `yarn lint`: ~16 seconds (TIMEOUT: 45 seconds)
 - `yarn format`: ~3 seconds (TIMEOUT: 30 seconds)
 - `yarn tsc`: ~26 seconds (TIMEOUT: 60 seconds)
-- `yarn buildall`: FAILS (~65 seconds then fails on storybook) - **DO NOT USE**
+- `yarn buildall`: Used for Storybook build and deployment to Netlify (~65 seconds then fails on storybook in sandboxed environments) - **DO NOT USE for development**
 
 ## Essential Setup & Development Commands
 
 **Bootstrap the repository:**
 ```bash
-# Repository uses Yarn 4.9.2 with PnP
+# Repository uses Yarn 4+ with PnP
 yarn install  # Fast with cache (~4s), slower fresh install (~90s)
 # Always run build before starting development
 yarn build    # NEVER CANCEL - takes ~57 seconds
@@ -28,10 +28,10 @@ yarn build    # NEVER CANCEL - takes ~57 seconds
 
 **Development workflow:**
 ```bash
-# WARNING: Storybook development server currently broken due to module resolution issues
-# yarn dev  # DO NOT USE - fails with ERR_MODULE_NOT_FOUND for 'locate-path'
+# Start Storybook development server for component testing
+yarn dev     # Starts Storybook server on http://localhost:6006
 
-# Instead, make changes and test with:
+# Alternative: make changes and test with:
 yarn build  # NEVER CANCEL - takes ~57 seconds  
 yarn test   # Takes ~10 seconds
 yarn lint   # Takes ~16 seconds
@@ -85,7 +85,7 @@ yarn format    # Format code with Prettier
 4. **Component validation scenarios:**
    - If changing React components in `packages/*/src/`, run the component's specific test file
    - For UI components (dropdown, input-text, css-value-input, date-picker), verify the test suite passes
-   - For hooks (use-keyboard-events, use-is-out-of-bounds, use-bounding-client-rect), test with a simple React app
+   - For hooks (use-keyboard-events, use-is-out-of-bounds, use-bounding-client-rect), test via Storybook stories using `yarn dev`
 
 ## Repository Structure & Key Locations
 
@@ -124,8 +124,9 @@ packages/
 ## Known Issues & Workarounds
 
 **Storybook development server:**
-- `yarn dev` fails with module resolution errors
-- **Workaround:** Make changes and validate with `yarn build && yarn test` instead of live preview
+- `yarn dev` starts Storybook server for component testing and development
+- May experience module resolution issues in sandboxed environments
+- **Workaround:** Use `yarn build && yarn test` for validation in constrained environments
 
 **Build warnings you can ignore:**
 - TypeScript version compatibility warnings from eslint plugins
@@ -148,7 +149,7 @@ packages/
 1. Build: `yarn build` (NEVER CANCEL - ~58 seconds)
 2. Test: `yarn test` - component tests should pass
 3. Lint: `yarn lint` - must have 0 errors
-4. Manual test: Create simple test app or check existing tests
+4. Manual test: Run `yarn dev` to start Storybook and test components via their stories (add stories when fixing bugs or changing behavior)
 
 **When working with TypeScript:**
 - Run `yarn tsc` but expect aws-signature-v4 to fail (known issue)
@@ -182,8 +183,8 @@ yarn workspaces foreach {command}
 # Build excluding docs (default)
 yarn build
 
-# Build including docs (currently broken - DO NOT USE)
-# yarn buildall  # FAILS: Storybook build fails after ~65 seconds
+# Build including docs for Netlify deployment (may fail in sandboxed environments)
+# yarn buildall  # Used for Storybook build and deployment to Netlify
 ```
 
 ## Troubleshooting
