@@ -47,6 +47,7 @@ const encrypt = async (payload: {
         typeof payload.key === 'string' ? encoder.encode(payload.key) : payload.key;
     const algorithm = { hash: payload.algorithm ?? DEFAULT_ALGORITHM, name: 'HMAC' };
     const key = await subtleCrypto.importKey('raw', keyArray, algorithm, false, ['sign']);
+    // @ts-expect-error TextEncoder.encode() returns Uint8Array<ArrayBufferLike> but WebCrypto API accepts it as BufferSource
     const signature = await subtleCrypto.sign('hmac', key, encoder.encode(payload.data));
     if (!payload.encoding) return new Uint8Array(signature);
     return decodeArrayBuffer(signature, payload.encoding);
@@ -61,6 +62,7 @@ const hash = async ({
     data: string;
     encoding: string;
 }) => {
+    // @ts-expect-error TextEncoder.encode() returns Uint8Array<ArrayBufferLike> but WebCrypto API accepts it as BufferSource
     const _hash = await subtleCrypto.digest({ name: algorithm }, encoder.encode(data));
     return decodeArrayBuffer(_hash, encoding);
 };
