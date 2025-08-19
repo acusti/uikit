@@ -46,8 +46,8 @@
         "@acusti/use-bounding-client-rect": "^2.0.0"
     },
     "peerDependencies": {
-        "react": "^16.8 || ^17 || ^18 || ^19 || ~0.0.0-experimental < 0.0.0-f",
-        "react-dom": "^16.8 || ^17 || ^18 || ^19 || ~0.0.0-experimental < 0.0.0-f"
+        "react": "^19 || ~0.0.0-experimental < 0.0.0-f",
+        "react-dom": "^19 || ~0.0.0-experimental < 0.0.0-f"
     },
     "scripts": {
         "build": "vite build"
