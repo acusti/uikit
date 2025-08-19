@@ -2,12 +2,11 @@ import {
     type ChangeEvent,
     type CSSProperties,
     type FocusEvent,
-    forwardRef,
     type InputHTMLAttributes,
     type KeyboardEvent,
+    type Ref,
     type SyntheticEvent,
     useEffect,
-    useImperativeHandle,
     useRef,
     useState,
 } from 'react';
@@ -61,6 +60,7 @@ export type Props = {
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
+    ref?: Ref<HTMLInputElement>;
     required?: boolean;
     rows?: number;
     /** If true, the contents of the input are selected when it’s focused. */
@@ -80,57 +80,60 @@ export type Props = {
 
 type InputRef = HTMLInputElement | null;
 
-export default forwardRef<HTMLInputElement, Props>(function InputText(
-    {
-        autoCapitalize,
-        autoComplete,
-        autoFocus,
-        className,
-        disabled,
-        doubleClickToEdit,
-        enterKeyHint,
-        form,
-        id,
-        initialValue,
-        list,
-        max,
-        maxHeight = Infinity,
-        maxLength,
-        min,
-        minLength,
-        multiLine,
-        multiple,
-        name,
-        onBlur,
-        onChange,
-        onChangeValue,
-        onFocus,
-        onKeyDown,
-        onKeyUp,
-        pattern,
-        placeholder,
-        readOnly,
-        required,
-        rows = 1,
-        selectTextOnFocus,
-        size,
-        step,
-        style,
-        submitOnEnter,
-        tabIndex,
-        title,
-        type = 'text',
-    }: Props,
+export default function InputText({
+    autoCapitalize,
+    autoComplete,
+    autoFocus,
+    className,
+    disabled,
+    doubleClickToEdit,
+    enterKeyHint,
+    form,
+    id,
+    initialValue,
+    list,
+    max,
+    maxHeight = Infinity,
+    maxLength,
+    min,
+    minLength,
+    multiLine,
+    multiple,
+    name,
+    onBlur,
+    onChange,
+    onChangeValue,
+    onFocus,
+    onKeyDown,
+    onKeyUp,
+    pattern,
+    placeholder,
+    readOnly,
     ref,
-) {
+    required,
+    rows = 1,
+    selectTextOnFocus,
+    size,
+    step,
+    style,
+    submitOnEnter,
+    tabIndex,
+    title,
+    type = 'text',
+}: Props) {
     const inputRef = useRef<InputRef>(null);
-    useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
     const [inputElement, _setInputElement] = useState<InputRef>(null);
     const resizeObserverRef = useRef<null | ResizeObserver>(null);
 
     const setInputElement = (element: InputRef) => {
         inputRef.current = element;
         _setInputElement(element);
+        // Set the forwarded ref
+        if (typeof ref === 'function') {
+            ref(element);
+        } else if (ref) {
+            ref.current = element;
+        }
     };
 
     // If props.initialValue changes, override input value from it
@@ -314,7 +317,7 @@ export default forwardRef<HTMLInputElement, Props>(function InputText(
             {...(multiLine ? { onInput: setInputHeight, rows } : { max, min, step })}
         />
     );
-});
+}
 
 const IS_APPLE_REGEXP = /mac|iphone|ipad|ipod/i;
 

@@ -12,12 +12,11 @@ import clsx from 'clsx';
 import {
     type ChangeEvent,
     type FocusEvent,
-    forwardRef,
     type KeyboardEvent,
     type ReactNode,
+    type Ref,
     type SyntheticEvent,
     useEffect,
-    useImperativeHandle,
     useRef,
 } from 'react';
 
@@ -52,6 +51,7 @@ export type Props = {
      */
     onSubmitValue: (value: string) => unknown;
     placeholder?: string;
+    ref?: Ref<HTMLInputElement>;
     step?: number;
     tabIndex?: number;
     title?: string;
@@ -65,7 +65,7 @@ type InputRef = HTMLInputElement | null;
 
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
-export default forwardRef<HTMLInputElement, Props>(function CSSValueInput(
+export default function CSSValueInput(
     {
         allowEmpty = true,
         className,
@@ -84,17 +84,27 @@ export default forwardRef<HTMLInputElement, Props>(function CSSValueInput(
         onKeyUp,
         onSubmitValue,
         placeholder,
+        ref,
         step = 1,
         tabIndex,
         title,
         unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
         validator,
         value: valueFromProps,
-    }: Props,
-    ref,
-) {
+    }: Props) {
     const inputRef = useRef<InputRef>(null);
-    useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
+
+    // Function to handle ref forwarding  
+    const setInputRef = (element: InputRef) => {
+        inputRef.current = element;
+        // Forward the ref to the external ref prop
+        if (typeof ref === 'function') {
+            ref(element);
+        } else if (ref) {
+            ref.current = element;
+        }
+    };
+
     // props.value should be a string; if it’s a number, convert it here
     const value =
         typeof valueFromProps === 'number' && !Number.isNaN(valueFromProps)
@@ -115,7 +125,7 @@ export default forwardRef<HTMLInputElement, Props>(function CSSValueInput(
 
     const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
         const input = event.currentTarget;
-        inputRef.current = input;
+        setInputRef(input);
         if (onBlur) onBlur(event);
 
         const currentValue = input.value.trim();
@@ -295,11 +305,11 @@ export default forwardRef<HTMLInputElement, Props>(function CSSValueInput(
                     onKeyDown={handleKeyDown}
                     onKeyUp={handleKeyUp}
                     placeholder={placeholder}
-                    ref={inputRef}
+                    ref={setInputRef}
                     selectTextOnFocus
                     tabIndex={tabIndex}
                 />
             </div>
         </label>
     );
-});
+}
