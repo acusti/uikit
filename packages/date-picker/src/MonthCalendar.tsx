@@ -33,11 +33,15 @@ export default function MonthCalendar({
     dateEndPreview,
     dateStart,
     isRange,
-    month,
+    month: _month,
     onChange,
     onChangeEndPreview,
     title,
 }: Props) {
+    // props.month must be a finite number within safe integer range
+    const month = Number.isFinite(_month)
+        ? Math.max(Number.MIN_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, _month))
+        : getMonthFromDate(new Date());
     const year = getYearFromMonth(month);
     title = title ?? `${getMonthNameFromMonth(month)} ${year}`;
     const firstDate = getDateFromMonthAndDay(month, 1);
