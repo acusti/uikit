@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/no-static-element-interactions */
 import { Style } from '@acusti/styling';
 import clsx from 'clsx';
 import { Fragment, useEffect, useRef, useState } from 'react';
@@ -144,17 +143,21 @@ export default function DatePicker({
                 })}
             >
                 <div className={`${ROOT_CLASS_NAME}-range-arrow-wrap`}>
-                    <div
+                    <button
+                        aria-label="Previous Month"
                         className={clsx(`${ROOT_CLASS_NAME}-range-arrow left-arrow`, {
                             disabled: monthLimitFirst != null && month <= monthLimitFirst,
                         })}
                         onClick={handleClickLeftArrow}
+                        type="button"
                     />
-                    <div
+                    <button
+                        aria-label="Next Month"
                         className={clsx(`${ROOT_CLASS_NAME}-range-arrow right-arrow`, {
                             disabled: monthLimitLast != null && month >= monthLimitLast,
                         })}
                         onClick={handleClickRightArrow}
+                        type="button"
                     />
                 </div>
                 <div className={`${ROOT_CLASS_NAME}-month-container`}>

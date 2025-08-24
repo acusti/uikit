@@ -27,6 +27,8 @@ export const STYLES = `
 }
 
 .${ROOT_CLASS_NAME}-range-arrow {
+    background-color: transparent;
+    border: 0;
     width: 35px;
     height: 35px;
     text-align: center;
@@ -47,7 +49,6 @@ export const STYLES = `
     content: "‹";
     font-size: 24px;
     line-height: 35px;
-    font-weight: bold;
 }
 
 .${ROOT_CLASS_NAME}-range-arrow.right-arrow:after {
