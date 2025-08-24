@@ -12,8 +12,8 @@ import {
 
 export type Props = {
     className?: string;
-    dateEnd?: Date | number | string;
-    dateStart?: Date | number | string;
+    dateEnd?: Date | null | number | string;
+    dateStart?: Date | null | number | string;
     initialMonth?: number;
     isRange?: boolean;
     isTwoUp?: boolean;
@@ -32,6 +32,11 @@ export type Props = {
 const getAbbreviatedMonthTitle = (month: number) =>
     `${getMonthAbbreviationFromMonth(month)} ${getYearFromMonth(month)}`;
 
+const normalizeDate = (date: Date | null | number | string | undefined) => {
+    if (date == null || date === '') return null;
+    return typeof date === 'string' ? date : new Date(date).toISOString();
+};
+
 export default function DatePicker({
     className,
     dateEnd: _dateEnd,
@@ -49,16 +54,10 @@ export default function DatePicker({
     // In two-up view we see 1 more month, so monthLimitLast needs to be 1 less
     const monthLimitLast =
         isTwoUp && _monthLimitLast != null ? _monthLimitLast - 1 : _monthLimitLast;
-    const dateEndFromProps =
-        _dateEnd != null && typeof _dateEnd !== 'string'
-            ? new Date(_dateEnd).toISOString()
-            : _dateEnd;
-    const dateStartFromProps =
-        _dateStart != null && typeof _dateStart !== 'string'
-            ? new Date(_dateStart).toISOString()
-            : _dateStart;
-    const [dateEnd, setDateEnd] = useState<null | string>(dateEndFromProps ?? null);
-    const [dateStart, setDateStart] = useState<null | string>(dateStartFromProps ?? null);
+    const dateEndFromProps = normalizeDate(_dateEnd);
+    const dateStartFromProps = normalizeDate(_dateStart);
+    const [dateEnd, setDateEnd] = useState(dateEndFromProps);
+    const [dateStart, setDateStart] = useState(dateStartFromProps);
     const updatingDateEndRef = useRef(false);
 
     useEffect(() => {
