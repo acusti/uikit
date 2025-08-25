@@ -1,5 +1,12 @@
 # @acusti/textual
 
+## 0.10.0
+
+### Minor Changes
+
+- 5befb4d: Add support for diacritics and other non A-Z/a-z characters
+  (i18n).
+
 ## 0.9.0
 
 ### Minor Changes
