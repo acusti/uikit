@@ -159,6 +159,7 @@ export default [
             // the following rules require setup-test-env: import '@testing-library/jest-dom/vitest';
             'jest-dom/prefer-empty': 'off',
             'jest-dom/prefer-in-document': 'off',
+            'jest-dom/prefer-to-have-class': 'off',
             'jest-dom/prefer-to-have-value': 'off',
         },
     },
