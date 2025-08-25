@@ -85,8 +85,7 @@ export default function DatePicker({
 
     // clamp initial month to monthLimit bounds
     const maxInitialMonth =
-        (monthLimitLast == null ? Number.MAX_SAFE_INTEGER : monthLimitLast) +
-        (isTwoUp ? -1 : 0);
+        (monthLimitLast ?? Number.MAX_SAFE_INTEGER) + (isTwoUp ? -1 : 0);
     initialMonth = Math.max(
         Math.min(initialMonth, maxInitialMonth),
         monthLimitFirst ?? Number.MIN_SAFE_INTEGER,
