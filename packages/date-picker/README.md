@@ -175,18 +175,12 @@ import { useState } from 'react';
 function BookingDatePicker() {
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
+    const isValid = checkIn && checkOut;
 
     // Limit to next 12 months only
     const today = new Date();
     const monthLimitFirst = getMonthFromDate(today);
     const monthLimitLast = monthLimitFirst + 12;
-
-    const handleDateChange = ({ dateStart, dateEnd }) => {
-        setCheckIn(dateStart);
-        setCheckOut(dateEnd);
-    };
-
-    const isValid = checkIn && checkOut;
 
     return (
         <div className="booking-date-picker">
@@ -197,7 +191,10 @@ function BookingDatePicker() {
                 isTwoUp
                 monthLimitFirst={monthLimitFirst}
                 monthLimitLast={monthLimitLast}
-                onChange={handleDateChange}
+                onChange={({ dateStart, dateEnd }) => {
+                    setCheckIn(dateStart);
+                    setCheckOut(dateEnd ?? '');
+                }}
                 dateStart={checkIn}
                 dateEnd={checkOut}
                 useMonthAbbreviations
