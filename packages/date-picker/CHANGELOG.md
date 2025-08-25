@@ -1,5 +1,18 @@
 # @acusti/date-picker
 
+## 0.14.0
+
+### Minor Changes
+
+- 316e8a3: Increase selected date range background color contrast (a11y).
+- b335084: Scope range styles to only apply to `MonthCalendar` components
+  when `isRange` to prevent range styles from affecting single date
+  selection.
+- 571dbaa: Distinguish today in `MonthCalendar` as having a red day number,
+  which is simpler and more intuitive. The visual UI vocabulary is now
+  completely distinct from the rest of the UI, which uses border for
+  hovered date and background for selected days and date ranges.
+
 ## 0.13.0
 
 ### Minor Changes
