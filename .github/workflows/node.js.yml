@@ -29,7 +29,10 @@ jobs:
             - name: 📥 Install deps
               run: yarn
 
-            - name: 🛠️ Typecheck & Build
+            - name: 🔍 Typecheck
+              run: yarn tsc
+
+            - name: 🛠️ Build
               run: yarn build
 
             - name: 🔬 Lint
