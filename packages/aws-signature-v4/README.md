@@ -2,7 +2,7 @@
 
 [![latest version](https://img.shields.io/npm/v/@acusti/aws-signature-v4?style=for-the-badge)](https://www.npmjs.com/package/@acusti/aws-signature-v4)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/aws-signature-v4?style=for-the-badge)](https://www.npmjs.com/package/@acusti/aws-signature-v4)
-[![supply chain security](https://socket.dev/api/badge/npm/package/@acusti/aws-signature-v4/1.0.0)](https://socket.dev/npm/package/@acusti/aws-signature-v4/overview/1.0.0)
+[![supply chain security](https://socket.dev/api/badge/npm/package/@acusti/aws-signature-v4/2.0.0)](https://socket.dev/npm/package/@acusti/aws-signature-v4/overview/2.0.0)
 [![bundle size](https://deno.bundlejs.com/badge?q=@acusti/aws-signature-v4)](https://bundlejs.com/?q=%40acusti%2Faws-signature-v4)
 
 `aws-signature-v4` is a lightweight isomorphic module that generates
