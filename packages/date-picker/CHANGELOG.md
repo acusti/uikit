@@ -1,5 +1,12 @@
 # @acusti/date-picker
 
+## 0.14.1
+
+### Patch Changes
+
+- 6fdb386: Replace nullish ternary with simpler nullish coalescing
+  operator.
+
 ## 0.14.0
 
 ### Minor Changes
