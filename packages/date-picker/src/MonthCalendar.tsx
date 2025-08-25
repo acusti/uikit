@@ -38,10 +38,11 @@ export default function MonthCalendar({
     onChangeEndPreview,
     title,
 }: Props) {
+    const today = new Date();
     // props.month must be a finite number within safe integer range
     const month = Number.isFinite(_month)
         ? Math.max(Number.MIN_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, _month))
-        : getMonthFromDate(new Date());
+        : getMonthFromDate(today);
     const year = getYearFromMonth(month);
     title = title ?? `${getMonthNameFromMonth(month)} ${year}`;
     const firstDate = getDateFromMonthAndDay(month, 1);
@@ -162,6 +163,11 @@ export default function MonthCalendar({
                                                         !isEmpty &&
                                                         isAfterDateRangeStart &&
                                                         isBeforeDateRangeEnd,
+                                                    'is-today':
+                                                        !isEmpty &&
+                                                        month ===
+                                                            getMonthFromDate(today) &&
+                                                        dayNumber === today.getDate(),
                                                     'start-date':
                                                         !isEmpty &&
                                                         dayNumber === dateRangeStartDay,

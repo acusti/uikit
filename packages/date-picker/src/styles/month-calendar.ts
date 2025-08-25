@@ -83,6 +83,13 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
     cursor: auto;
 }
 
+.${ROOT_CLASS_NAME}-month-day-item.is-today:after {
+    background-color: rgba(0,0,0,0.05);
+    border-color: transparent;
+    opacity: 1;
+    visibility: visible;
+}
+
 .${ROOT_CLASS_NAME}-month-day-item.is-selected {
     background-color: #f8f8f8;
 }
@@ -117,7 +124,9 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
     color: #fff;
 }
 
-.${ROOT_CLASS_NAME}-month-day-item:hover:after {
+.${ROOT_CLASS_NAME}-month-day-item:hover:after,
+.${ROOT_CLASS_NAME}-month-day-item.is-today:hover:after {
+    border-color: #000;
     opacity: 1;
     visibility: visible;
 }
