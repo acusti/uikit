@@ -84,7 +84,15 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
 }
 
 .${ROOT_CLASS_NAME}-month-day-item.is-today:after {
-    background-color: rgba(0,0,0,0.05);
+    background-image: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 1px,
+      #e6e6e6 1px,
+      #e6e6e6 2px,
+      transparent 2px,
+      transparent 4px
+    );
     border-color: transparent;
     opacity: 1;
     visibility: visible;
