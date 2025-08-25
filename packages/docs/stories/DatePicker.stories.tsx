@@ -199,7 +199,7 @@ export const EventScheduler: Story = {
                         style={{
                             display: 'block',
                             marginBottom: '8px',
-                            fontWeight: '500',
+                            fontWeight: 500,
                         }}
                     >
                         Event Date:
