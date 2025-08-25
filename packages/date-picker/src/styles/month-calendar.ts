@@ -87,11 +87,11 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
     color: #eb4e3d;
 }
 
-.${ROOT_CLASS_NAME}-month-day-item.is-selected {
+.${ROOT_CLASS_NAME}.is-range .${ROOT_CLASS_NAME}-month-day-item.is-selected {
     background-color: #f6f6f6;
 }
 
-.${ROOT_CLASS_NAME}-month-day-item.start-date {
+.${ROOT_CLASS_NAME}.is-range .${ROOT_CLASS_NAME}-month-day-item.start-date {
     background-color: #f6f6f6;
     border-top-left-radius: 50%;
     border-bottom-left-radius: 50%;
@@ -107,7 +107,7 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
     color: #fff;
 }
 
-.${ROOT_CLASS_NAME}-month-day-item.end-date {
+.${ROOT_CLASS_NAME}.is-range .${ROOT_CLASS_NAME}-month-day-item.end-date {
     background-color: #f6f6f6;
     border-top-right-radius: 50%;
     border-bottom-right-radius: 50%;
