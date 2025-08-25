@@ -1,5 +1,14 @@
 # @acusti/uikit-docs
 
+## 0.4.2
+
+### Patch Changes
+
+- Updated dependencies [316e8a3]
+- Updated dependencies [b335084]
+- Updated dependencies [571dbaa]
+    - @acusti/date-picker@0.14.0
+
 ## 0.4.1
 
 ### Patch Changes
