@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 
 import { capitalize, getInitials, getNameFromEmail } from './index.js';
 
-describe('@acusti/text-transform', () => {
+describe('@acusti/textual', () => {
     describe('capitalize', () => {
         it('uppercases the first letter of each word', () => {
             expect(capitalize('breonna')).toBe('Breonna');
@@ -34,6 +34,12 @@ describe('@acusti/text-transform', () => {
                 capitalize('\tmother-of-pearl father-in-law\njack-of-all-trades\n'),
             ).toBe('\tMother-Of-Pearl Father-In-Law\nJack-Of-All-Trades\n');
             expect(capitalize('this iS copy-editing_4')).toBe('This IS Copy-Editing_4');
+        });
+
+        it('works with non-latin text', () => {
+            expect(capitalize('björk guðmundsdóttir')).toBe('Björk Guðmundsdóttir');
+            expect(capitalize('ólafur arnalds')).toBe('Ólafur Arnalds');
+            expect(capitalize('ælfgyva')).toBe('Ælfgyva');
         });
     });
 
@@ -79,6 +85,12 @@ describe('@acusti/text-transform', () => {
 
         it('ignores any non alphanumeric characters', () => {
             expect(getInitials('**franklin delano !! roosevelt 3rd', 4)).toBe('FDR3');
+        });
+
+        it('works with non-latin text', () => {
+            expect(getInitials('björk guðmundsdóttir')).toBe('BG');
+            expect(getInitials('ólafur arnalds')).toBe('ÓA');
+            expect(getInitials('ælfgyva')).toBe('Æ');
         });
     });
 
