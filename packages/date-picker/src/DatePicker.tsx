@@ -83,8 +83,16 @@ export default function DatePicker({
         }
     }
 
-    const [dateEndPreview, setDateEndPreview] = useState<null | string>(null);
+    // clamp initial month to monthLimit bounds
+    const maxInitialMonth =
+        (monthLimitLast == null ? Number.MAX_SAFE_INTEGER : monthLimitLast) +
+        (isTwoUp ? -1 : 0);
+    initialMonth = Math.max(
+        Math.min(initialMonth, maxInitialMonth),
+        monthLimitFirst ?? Number.MIN_SAFE_INTEGER,
+    );
     const [month, setMonth] = useState<number>(initialMonth);
+    const [dateEndPreview, setDateEndPreview] = useState<null | string>(null);
 
     const delta = isTwoUp ? 2 : 1;
 
