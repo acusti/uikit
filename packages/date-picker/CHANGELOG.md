@@ -1,5 +1,22 @@
 # @acusti/date-picker
 
+## 0.13.0
+
+### Minor Changes
+
+- d583745: Parse (validate) `props.month` in `MonthCalendar` by adding
+  checks to ensure that it’s a finite number within the safe integer range.
+  If invalid, it defaults to the current month or clamps the value,
+  improving robustness against incorrect prop values. Prevents error: Array
+  length must be a positive integer of safe magnitude.
+- 91ebab9: 🐞 Clamp initialMonth within monthLimit bounds, ensuring that
+  the `initialMonth` value is constrained between `monthLimitFirst` and
+  `monthLimitLast`, accounting for two-up mode. This prevents the date
+  picker from initializing outside allowed month limits.
+- 5e1b41c: Replace month navigation divs with buttons for accessibility
+- d3a2908: Highlight today’s date in MonthCalendar by adding a new
+  `.is-today` class.
+
 ## 0.12.0
 
 ### Minor Changes
