@@ -83,19 +83,8 @@ h3.${ROOT_CLASS_NAME}-month-title-text {
     cursor: auto;
 }
 
-.${ROOT_CLASS_NAME}-month-day-item.is-today:after {
-    background-image: repeating-linear-gradient(
-      0deg,
-      transparent,
-      transparent 1px,
-      #e6e6e6 1px,
-      #e6e6e6 2px,
-      transparent 2px,
-      transparent 4px
-    );
-    border-color: transparent;
-    opacity: 1;
-    visibility: visible;
+.${ROOT_CLASS_NAME}-month-day-item.is-today span.month-day-item-text {
+    color: #eb4e3d;
 }
 
 .${ROOT_CLASS_NAME}-month-day-item.is-selected {
