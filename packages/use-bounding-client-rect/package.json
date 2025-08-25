@@ -31,7 +31,7 @@
     },
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/use-bounding-client-rect#readme",
     "devDependencies": {
-        "@types/react": "^19.1.10",
+        "@types/react": "^19.1.11",
         "@vitejs/plugin-react": "^5.0.1",
         "babel-plugin-react-compiler": "rc",
         "react": "^19.1.1",
