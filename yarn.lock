@@ -18,7 +18,7 @@ __metadata:
   dependencies:
     "@acusti/aws-signature-v4": "npm:^2.0.0"
     "@acusti/post": "npm:^1.2.0"
-    "@types/node": "npm:^24.3.0"
+    "@types/node": "npm:^24.3.1"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.5"
@@ -30,7 +30,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/aws-signature-v4@workspace:packages/aws-signature-v4"
   dependencies:
-    "@types/node": "npm:^24.3.0"
+    "@types/node": "npm:^24.3.1"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.5"
@@ -177,7 +177,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/post@workspace:packages/post"
   dependencies:
-    "@types/node": "npm:^24.3.0"
+    "@types/node": "npm:^24.3.1"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.5"
@@ -251,7 +251,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.0"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/node": "npm:^24.3.0"
+    "@types/node": "npm:^24.3.1"
     "@types/react": "npm:^19.1.11"
     "@typescript-eslint/eslint-plugin": "npm:^8.42.0"
     "@typescript-eslint/parser": "npm:^8.42.0"
@@ -2028,12 +2028,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^24.3.0":
-  version: 24.3.0
-  resolution: "@types/node@npm:24.3.0"
+"@types/node@npm:^24.3.1":
+  version: 24.3.1
+  resolution: "@types/node@npm:24.3.1"
   dependencies:
     undici-types: "npm:~7.10.0"
-  checksum: 10/1331c2d0e9a512ac27a016b4df3eff92317e4603dbbbab31731275dff14d3a04847a50c5776cbf94f99ff4dedac0ba5f721dce8cea020d8eea5e21711fd964b0
+  checksum: 10/b9a52ed8f2fb1fa764ce988828b8d579761f944f1bb0492adbdeaa676a161086bad1a807b590799681ad93b3d272468b5c5ddccf5678735d487d1b65e481bc07
   languageName: node
   linkType: hard
 
