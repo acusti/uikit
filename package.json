@@ -41,7 +41,7 @@
         "packages/*"
     ],
     "dependencies": {
-        "@changesets/cli": "^2.29.6"
+        "@changesets/cli": "^2.29.7"
     },
     "devDependencies": {
         "@babel/core": "^7.28.3",
