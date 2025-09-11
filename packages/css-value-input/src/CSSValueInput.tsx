@@ -17,6 +17,7 @@ import {
     type Ref,
     type SyntheticEvent,
     useEffect,
+    useImperativeHandle,
     useRef,
 } from 'react';
 
@@ -93,17 +94,8 @@ export default function CSSValueInput(
         value: valueFromProps,
     }: Props) {
     const inputRef = useRef<InputRef>(null);
-
-    // Function to handle ref forwarding  
-    const setInputRef = (element: InputRef) => {
-        inputRef.current = element;
-        // Forward the ref to the external ref prop
-        if (typeof ref === 'function') {
-            ref(element);
-        } else if (ref) {
-            ref.current = element;
-        }
-    };
+    
+    useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
 
     // props.value should be a string; if it’s a number, convert it here
     const value =
@@ -125,7 +117,7 @@ export default function CSSValueInput(
 
     const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
         const input = event.currentTarget;
-        setInputRef(input);
+        inputRef.current = input;
         if (onBlur) onBlur(event);
 
         const currentValue = input.value.trim();
@@ -305,7 +297,7 @@ export default function CSSValueInput(
                     onKeyDown={handleKeyDown}
                     onKeyUp={handleKeyUp}
                     placeholder={placeholder}
-                    ref={setInputRef}
+                    ref={inputRef}
                     selectTextOnFocus
                     tabIndex={tabIndex}
                 />

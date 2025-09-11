@@ -326,8 +326,8 @@ __metadata:
     vite: "npm:^7.1.4"
     vitest: "npm:^3.2.4"
   peerDependencies:
-    react: ^16.8 || ^17 || ^18 || ^19 || ~0.0.0-experimental < 0.0.0-f
-    react-dom: ^16.8 || ^17 || ^18 || ^19 || ~0.0.0-experimental < 0.0.0-f
+    react: ^19 || ~0.0.0-experimental < 0.0.0-f
+    react-dom: ^19 || ~0.0.0-experimental < 0.0.0-f
   languageName: unknown
   linkType: soft
 
