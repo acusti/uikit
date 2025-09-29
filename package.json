@@ -69,7 +69,7 @@
         "eslint-plugin-react-hooks": "rc",
         "eslint-plugin-testing-library": "^7.6.6",
         "globals": "^16.4.0",
-        "happy-dom": "^18.0.1",
+        "happy-dom": "^19.0.1",
         "prettier": "^3.6.2",
         "react": "^19.1.1",
         "react-dom": "^19.1.1",
