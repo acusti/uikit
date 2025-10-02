@@ -47,7 +47,7 @@
         "@types/react": "^19.1.12",
         "@vitejs/plugin-react": "^5.0.4",
         "babel-plugin-react-compiler": "rc",
-        "happy-dom": "^18.0.1",
+        "happy-dom": "^19.0.2",
         "react": "^19",
         "react-dom": "^19",
         "typescript": "5.9.2",
