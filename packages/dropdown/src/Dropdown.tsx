@@ -618,7 +618,7 @@ export default function Dropdown({
             );
         } else {
             trigger = (
-                <button className={TRIGGER_CLASS_NAME} tabIndex={0}>
+                <button className={TRIGGER_CLASS_NAME} tabIndex={0} type="button">
                     {trigger}
                 </button>
             );
