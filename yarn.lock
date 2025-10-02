@@ -269,7 +269,7 @@ __metadata:
     eslint-plugin-react: "npm:^7.37.5"
     eslint-plugin-react-compiler: "npm:rc"
     eslint-plugin-react-hooks: "npm:rc"
-    eslint-plugin-testing-library: "npm:^7.6.6"
+    eslint-plugin-testing-library: "npm:^7.11.0"
     globals: "npm:^16.4.0"
     happy-dom: "npm:^19.0.2"
     prettier: "npm:^3.6.2"
@@ -437,7 +437,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/helper-create-class-features-plugin@npm:^7.18.6, @babel/helper-create-class-features-plugin@npm:^7.27.1":
+"@babel/helper-create-class-features-plugin@npm:^7.18.6":
   version: 7.27.1
   resolution: "@babel/helper-create-class-features-plugin@npm:7.27.1"
   dependencies:
@@ -584,18 +584,6 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.0.0-0
   checksum: 10/22d8502ee96bca99ad2c8393e8493e2b8d4507576dd054490fd8201a36824373440106f5b098b6d821b026c7e72b0424ff4aeca69ed5f42e48f029d3a156d5ad
-  languageName: node
-  linkType: hard
-
-"@babel/plugin-transform-private-methods@npm:^7.24.4":
-  version: 7.27.1
-  resolution: "@babel/plugin-transform-private-methods@npm:7.27.1"
-  dependencies:
-    "@babel/helper-create-class-features-plugin": "npm:^7.27.1"
-    "@babel/helper-plugin-utils": "npm:^7.27.1"
-  peerDependencies:
-    "@babel/core": ^7.0.0-0
-  checksum: 10/c76f8f6056946466116e67eb9d8014a2d748ade2062636ab82045c1dac9c233aff10e597777bc5af6f26428beb845ceb41b95007abef7d0484da95789da56662
   languageName: node
   linkType: hard
 
@@ -3942,18 +3930,18 @@ __metadata:
   linkType: hard
 
 "eslint-plugin-react-hooks@npm:rc":
-  version: 6.0.0-rc.1
-  resolution: "eslint-plugin-react-hooks@npm:6.0.0-rc.1"
+  version: 6.0.0-rc.2
+  resolution: "eslint-plugin-react-hooks@npm:6.0.0-rc.2"
   dependencies:
     "@babel/core": "npm:^7.24.4"
     "@babel/parser": "npm:^7.24.4"
-    "@babel/plugin-transform-private-methods": "npm:^7.24.4"
+    "@babel/plugin-proposal-private-methods": "npm:^7.18.6"
     hermes-parser: "npm:^0.25.1"
     zod: "npm:^3.22.4"
     zod-validation-error: "npm:^3.0.3"
   peerDependencies:
     eslint: ^3.0.0 || ^4.0.0 || ^5.0.0 || ^6.0.0 || ^7.0.0 || ^8.0.0-0 || ^9.0.0
-  checksum: 10/53162ff842f03e1a4588778410640211ba6aa022cd6c33d735597f7262f3ae4ee99d6170a1052b2154691beba24faaad7f49bda2976e3ea24e2fc097abed9016
+  checksum: 10/b69003df9609b9baa18f73aded929e75bedd2c4ea94aa17f7ea6742921b2af86052f2c57d2fe52c032483f1d125dde580666bee0b22faadeff54209c1291217b
   languageName: node
   linkType: hard
 
@@ -3985,15 +3973,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-testing-library@npm:^7.6.6":
-  version: 7.6.6
-  resolution: "eslint-plugin-testing-library@npm:7.6.6"
+"eslint-plugin-testing-library@npm:^7.11.0":
+  version: 7.11.0
+  resolution: "eslint-plugin-testing-library@npm:7.11.0"
   dependencies:
     "@typescript-eslint/scope-manager": "npm:^8.15.0"
     "@typescript-eslint/utils": "npm:^8.15.0"
   peerDependencies:
     eslint: ^8.57.0 || ^9.0.0
-  checksum: 10/620032f284d48ded915485f383936099feac4694e697d189b8426e429bfeff091f4812d4bea8977341f7809bf7e7201887a732ff7b659fbc2c1174a13c4e2456
+  checksum: 10/25be8a202879220213a5b15204ab85e82e8c57d3c68ba6e9f946d122b39c80b646c198968ad5a9990def9e3e42a0a09dcdf1256a7e9d58c06170bd9a869ad956
   languageName: node
   linkType: hard
 
