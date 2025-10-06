@@ -38,7 +38,7 @@
         "@types/node": "^24.6.2",
         "typescript": "5.9.2",
         "unplugin-dts": "^1.0.0-beta.6",
-        "vite": "^7.1.8",
+        "vite": "^7.1.9",
         "vitest": "^3.2.4"
     }
 }
