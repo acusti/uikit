@@ -38,7 +38,11 @@ export const compilerOptions = {
     logger: {
         logEvent(filename, event) {
             if (event.kind !== 'CompileError') return;
-            console.log('React Compiler logger', filename, event.detail);
+            console.log(
+                'React Compiler logger',
+                filename,
+                JSON.stringify(event.detail, null, 2),
+            );
         },
     },
     // https://github.com/facebook/react/blob/5c56b87/compiler/packages/babel-plugin-react-compiler/src/CompilerError.ts#L11-L39
