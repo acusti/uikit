@@ -1,5 +1,25 @@
 # @acusti/input-text
 
+## 2.2.0
+
+### Minor Changes
+
+- 80a69bf: Introduce a `discardOnEscape` prop that resets the input value
+  to `initialValue` and blurs the input when the Escape key is pressed to
+  provide users with a way to quickly revert changes and exit editing mode.
+  The `discardOnEscape` prop also blurs the input on Enter, so when
+  `discardOnEscape` is true, the component consumer can use `onBlur` to
+  handle “submit” and the input’s value will either be the last submitted
+  value if the user hit Escape or the new value if they hit Enter.
+
+### Patch Changes
+
+- b01d978: Simplify input ref and auto-sizing fallback logic by using
+  React’s cleanup callback support for refs
+- 056a91f: Refactor field sizing support logic in `InputText` to resolve
+  the following eslint error: “Calling setState synchronously within an
+  effect can trigger cascading renders”.
+
 ## 2.1.1
 
 ### Patch Changes

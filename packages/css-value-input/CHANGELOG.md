@@ -1,5 +1,20 @@
 # @acusti/css-value-input
 
+## 2.2.0
+
+### Minor Changes
+
+- ab0dff5: Upgrade to @acusti/input-text v2.2.0 and use `InputText`
+  component’s new `discardOnEscape` prop to simplify internal
+  `CSSValueInput` logic
+
+### Patch Changes
+
+- Updated dependencies [80a69bf]
+- Updated dependencies [b01d978]
+- Updated dependencies [056a91f]
+    - @acusti/input-text@2.2.0
+
 ## 2.1.2
 
 ### Patch Changes
