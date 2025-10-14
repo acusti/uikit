@@ -128,35 +128,6 @@ export default function InputText({
     type = 'text',
 }: Props) {
     const inputRef = useRef<InputRef>(null);
-    const [inputElement, _setInputElement] = useState<InputRef>(null);
-    const resizeObserverRef = useRef<null | ResizeObserver>(null);
-
-    const setInputElement = (element: InputRef) => {
-        inputRef.current = element;
-        _setInputElement(element);
-        // Set the forwarded ref
-        if (typeof ref === 'function') {
-            ref(element);
-        } else if (ref) {
-            ref.current = element;
-        }
-    };
-
-    // If props.initialValue changes, override input value from it
-    useEffect(() => {
-        if (!inputRef.current) return;
-        inputRef.current.value = initialValue ?? '';
-    }, [initialValue]);
-
-    const [readOnlyState, setReadOnlyState] = useState<boolean | undefined>(
-        readOnly ?? doubleClickToEdit,
-    );
-    const isInitialSelectionRef = useRef<boolean>(true);
-
-    const startEditing = () => {
-        if (!doubleClickToEdit) return;
-        setReadOnlyState(false);
-    };
 
     const setInputHeight = () => {
         if (!inputRef.current || SUPPORTS_FIELD_SIZING) return;
@@ -192,21 +163,45 @@ export default function InputText({
         }, 0);
     };
 
-    // Setup ResizeObserver to detect when element gets layout
-    useEffect(() => {
-        if (!inputElement || !multiLine || SUPPORTS_FIELD_SIZING) return;
+    const handleRef = (element: InputRef) => {
+        inputRef.current = element;
+        // Set the forwarded ref
+        if (typeof ref === 'function') {
+            ref(element);
+        } else if (ref) {
+            ref.current = element;
+        }
+
+        // Setup ResizeObserver for multiLine inputs
+        if (!element || !multiLine || SUPPORTS_FIELD_SIZING) return;
+
         // Initialize input height
         setInputHeight();
 
-        resizeObserverRef.current = new ResizeObserver(() => setInputHeight());
-        resizeObserverRef.current.observe(inputElement);
+        const observer = new ResizeObserver(setInputHeight);
+        observer.observe(element);
 
+        // Return cleanup function to disconnect observer
         return () => {
-            if (!resizeObserverRef.current) return;
-            resizeObserverRef.current.disconnect();
-            resizeObserverRef.current = null;
+            observer.disconnect();
         };
-    }, [inputElement, multiLine, setInputHeight]);
+    };
+
+    // If props.initialValue changes, override input value from it
+    useEffect(() => {
+        if (!inputRef.current) return;
+        inputRef.current.value = initialValue ?? '';
+    }, [initialValue]);
+
+    const [readOnlyState, setReadOnlyState] = useState<boolean | undefined>(
+        readOnly ?? doubleClickToEdit,
+    );
+    const isInitialSelectionRef = useRef<boolean>(true);
+
+    const startEditing = () => {
+        if (!doubleClickToEdit) return;
+        setReadOnlyState(false);
+    };
 
     const handleChange = (event: ChangeEvent<InputElement>) => {
         if (onChange) onChange(event);
@@ -224,7 +219,6 @@ export default function InputText({
             setReadOnlyState(true);
         }
         if (!selectTextOnFocus) return;
-        setInputElement(event.currentTarget);
         // When input loses focus, reset isInitialSelection to true for next onSelect event
         isInitialSelectionRef.current = true;
     };
@@ -234,7 +228,6 @@ export default function InputText({
     const handleSelect = (event: SyntheticEvent<HTMLInputElement>) => {
         if (!selectTextOnFocus) return;
         const input = event.currentTarget;
-        setInputElement(input);
         // Do nothing if this isn't the initial select-on-focus event
         if (!isInitialSelectionRef.current) return;
         // This is the initial select-on-focus event, so reset isInitialSelection to false
@@ -311,7 +304,7 @@ export default function InputText({
             pattern={pattern}
             placeholder={placeholder}
             readOnly={readOnlyState}
-            ref={setInputElement}
+            ref={handleRef}
             required={required}
             size={size}
             style={inputStyle}
