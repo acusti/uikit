@@ -107,7 +107,7 @@ export const MultiLineInputWithSubmitOnEnter: Story = {
 export const MultiLineInputWithSubmitOnEnterNoForm: Story = {
     args: {
         ...SUBMIT_ON_ENTER_PROPS,
-        name: SUBMIT_ON_ENTER_PROPS.name + '-no-form',
+        name: `${SUBMIT_ON_ENTER_PROPS.name}-no-form`,
     },
 };
 

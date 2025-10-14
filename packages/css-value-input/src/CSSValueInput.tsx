@@ -66,35 +66,34 @@ type InputRef = HTMLInputElement | null;
 
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
-export default function CSSValueInput(
-    {
-        allowEmpty = true,
-        className,
-        cssValueType = DEFAULT_CSS_VALUE_TYPE,
-        disabled,
-        getValueAsNumber = getCSSValueAsNumber,
-        icon,
-        label,
-        max,
-        min,
-        name,
-        onBlur,
-        onChange,
-        onFocus,
-        onKeyDown,
-        onKeyUp,
-        onSubmitValue,
-        placeholder,
-        ref,
-        step = 1,
-        tabIndex,
-        title,
-        unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
-        validator,
-        value: valueFromProps,
-    }: Props) {
+export default function CSSValueInput({
+    allowEmpty = true,
+    className,
+    cssValueType = DEFAULT_CSS_VALUE_TYPE,
+    disabled,
+    getValueAsNumber = getCSSValueAsNumber,
+    icon,
+    label,
+    max,
+    min,
+    name,
+    onBlur,
+    onChange,
+    onFocus,
+    onKeyDown,
+    onKeyUp,
+    onSubmitValue,
+    placeholder,
+    ref,
+    step = 1,
+    tabIndex,
+    title,
+    unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
+    validator,
+    value: valueFromProps,
+}: Props) {
     const inputRef = useRef<InputRef>(null);
-    
+
     useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
 
     // props.value should be a string; if it’s a number, convert it here
