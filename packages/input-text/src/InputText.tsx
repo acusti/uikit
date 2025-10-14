@@ -20,6 +20,11 @@ export type Props = {
     className?: string;
     disabled?: boolean;
     /**
+     * If true, resets input’s value to initialValue and blurs when user presses
+     * the escape key.
+     */
+    discardOnEscape?: boolean;
+    /**
      * If true, input renders as readonly initially and only becomes interactive
      * when double-clicked or when user focuses the readonly input and then
      * presses the enter key. Likewise, the input becomes readonly again when
@@ -86,6 +91,7 @@ export default function InputText({
     autoFocus,
     className,
     disabled,
+    discardOnEscape,
     doubleClickToEdit,
     enterKeyHint,
     form,
@@ -269,10 +275,12 @@ export default function InputText({
             event.currentTarget.blur();
             return;
         }
+        // only discardOnEscape + doubleClickToEdit have custom Enter/Escape behavior
+        if (!discardOnEscape && !doubleClickToEdit) return;
 
-        if (!doubleClickToEdit) return;
-
-        if (event.key === 'Enter' && readOnlyState) {
+        if (event.key === 'Escape' && discardOnEscape) {
+            event.currentTarget.value = initialValue ?? '';
+        } else if (event.key === 'Enter' && doubleClickToEdit && readOnlyState) {
             setReadOnlyState(false);
         }
         // blur the input on Enter and Escape
