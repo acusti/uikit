@@ -148,13 +148,6 @@ export default function InputText({
         inputRef.current.value = initialValue ?? '';
     }, [initialValue]);
 
-    const [supportsFieldSizing, setSupportsFieldSizing] = useState(true);
-
-    useEffect(() => {
-        if (typeof CSS === 'undefined') return;
-        setSupportsFieldSizing(CSS.supports('field-sizing', 'content'));
-    }, []);
-
     const [readOnlyState, setReadOnlyState] = useState<boolean | undefined>(
         readOnly ?? doubleClickToEdit,
     );
@@ -166,7 +159,7 @@ export default function InputText({
     };
 
     const setInputHeight = () => {
-        if (!inputRef.current || supportsFieldSizing) return;
+        if (!inputRef.current || SUPPORTS_FIELD_SIZING) return;
 
         if (!multiLine) {
             // Reset height to handle multiLine → !multiLine prop change
@@ -201,7 +194,7 @@ export default function InputText({
 
     // Setup ResizeObserver to detect when element gets layout
     useEffect(() => {
-        if (!inputElement || !multiLine || supportsFieldSizing) return;
+        if (!inputElement || !multiLine || SUPPORTS_FIELD_SIZING) return;
         // Initialize input height
         setInputHeight();
 
@@ -213,7 +206,7 @@ export default function InputText({
             resizeObserverRef.current.disconnect();
             resizeObserverRef.current = null;
         };
-    }, [inputElement, multiLine, setInputHeight, supportsFieldSizing]);
+    }, [inputElement, multiLine, setInputHeight]);
 
     const handleChange = (event: ChangeEvent<InputElement>) => {
         if (onChange) onChange(event);
@@ -288,7 +281,7 @@ export default function InputText({
     };
 
     const inputStyle =
-        multiLine && supportsFieldSizing ? { ...style, fieldSizing: 'content' } : style;
+        multiLine && SUPPORTS_FIELD_SIZING ? { ...style, fieldSizing: 'content' } : style;
 
     const Element = (multiLine ? 'textarea' : 'input') as unknown as 'input';
 
@@ -329,6 +322,9 @@ export default function InputText({
         />
     );
 }
+
+const SUPPORTS_FIELD_SIZING =
+    typeof CSS === 'undefined' ? true : CSS.supports('field-sizing', 'content');
 
 const IS_APPLE_REGEXP = /mac|iphone|ipad|ipod/i;
 
