@@ -19,6 +19,7 @@ import {
     useEffect,
     useImperativeHandle,
     useRef,
+    useState,
 } from 'react';
 
 export type Props = {
@@ -101,16 +102,16 @@ export default function CSSValueInput({
         typeof valueFromProps === 'number' && !Number.isNaN(valueFromProps)
             ? `${valueFromProps}`
             : valueFromProps;
-    const submittedValueRef = useRef<string>(value ?? '');
+    const [submittedValue, setSubmittedValue] = useState(value ?? '');
 
     useEffect(() => {
-        submittedValueRef.current = value ?? '';
+        setSubmittedValue(value ?? '');
     }, [value]);
 
     const handleSubmitValue = (event: SyntheticEvent<HTMLInputElement>) => {
         const currentValue = event.currentTarget.value;
         // Store last submittedValue (used to reset value on invalid input)
-        submittedValueRef.current = currentValue;
+        setSubmittedValue(currentValue);
         onSubmitValue(currentValue);
     };
 
@@ -135,7 +136,7 @@ export default function CSSValueInput({
             ? getUnitFromCSSValue({
                   cssValueType,
                   defaultUnit: unit,
-                  value: submittedValueRef.current,
+                  value: submittedValue,
               })
             : '';
 
@@ -151,7 +152,7 @@ export default function CSSValueInput({
                 handleSubmitValue(event);
             } else {
                 // If current value isn’t valid, revert to last submitted value
-                input.value = submittedValueRef.current;
+                input.value = submittedValue;
             }
 
             return;
@@ -231,36 +232,21 @@ export default function CSSValueInput({
         const input = event.currentTarget;
         inputRef.current = input;
         if (onKeyDown) onKeyDown(event);
+        if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
 
         const currentValue = input.value ?? placeholder ?? `0${unit}`;
-        let nextValue = '';
+        const nextValue = getNextValue({
+            currentValue,
+            multiplier: event.shiftKey ? 10 : 1,
+            signum: event.key === 'ArrowUp' ? 1 : -1,
+        });
 
-        switch (event.key) {
-            case 'ArrowDown':
-            case 'ArrowUp':
-                nextValue = getNextValue({
-                    currentValue,
-                    multiplier: event.shiftKey ? 10 : 1,
-                    signum: event.key === 'ArrowUp' ? 1 : -1,
-                });
+        if (nextValue === currentValue) return;
 
-                if (nextValue === currentValue) return;
+        event.stopPropagation();
+        event.preventDefault();
 
-                event.stopPropagation();
-                event.preventDefault();
-
-                input.value = nextValue;
-                return;
-            case 'Enter':
-            case 'Escape':
-                if (event.key === 'Escape') {
-                    input.value = submittedValueRef.current;
-                }
-                input.blur();
-                return;
-            default:
-            // No default key handling
-        }
+        input.value = nextValue;
     };
 
     const handleKeyUp = (event: KeyboardEvent<HTMLInputElement>) => {
@@ -288,7 +274,8 @@ export default function CSSValueInput({
             <div className={`${ROOT_CLASS_NAME}-value`}>
                 <InputText
                     disabled={disabled}
-                    initialValue={value}
+                    discardOnEscape
+                    initialValue={submittedValue}
                     name={name}
                     onBlur={handleBlur}
                     onChange={onChange}
