@@ -111,12 +111,55 @@ export const MultiLineInputWithSubmitOnEnterNoForm: Story = {
     },
 };
 
+const DOUBLE_CLICK_TO_EDIT_PROPS = {
+    className: 'input-text-double-click-to-edit',
+    doubleClickToEdit: true,
+    initialValue: 'Lorem ipsum dolor sit amet',
+    name: 'double-click-to-edit-input',
+};
+
 export const InputWithDoubleClickToEdit: Story = {
+    args: DOUBLE_CLICK_TO_EDIT_PROPS,
+};
+
+const DISCARD_ON_ESCAPE_PROPS = {
+    className: 'input-text',
+    discardOnEscape: true,
+    initialValue: 'Lorem ipsum',
+    name: 'discard-on-escape-input',
+};
+
+export const InputWithDiscardOnEscape: Story = {
+    args: DISCARD_ON_ESCAPE_PROPS,
+    render() {
+        const [value, setValue] = useState('Lorem ipsum');
+        return (
+            <InputText
+                {...DISCARD_ON_ESCAPE_PROPS}
+                initialValue={value}
+                onBlur={(event) => setValue(event.currentTarget.value)}
+            />
+        );
+    },
+};
+
+export const InputWithDoubleClickToEditAndDiscardOnEscape: Story = {
     args: {
-        className: 'input-text-double-click-to-edit',
-        doubleClickToEdit: true,
-        initialValue: 'Lorem ipsum dolor sit amet',
-        name: 'double-click-to-edit-input',
+        ...DISCARD_ON_ESCAPE_PROPS,
+        ...DOUBLE_CLICK_TO_EDIT_PROPS,
+        name: 'double-click-to-edit-and-discard-on-escape-input',
+    },
+    render() {
+        const [value, setValue] = useState('Lorem ipsum dolor');
+        return (
+            <InputText
+                {...DISCARD_ON_ESCAPE_PROPS}
+                {...DOUBLE_CLICK_TO_EDIT_PROPS}
+                initialValue={value}
+                name="double-click-to-edit-and-discard-on-escape-input"
+                onBlur={(event) => setValue(event.currentTarget.value)}
+            />
+        );
     },
 };
 

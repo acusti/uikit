@@ -8,6 +8,7 @@
 
 .input-text-double-click-to-edit {
     border-color: transparent;
+    max-width: 300px;
 
     &:read-only {
         cursor: pointer;
