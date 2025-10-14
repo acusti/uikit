@@ -254,6 +254,8 @@ export default function InputText({
 
     const handleKeyDown = (event: KeyboardEvent<InputElement>) => {
         if (onKeyDown) onKeyDown(event);
+        // special handling is only for Enter and Escape keys
+        if (event.key !== 'Enter' && event.key !== 'Escape') return;
         if (
             event.key === 'Enter' &&
             // for multi-line inputs, ⌘-Enter should always submit
@@ -265,15 +267,16 @@ export default function InputText({
             event.currentTarget.closest('form')?.requestSubmit();
             // always blur input on Enter when submitOnEnter is true
             event.currentTarget.blur();
-        } else if (doubleClickToEdit && inputRef.current) {
-            if (readOnlyState) {
-                if (event.key === 'Enter') {
-                    setReadOnlyState(false);
-                }
-            } else if (event.key === 'Enter' || event.key === 'Escape') {
-                inputRef.current.blur();
-            }
+            return;
         }
+
+        if (!doubleClickToEdit) return;
+
+        if (event.key === 'Enter' && readOnlyState) {
+            setReadOnlyState(false);
+        }
+        // blur the input on Enter and Escape
+        event.currentTarget.blur();
     };
 
     const inputStyle =
