@@ -1,6 +1,6 @@
 {
     "name": "@acusti/input-text",
-    "version": "2.1.1",
+    "version": "2.2.0",
     "type": "module",
     "sideEffects": false,
     "exports": "./dist/InputText.js",
@@ -42,7 +42,7 @@
         "@testing-library/user-event": "^14.6.1",
         "@types/react": "^19.2.0",
         "@vitejs/plugin-react": "^5.0.4",
-        "babel-plugin-react-compiler": "rc",
+        "babel-plugin-react-compiler": "^1",
         "happy-dom": "^20.0.0",
         "react": "^19.2.0",
         "react-dom": "^19.2.0",
