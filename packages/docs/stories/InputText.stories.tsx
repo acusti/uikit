@@ -131,16 +131,6 @@ const DISCARD_ON_ESCAPE_PROPS = {
 
 export const InputWithDiscardOnEscape: Story = {
     args: DISCARD_ON_ESCAPE_PROPS,
-    render() {
-        const [value, setValue] = useState('Lorem ipsum');
-        return (
-            <InputText
-                {...DISCARD_ON_ESCAPE_PROPS}
-                initialValue={value}
-                onBlur={(event) => setValue(event.currentTarget.value)}
-            />
-        );
-    },
 };
 
 export const InputWithDoubleClickToEditAndDiscardOnEscape: Story = {
@@ -148,18 +138,6 @@ export const InputWithDoubleClickToEditAndDiscardOnEscape: Story = {
         ...DISCARD_ON_ESCAPE_PROPS,
         ...DOUBLE_CLICK_TO_EDIT_PROPS,
         name: 'double-click-to-edit-and-discard-on-escape-input',
-    },
-    render() {
-        const [value, setValue] = useState('Lorem ipsum dolor');
-        return (
-            <InputText
-                {...DISCARD_ON_ESCAPE_PROPS}
-                {...DOUBLE_CLICK_TO_EDIT_PROPS}
-                initialValue={value}
-                name="double-click-to-edit-and-discard-on-escape-input"
-                onBlur={(event) => setValue(event.currentTarget.value)}
-            />
-        );
     },
 };
 

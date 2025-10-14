@@ -128,6 +128,8 @@ export default function InputText({
     type = 'text',
 }: Props) {
     const inputRef = useRef<InputRef>(null);
+    const valueFromProps = initialValue ?? '';
+    const committedValueRef = useRef(valueFromProps);
 
     const setInputHeight = () => {
         if (!inputRef.current || SUPPORTS_FIELD_SIZING) return;
@@ -187,11 +189,12 @@ export default function InputText({
         };
     };
 
-    // If props.initialValue changes, override input value from it
     useEffect(() => {
+        committedValueRef.current = valueFromProps;
         if (!inputRef.current) return;
-        inputRef.current.value = initialValue ?? '';
-    }, [initialValue]);
+        // if props.initialValue changes, override input value with it
+        inputRef.current.value = valueFromProps;
+    }, [valueFromProps]);
 
     const [readOnlyState, setReadOnlyState] = useState<boolean | undefined>(
         readOnly ?? doubleClickToEdit,
@@ -215,6 +218,7 @@ export default function InputText({
 
     const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
         if (onBlur) onBlur(event);
+        committedValueRef.current = event.currentTarget.value;
         if (doubleClickToEdit) {
             setReadOnlyState(true);
         }
@@ -265,7 +269,8 @@ export default function InputText({
         if (!discardOnEscape && !doubleClickToEdit) return;
 
         if (event.key === 'Escape' && discardOnEscape) {
-            event.currentTarget.value = initialValue ?? '';
+            // reset input to last “committed” value
+            event.currentTarget.value = committedValueRef.current;
         } else if (event.key === 'Enter' && doubleClickToEdit && readOnlyState) {
             setReadOnlyState(false);
         }
@@ -284,7 +289,7 @@ export default function InputText({
             autoComplete={autoComplete}
             autoFocus={autoFocus} // eslint-disable-line jsx-a11y/no-autofocus
             className={className}
-            defaultValue={initialValue ?? ''}
+            defaultValue={valueFromProps}
             disabled={disabled}
             enterKeyHint={enterKeyHint}
             form={form}
