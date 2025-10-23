@@ -49,8 +49,8 @@
         "react-dom": "^19.2.0",
         "typescript": "5.9.2",
         "unplugin-dts": "^1.0.0-beta.6",
-        "vite": "^7.1.10",
-        "vitest": "^3.2.4"
+        "vite": "^7.1.11",
+        "vitest": "^4.0.1"
     },
     "dependencies": {
         "@acusti/css-values": "^1.2.0",
