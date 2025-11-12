@@ -275,10 +275,7 @@ export default function InputText({
             event.currentTarget.value = committedValue;
             // if the value changed, manually trigger onChange handlers
             if (currentValue !== committedValue) {
-                handleChange({
-                    currentTarget: event.currentTarget,
-                    target: event.currentTarget,
-                } as ChangeEvent<InputElement>);
+                handleChange(event as unknown as ChangeEvent<InputElement>);
             }
         } else if (event.key === 'Enter' && doubleClickToEdit && readOnlyState) {
             setReadOnlyState(false);
