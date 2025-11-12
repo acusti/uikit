@@ -269,7 +269,6 @@ export default function InputText({
         if (!discardOnEscape && !doubleClickToEdit) return;
 
         if (event.key === 'Escape' && discardOnEscape) {
-            const currentValue = event.currentTarget.value;
             // reset input to last “committed” value
             if (event.currentTarget.value !== committedValueRef.current) {
                 event.currentTarget.value = committedValueRef.current;
