@@ -269,8 +269,17 @@ export default function InputText({
         if (!discardOnEscape && !doubleClickToEdit) return;
 
         if (event.key === 'Escape' && discardOnEscape) {
+            const currentValue = event.currentTarget.value;
+            const committedValue = committedValueRef.current;
             // reset input to last “committed” value
-            event.currentTarget.value = committedValueRef.current;
+            event.currentTarget.value = committedValue;
+            // if the value changed, manually trigger onChange handlers
+            if (currentValue !== committedValue) {
+                handleChange({
+                    currentTarget: event.currentTarget,
+                    target: event.currentTarget,
+                } as ChangeEvent<InputElement>);
+            }
         } else if (event.key === 'Enter' && doubleClickToEdit && readOnlyState) {
             setReadOnlyState(false);
         }

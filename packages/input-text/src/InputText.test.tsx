@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { cleanup, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import InputText from './InputText.js';
 
@@ -38,5 +38,75 @@ describe('CSSValueInput.tsx', () => {
         expect(textarea.value).toBe(longText);
         await user.type(textarea, '{Enter}New line');
         expect(textarea.value).toBe(longText + '\nNew line');
+    });
+
+    it('triggers onChange and onChangeValue when discarding changes via Escape with discardOnEscape', async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+        const onChangeValue = vi.fn();
+        render(
+            <InputText
+                discardOnEscape
+                initialValue="original"
+                onChange={onChange}
+                onChangeValue={onChangeValue}
+            />,
+        );
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+
+        // Type some text to modify the value
+        await user.type(input, ' modified');
+        expect(input.value).toBe('original modified');
+
+        // onChange and onChangeValue should be called for each character typed
+        expect(onChange).toHaveBeenCalled();
+        expect(onChangeValue).toHaveBeenCalled();
+
+        // Clear the mock calls
+        onChange.mockClear();
+        onChangeValue.mockClear();
+
+        // Press Escape to discard changes
+        await user.keyboard('{Escape}');
+
+        // Value should be reset to original
+        expect(input.value).toBe('original');
+
+        // onChange and onChangeValue should be called when value is reset
+        expect(onChange).toHaveBeenCalledTimes(1);
+        expect(onChangeValue).toHaveBeenCalledTimes(1);
+        expect(onChangeValue).toHaveBeenCalledWith('original');
+    });
+
+    it('does not trigger onChange when discarding via Escape if value has not changed', async () => {
+        const user = userEvent.setup();
+        const onChange = vi.fn();
+        const onChangeValue = vi.fn();
+        render(
+            <InputText
+                discardOnEscape
+                initialValue="original"
+                onChange={onChange}
+                onChangeValue={onChangeValue}
+            />,
+        );
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+
+        // Focus the input without changing the value
+        await user.click(input);
+
+        // Clear any mock calls from focusing
+        onChange.mockClear();
+        onChangeValue.mockClear();
+
+        // Press Escape without making changes
+        await user.keyboard('{Escape}');
+
+        // Value should still be original
+        expect(input.value).toBe('original');
+
+        // onChange and onChangeValue should NOT be called since value didn't change
+        expect(onChange).not.toHaveBeenCalled();
+        expect(onChangeValue).not.toHaveBeenCalled();
     });
 });
