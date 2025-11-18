@@ -1871,7 +1871,7 @@ const RAW_RUNTIME_STATE =
           ["@joshwooding/vite-plugin-react-docgen-typescript", "virtual:7029d2f05217ce663a3898b830c3b08cef7e230b0202e0476f6edcbe68e7784194e72c2ed78e0f9ff86a180c9f3e38ec87140db4e03d935dfdfee70054c28631#npm:0.6.1"],\
           ["@types/typescript", null],\
           ["@types/vite", null],\
-          ["glob", "npm:10.4.5"],\
+          ["glob", "npm:10.5.0"],\
           ["magic-string", "npm:0.30.17"],\
           ["react-docgen-typescript", "virtual:50649f8758c6ff527eed68075af42011237bd1ce26d86ebed693dd8fd2bc06e03d8e278774ca2975988919fe2e610d217e8873d5cdff27a82e9eb18ca074bb67#npm:2.2.2"],\
           ["typescript", null],\
@@ -4192,7 +4192,7 @@ const RAW_RUNTIME_STATE =
           ["@npmcli/fs", "npm:4.0.0"],\
           ["cacache", "npm:19.0.1"],\
           ["fs-minipass", "npm:3.0.3"],\
-          ["glob", "npm:10.4.5"],\
+          ["glob", "npm:10.5.0"],\
           ["lru-cache", "npm:10.4.3"],\
           ["minipass", "npm:7.1.2"],\
           ["minipass-collect", "npm:2.0.1"],\
@@ -6141,11 +6141,11 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["glob", [\
-      ["npm:10.4.5", {\
-        "packageLocation": "./.yarn/cache/glob-npm-10.4.5-8c63175f05-698dfe1182.zip/node_modules/glob/",\
+      ["npm:10.5.0", {\
+        "packageLocation": "./.yarn/cache/glob-npm-10.5.0-b569657078-ab3bccfefc.zip/node_modules/glob/",\
         "packageDependencies": [\
           ["foreground-child", "npm:3.1.1"],\
-          ["glob", "npm:10.4.5"],\
+          ["glob", "npm:10.5.0"],\
           ["jackspeak", "npm:3.4.3"],\
           ["minimatch", "npm:9.0.5"],\
           ["minipass", "npm:7.1.2"],\
