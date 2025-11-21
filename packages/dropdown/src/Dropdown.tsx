@@ -79,6 +79,7 @@ export type Props = {
      * Used as search input’s name.
      */
     name?: string;
+    onActiveItem?: (payload: Item) => void;
     onClick?: (event: ReactMouseEvent<HTMLElement>) => unknown;
     onClose?: () => unknown;
     onMouseDown?: (event: ReactMouseEvent<HTMLElement>) => unknown;
@@ -130,6 +131,7 @@ export default function Dropdown({
     minHeightBody = 30,
     minWidthBody = 100,
     name,
+    onActiveItem,
     onClick,
     onClose,
     onMouseDown,
@@ -310,7 +312,7 @@ export default function Dropdown({
         const element = item ?? eventTarget;
         for (const itemElement of itemElements) {
             if (itemElement === element) {
-                setActiveItem({ dropdownElement, element });
+                setActiveItem({ dropdownElement, element, event, onActiveItem });
                 return;
             }
         }
@@ -422,9 +424,11 @@ export default function Dropdown({
 
                 setActiveItem({
                     dropdownElement,
+                    event,
                     // If props.allowCreate, only override the input’s value with an
                     // exact text match so user can enter a value not in items
                     isExactMatch: allowCreateRef.current,
+                    onActiveItem,
                     text: enteredCharactersRef.current,
                 });
 
@@ -465,9 +469,14 @@ export default function Dropdown({
             if (key === 'ArrowUp') {
                 onEventHandled();
                 if (altKey || metaKey) {
-                    setActiveItem({ dropdownElement, index: 0 });
+                    setActiveItem({ dropdownElement, event, index: 0, onActiveItem });
                 } else {
-                    setActiveItem({ dropdownElement, indexAddend: -1 });
+                    setActiveItem({
+                        dropdownElement,
+                        event,
+                        indexAddend: -1,
+                        onActiveItem,
+                    });
                 }
                 return;
             }
@@ -475,9 +484,14 @@ export default function Dropdown({
                 onEventHandled();
                 if (altKey || metaKey) {
                     // Using a negative index counts back from the end
-                    setActiveItem({ dropdownElement, index: -1 });
+                    setActiveItem({ dropdownElement, event, index: -1, onActiveItem });
                 } else {
-                    setActiveItem({ dropdownElement, indexAddend: 1 });
+                    setActiveItem({
+                        dropdownElement,
+                        event,
+                        indexAddend: 1,
+                        onActiveItem,
+                    });
                 }
                 return;
             }
@@ -572,9 +586,11 @@ export default function Dropdown({
 
             setActiveItem({
                 dropdownElement: ref,
+                event,
                 // If props.allowCreate, only override the input’s value with an
                 // exact text match so user can enter a value not in items
                 isExactMatch: allowCreateRef.current,
+                onActiveItem,
                 text: enteredCharactersRef.current,
             });
         };

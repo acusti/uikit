@@ -1,5 +1,7 @@
 import { getBestMatch } from '@acusti/matchmaking';
+import { type SyntheticEvent } from 'react';
 
+import { type Item } from './Dropdown.js';
 import { BODY_SELECTOR } from './styles.js';
 
 export const ITEM_SELECTOR = `[data-ukt-item], [data-ukt-value]`;
@@ -44,33 +46,37 @@ const clearItemElementsState = (itemElements: Array<HTMLElement>) => {
 type BaseSetActiveItemPayload = {
     dropdownElement: HTMLElement;
     element?: null;
+    event: Event | SyntheticEvent<HTMLElement>;
     index?: null;
     indexAddend?: null;
     isExactMatch?: null;
+    onActiveItem?: (payload: Item) => void;
     text?: null;
 };
 
 export const setActiveItem = ({
     dropdownElement,
     element,
+    event,
     index,
     indexAddend,
     isExactMatch,
+    onActiveItem,
     text,
 }:
-    | (Omit<BaseSetActiveItemPayload, 'element'> & {
+    | ({
           element: HTMLElement;
-      })
-    | (Omit<BaseSetActiveItemPayload, 'index'> & {
+      } & Omit<BaseSetActiveItemPayload, 'element'>)
+    | ({
           index: number;
-      })
-    | (Omit<BaseSetActiveItemPayload, 'indexAddend'> & {
+      } & Omit<BaseSetActiveItemPayload, 'index'>)
+    | ({
           indexAddend: number;
-      })
-    | (Omit<BaseSetActiveItemPayload, 'isExactMatch' | 'text'> & {
+      } & Omit<BaseSetActiveItemPayload, 'indexAddend'>)
+    | ({
           isExactMatch?: boolean;
           text: string;
-      })) => {
+      } & Omit<BaseSetActiveItemPayload, 'isExactMatch' | 'text'>)) => {
     const items = getItemElements(dropdownElement);
     if (!items) return;
 
@@ -124,12 +130,15 @@ export const setActiveItem = ({
         }
     }
 
-    const nextActiveItem = items[nextActiveIndex];
+    const nextActiveItem = items[nextActiveIndex] as HTMLElement | null;
     if (nextActiveItem == null || nextActiveIndex === currentActiveIndex) return;
 
     // Clear any existing active dropdown body item state
     clearItemElementsState(itemElements);
     nextActiveItem.setAttribute('data-ukt-active', '');
+    const label = nextActiveItem.innerText;
+    const value = nextActiveItem.dataset.uktValue ?? label;
+    onActiveItem?.({ element: nextActiveItem, event, label, value });
     // Find closest scrollable parent and ensure that next active item is visible
     let { parentElement } = nextActiveItem;
     let scrollableParent = null;
