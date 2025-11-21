@@ -19,7 +19,6 @@ import {
     useEffect,
     useImperativeHandle,
     useRef,
-    useState,
 } from 'react';
 
 export type Props = {
@@ -99,20 +98,19 @@ export default function CSSValueInput({
 
     // props.value should be a string; if it’s a number, convert it here
     const value =
-        typeof valueFromProps === 'number' && !Number.isNaN(valueFromProps)
+        typeof valueFromProps === 'number' && Number.isFinite(valueFromProps)
             ? `${valueFromProps}`
             : valueFromProps;
-    const [submittedValue, setSubmittedValue] = useState(value ?? '');
+    const submittedValueRef = useRef(value ?? '');
 
     useEffect(() => {
-        setSubmittedValue(value ?? '');
+        submittedValueRef.current = value ?? '';
     }, [value]);
 
     const handleSubmitValue = (event: SyntheticEvent<HTMLInputElement>) => {
-        const currentValue = event.currentTarget.value;
         // Store last submittedValue (used to reset value on invalid input)
-        setSubmittedValue(currentValue);
-        onSubmitValue(currentValue);
+        submittedValueRef.current = event.currentTarget.value;
+        onSubmitValue(event.currentTarget.value);
     };
 
     const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
@@ -136,7 +134,7 @@ export default function CSSValueInput({
             ? getUnitFromCSSValue({
                   cssValueType,
                   defaultUnit: unit,
-                  value: submittedValue,
+                  value: submittedValueRef.current,
               })
             : '';
 
@@ -152,7 +150,7 @@ export default function CSSValueInput({
                 handleSubmitValue(event);
             } else {
                 // If current value isn’t valid, revert to last submitted value
-                input.value = submittedValue;
+                input.value = submittedValueRef.current;
             }
 
             return;
@@ -275,7 +273,7 @@ export default function CSSValueInput({
                 <InputText
                     disabled={disabled}
                     discardOnEscape
-                    initialValue={submittedValue}
+                    initialValue={value}
                     name={name}
                     onBlur={handleBlur}
                     onChange={onChange}
