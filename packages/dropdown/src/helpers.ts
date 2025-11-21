@@ -41,6 +41,15 @@ const clearItemElementsState = (itemElements: Array<HTMLElement>) => {
     });
 };
 
+type BaseSetActiveItemPayload = {
+    dropdownElement: HTMLElement;
+    element?: null;
+    index?: null;
+    indexAddend?: null;
+    isExactMatch?: null;
+    text?: null;
+};
+
 export const setActiveItem = ({
     dropdownElement,
     element,
@@ -49,38 +58,19 @@ export const setActiveItem = ({
     isExactMatch,
     text,
 }:
-    | {
-          dropdownElement: HTMLElement;
+    | (Omit<BaseSetActiveItemPayload, 'element'> & {
           element: HTMLElement;
-          index?: null;
-          indexAddend?: null;
-          isExactMatch?: null;
-          text?: null;
-      }
-    | {
-          dropdownElement: HTMLElement;
-          element?: null;
+      })
+    | (Omit<BaseSetActiveItemPayload, 'index'> & {
           index: number;
-          indexAddend?: null;
-          isExactMatch?: null;
-          text?: null;
-      }
-    | {
-          dropdownElement: HTMLElement;
-          element?: null;
-          index?: null;
+      })
+    | (Omit<BaseSetActiveItemPayload, 'indexAddend'> & {
           indexAddend: number;
-          isExactMatch?: null;
-          text?: null;
-      }
-    | {
-          dropdownElement: HTMLElement;
-          element?: null;
-          index?: null;
-          indexAddend?: null;
+      })
+    | (Omit<BaseSetActiveItemPayload, 'isExactMatch' | 'text'> & {
           isExactMatch?: boolean;
           text: string;
-      }) => {
+      })) => {
     const items = getItemElements(dropdownElement);
     if (!items) return;
 
