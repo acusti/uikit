@@ -1,6 +1,6 @@
 {
     "name": "@acusti/uikit-docs",
-    "version": "0.4.3",
+    "version": "0.4.4",
     "engines": {
         "node": ">=20"
     },
