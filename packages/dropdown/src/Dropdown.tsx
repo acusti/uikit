@@ -272,14 +272,12 @@ export default function Dropdown({
         // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
         if (valueRef.current && valueRef.current === nextValue) return;
 
-        if (onSubmitItemRef.current) {
-            onSubmitItemRef.current({
-                element,
-                event,
-                label: itemLabel,
-                value: nextValue,
-            });
-        }
+        onSubmitItemRef.current?.({
+            element,
+            event,
+            label: itemLabel,
+            value: nextValue,
+        });
     };
 
     const handleMouseMove = ({ clientX, clientY }: ReactMouseEvent<HTMLElement>) => {
