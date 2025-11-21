@@ -1,5 +1,18 @@
 # @acusti/dropdown
 
+## 0.51.0
+
+### Minor Changes
+
+- c7e0e28: Add support for `onActiveItem` prop (mirroring the existing
+  `onSubmitItem` prop) that is triggered whenever the active Dropdown item
+  changes
+
+### Patch Changes
+
+- 0d6411e: Prevent theoretical edge cases when handling active item change
+  that could clear active item state erroneously
+
 ## 0.50.1
 
 ### Patch Changes

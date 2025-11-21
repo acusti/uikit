@@ -1,5 +1,13 @@
 # @acusti/input-text
 
+## 2.2.1
+
+### Patch Changes
+
+- dcb8377: Update `InputText` to emit a change event when discarding via
+  the Escape key with `discardOnEscape` set to `true` if the action results
+  in a value change (plus new tests verifying the behavior)
+
 ## 2.2.0
 
 ### Minor Changes

@@ -1,5 +1,17 @@
 # @acusti/css-value-input
 
+## 2.2.1
+
+### Patch Changes
+
+- 7fd6663: Track last submitted value as a ref that can be referred to in
+  event handlers, not as a state value that triggers re-renders. This
+  addresses a violation related to the
+  [`set-state-in-effect`](https://react.dev/reference/eslint-plugin-react-hooks/lints/set-state-in-effect)
+  part of the Rules of React.
+- Updated dependencies [dcb8377]
+    - @acusti/input-text@2.2.1
+
 ## 2.2.0
 
 ### Minor Changes

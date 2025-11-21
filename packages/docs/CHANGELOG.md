@@ -1,5 +1,17 @@
 # @acusti/uikit-docs
 
+## 0.4.3
+
+### Patch Changes
+
+- Updated dependencies [c7e0e28]
+- Updated dependencies [dcb8377]
+- Updated dependencies [0d6411e]
+- Updated dependencies [7fd6663]
+    - @acusti/dropdown@0.51.0
+    - @acusti/input-text@2.2.1
+    - @acusti/css-value-input@2.2.1
+
 ## 0.4.2
 
 ### Patch Changes
