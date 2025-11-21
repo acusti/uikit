@@ -100,11 +100,7 @@ export const setActiveItem = ({
             nextActiveIndex += indexAddend;
         }
         // Keep it within the bounds of the items list
-        if (nextActiveIndex < 0) {
-            nextActiveIndex = 0;
-        } else if (nextActiveIndex > lastIndex) {
-            nextActiveIndex = lastIndex;
-        }
+        nextActiveIndex = Math.max(0, Math.min(nextActiveIndex, lastIndex));
     } else if (typeof text === 'string') {
         // If text is empty, clear existing active items and early return
         if (!text) {
@@ -128,42 +124,38 @@ export const setActiveItem = ({
         }
     }
 
-    if (nextActiveIndex === -1 || nextActiveIndex === currentActiveIndex) return;
+    const nextActiveItem = items[nextActiveIndex];
+    if (nextActiveItem == null || nextActiveIndex === currentActiveIndex) return;
 
     // Clear any existing active dropdown body item state
     clearItemElementsState(itemElements);
-
-    const nextActiveItem = items[nextActiveIndex];
-    if (nextActiveItem != null) {
-        nextActiveItem.setAttribute('data-ukt-active', '');
-        // Find closest scrollable parent and ensure that next active item is visible
-        let { parentElement } = nextActiveItem;
-        let scrollableParent = null;
-        while (!scrollableParent && parentElement && parentElement !== dropdownElement) {
-            const isScrollable =
-                parentElement.scrollHeight > parentElement.clientHeight + 15;
-            if (isScrollable) {
-                scrollableParent = parentElement;
-            } else {
-                parentElement = parentElement.parentElement;
-            }
+    nextActiveItem.setAttribute('data-ukt-active', '');
+    // Find closest scrollable parent and ensure that next active item is visible
+    let { parentElement } = nextActiveItem;
+    let scrollableParent = null;
+    while (!scrollableParent && parentElement && parentElement !== dropdownElement) {
+        const isScrollable = parentElement.scrollHeight > parentElement.clientHeight + 15;
+        if (isScrollable) {
+            scrollableParent = parentElement;
+        } else {
+            parentElement = parentElement.parentElement;
         }
+    }
 
-        if (scrollableParent) {
-            const parentRect = scrollableParent.getBoundingClientRect();
-            const itemRect = nextActiveItem.getBoundingClientRect();
-            const isAboveTop = itemRect.top < parentRect.top;
-            const isBelowBottom = itemRect.bottom > parentRect.bottom;
-            if (isAboveTop || isBelowBottom) {
-                let { scrollTop } = scrollableParent;
-                // Item isn’t fully visible; adjust scrollTop to put item within closest edge
-                if (isAboveTop) {
-                    scrollTop -= parentRect.top - itemRect.top;
-                } else {
-                    scrollTop += itemRect.bottom - parentRect.bottom;
-                }
-                scrollableParent.scrollTop = scrollTop;
+    if (scrollableParent) {
+        const parentRect = scrollableParent.getBoundingClientRect();
+        const itemRect = nextActiveItem.getBoundingClientRect();
+        const isAboveTop = itemRect.top < parentRect.top;
+        const isBelowBottom = itemRect.bottom > parentRect.bottom;
+        if (isAboveTop || isBelowBottom) {
+            let { scrollTop } = scrollableParent;
+            // Item isn’t fully visible; adjust scrollTop to put item within closest edge
+            if (isAboveTop) {
+                scrollTop -= parentRect.top - itemRect.top;
+            } else {
+                scrollTop += itemRect.bottom - parentRect.bottom;
             }
+            scrollableParent.scrollTop = scrollTop;
         }
     }
 };
