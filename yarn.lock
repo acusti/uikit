@@ -21,7 +21,7 @@ __metadata:
     "@types/node": "npm:^24.7.2"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -33,7 +33,7 @@ __metadata:
     "@types/node": "npm:^24.7.2"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -56,7 +56,7 @@ __metadata:
     react-dom: "npm:^19.2.0"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   peerDependencies:
     react: ^19 || ~0.0.0-experimental < 0.0.0-f
@@ -70,7 +70,7 @@ __metadata:
   dependencies:
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -92,7 +92,7 @@ __metadata:
     react-dom: "npm:^19.2.0"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   peerDependencies:
     react: ^19 || ~0.0.0-experimental < 0.0.0-f
@@ -120,7 +120,7 @@ __metadata:
     react-dom: "npm:^19"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   peerDependencies:
     react: ^19 || ~0.0.0-experimental < 0.0.0-f
@@ -143,7 +143,7 @@ __metadata:
     react-dom: "npm:^19.2.0"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   peerDependencies:
     react: ^19 || ~0.0.0-experimental < 0.0.0-f
@@ -157,7 +157,7 @@ __metadata:
   dependencies:
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -168,7 +168,7 @@ __metadata:
   dependencies:
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -180,7 +180,7 @@ __metadata:
     "@types/node": "npm:^24.7.2"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -200,7 +200,7 @@ __metadata:
     react-dom: "npm:^19"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   peerDependencies:
     react: ^19 || ~0.0.0-experimental < 0.0.0-f
@@ -214,7 +214,7 @@ __metadata:
   dependencies:
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -237,7 +237,7 @@ __metadata:
     react-dom: "npm:^19.2.0"
     storybook: "npm:^9"
     typescript: "npm:5.9.2"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
   languageName: unknown
   linkType: soft
 
@@ -277,7 +277,7 @@ __metadata:
     react-dom: "npm:^19.2.0"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -288,7 +288,7 @@ __metadata:
   dependencies:
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   languageName: unknown
   linkType: soft
@@ -304,7 +304,7 @@ __metadata:
     react-dom: "npm:^19.2.0"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   peerDependencies:
     react: ^19 || ~0.0.0-experimental < 0.0.0-f
@@ -323,7 +323,7 @@ __metadata:
     react-dom: "npm:^19.2.0"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   peerDependencies:
     react: ^19 || ~0.0.0-experimental < 0.0.0-f
@@ -346,7 +346,7 @@ __metadata:
     react-dom: "npm:^19.2.0"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
-    vite: "npm:^7.1.10"
+    vite: "npm:^7.1.11"
     vitest: "npm:^3.2.4"
   peerDependencies:
     react: ^19 || ~0.0.0-experimental < 0.0.0-f
@@ -7676,9 +7676,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"vite@npm:^5.0.0 || ^6.0.0 || ^7.0.0-0, vite@npm:^7.1.10":
-  version: 7.1.10
-  resolution: "vite@npm:7.1.10"
+"vite@npm:^5.0.0 || ^6.0.0 || ^7.0.0-0, vite@npm:^7.1.11":
+  version: 7.2.2
+  resolution: "vite@npm:7.2.2"
   dependencies:
     esbuild: "npm:^0.25.0"
     fdir: "npm:^6.5.0"
@@ -7727,7 +7727,7 @@ __metadata:
       optional: true
   bin:
     vite: bin/vite.js
-  checksum: 10/34482c3698a6e10986036caa91c0114fc59f5a4bdda571d19b863a44a8b231dda09b0e3c63eb459e3b27ce453e695bce476f504b160451706563ce97e841ac5a
+  checksum: 10/aee08b420646d5bcd92d5f4130b13b90303cab1cf48ee4772030f5fa7b464cc602ba578e9b1800a71f9b1c9b8daf1336e8c069a4cf1bb90b7b05ae5b13f62b06
   languageName: node
   linkType: hard
 
