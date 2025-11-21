@@ -114,6 +114,7 @@ type TimeoutID = ReturnType<typeof setTimeout>;
 
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
+const CLICKABLE_SELECTOR = 'button, a[href], input[type="button"], input[type="submit"]';
 const TEXT_INPUT_SELECTOR =
     'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea';
 
@@ -271,6 +272,31 @@ export default function Dropdown({
         const nextValue = element?.dataset.uktValue ?? itemLabel;
         // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
         if (valueRef.current && valueRef.current === nextValue) return;
+
+        // If the item is clickable or contains exactly one clickable element, invoke it
+        // (but only if the event didn’t already originate from that element)
+        if (element) {
+            const eventTarget = event.target as HTMLElement;
+
+            if (element.matches(CLICKABLE_SELECTOR)) {
+                // The item element itself is clickable (e.g., <button data-ukt-value="…">)
+                if (element !== eventTarget && !element.contains(eventTarget)) {
+                    element.click();
+                }
+            } else {
+                // Check if item contains exactly one clickable child element
+                const clickableElements = element.querySelectorAll(CLICKABLE_SELECTOR);
+                if (clickableElements.length === 1) {
+                    const clickableElement = clickableElements[0] as HTMLElement;
+                    if (
+                        clickableElement !== eventTarget &&
+                        !clickableElement.contains(eventTarget)
+                    ) {
+                        clickableElement.click();
+                    }
+                }
+            }
+        }
 
         onSubmitItemRef.current?.({
             element,
