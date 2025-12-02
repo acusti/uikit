@@ -47,11 +47,11 @@ export const compilerOptions = {
     },
     // https://github.com/facebook/react/blob/5c56b87/compiler/packages/babel-plugin-react-compiler/src/CompilerError.ts#L11-L39
     reportableLevels: new Set([
+        'CannotPreserveMemoization',
+        'InvalidConfig',
         'InvalidJS',
         'InvalidReact',
-        'InvalidConfig',
-        'CannotPreserveMemoization',
-        'Todo',
         'Invariant',
+        'Todo',
     ]),
 };
