@@ -1,5 +1,14 @@
 # @acusti/input-text
 
+## 2.2.2
+
+### Patch Changes
+
+- 01da0b4: Add support for React 19 ref callback cleanup functions. Ref
+  callbacks can now return cleanup functions that will be called when the
+  element is removed or the ref changes, matching React 19’s native ref
+  behavior.
+
 ## 2.2.1
 
 ### Patch Changes
