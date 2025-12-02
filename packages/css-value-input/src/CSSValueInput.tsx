@@ -17,7 +17,6 @@ import {
     type Ref,
     type SyntheticEvent,
     useEffect,
-    useImperativeHandle,
     useRef,
 } from 'react';
 
@@ -62,8 +61,6 @@ export type Props = {
     value?: string;
 };
 
-type InputRef = HTMLInputElement | null;
-
 const ROOT_CLASS_NAME = 'cssvalueinput';
 
 export default function CSSValueInput({
@@ -92,10 +89,6 @@ export default function CSSValueInput({
     validator,
     value: valueFromProps,
 }: Props) {
-    const inputRef = useRef<InputRef>(null);
-
-    useImperativeHandle<InputRef, InputRef>(ref, () => inputRef.current);
-
     // props.value should be a string; if it’s a number, convert it here
     const value =
         typeof valueFromProps === 'number' && Number.isFinite(valueFromProps)
@@ -115,7 +108,6 @@ export default function CSSValueInput({
 
     const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
         const input = event.currentTarget;
-        inputRef.current = input;
         if (onBlur) onBlur(event);
 
         const currentValue = input.value.trim();
@@ -228,7 +220,6 @@ export default function CSSValueInput({
 
     const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
         const input = event.currentTarget;
-        inputRef.current = input;
         if (onKeyDown) onKeyDown(event);
         if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
 
@@ -281,7 +272,7 @@ export default function CSSValueInput({
                     onKeyDown={handleKeyDown}
                     onKeyUp={handleKeyUp}
                     placeholder={placeholder}
-                    ref={inputRef}
+                    ref={ref}
                     selectTextOnFocus
                     tabIndex={tabIndex}
                 />
