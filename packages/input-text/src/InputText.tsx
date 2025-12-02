@@ -167,15 +167,20 @@ export default function InputText({
 
     const handleRef = (element: InputRef) => {
         inputRef.current = element;
-        // Set the forwarded ref
+
+        // Forward the ref and capture any cleanup function it returns
+        let cleanup: (() => void) | void = undefined;
         if (typeof ref === 'function') {
-            ref(element);
+            cleanup = ref(element);
         } else if (ref) {
             ref.current = element;
         }
 
         // Setup ResizeObserver for multiLine inputs
-        if (!element || !multiLine || SUPPORTS_FIELD_SIZING) return;
+        if (!element || !multiLine || SUPPORTS_FIELD_SIZING) {
+            // Return ref cleanup if present
+            return cleanup;
+        }
 
         // Initialize input height
         setInputHeight();
@@ -183,9 +188,12 @@ export default function InputText({
         const observer = new ResizeObserver(setInputHeight);
         observer.observe(element);
 
-        // Return cleanup function to disconnect observer
+        // Return cleanup function that disconnects observer and calls ref cleanup
         return () => {
             observer.disconnect();
+            if (typeof cleanup === 'function') {
+                cleanup();
+            }
         };
     };
 
