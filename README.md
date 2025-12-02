@@ -146,9 +146,9 @@ git push --follow-tags
 
 ## Developing
 
-The run script for developing is `yarn dev`, which kicks kicks off the
-default `storybook` command from `packages/docs/package.json` abd runs
-storybook in watch mode. Changes to the source files (e.g.
+The run script for developing is `yarn dev`, which kicks off the default
+`storybook` command from `packages/docs/package.json` and runs storybook in
+watch mode. Changes to the source files (e.g.
 `packages/dropdown/src/Dropdown.tsx`) should trigger a rebuild, but if not,
 run `yarn build` to ensure it’s picked up.
 
