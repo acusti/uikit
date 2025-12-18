@@ -120,7 +120,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
-          ["@types/node", "npm:24.7.2"],\
+          ["@types/node", "npm:25.0.3"],\
           ["@types/react", "npm:19.2.2"],\
           ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.46.1"],\
           ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.46.1"],\
@@ -168,7 +168,7 @@ const RAW_RUNTIME_STATE =
           ["@acusti/appsync-fetch", "workspace:packages/appsync-fetch"],\
           ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
           ["@acusti/post", "workspace:packages/post"],\
-          ["@types/node", "npm:24.7.2"],\
+          ["@types/node", "npm:25.0.3"],\
           ["typescript", "patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"],\
           ["unplugin-dts", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:1.0.0-beta.6"],\
           ["vite", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.1.10"],\
@@ -182,7 +182,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/aws-signature-v4/",\
         "packageDependencies": [\
           ["@acusti/aws-signature-v4", "workspace:packages/aws-signature-v4"],\
-          ["@types/node", "npm:24.7.2"],\
+          ["@types/node", "npm:25.0.3"],\
           ["typescript", "patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"],\
           ["unplugin-dts", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:1.0.0-beta.6"],\
           ["vite", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.1.10"],\
@@ -447,7 +447,7 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/post/",\
         "packageDependencies": [\
           ["@acusti/post", "workspace:packages/post"],\
-          ["@types/node", "npm:24.7.2"],\
+          ["@types/node", "npm:25.0.3"],\
           ["typescript", "patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"],\
           ["unplugin-dts", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:1.0.0-beta.6"],\
           ["vite", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.1.10"],\
@@ -528,7 +528,7 @@ const RAW_RUNTIME_STATE =
           ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.0"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
-          ["@types/node", "npm:24.7.2"],\
+          ["@types/node", "npm:25.0.3"],\
           ["@types/react", "npm:19.2.2"],\
           ["@typescript-eslint/eslint-plugin", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.46.1"],\
           ["@typescript-eslint/parser", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:8.46.1"],\
@@ -2933,11 +2933,11 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
-      ["npm:24.7.2", {\
-        "packageLocation": "./.yarn/cache/@types-node-npm-24.7.2-c42e5df6ef-62073022f7.zip/node_modules/@types/node/",\
+      ["npm:25.0.3", {\
+        "packageLocation": "./.yarn/cache/@types-node-npm-25.0.3-b5e8cb0cae-5889b00f39.zip/node_modules/@types/node/",\
         "packageDependencies": [\
-          ["@types/node", "npm:24.7.2"],\
-          ["undici-types", "npm:7.14.0"]\
+          ["@types/node", "npm:25.0.3"],\
+          ["undici-types", "npm:7.16.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -9404,10 +9404,10 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
-      ["npm:7.14.0", {\
-        "packageLocation": "./.yarn/cache/undici-types-npm-7.14.0-d9eb643e6a-0f8709b214.zip/node_modules/undici-types/",\
+      ["npm:7.16.0", {\
+        "packageLocation": "./.yarn/cache/undici-types-npm-7.16.0-0e23b08124-db43439f69.zip/node_modules/undici-types/",\
         "packageDependencies": [\
-          ["undici-types", "npm:7.14.0"]\
+          ["undici-types", "npm:7.16.0"]\
         ],\
         "linkType": "HARD"\
       }]\
@@ -9680,7 +9680,7 @@ const RAW_RUNTIME_STATE =
           ["@types/jiti", null],\
           ["@types/less", null],\
           ["@types/lightningcss", null],\
-          ["@types/node", "npm:24.7.2"],\
+          ["@types/node", "npm:25.0.3"],\
           ["@types/sass", null],\
           ["@types/sass-embedded", null],\
           ["@types/stylus", null],\
@@ -9822,7 +9822,7 @@ const RAW_RUNTIME_STATE =
           ["@types/edge-runtime__vm", null],\
           ["@types/happy-dom", null],\
           ["@types/jsdom", null],\
-          ["@types/node", "npm:24.7.2"],\
+          ["@types/node", "npm:25.0.3"],\
           ["@types/vitest__browser", null],\
           ["@types/vitest__ui", null],\
           ["@vitest/browser", null],\
@@ -9990,7 +9990,7 @@ const RAW_RUNTIME_STATE =
           ["@types/edge-runtime__vm", null],\
           ["@types/happy-dom", null],\
           ["@types/jsdom", null],\
-          ["@types/node", "npm:24.7.2"],\
+          ["@types/node", "npm:25.0.3"],\
           ["@types/vitest__browser", null],\
           ["@types/vitest__ui", null],\
           ["@vitest/browser", null],\
