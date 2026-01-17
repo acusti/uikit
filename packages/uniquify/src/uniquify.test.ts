@@ -459,6 +459,47 @@ describe('uniquify', () => {
         });
     });
 
+    describe('ReadonlyArray support', () => {
+        it('accepts ReadonlyArray for items parameter', () => {
+            const readonlyItems: ReadonlyArray<string> = ['bear', 'chickaree', 'coyote'];
+            expect(
+                uniquify({
+                    items: readonlyItems,
+                    value: 'bear',
+                }),
+            ).toBe('bear 2');
+        });
+
+        it('accepts ReadonlyArray for propertyPath parameter', () => {
+            const readonlyPath: ReadonlyArray<string> = ['slug'];
+            const items = [{ slug: 'home' }, { slug: 'about' }];
+            expect(
+                uniquify({
+                    items,
+                    propertyPath: readonlyPath,
+                    separator: '-',
+                    value: 'about',
+                }),
+            ).toBe('about-2');
+        });
+
+        it('accepts ReadonlyArray for both items and propertyPath', () => {
+            const readonlyItems: ReadonlyArray<{ slug: string }> = [
+                { slug: 'home' },
+                { slug: 'about' },
+            ];
+            const readonlyPath: ReadonlyArray<string> = ['slug'];
+            expect(
+                uniquify({
+                    items: readonlyItems,
+                    propertyPath: readonlyPath,
+                    separator: '-',
+                    value: 'home',
+                }),
+            ).toBe('home-2');
+        });
+    });
+
     describe('escapeRegExp', () => {
         const escaped = '\\^\\$\\.\\*\\+\\?\\(\\)\\[\\]\\{\\}\\|\\\\';
         const unescaped = '^$.*+?()[]{}|\\';

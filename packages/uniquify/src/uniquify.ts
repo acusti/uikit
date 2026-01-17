@@ -1,6 +1,8 @@
 type GenericObject = Record<string, unknown>;
-type Items = Array<GenericObject | null | undefined> | Array<null | string | undefined>;
-type StringKeyPath = Array<string>;
+type Items =
+    | ReadonlyArray<GenericObject | null | undefined>
+    | ReadonlyArray<null | string | undefined>;
+type StringKeyPath = ReadonlyArray<string>;
 
 /**
  * Escapes the RegExp special characters "^", "$", "\\", ".", "*", "+", "?", "(", ")", "[", "]", "{", "}", and "|" in `str`.
@@ -14,7 +16,7 @@ type StringKeyPath = Array<string>;
 export const escapeRegExp = (str: string): string =>
     str.replace(/[\\^$.*+?()[\]{}|]/g, '\\$&');
 
-const getIn = (item: unknown, path: Array<string>) => {
+const getIn = (item: unknown, path: ReadonlyArray<string>) => {
     let value = item;
     for (let i = 0; i < path.length && value != null; i++) {
         value = (value as GenericObject)[path[i]];
