@@ -2000,7 +2000,7 @@ const RAW_RUNTIME_STATE =
           ["@rushstack/rig-package", "npm:0.5.3"],\
           ["@rushstack/terminal", "virtual:0ba4e33118477afb89f7407c25951f71c6b7b89c223e8743f0cdd4ef22e0976ad287c195a5cb5e3f0053f5e4de6f7928116d0dc7cc6e7af8048dff62763d19a8#npm:0.15.3"],\
           ["@rushstack/ts-command-line", "npm:5.0.1"],\
-          ["lodash", "npm:4.17.21"],\
+          ["lodash", "npm:4.17.23"],\
           ["minimatch", "npm:3.0.8"],\
           ["resolve", "patch:resolve@npm%3A1.22.10#optional!builtin<compat/resolve>::version=1.22.10&hash=c3c19d"],\
           ["semver", "npm:7.5.4"],\
@@ -2698,7 +2698,7 @@ const RAW_RUNTIME_STATE =
           ["chalk", "npm:3.0.0"],\
           ["css.escape", "npm:1.5.1"],\
           ["dom-accessibility-api", "npm:0.6.3"],\
-          ["lodash", "npm:4.17.21"],\
+          ["lodash", "npm:4.17.23"],\
           ["redent", "npm:3.0.0"]\
         ],\
         "linkType": "HARD"\
@@ -5288,7 +5288,7 @@ const RAW_RUNTIME_STATE =
           ["is-js-type", "npm:2.0.0"],\
           ["is-obj-prop", "npm:1.0.0"],\
           ["is-proto-prop", "npm:2.0.0"],\
-          ["lodash", "npm:4.17.21"],\
+          ["lodash", "npm:4.17.23"],\
           ["natural-orderby", "npm:5.0.0"],\
           ["recast", "npm:0.23.11"],\
           ["roarr", "npm:7.21.1"],\
@@ -7173,10 +7173,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["lodash", [\
-      ["npm:4.17.21", {\
-        "packageLocation": "./.yarn/cache/lodash-npm-4.17.21-6382451519-c08619c038.zip/node_modules/lodash/",\
+      ["npm:4.17.23", {\
+        "packageLocation": "./.yarn/cache/lodash-npm-4.17.23-50bdb1c01a-82504c8825.zip/node_modules/lodash/",\
         "packageDependencies": [\
-          ["lodash", "npm:4.17.21"]\
+          ["lodash", "npm:4.17.23"]\
         ],\
         "linkType": "HARD"\
       }]\
