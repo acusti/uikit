@@ -40,15 +40,15 @@
         "@testing-library/react": "^16.3.1",
         "@testing-library/user-event": "^14.6.1",
         "@types/react": "^19.2.10",
-        "@vitejs/plugin-react": "^5.0.4",
+        "@vitejs/plugin-react": "^5.1.2",
         "babel-plugin-react-compiler": "^1",
         "happy-dom": "^20.0.10",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
         "typescript": "5.9.2",
         "unplugin-dts": "^1.0.0-beta.6",
-        "vite": "^7.1.10",
-        "vitest": "^3.2.4"
+        "vite": "^7.3.1",
+        "vitest": "^4.0.18"
     },
     "peerDependencies": {
         "react": "^19 || ~0.0.0-experimental < 0.0.0-f",
