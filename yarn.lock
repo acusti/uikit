@@ -47,13 +47,13 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.1"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     "@vitejs/plugin-react": "npm:^5.0.4"
     babel-plugin-react-compiler: "npm:^1"
     clsx: "npm:^2"
     happy-dom: "npm:^20.0.10"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
+    react: "npm:^19.2.4"
+    react-dom: "npm:^19.2.4"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.10"
@@ -83,13 +83,13 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.1"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     "@vitejs/plugin-react": "npm:^5.0.4"
     babel-plugin-react-compiler: "npm:^1"
     clsx: "npm:^2"
     happy-dom: "npm:^20.0.10"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
+    react: "npm:^19.2.4"
+    react-dom: "npm:^19.2.4"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.10"
@@ -111,7 +111,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.1"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     "@vitejs/plugin-react": "npm:^5.0.4"
     babel-plugin-react-compiler: "npm:^1"
     clsx: "npm:^2"
@@ -135,12 +135,12 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.1"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     "@vitejs/plugin-react": "npm:^5.0.4"
     babel-plugin-react-compiler: "npm:^1"
     happy-dom: "npm:^20.0.10"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
+    react: "npm:^19.2.4"
+    react-dom: "npm:^19.2.4"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.10"
@@ -192,7 +192,7 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.1"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     "@vitejs/plugin-react": "npm:^5.0.4"
     babel-plugin-react-compiler: "npm:^1"
     happy-dom: "npm:^20.0.10"
@@ -231,10 +231,10 @@ __metadata:
     "@acusti/use-keyboard-events": "workspace:^"
     "@storybook/addon-docs": "npm:^9"
     "@storybook/react-vite": "npm:^9"
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     core-js: "npm:^3.46.0"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
+    react: "npm:^19.2.4"
+    react-dom: "npm:^19.2.4"
     storybook: "npm:^9"
     typescript: "npm:5.9.2"
     vite: "npm:^7.1.10"
@@ -252,7 +252,7 @@ __metadata:
     "@testing-library/react": "npm:^16.3.1"
     "@testing-library/user-event": "npm:^14.6.1"
     "@types/node": "npm:^25.0.3"
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     "@typescript-eslint/eslint-plugin": "npm:^8.48.1"
     "@typescript-eslint/parser": "npm:^8.48.1"
     eslint: "npm:^9.38.0"
@@ -273,8 +273,8 @@ __metadata:
     globals: "npm:^17.0.0"
     happy-dom: "npm:^20.0.10"
     prettier: "npm:^3.7.4"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
+    react: "npm:^19.2.4"
+    react-dom: "npm:^19.2.4"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.10"
@@ -297,11 +297,11 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@acusti/use-bounding-client-rect@workspace:packages/use-bounding-client-rect"
   dependencies:
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     "@vitejs/plugin-react": "npm:^5.0.4"
     babel-plugin-react-compiler: "npm:^1"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
+    react: "npm:^19.2.4"
+    react-dom: "npm:^19.2.4"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.10"
@@ -317,10 +317,10 @@ __metadata:
   resolution: "@acusti/use-is-out-of-bounds@workspace:packages/use-is-out-of-bounds"
   dependencies:
     "@acusti/use-bounding-client-rect": "npm:^2.0.0"
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     "@vitejs/plugin-react": "npm:^5.0.4"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
+    react: "npm:^19.2.4"
+    react-dom: "npm:^19.2.4"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.10"
@@ -338,12 +338,12 @@ __metadata:
     "@testing-library/dom": "npm:^10.4.1"
     "@testing-library/react": "npm:^16.3.1"
     "@testing-library/user-event": "npm:^14.6.1"
-    "@types/react": "npm:^19.2.2"
+    "@types/react": "npm:^19.2.10"
     "@vitejs/plugin-react": "npm:^5.0.4"
     babel-plugin-react-compiler: "npm:^1"
     happy-dom: "npm:^20.0.10"
-    react: "npm:^19.2.0"
-    react-dom: "npm:^19.2.0"
+    react: "npm:^19.2.4"
+    react-dom: "npm:^19.2.4"
     typescript: "npm:5.9.2"
     unplugin-dts: "npm:^1.0.0-beta.6"
     vite: "npm:^7.1.10"
@@ -2027,12 +2027,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:^19.2.2":
-  version: 19.2.2
-  resolution: "@types/react@npm:19.2.2"
+"@types/react@npm:^19.2.10":
+  version: 19.2.10
+  resolution: "@types/react@npm:19.2.10"
   dependencies:
-    csstype: "npm:^3.0.2"
-  checksum: 10/d6adf8fd4bb23a7e04da5700d96b15dc0f59653727a9c6e940c151d7232fa1dbbab98417d5ac830dcfb6cba3f206efbd4cd83647e6f9a688d7363a90e607f6bf
+    csstype: "npm:^3.2.2"
+  checksum: 10/0e34a0e42db02f4b3f4bed446128c555446c2854b833d71d597e6c8b08800dd90519a03a226ad250cccc4a0c9e51bd3f9c54cdcb79ee1219f4d5b318fb3a3813
   languageName: node
   linkType: hard
 
@@ -3146,10 +3146,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"csstype@npm:^3.0.2":
-  version: 3.0.7
-  resolution: "csstype@npm:3.0.7"
-  checksum: 10/a93533d9ff044690ad6403b8915db36d667c2a58024fa8b36f398271bb96a132d65cde5d95d0116428311e614193099fdc87e41db076ad923444f0fdceea1282
+"csstype@npm:^3.2.2":
+  version: 3.2.3
+  resolution: "csstype@npm:3.2.3"
+  checksum: 10/ad41baf7e2ffac65ab544d79107bf7cd1a4bb9bab9ac3302f59ab4ba655d5e30942a8ae46e10ba160c6f4ecea464cc95b975ca2fefbdeeacd6ac63f12f99fe1f
   languageName: node
   linkType: hard
 
@@ -6301,14 +6301,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0, react-dom@npm:^19, react-dom@npm:^19.2.0":
-  version: 19.2.0
-  resolution: "react-dom@npm:19.2.0"
+"react-dom@npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0, react-dom@npm:^19, react-dom@npm:^19.2.4":
+  version: 19.2.4
+  resolution: "react-dom@npm:19.2.4"
   dependencies:
     scheduler: "npm:^0.27.0"
   peerDependencies:
-    react: ^19.2.0
-  checksum: 10/3dbba071b9b1e7a19eae55f05c100f6b44f88c0aee72397d719ae338248ca66ed5028e6964c1c14870cc3e1abcecc91b22baba6dc2072f819dea81a9fd72f2fd
+    react: ^19.2.4
+  checksum: 10/ec17721a8cb131bc33480a9f738bc5bbfe4bd11b11cf69f3f473605346578a329ad26ceef6ef0761ea67a4b455803407dd7ed4ba3d8a5abd2cee8c32d221e498
   languageName: node
   linkType: hard
 
@@ -6333,10 +6333,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0, react@npm:^19, react@npm:^19.2.0":
-  version: 19.2.0
-  resolution: "react@npm:19.2.0"
-  checksum: 10/e13bcdb8e994c3cfa922743cb75ca8deb60531bf02f584d2d8dab940a8132ce8a2e6ef16f8ed7f372b4072e7a7eeff589b2812dabbedfa73e6e46201dac8a9d0
+"react@npm:^16.8.0 || ^17.0.0 || ^18.0.0 || ^19.0.0, react@npm:^19, react@npm:^19.2.4":
+  version: 19.2.4
+  resolution: "react@npm:19.2.4"
+  checksum: 10/18179fe217f67eb2d0bc61cd04e7ad3c282ea09a1dface7eacd71816f62609f4bbf566c447c704335284deb8397b00bca084e0cd60e6f437279a7498e2d0bfe0
   languageName: node
   linkType: hard
 
