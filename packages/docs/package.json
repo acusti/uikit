@@ -11,10 +11,10 @@
     "devDependencies": {
         "@storybook/addon-docs": "^9",
         "@storybook/react-vite": "^9",
-        "@types/react": "^19.2.2",
+        "@types/react": "^19.2.10",
         "core-js": "^3.46.0",
-        "react": "^19.2.0",
-        "react-dom": "^19.2.0",
+        "react": "^19.2.4",
+        "react-dom": "^19.2.4",
         "storybook": "^9",
         "typescript": "5.9.2",
         "vite": "^7.1.10"
