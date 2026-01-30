@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 
 import { minifyStyles } from './minifyStyles.js';
 
@@ -30,22 +30,22 @@ export function useStyles(styles: string, initialHref?: string) {
         return item;
     });
 
+    const handleKeyUpdate = useEffectEvent((key: string) => {
+        if (styleCache.get(key)) return;
+        const minified = minifyStyles(styles);
+        const item = {
+            href: sanitizeHref(initialHref ?? minified),
+            referenceCount: 1,
+            styles: minified,
+        };
+        styleCache.set(key, item);
+        setStylesItem(item);
+    });
+
     useEffect(() => {
         if (!styles) return;
 
-        const key = initialHref ?? styles;
-
-        if (!styleCache.get(key)) {
-            const minified = minifyStyles(styles);
-            const item = {
-                href: sanitizeHref(initialHref ?? minified),
-                referenceCount: 1,
-                styles: minified,
-            };
-            styleCache.set(key, item);
-            setStylesItem(item);
-        }
-
+        handleKeyUpdate(initialHref ?? styles);
         return () => {
             const existingItem = styleCache.get(styles);
             if (existingItem) {
