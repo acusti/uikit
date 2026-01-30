@@ -291,7 +291,9 @@ export default function InputText({
     };
 
     const inputStyle =
-        multiLine && SUPPORTS_FIELD_SIZING ? { ...style, fieldSizing: 'content' as const } : style;
+        multiLine && SUPPORTS_FIELD_SIZING
+            ? { ...style, fieldSizing: 'content' as const }
+            : style;
 
     const Element = (multiLine ? 'textarea' : 'input') as unknown as 'input';
 

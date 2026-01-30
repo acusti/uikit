@@ -247,8 +247,7 @@ describe('uniquify', () => {
             }),
         ).toBe('about_3');
 
-        const separator =
-            ' 🌮—🥑asdœ__–¢™º•ø¨∆as_____dbnm______ds®†ª™¢•b√awekj#Bfsªç∆å';
+        const separator = ' 🌮—🥑asdœ__–¢™º•ø¨∆as_____dbnm______ds®†ª™¢•b√awekj#Bfsªç∆å';
         expect(
             uniquify({
                 items: baseItemObjects.concat({ slug: `about${separator}2` }),
