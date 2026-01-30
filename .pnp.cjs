@@ -574,7 +574,7 @@ const RAW_RUNTIME_STATE =
           ["@storybook/addon-docs", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:9.1.10"],\
           ["@storybook/react-vite", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:9.1.10"],\
           ["@types/react", "npm:19.2.10"],\
-          ["core-js", "npm:3.46.0"],\
+          ["core-js", "npm:3.48.0"],\
           ["react", "npm:19.2.4"],\
           ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.2.4"],\
           ["storybook", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#npm:9.1.17"],\
@@ -4445,10 +4445,10 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["core-js", [\
-      ["npm:3.46.0", {\
-        "packageLocation": "./.yarn/unplugged/core-js-npm-3.46.0-457a28ad91/node_modules/core-js/",\
+      ["npm:3.48.0", {\
+        "packageLocation": "./.yarn/unplugged/core-js-npm-3.48.0-0a48805efd/node_modules/core-js/",\
         "packageDependencies": [\
-          ["core-js", "npm:3.46.0"]\
+          ["core-js", "npm:3.48.0"]\
         ],\
         "linkType": "HARD"\
       }]\
