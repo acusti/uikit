@@ -1,6 +1,6 @@
 import { Style } from '@acusti/styling';
 import clsx from 'clsx';
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useRef, useState } from 'react';
 
 import MonthCalendar from './MonthCalendar.js';
 import { ROOT_CLASS_NAME, STYLES } from './styles/date-picker.js';
@@ -12,8 +12,8 @@ import {
 
 export type Props = {
     className?: string;
-    dateEnd?: Date | null | number | string;
-    dateStart?: Date | null | number | string;
+    defaultDateEnd?: Date | null | number | string;
+    defaultDateStart?: Date | null | number | string;
     initialMonth?: number;
     isRange?: boolean;
     isTwoUp?: boolean;
@@ -39,8 +39,8 @@ const normalizeDate = (date: Date | null | number | string | undefined) => {
 
 export default function DatePicker({
     className,
-    dateEnd: _dateEnd,
-    dateStart: _dateStart,
+    defaultDateEnd,
+    defaultDateStart,
     initialMonth,
     isRange: _isRange,
     isTwoUp,
@@ -50,25 +50,15 @@ export default function DatePicker({
     showEndInitially,
     useMonthAbbreviations,
 }: Props) {
-    const isRange = _isRange ?? _dateEnd != null;
+    const isRange = _isRange ?? defaultDateEnd != null;
     // In two-up view we see 1 more month, so monthLimitLast needs to be 1 less
     const monthLimitLast =
         isTwoUp && _monthLimitLast != null ? _monthLimitLast - 1 : _monthLimitLast;
-    const dateEndFromProps = normalizeDate(_dateEnd);
-    const dateStartFromProps = normalizeDate(_dateStart);
-    const [dateEnd, setDateEnd] = useState(dateEndFromProps);
-    const [dateStart, setDateStart] = useState(dateStartFromProps);
+    const defaultDateEndNormalized = normalizeDate(defaultDateEnd);
+    const defaultDateStartNormalized = normalizeDate(defaultDateStart);
+    const [dateEnd, setDateEnd] = useState(defaultDateEndNormalized);
+    const [dateStart, setDateStart] = useState(defaultDateStartNormalized);
     const updatingDateEndRef = useRef(false);
-
-    useEffect(() => {
-        if (dateEndFromProps == null) return;
-        setDateEnd(dateEndFromProps);
-    }, [dateEndFromProps]);
-
-    useEffect(() => {
-        if (dateStartFromProps == null) return;
-        setDateStart(dateStartFromProps);
-    }, [dateStartFromProps]);
 
     if (initialMonth == null) {
         // if no valid initial date, initially show present month as date end

@@ -49,7 +49,7 @@ function SimpleDatePicker() {
     return (
         <DatePicker
             onChange={({ dateStart }) => setSelectedDate(dateStart)}
-            dateStart={selectedDate}
+            defaultDateStart={selectedDate}
         />
     );
 }
@@ -59,7 +59,7 @@ function DateRangePicker() {
     const [dateRange, setDateRange] = useState({ start: '', end: '' });
 
     const handleChange = ({ dateStart, dateEnd }) => {
-        setDateRange({ start: dateStart, end: dateEnd || '' });
+        setDateRange({ start: dateStart, end: dateEnd ?? '' });
     };
 
     return (
@@ -67,10 +67,53 @@ function DateRangePicker() {
             isRange
             isTwoUp
             onChange={handleChange}
-            dateStart={dateRange.start}
-            dateEnd={dateRange.end}
+            defaultDateStart={dateRange.start}
+            defaultDateEnd={dateRange.end}
             useMonthAbbreviations
         />
+    );
+}
+```
+
+## Component Behavior
+
+The `DatePicker` component is **uncontrolled**, meaning it manages its own
+internal state. The `defaultDateStart` and `defaultDateEnd` props are used
+only to set the default state when the component first mounts.
+
+### Resetting State
+
+To reset the date picker’s internal state (for example, to clear selected
+dates), change the component’s `key` prop:
+
+```tsx
+function DatePickerWithReset() {
+    const [resetKey, setResetKey] = useState(0);
+    const [selectedDates, setSelectedDates] = useState({
+        start: '',
+        end: '',
+    });
+
+    const handleReset = () => {
+        setResetKey((prev) => prev + 1); // This will reset the DatePicker
+        setSelectedDates({ start: '', end: '' });
+    };
+
+    return (
+        <div>
+            <DatePicker
+                key={resetKey} // Changing this resets all internal state
+                defaultDateStart={selectedDates.start}
+                defaultDateEnd={selectedDates.end}
+                onChange={({ dateStart, dateEnd }) => {
+                    setSelectedDates({
+                        start: dateStart,
+                        end: dateEnd ?? '',
+                    });
+                }}
+            />
+            <button onClick={handleReset}>Reset Dates</button>
+        </div>
     );
 }
 ```
@@ -84,11 +127,11 @@ type Props = {
     /** Additional CSS class name for styling */
     className?: string;
 
-    /** End date for range selection (Date object, ISO string, timestamp, or null) */
-    dateEnd?: Date | string | number | null;
+    /** Default end date for range selection (Date object, ISO string, timestamp, or null) */
+    defaultDateEnd?: Date | string | number | null;
 
-    /** Start date for single or range selection (Date object, ISO string, timestamp, or null) */
-    dateStart?: Date | string | number | null;
+    /** Default start date for single or range selection (Date object, ISO string, timestamp, or null) */
+    defaultDateStart?: Date | string | number | null;
 
     /** Initial month to display (number of months since January 1970) */
     initialMonth?: number;
@@ -173,6 +216,7 @@ import { DatePicker } from '@acusti/date-picker';
 import { useState } from 'react';
 
 function BookingDatePicker() {
+    const [resetKey, setResetKey] = useState(0);
     const [checkIn, setCheckIn] = useState('');
     const [checkOut, setCheckOut] = useState('');
     const isValid = checkIn && checkOut;
@@ -182,11 +226,20 @@ function BookingDatePicker() {
     const monthLimitFirst = getMonthFromDate(today);
     const monthLimitLast = monthLimitFirst + 12;
 
+    const handleClearDates = () => {
+        setResetKey((prev) => prev + 1);
+        setCheckIn('');
+        setCheckOut('');
+    };
+
     return (
         <div className="booking-date-picker">
             <h3>Select Your Stay</h3>
             <DatePicker
-                className="booking-date-picker-story"
+                key={resetKey}
+                className="booking-calendar"
+                defaultDateStart={checkIn}
+                defaultDateEnd={checkOut}
                 isRange
                 isTwoUp
                 monthLimitFirst={monthLimitFirst}
@@ -195,10 +248,21 @@ function BookingDatePicker() {
                     setCheckIn(dateStart);
                     setCheckOut(dateEnd ?? '');
                 }}
-                dateStart={checkIn}
-                dateEnd={checkOut}
                 useMonthAbbreviations
             />
+
+            <button
+                onClick={handleClearDates}
+                style={{
+                    marginTop: '12px',
+                    padding: '8px 16px',
+                    border: '1px solid #ccc',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                }}
+            >
+                Clear Dates
+            </button>
 
             {isValid ? (
                 <div
@@ -415,6 +479,7 @@ import { DatePicker, getMonthFromDate } from '@acusti/date-picker';
 import { useState } from 'react';
 
 function BirthdayPicker() {
+    const [resetKey, setResetKey] = useState(0);
     const [birthday, setBirthday] = useState('');
 
     // Reasonable age limits: 13 to 120 years ago
@@ -442,36 +507,59 @@ function BirthdayPicker() {
         ),
     );
 
+    const handleClear = () => {
+        setResetKey((prev) => prev + 1);
+        setBirthday('');
+    };
+
     return (
         <div className="birthday-picker">
             <h3>Enter Your Birthday</h3>
             <DatePicker
+                key={resetKey}
                 initialMonth={defaultMonth}
                 monthLimitFirst={monthLimitFirst}
                 monthLimitLast={monthLimitLast}
                 onChange={({ dateStart }) => setBirthday(dateStart)}
-                dateStart={birthday}
+                defaultDateStart={birthday}
             />
 
             {birthday ? (
-                <p
-                    style={{
-                        marginTop: '16px',
-                        padding: '12px',
-                        backgroundColor: '#e3f2fd',
-                        borderRadius: '6px',
-                    }}
-                >
-                    <strong>
-                        You are{' '}
-                        {Math.floor(
-                            (today.getTime() -
-                                new Date(birthday).getTime()) /
-                                (1000 * 60 * 60 * 24 * 365.25),
-                        )}{' '}
-                        years old
-                    </strong>
-                </p>
+                <>
+                    <button
+                        onClick={handleClear}
+                        style={{
+                            marginTop: '12px',
+                            padding: '6px 12px',
+                            border: '1px solid #dc3545',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: '#fff',
+                            color: '#dc3545',
+                            fontSize: '14px',
+                        }}
+                    >
+                        Clear Birthday
+                    </button>
+                    <p
+                        style={{
+                            marginTop: '12px',
+                            padding: '12px',
+                            backgroundColor: '#e3f2fd',
+                            borderRadius: '6px',
+                        }}
+                    >
+                        <strong>
+                            You are{' '}
+                            {Math.floor(
+                                (today.getTime() -
+                                    new Date(birthday).getTime()) /
+                                    (1000 * 60 * 60 * 24 * 365.25),
+                            )}{' '}
+                            years old
+                        </strong>
+                    </p>
+                </>
             ) : null}
         </div>
     );

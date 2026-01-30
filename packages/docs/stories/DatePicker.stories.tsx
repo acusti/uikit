@@ -7,13 +7,13 @@ import './DatePicker.css';
 
 const meta: Meta<typeof DatePicker> = {
     argTypes: {
-        dateEnd: {
+        defaultDateEnd: {
             control: 'date',
-            description: '(optional) end date of current date range',
+            description: '(optional) default end date of current date range',
         },
-        dateStart: {
+        defaultDateStart: {
             control: 'date',
-            description: '(optional) start date of current date range',
+            description: '(optional) default start date of current date range',
         },
     },
     component: DatePicker,
@@ -49,31 +49,65 @@ export const TwoUpDatePicker: Story = {
 
 const DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS = {
     className: 'date-range-date-picker-story',
-    dateEnd: new Date(2024, 0, 6).toISOString(),
-    dateStart: new Date(2023, 11, 25).toISOString(),
+    defaultDateEnd: new Date(2024, 0, 6).toISOString(),
+    defaultDateStart: new Date(2023, 11, 25).toISOString(),
     isTwoUp: true,
 };
 
 export const DateRangeNavidadDiaDeLosReyesDatePicker: Story = {
     args: DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS,
     render() {
-        const [dateStart, setDateStart] = useState(
-            DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.dateStart,
-        );
-        const [dateEnd, setDateEnd] = useState(
-            DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.dateEnd,
-        );
+        const [resetKey, setResetKey] = useState(0);
+        const [selectedDates, setSelectedDates] = useState({
+            start: DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.defaultDateStart,
+            end: DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.defaultDateEnd,
+        });
+
+        const handleReset = () => {
+            setResetKey((prev) => prev + 1);
+            setSelectedDates({
+                start: DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.defaultDateStart,
+                end: DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.defaultDateEnd,
+            });
+        };
 
         return (
-            <DatePicker
-                {...DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS}
-                dateEnd={dateEnd}
-                dateStart={dateStart}
-                onChange={(update) => {
-                    if (update.dateEnd != null) setDateEnd(update.dateEnd);
-                    if (update.dateStart != null) setDateStart(update.dateStart);
-                }}
-            />
+            <div>
+                <DatePicker
+                    key={resetKey}
+                    className={DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.className}
+                    isTwoUp={DATE_RANGE_NAVIDAD_DIA_DE_LOS_REYES_PROPS.isTwoUp}
+                    defaultDateEnd={selectedDates.end}
+                    defaultDateStart={selectedDates.start}
+                    onChange={(update) => {
+                        setSelectedDates({
+                            start: update.dateStart,
+                            end: update.dateEnd ?? '',
+                        });
+                    }}
+                />
+                <div style={{ marginTop: '16px' }}>
+                    <button
+                        onClick={handleReset}
+                        style={{
+                            padding: '8px 16px',
+                            border: '1px solid #ccc',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: '#f5f5f5',
+                        }}
+                    >
+                        Reset to Christmas-Epiphany Range
+                    </button>
+                    {selectedDates.start && (
+                        <p style={{ marginTop: '8px' }}>
+                            Selected: {new Date(selectedDates.start).toLocaleDateString()}
+                            {selectedDates.end &&
+                                ` - ${new Date(selectedDates.end).toLocaleDateString()}`}
+                        </p>
+                    )}
+                </div>
+            </div>
         );
     },
 };
@@ -89,8 +123,8 @@ export const NoFutureTwoUpDatePicker: Story = {
 export const ShowEndInitiallyDatePicker: Story = {
     args: {
         className: 'no-future-two-up-date-picker-story',
-        dateEnd: new Date(1234, 0, 1).toISOString(),
-        dateStart: new Date(1233, 0, 1).toISOString(),
+        defaultDateEnd: new Date(1234, 0, 1).toISOString(),
+        defaultDateStart: new Date(1233, 0, 1).toISOString(),
         isTwoUp: true,
         showEndInitially: true,
     },
@@ -108,6 +142,7 @@ const BOOKING_PROPS = {
 export const BookingSystemDateRange: Story = {
     args: BOOKING_PROPS,
     render() {
+        const [resetKey, setResetKey] = useState(0);
         const [checkIn, setCheckIn] = useState('');
         const [checkOut, setCheckOut] = useState('');
         const isValid = checkIn && checkOut;
@@ -117,10 +152,17 @@ export const BookingSystemDateRange: Story = {
         const monthLimitFirst = getMonthFromDate(today);
         const monthLimitLast = monthLimitFirst + 12;
 
+        const handleClearDates = () => {
+            setResetKey((prev) => prev + 1);
+            setCheckIn('');
+            setCheckOut('');
+        };
+
         return (
             <div className="booking-date-picker">
                 <h3>Select Your Stay</h3>
                 <DatePicker
+                    key={resetKey}
                     {...BOOKING_PROPS}
                     monthLimitFirst={monthLimitFirst}
                     monthLimitLast={monthLimitLast}
@@ -128,9 +170,26 @@ export const BookingSystemDateRange: Story = {
                         setCheckIn(dateStart);
                         setCheckOut(dateEnd ?? '');
                     }}
-                    dateStart={checkIn}
-                    dateEnd={checkOut}
+                    defaultDateStart={checkIn}
+                    defaultDateEnd={checkOut}
                 />
+
+                <div style={{ marginTop: '16px' }}>
+                    <button
+                        onClick={handleClearDates}
+                        style={{
+                            padding: '8px 16px',
+                            border: '1px solid #dc3545',
+                            borderRadius: '4px',
+                            cursor: 'pointer',
+                            backgroundColor: '#fff',
+                            color: '#dc3545',
+                            marginRight: '8px',
+                        }}
+                    >
+                        Clear Dates
+                    </button>
+                </div>
 
                 {isValid ? (
                     <div
@@ -185,11 +244,18 @@ const EVENT_PROPS = {
 export const EventScheduler: Story = {
     args: EVENT_PROPS,
     render() {
+        const [resetKey, setResetKey] = useState(0);
         const [eventDate, setEventDate] = useState('');
         const [showPicker, setShowPicker] = useState(false);
 
         // Only allow future dates
         const monthLimitFirst = getMonthFromDate(new Date());
+
+        const handleClearDate = () => {
+            setResetKey((prev) => prev + 1);
+            setEventDate('');
+            setShowPicker(false);
+        };
 
         return (
             <div className="event-scheduler">
@@ -204,21 +270,41 @@ export const EventScheduler: Story = {
                     >
                         Event Date:
                     </label>
-                    <input
-                        id="event-date"
-                        type="text"
-                        value={eventDate ? new Date(eventDate).toLocaleDateString() : ''}
-                        onClick={() => setShowPicker(true)}
-                        placeholder="Click to select date"
-                        readOnly
-                        style={{
-                            padding: '8px 12px',
-                            border: '2px solid #e1e5e9',
-                            borderRadius: '6px',
-                            cursor: 'pointer',
-                            width: '200px',
-                        }}
-                    />
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <input
+                            id="event-date"
+                            type="text"
+                            value={
+                                eventDate ? new Date(eventDate).toLocaleDateString() : ''
+                            }
+                            onClick={() => setShowPicker(true)}
+                            placeholder="Click to select date"
+                            readOnly
+                            style={{
+                                padding: '8px 12px',
+                                border: '2px solid #e1e5e9',
+                                borderRadius: '6px',
+                                cursor: 'pointer',
+                                width: '200px',
+                            }}
+                        />
+                        {eventDate && (
+                            <button
+                                onClick={handleClearDate}
+                                style={{
+                                    padding: '6px 12px',
+                                    border: '1px solid #dc3545',
+                                    borderRadius: '4px',
+                                    cursor: 'pointer',
+                                    backgroundColor: '#fff',
+                                    color: '#dc3545',
+                                    fontSize: '12px',
+                                }}
+                            >
+                                Clear
+                            </button>
+                        )}
+                    </div>
                 </div>
 
                 {showPicker ? (
@@ -239,13 +325,14 @@ export const EventScheduler: Story = {
                             }}
                         >
                             <DatePicker
+                                key={resetKey}
                                 {...EVENT_PROPS}
                                 monthLimitFirst={monthLimitFirst}
                                 onChange={({ dateStart }) => {
                                     setEventDate(dateStart);
                                     setShowPicker(false);
                                 }}
-                                dateStart={eventDate}
+                                defaultDateStart={eventDate}
                             />
                             <button
                                 onClick={() => setShowPicker(false)}
@@ -276,6 +363,7 @@ export const EventScheduler: Story = {
 
 export const BirthdayPicker: Story = {
     render() {
+        const [resetKey, setResetKey] = useState(0);
         const [birthday, setBirthday] = useState('');
 
         // Reasonable age limits: 13 to 120 years ago
@@ -299,21 +387,47 @@ export const BirthdayPicker: Story = {
             new Date(today.getFullYear() - 25, today.getMonth(), today.getDate()),
         );
 
+        const handleClear = () => {
+            setResetKey((prev) => prev + 1);
+            setBirthday('');
+        };
+
         return (
             <div className="birthday-picker">
                 <h3>Enter Your Birthday</h3>
                 <DatePicker
+                    key={resetKey}
                     initialMonth={defaultMonth}
                     monthLimitFirst={monthLimitFirst}
                     monthLimitLast={monthLimitLast}
                     onChange={({ dateStart }) => setBirthday(dateStart)}
-                    dateStart={birthday}
+                    defaultDateStart={birthday}
                 />
+
+                <div style={{ marginTop: '16px' }}>
+                    {birthday && (
+                        <button
+                            onClick={handleClear}
+                            style={{
+                                padding: '6px 12px',
+                                border: '1px solid #dc3545',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                backgroundColor: '#fff',
+                                color: '#dc3545',
+                                fontSize: '14px',
+                                marginBottom: '12px',
+                            }}
+                        >
+                            Clear Birthday
+                        </button>
+                    )}
+                </div>
 
                 {birthday ? (
                     <p
                         style={{
-                            marginTop: '16px',
+                            marginTop: '8px',
                             padding: '12px',
                             backgroundColor: '#e3f2fd',
                             borderRadius: '6px',
@@ -343,8 +457,14 @@ export const BirthdayPicker: Story = {
 
 export const FlexibleDatePicker: Story = {
     render() {
+        const [resetKey, setResetKey] = useState(0);
         const [selectedDate, setSelectedDate] = useState('');
         const [viewMode, setViewMode] = useState<'single' | 'double'>('single');
+
+        const handleClear = () => {
+            setResetKey((prev) => prev + 1);
+            setSelectedDate('');
+        };
 
         return (
             <div className="flexible-date-picker">
@@ -358,7 +478,7 @@ export const FlexibleDatePicker: Story = {
                         />
                         Single Month
                     </label>
-                    <label>
+                    <label style={{ marginRight: '16px' }}>
                         <input
                             type="radio"
                             checked={viewMode === 'double'}
@@ -367,13 +487,30 @@ export const FlexibleDatePicker: Story = {
                         />
                         Two Months
                     </label>
+                    {selectedDate && (
+                        <button
+                            onClick={handleClear}
+                            style={{
+                                padding: '4px 8px',
+                                border: '1px solid #dc3545',
+                                borderRadius: '4px',
+                                cursor: 'pointer',
+                                backgroundColor: '#fff',
+                                color: '#dc3545',
+                                fontSize: '12px',
+                            }}
+                        >
+                            Clear
+                        </button>
+                    )}
                 </div>
 
                 <DatePicker
+                    key={resetKey}
                     isTwoUp={viewMode === 'double'}
                     useMonthAbbreviations={viewMode === 'double'}
                     onChange={({ dateStart }) => setSelectedDate(dateStart)}
-                    dateStart={selectedDate}
+                    defaultDateStart={selectedDate}
                 />
 
                 {selectedDate ? (
