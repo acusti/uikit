@@ -101,10 +101,16 @@ export default [
                 'warn',
                 { ...compilerOptions, logger: undefined },
             ],
+            'react-hooks/capitalized-calls': 'error', // avoid calling capitalized functions (should use JSX)
             'react-hooks/exhaustive-deps': [
                 'warn',
                 { enableDangerousAutofixThisMayCauseInfiniteLoops: true },
             ],
+            'react-hooks/hooks': 'error', // largely reimplements the "rules-of-hooks" non-compiler rule
+            'react-hooks/todo': 'error',
+            'react-hooks/rule-suppression': 'error',
+            'react-hooks/syntax': 'error',
+            'react-hooks/unsupported-syntax': 'error',
             'react/jsx-no-leaked-render': ['warn', { validStrategies: ['ternary'] }],
             'react/jsx-sort-props': 'off',
             'react/no-unknown-property': 'error',
