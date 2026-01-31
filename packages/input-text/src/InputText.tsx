@@ -41,10 +41,10 @@ export type Props = {
     initialValue?: string;
     list?: string;
     max?: number;
-    maxHeight?: number | string;
+    maxHeight?: null | number | string;
     maxLength?: number;
     min?: number;
-    minHeight?: number | string;
+    minHeight?: null | number | string;
     minLength?: number;
     /**
      * If true, input renders as a <textarea> that automatically grows and
@@ -100,10 +100,10 @@ export default function InputText({
     initialValue,
     list,
     max,
-    maxHeight = Infinity,
+    maxHeight,
     maxLength,
     min,
-    minHeight = 0,
+    minHeight,
     minLength,
     multiLine,
     multiple,
@@ -154,8 +154,8 @@ export default function InputText({
             typeof maxHeight === 'string' ? parseFloat(maxHeight) : maxHeight;
 
         const height = Math.max(
-            minHeightValue,
-            Math.min(inputRef.current.scrollHeight, maxHeightValue),
+            minHeightValue ?? 0,
+            Math.min(inputRef.current.scrollHeight, maxHeightValue ?? Infinity),
         );
         if (height) {
             inputRef.current.style.height = `${height}px`;
@@ -301,8 +301,8 @@ export default function InputText({
             ? {
                   ...style,
                   fieldSizing: 'content' as const,
-                  maxHeight: Number.isFinite(maxHeight) ? maxHeight : undefined,
-                  minHeight: minHeight || undefined,
+                  maxHeight: isHeightEmpty(maxHeight) ? undefined : maxHeight,
+                  minHeight: isHeightEmpty(minHeight) ? undefined : minHeight,
               }
             : style;
 
@@ -350,6 +350,12 @@ const SUPPORTS_FIELD_SIZING =
     typeof CSS === 'undefined' ? true : CSS.supports('field-sizing', 'content');
 
 const IS_APPLE_REGEXP = /mac|iphone|ipad|ipod/i;
+
+function isHeightEmpty(
+    value?: null | number | string,
+): value is '' | 0 | null | typeof Infinity | undefined {
+    return value == null || value === '' || value === 0 || value === Infinity;
+}
 
 function isPrimaryModifierPressed(event: KeyboardEvent<InputElement>) {
     // eslint-disable-next-line @typescript-eslint/no-deprecated

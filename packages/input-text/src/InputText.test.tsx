@@ -148,8 +148,8 @@ describe('CSSValueInput.tsx', () => {
         render(
             <InputText
                 initialValue=""
-                minHeight={50}
                 maxHeight={100}
+                minHeight={50}
                 multiLine
                 rows={1}
             />,
