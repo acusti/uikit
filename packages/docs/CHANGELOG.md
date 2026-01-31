@@ -1,5 +1,57 @@
 # @acusti/uikit-docs
 
+## 0.4.5
+
+### Patch Changes
+
+- Add support for `props.minHeight` for multi-line `InputText` elements to
+  ensure that the textarea element is never resized shorter than that value
+  and render `minHeight`/`maxHeight` as inline styles when using
+  `field-sizing: content` to render auto-resizing textareas
+- d72a772: **Breaking:** DatePicker now uncontrolled with
+  `defaultDateStart`/`defaultDateEnd` props
+    - **Renamed props:**: `dateStart` → `defaultDateStart`, `dateEnd` →
+      `defaultDateEnd`
+    - **Behavior change:**: DatePicker is now fully uncontrolled - props
+      only set initial values, not ongoing state
+    - **Reset pattern:**: To reset the picker’s state, change the
+      component’s `key` prop instead of updating date props
+    - **Migration:**
+        - Replace `dateStart`/`dateEnd` with
+          `defaultDateStart`/`defaultDateEnd`
+        - Implement key-based reset for clearing selected dates
+        - Remove any logic that updates date props to control the picker
+          externally
+
+    **Before:**
+
+    ```tsx
+    <DatePicker
+        dateStart={selectedDate}
+        dateEnd={endDate}
+        onChange={handleChange}
+    />
+    ```
+
+    **After:**
+
+    ```tsx
+    <DatePicker
+        key={resetKey}
+        defaultDateStart={selectedDate}
+        defaultDateEnd={endDate}
+        onChange={handleChange}
+    />
+    ```
+
+    This change resolves ` react-hooks/set-state-in-effect` ESLint errors
+    and follows React conventions for uncontrolled components.
+
+- Updated dependencies
+- Updated dependencies [d72a772]
+    - @acusti/input-text@2.3.0
+    - @acusti/date-picker@0.15.0
+
 ## 0.4.4
 
 ### Patch Changes

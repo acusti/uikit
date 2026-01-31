@@ -1,5 +1,14 @@
 # @acusti/input-text
 
+## 2.3.0
+
+### Minor Changes
+
+- 1574b856: Add support for `props.minHeight` for multi-line `InputText`
+  elements to ensure that the textarea element is never resized shorter
+  than that value and render `minHeight`/`maxHeight` as inline styles when
+  using `field-sizing: content` to render auto-resizing textareas
+
 ## 2.2.2
 
 ### Patch Changes

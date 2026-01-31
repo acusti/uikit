@@ -1,5 +1,12 @@
 # @acusti/styling
 
+## 2.1.1
+
+### Patch Changes
+
+- f69a491: Extract useEffect logic into useEffectEvent handler to resolve
+  react-hooks/set-state-in-effect linting error
+
 ## 2.1.0
 
 ### Minor Changes
