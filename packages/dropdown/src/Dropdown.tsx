@@ -230,7 +230,7 @@ export default function Dropdown({
         setIsOpen(false);
         setIsOpening(false);
         mouseDownPositionRef.current = null;
-        if (closingTimerRef.current) {
+        if (closingTimerRef.current != null) {
             clearTimeout(closingTimerRef.current);
             closingTimerRef.current = null;
         }
@@ -373,7 +373,7 @@ export default function Dropdown({
     const handleMouseUp = (event: ReactMouseEvent<HTMLElement>) => {
         if (onMouseUp) onMouseUp(event);
         // If dropdown is still opening or isn’t open or is closing, do nothing
-        if (isOpeningRef.current || !isOpenRef.current || closingTimerRef.current) {
+        if (isOpeningRef.current || !isOpenRef.current || closingTimerRef.current != null) {
             return;
         }
 
@@ -456,7 +456,7 @@ export default function Dropdown({
                     text: enteredCharactersRef.current,
                 });
 
-                if (clearEnteredCharactersTimerRef.current) {
+                if (clearEnteredCharactersTimerRef.current != null) {
                     clearTimeout(clearEnteredCharactersTimerRef.current);
                 }
 
@@ -549,12 +549,12 @@ export default function Dropdown({
         };
 
         const handleGlobalMouseUp = ({ target }: MouseEvent) => {
-            if (!isOpenRef.current || closingTimerRef.current) return;
+            if (!isOpenRef.current || closingTimerRef.current != null) return;
 
             // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
             if (isOpeningRef.current) {
                 setIsOpening(false);
-                if (isOpeningTimerRef.current) {
+                if (isOpeningTimerRef.current != null) {
                     clearTimeout(isOpeningTimerRef.current);
                     isOpeningTimerRef.current = null;
                 }
