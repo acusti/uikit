@@ -8,6 +8,7 @@
   elements to ensure that the textarea element is never resized shorter
   than that value and render `minHeight`/`maxHeight` as inline styles when
   using `field-sizing: content` to render auto-resizing textareas
+- 8a6676ca: Allow maxHeight/minHeight to be null and add isHeightEmpty util
 
 ## 2.2.2
 
