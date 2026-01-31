@@ -1,5 +1,12 @@
 # @acusti/uniquify
 
+## 0.8.1
+
+### Patch Changes
+
+- 3eaef36: Update uniquify to accept ReadonlyArray for items and keyPath
+  parameters
+
 ## 0.8.0
 
 ### Minor Changes
