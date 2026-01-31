@@ -3,7 +3,19 @@ import { cleanup, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import InputText from './InputText.js';
+// Stub CSS.supports to return false for field-sizing to test fallback behavior
+vi.stubGlobal('CSS', {
+    supports: (property: string, value: string) => {
+        if (property === 'field-sizing' && value === 'content') {
+            return false;
+        }
+        return true;
+    },
+});
+
+const InputText = (await import('./InputText.js')).default;
+
+vi.unstubAllGlobals();
 
 afterEach(cleanup);
 
@@ -108,5 +120,48 @@ describe('CSSValueInput.tsx', () => {
         // onChange and onChangeValue should NOT be called since value didn't change
         expect(onChange).not.toHaveBeenCalled();
         expect(onChangeValue).not.toHaveBeenCalled();
+    });
+
+    it('respects minHeight prop for multiLine inputs', async () => {
+        const user = userEvent.setup();
+        render(<InputText initialValue="" minHeight={100} multiLine rows={1} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        // Focus the textarea to trigger height calculation
+        await user.click(textarea);
+
+        // Initial height should be at least minHeight
+        expect(parseFloat(textarea.style.height)).toBe(100);
+
+        // Type some text
+        await user.type(textarea, 'Line 1\nLine 2\nLine 3');
+
+        // Height should still be at least minHeight
+        expect(parseFloat(textarea.style.height)).toBe(100);
+    });
+
+    // NOTE cannot test maxHeight prop for multiLine inputs in happy-dom
+    // due to limitations in how it calculates layout and dimensions
+
+    it('respects both minHeight and maxHeight props together', async () => {
+        const user = userEvent.setup();
+        render(
+            <InputText
+                initialValue=""
+                minHeight={50}
+                maxHeight={100}
+                multiLine
+                rows={1}
+            />,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        // Focus the textarea to trigger height calculation
+        await user.click(textarea);
+
+        // Initial height should be between minHeight and maxHeight
+        const height = parseFloat(textarea.style.height);
+        expect(height).toBeGreaterThanOrEqual(50);
+        expect(height).toBeLessThanOrEqual(100);
     });
 });

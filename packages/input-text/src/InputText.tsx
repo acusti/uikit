@@ -44,6 +44,7 @@ export type Props = {
     maxHeight?: number | string;
     maxLength?: number;
     min?: number;
+    minHeight?: number | string;
     minLength?: number;
     /**
      * If true, input renders as a <textarea> that automatically grows and
@@ -102,6 +103,7 @@ export default function InputText({
     maxHeight = Infinity,
     maxLength,
     min,
+    minHeight = 0,
     minLength,
     multiLine,
     multiple,
@@ -146,11 +148,15 @@ export default function InputText({
         inputRef.current.style.transitionDuration = '0s';
         inputRef.current.style.height = '';
 
-        const height = Math.min(
-            inputRef.current.scrollHeight,
-            typeof maxHeight === 'string' ? parseFloat(maxHeight) : maxHeight,
-        );
+        const minHeightValue =
+            typeof minHeight === 'string' ? parseFloat(minHeight) : minHeight;
+        const maxHeightValue =
+            typeof maxHeight === 'string' ? parseFloat(maxHeight) : maxHeight;
 
+        const height = Math.max(
+            minHeightValue,
+            Math.min(inputRef.current.scrollHeight, maxHeightValue),
+        );
         if (height) {
             inputRef.current.style.height = `${height}px`;
         }
@@ -296,6 +302,7 @@ export default function InputText({
                   ...style,
                   fieldSizing: 'content' as const,
                   maxHeight: Number.isFinite(maxHeight) ? maxHeight : undefined,
+                  minHeight: minHeight || undefined,
               }
             : style;
 

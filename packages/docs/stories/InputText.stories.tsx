@@ -148,6 +148,42 @@ export const InputWithAutoFocus: Story = {
     },
 };
 
+export const MultiLineInputWithMinHeight: Story = {
+    args: {
+        className: 'multi-line-input-text',
+        initialValue:
+            'This textarea has a minHeight of 50px.\n\nTry deleting this text to see that the textarea does not shrink below the minimum height.',
+        minHeight: 50,
+        multiLine: true,
+        name: 'multi-line-min-height-input',
+        placeholder: 'enter text of any length',
+    },
+};
+
+export const MultiLineInputWithMaxHeight: Story = {
+    args: {
+        className: 'multi-line-input-text',
+        initialValue:
+            'This textarea has a maxHeight of 150px.\n\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10',
+        maxHeight: 150,
+        multiLine: true,
+        name: 'multi-line-max-height-input',
+        placeholder: 'enter text of any length',
+    },
+};
+
+export const MultiLineInputWithMinHeightAndMaxHeight: Story = {
+    args: {
+        className: 'multi-line-input-text',
+        initialValue: 'This textarea has minHeight of 100px and maxHeight of 200px.',
+        maxHeight: 200,
+        minHeight: 100,
+        multiLine: true,
+        name: 'multi-line-min-max-height-input',
+        placeholder: 'enter text of any length',
+    },
+};
+
 export const MultiLineInputWithCSSTransition: Story = {
     args: {
         className: 'multi-line-input-css-transition',
