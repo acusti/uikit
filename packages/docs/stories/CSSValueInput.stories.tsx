@@ -113,7 +113,7 @@ export const LabelLess: Story = {
 export const CustomGetValueAsNumber: Story = {
     args: {
         className: 'letter-spacing',
-        getValueAsNumber: (value) => {
+        getValueAsNumber: (value: number | string) => {
             if (typeof value === 'number') return value;
             // “normal” for letter-spacing is effectively equivalent to 0
             if (typeof value === 'string' && value.toLowerCase() === 'normal') {
