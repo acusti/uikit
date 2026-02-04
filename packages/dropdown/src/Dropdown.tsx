@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions */
-import { Style } from '@acusti/styling';
 import useBoundingClientRect from '@acusti/use-bounding-client-rect';
 import useKeyboardEvents, {
     isEventTargetUsingKeyEvent,
@@ -26,6 +25,7 @@ import {
     ITEM_SELECTOR,
     setActiveItem,
 } from './helpers.js';
+import styles from './styles.css?raw';
 import {
     BODY_CLASS_NAME,
     BODY_MAX_HEIGHT_VAR,
@@ -34,7 +34,6 @@ import {
     LABEL_CLASS_NAME,
     LABEL_TEXT_CLASS_NAME,
     ROOT_CLASS_NAME,
-    STYLES,
     TRIGGER_CLASS_NAME,
 } from './styles.js';
 
@@ -373,7 +372,11 @@ export default function Dropdown({
     const handleMouseUp = (event: ReactMouseEvent<HTMLElement>) => {
         if (onMouseUp) onMouseUp(event);
         // If dropdown is still opening or isn’t open or is closing, do nothing
-        if (isOpeningRef.current || !isOpenRef.current || closingTimerRef.current != null) {
+        if (
+            isOpeningRef.current ||
+            !isOpenRef.current ||
+            closingTimerRef.current != null
+        ) {
             return;
         }
 
@@ -717,8 +720,12 @@ export default function Dropdown({
 
     return (
         <Fragment>
-            <Style href="@acusti/dropdown/Dropdown">{STYLES}</Style>
-            <Style href={`@acusti/dropdown/Dropdown/${id}`}>{anchorStyles}</Style>
+            <style href="@acusti/dropdown/Dropdown" precedence="medium">
+                {styles}
+            </style>
+            <style href={`@acusti/dropdown/Dropdown/${id}`} precedence="medium">
+                {anchorStyles}
+            </style>
             <div
                 className={clsx(ROOT_CLASS_NAME, className, {
                     disabled,

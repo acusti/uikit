@@ -57,7 +57,6 @@
     },
     "dependencies": {
         "@acusti/matchmaking": "^0.10.0",
-        "@acusti/styling": "^2.1.0",
         "@acusti/use-bounding-client-rect": "^2.0.1",
         "@acusti/use-keyboard-events": "^0.11.0",
         "clsx": "^2"
