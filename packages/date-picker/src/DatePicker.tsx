@@ -1,9 +1,9 @@
-import { Style } from '@acusti/styling';
 import clsx from 'clsx';
 import { Fragment, useRef, useState } from 'react';
 
 import MonthCalendar from './MonthCalendar.js';
-import { ROOT_CLASS_NAME, STYLES } from './styles/date-picker.js';
+import styles from './styles/date-picker.css?raw';
+import { ROOT_CLASS_NAME } from './styles/date-picker.js';
 import {
     getMonthAbbreviationFromMonth,
     getMonthFromDate,
@@ -132,7 +132,9 @@ export default function DatePicker({
 
     return (
         <Fragment>
-            <Style href="@acusti/date-picker/DatePicker">{STYLES}</Style>
+            <style href="@acusti/date-picker/DatePicker" precedence="medium">
+                {styles}
+            </style>
             <div
                 className={clsx(ROOT_CLASS_NAME, className, {
                     'two-up': isTwoUp,
