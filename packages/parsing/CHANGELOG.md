@@ -1,5 +1,12 @@
 # @acusti/parsing
 
+## 0.20.2
+
+### Patch Changes
+
+- 0bfa690: Prefer direct JSON.parse for fully fenced code-block responses
+  before repair heuristics
+
 ## 0.20.1
 
 ### Patch Changes
