@@ -197,6 +197,9 @@ const cleanThinkingText = (preamble: string) =>
         .replace(/^```(?:[a-z0-9]{1,9})?$/im, '')
         .trim();
 
+const FENCED_CODE_BLOCK_REGEXP =
+    /^([ \t]*)```(?:[a-z0-9_-]{1,20})?[ \t]*\n([\s\S]*?)\n\1```[ \t]*$/i;
+
 const getObjectKeyFromIndex = (index: number) =>
     `"key${index === 1 ? '' : '-' + index}":`;
 
@@ -219,6 +222,12 @@ export function parseAsJSON(text: string): ParsedResult {
         text = '';
     } else {
         text = text.replace(CONTROL_TOKENS_REGEXP, '').trim();
+        // if payload is entirely wrapped in a fenced code block, unwrap it first
+        const fencedBlockMatch = text.match(FENCED_CODE_BLOCK_REGEXP);
+        const fencedContent = fencedBlockMatch?.[2]?.trim();
+        if (fencedContent) {
+            text = fencedContent;
+        }
     }
     // if the input is empty, use value: null to indicate failure
     if (text === '') return { postscript, preamble, value: null };
