@@ -68,6 +68,14 @@ describe('@acusti/parsing', () => {
         it('handles extraneous escape characters', extraneousEscapeCharactersTestCase);
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
         it(
+            'handles fenced JSON with percent signs and nested arrays of objects',
+            fencedJSONWithPercentSignsTestCase,
+        );
+        it(
+            'handles fenced JSON variants including indentation and blank lines',
+            fencedJSONVariantsTestCase,
+        );
+        it(
             'detects premature closing curly brace and ignores it',
             prematureClosingCurliesTestCase,
         );
@@ -195,6 +203,204 @@ function extraneousEscapeCharactersTestCase() {
                 '\nAt Cinco Design, we believe that print design is not just about creating visually appealing materials, but also about effectively communicating your message to your target audience. Our team of experienced designers works closely with you to understand your brand, your audience, and your goals, and then crafts a unique print design solution that captures your essence and resonates with your audience.\n\nOur print design services include:\n\n- Branding and identity design: We create a cohesive visual identity for your brand, including logos, business cards, letterheads, and more.\n- Marketing collateral: We design brochures, flyers, posters, and other marketing materials that effectively promote your products or services.\n- Packaging design: We design packaging that not only protects your products but also enhances their appeal and makes them stand out on the shelf.\n- Publication design: We design magazines, newspapers, books, and other publications that are visually engaging and easy to navigate.\n\nLet us help you make a lasting impression with our print design services. Contact us today to discuss your project and see how we can bring your vision to life.',
             heading: 'Print Design',
         },
+    });
+}
+
+function fencedJSONWithPercentSignsTestCase() {
+    const response = `\
+\`\`\`json
+{
+  "heading": "Our Impact & Milestones",
+  "subheading": "Rooted in the earth and woven with intention, our achievements reflect a commitment to a kinder, more sustainable world.",
+  "imagePrompt": "A high-resolution, minimalist composition of natural elements: a bundle of raw flax, a smooth river stone, and a recycled paper certificate with a botanical seal, all bathed in soft, golden morning light on a light oak surface.",
+  "items": [
+    {
+      "heading": "12 Global Artisan Communities",
+      "subheading": "Supporting traditional craftsmanship in 8 countries.",
+      "description": "We partner directly with small-scale cooperatives from Kyoto to Oregon, ensuring fair wages and preserving ancestral techniques that have been passed down for generations.",
+      "button": "Meet the Makers",
+      "buttonLink": {
+        "enabled": true,
+        "label": "Meet the Makers",
+        "type": "internal",
+        "value": "/journal"
+      },
+      "imageAlt": "An artisan's hands weaving on a traditional wooden loom",
+      "imagePrompt": "Close-up of weathered hands working on a large wooden loom, weaving cream-colored linen thread, soft-focus background of a sunlit workshop.",
+      "id": "0"
+    },
+    {
+      "heading": "450k Gallons of Water Saved",
+      "subheading": "Through organic flax and closed-loop dyeing.",
+      "description": "By prioritizing organic Belgian flax over conventional cotton and utilizing rainwater harvesting in our ceramic studios, we significantly reduce our environmental footprint.",
+      "button": "Our Sourcing Journey",
+      "buttonLink": {
+        "enabled": true,
+        "label": "Our Sourcing Journey",
+        "type": "internal",
+        "value": "fbbe35e2-c76b-4ae4-9c26-774160ebbda2"
+      },
+      "imageAlt": "A serene view of a lush flax field under a clear sky",
+      "imagePrompt": "A wide, cinematic shot of a flowering flax field in the European countryside, soft blue flowers swaying in the breeze under a pale morning sky.",
+      "id": "1"
+    },
+    {
+      "heading": "100% GOTS & OEKO-TEX Certified",
+      "subheading": "Rigorous standards for textile safety and ecology.",
+      "description": "Every thread in our collection is verified free from harmful chemicals and synthetic dyes, ensuring a healthy, non-toxic sanctuary for your family.",
+      "button": "View Standards",
+      "buttonLink": {
+        "enabled": true,
+        "label": "View Standards",
+        "type": "external",
+        "value": "https://www.global-standard.org/"
+      },
+      "imageAlt": "A close-up of a GOTS certification tag on a linen throw",
+      "imagePrompt": "Macro photography of a recycled paper hangtag with a green botanical logo attached to a heavily textured oatmeal-colored linen fabric.",
+      "id": "2"
+    },
+    {
+      "heading": "Carbon-Neutral Shipping",
+      "subheading": "Offsetting every delivery through reforestation.",
+      "description": "We partner with global reforestation projects to offset 100% of the carbon emitted from our studio to your doorstep, keeping the air as clean as our designs.",
+      "button": "Read Our Report",
+      "buttonLink": {
+        "enabled": true,
+        "label": "Read Our Report",
+        "type": "internal",
+        "value": "/ethos"
+      },
+      "imageAlt": "A young sapling growing in a sunlit forest",
+      "imagePrompt": "A delicate green sapling emerging from rich, dark forest soil, dappled sunlight filtering through tall trees in the background.",
+      "id": "3"
+    }
+  ]
+}
+\`\`\``;
+
+    expect(parseAsJSON(response)).toEqual({
+        postscript: '',
+        preamble: '',
+        value: {
+            heading: 'Our Impact & Milestones',
+            imagePrompt:
+                'A high-resolution, minimalist composition of natural elements: a bundle of raw flax, a smooth river stone, and a recycled paper certificate with a botanical seal, all bathed in soft, golden morning light on a light oak surface.',
+            items: [
+                {
+                    button: 'Meet the Makers',
+                    buttonLink: {
+                        enabled: true,
+                        label: 'Meet the Makers',
+                        type: 'internal',
+                        value: '/journal',
+                    },
+                    description:
+                        'We partner directly with small-scale cooperatives from Kyoto to Oregon, ensuring fair wages and preserving ancestral techniques that have been passed down for generations.',
+                    heading: '12 Global Artisan Communities',
+                    id: '0',
+                    imageAlt: "An artisan's hands weaving on a traditional wooden loom",
+                    imagePrompt:
+                        'Close-up of weathered hands working on a large wooden loom, weaving cream-colored linen thread, soft-focus background of a sunlit workshop.',
+                    subheading: 'Supporting traditional craftsmanship in 8 countries.',
+                },
+                {
+                    button: 'Our Sourcing Journey',
+                    buttonLink: {
+                        enabled: true,
+                        label: 'Our Sourcing Journey',
+                        type: 'internal',
+                        value: 'fbbe35e2-c76b-4ae4-9c26-774160ebbda2',
+                    },
+                    description:
+                        'By prioritizing organic Belgian flax over conventional cotton and utilizing rainwater harvesting in our ceramic studios, we significantly reduce our environmental footprint.',
+                    heading: '450k Gallons of Water Saved',
+                    id: '1',
+                    imageAlt: 'A serene view of a lush flax field under a clear sky',
+                    imagePrompt:
+                        'A wide, cinematic shot of a flowering flax field in the European countryside, soft blue flowers swaying in the breeze under a pale morning sky.',
+                    subheading: 'Through organic flax and closed-loop dyeing.',
+                },
+                {
+                    button: 'View Standards',
+                    buttonLink: {
+                        enabled: true,
+                        label: 'View Standards',
+                        type: 'external',
+                        value: 'https://www.global-standard.org/',
+                    },
+                    description:
+                        'Every thread in our collection is verified free from harmful chemicals and synthetic dyes, ensuring a healthy, non-toxic sanctuary for your family.',
+                    heading: '100% GOTS & OEKO-TEX Certified',
+                    id: '2',
+                    imageAlt: 'A close-up of a GOTS certification tag on a linen throw',
+                    imagePrompt:
+                        'Macro photography of a recycled paper hangtag with a green botanical logo attached to a heavily textured oatmeal-colored linen fabric.',
+                    subheading: 'Rigorous standards for textile safety and ecology.',
+                },
+                {
+                    button: 'Read Our Report',
+                    buttonLink: {
+                        enabled: true,
+                        label: 'Read Our Report',
+                        type: 'internal',
+                        value: '/ethos',
+                    },
+                    description:
+                        'We partner with global reforestation projects to offset 100% of the carbon emitted from our studio to your doorstep, keeping the air as clean as our designs.',
+                    heading: 'Carbon-Neutral Shipping',
+                    id: '3',
+                    imageAlt: 'A young sapling growing in a sunlit forest',
+                    imagePrompt:
+                        'A delicate green sapling emerging from rich, dark forest soil, dappled sunlight filtering through tall trees in the background.',
+                    subheading: 'Offsetting every delivery through reforestation.',
+                },
+            ],
+            subheading:
+                'Rooted in the earth and woven with intention, our achievements reflect a commitment to a kinder, more sustainable world.',
+        },
+    });
+}
+
+function fencedJSONVariantsTestCase() {
+    expect(
+        parseAsJSON(`\
+\`\`\`json
+
+{
+  "heading": "News"
+}
+
+\`\`\``),
+    ).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { heading: 'News' },
+    });
+
+    expect(
+        parseAsJSON(`\
+\`\`\`JSON
+{
+  "heading": "News"
+}
+\`\`\``),
+    ).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { heading: 'News' },
+    });
+
+    expect(
+        parseAsJSON(`\
+  \`\`\`json
+  {
+    "heading": "News"
+  }
+  \`\`\``),
+    ).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { heading: 'News' },
     });
 }
 
