@@ -1,5 +1,13 @@
 # @acusti/date-picker
 
+## 0.16.0
+
+### Minor Changes
+
+- 6ec2fff: Refactor CSS handling to minify styles in the prod build via
+  lightningcss and remove now useless @acusti/styling dependency (no
+  benefit from its minification functionality)
+
 ## 0.15.0
 
 ### Minor Changes
