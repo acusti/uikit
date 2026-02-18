@@ -98,7 +98,6 @@ __metadata:
   resolution: "@acusti/dropdown@workspace:packages/dropdown"
   dependencies:
     "@acusti/matchmaking": "npm:^0.10.0"
-    "@acusti/styling": "npm:^2.1.0"
     "@acusti/use-bounding-client-rect": "npm:^2.0.1"
     "@acusti/use-keyboard-events": "npm:^0.11.0"
     "@testing-library/dom": "npm:^10.4.1"
@@ -178,7 +177,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@acusti/styling@npm:^2.1.0, @acusti/styling@npm:^2.1.1, @acusti/styling@workspace:packages/styling":
+"@acusti/styling@npm:^2.1.1, @acusti/styling@workspace:packages/styling":
   version: 0.0.0-use.local
   resolution: "@acusti/styling@workspace:packages/styling"
   dependencies:

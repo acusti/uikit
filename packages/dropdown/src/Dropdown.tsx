@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions */
-import { Style } from '@acusti/styling';
 import useBoundingClientRect from '@acusti/use-bounding-client-rect';
 import useKeyboardEvents, {
     isEventTargetUsingKeyEvent,
@@ -696,7 +695,9 @@ export default function Dropdown({
 
     return (
         <Fragment>
-            <Style href="@acusti/dropdown/Dropdown">{styles}</Style>
+            <style href="@acusti/dropdown/Dropdown" precedence="medium">
+                {styles}
+            </style>
             <div
                 className={clsx('uktdropdown', className, {
                     disabled,
