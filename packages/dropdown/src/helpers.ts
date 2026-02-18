@@ -2,14 +2,13 @@ import { getBestMatch } from '@acusti/matchmaking';
 import { type SyntheticEvent } from 'react';
 
 import { type Item } from './Dropdown.js';
-import { BODY_SELECTOR } from './styles.js';
 
 export const ITEM_SELECTOR = `[data-ukt-item], [data-ukt-value]`;
 
 export const getItemElements = (dropdownElement: HTMLElement | null) => {
     if (!dropdownElement) return null;
 
-    const bodyElement = dropdownElement.querySelector(BODY_SELECTOR);
+    const bodyElement = dropdownElement.querySelector('.uktdropdown-body');
     if (!bodyElement) return null;
 
     let items: HTMLCollection | NodeListOf<Element> =

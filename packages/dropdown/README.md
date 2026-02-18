@@ -27,7 +27,7 @@ The three primary design goals for the existence of this component:
        and the value of that item at the same time (otherwise, the value is
        the text content of the dropdown item element)
     4. To style your dropdowns, use CSS; there are a
-       [collection of CSS custom properties](https://github.com/acusti/uikit/blob/main/packages/dropdown/src/styles.ts#L21-L32)
+       [collection of CSS custom properties](https://github.com/acusti/uikit/blob/main/packages/dropdown/src/Dropdown.css)
        used internally to style them if that works best for you, or just
        override the minimal default CSS as appropriate
 3. **Lightweight bundle size** with the bare minimum of dependencies (see

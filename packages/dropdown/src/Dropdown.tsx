@@ -19,22 +19,13 @@ import {
     useState,
 } from 'react';
 
+import styles from './Dropdown.css?inline';
 import {
     getActiveItemElement,
     getItemElements,
     ITEM_SELECTOR,
     setActiveItem,
 } from './helpers.js';
-import {
-    BODY_CLASS_NAME,
-    BODY_MAX_HEIGHT_VAR,
-    BODY_SELECTOR,
-    LABEL_CLASS_NAME,
-    LABEL_TEXT_CLASS_NAME,
-    ROOT_CLASS_NAME,
-    STYLES,
-    TRIGGER_CLASS_NAME,
-} from './styles.js';
 
 export type Item = {
     element: MaybeHTMLElement;
@@ -379,7 +370,7 @@ export default function Dropdown({
 
         const eventTarget = event.target as HTMLElement;
         // If click was outside dropdown body, don’t trigger submit
-        if (!eventTarget.closest(BODY_SELECTOR)) {
+        if (!eventTarget.closest('.uktdropdown-body')) {
             // Don’t close dropdown if isOpening or search input is focused
             if (
                 !isOpeningRef.current &&
@@ -645,7 +636,7 @@ export default function Dropdown({
             trigger = (
                 <input
                     autoComplete="off"
-                    className={TRIGGER_CLASS_NAME}
+                    className="uktdropdown-trigger"
                     defaultValue={value ?? ''}
                     disabled={disabled}
                     name={name}
@@ -658,7 +649,7 @@ export default function Dropdown({
             );
         } else {
             trigger = (
-                <button className={TRIGGER_CLASS_NAME} tabIndex={0} type="button">
+                <button className="uktdropdown-trigger" tabIndex={0} type="button">
                     {trigger}
                 </button>
             );
@@ -667,8 +658,8 @@ export default function Dropdown({
 
     if (label) {
         trigger = (
-            <label className={LABEL_CLASS_NAME}>
-                <div className={LABEL_TEXT_CLASS_NAME}>{label}</div>
+            <label className="uktdropdown-label">
+                <div className="uktdropdown-label-text">{label}</div>
                 {trigger}
             </label>
         );
@@ -694,15 +685,17 @@ export default function Dropdown({
     const style = {
         ...styleFromProps,
         ...(maxHeight != null && maxHeight > minHeightBody
-            ? { [BODY_MAX_HEIGHT_VAR]: `calc(${maxHeight}px - var(--uktdd-body-buffer))` }
+            ? {
+                  '--uktdd-body-max-height': `calc(${maxHeight}px - var(--uktdd-body-buffer))`,
+              }
             : null),
     };
 
     return (
         <Fragment>
-            <Style href="@acusti/dropdown/Dropdown">{STYLES}</Style>
+            <Style href="@acusti/dropdown/Dropdown">{styles}</Style>
             <div
-                className={clsx(ROOT_CLASS_NAME, className, {
+                className={clsx('uktdropdown', className, {
                     disabled,
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
@@ -719,7 +712,7 @@ export default function Dropdown({
                 {trigger}
                 {/* TODO next version of Dropdown should use <Activity> for body https://react.dev/reference/react/Activity */}
                 {isOpen ? (
-                    <div className={BODY_CLASS_NAME} ref={setDropdownBodyElement}>
+                    <div className="uktdropdown-body" ref={setDropdownBodyElement}>
                         {childrenCount > 1 ? (children as ChildrenTuple)[1] : children}
                     </div>
                 ) : null}
