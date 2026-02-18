@@ -22,8 +22,8 @@
         "buildall": "yarn workspaces foreach -Rit --from 'packages/*' run build",
         "dev": "yarn workspace @acusti/uikit-docs storybook",
         "format": "prettier --write eslint.config.js package.json README.md tsconfig.json ./.changeset/ ./packages/ ./packages/docs/.storybook/",
-        "lint": "eslint ./packages/*/src/**",
-        "lintfix": "eslint ./packages/*/src/** --fix",
+        "lint": "eslint './packages/*/src/**/*.{js,jsx,ts,tsx}'",
+        "lintfix": "eslint './packages/*/src/**/*.{js,jsx,ts,tsx}' --fix",
         "test": "vitest",
         "tsc": "yarn workspaces foreach -Rp --from 'packages/*' run tsc --noEmit"
     },
