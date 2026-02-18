@@ -15,7 +15,6 @@ import {
     type ReactNode,
     type SyntheticEvent,
     useEffect,
-    useId,
     useRef,
     useState,
 } from 'react';
@@ -162,8 +161,6 @@ export default function Dropdown({
     const [dropdownElement, setDropdownElement] = useState<MaybeHTMLElement>(null);
     const [dropdownBodyElement, setDropdownBodyElement] =
         useState<MaybeHTMLElement>(null);
-    const id = useId();
-
     const inputElementRef = useRef<HTMLInputElement | null>(null);
     const closingTimerRef = useRef<null | TimeoutID>(null);
     const isOpeningTimerRef = useRef<null | TimeoutID>(null);
@@ -373,7 +370,11 @@ export default function Dropdown({
     const handleMouseUp = (event: ReactMouseEvent<HTMLElement>) => {
         if (onMouseUp) onMouseUp(event);
         // If dropdown is still opening or isn’t open or is closing, do nothing
-        if (isOpeningRef.current || !isOpenRef.current || closingTimerRef.current != null) {
+        if (
+            isOpeningRef.current ||
+            !isOpenRef.current ||
+            closingTimerRef.current != null
+        ) {
             return;
         }
 
@@ -707,25 +708,15 @@ export default function Dropdown({
             : null),
     };
 
-    const anchorStyles = `\
-[data-ukt-id="${id}"] > :first-child {
-  anchor-name: --uktdd-anchor${id};
-}
-[data-ukt-id="${id}"] ${BODY_SELECTOR} {
-  position-anchor: --uktdd-anchor${id};
-}`;
-
     return (
         <Fragment>
             <Style href="@acusti/dropdown/Dropdown">{STYLES}</Style>
-            <Style href={`@acusti/dropdown/Dropdown/${id}`}>{anchorStyles}</Style>
             <div
                 className={clsx(ROOT_CLASS_NAME, className, {
                     disabled,
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
                 })}
-                data-ukt-id={id}
                 onClick={onClick}
                 onMouseDown={handleMouseDown}
                 onMouseMove={handleMouseMove}

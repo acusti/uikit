@@ -37,12 +37,16 @@ ${TRIGGER_SELECTOR} {
 }
 ${ROOT_SELECTOR} {
   width: max-content;
+  anchor-scope: --uktdd-anchor;
 }
 ${ROOT_SELECTOR}.disabled {
   pointer-events: none;
 }
 ${ROOT_SELECTOR} > * {
   cursor: default;
+}
+${ROOT_SELECTOR} > :first-child {
+  anchor-name: --uktdd-anchor;
 }
 ${LABEL_SELECTOR} {
   display: flex;
@@ -54,6 +58,7 @@ ${LABEL_TEXT_SELECTOR} {
 ${BODY_SELECTOR} {
   box-sizing: border-box;
   position: absolute;
+  position-anchor: --uktdd-anchor;
   top: anchor(bottom);
   left: anchor(left);
   bottom: auto;
