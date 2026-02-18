@@ -119,7 +119,7 @@ export default function Dropdown({
     keepOpenOnSubmit = !hasItems,
     label,
     minHeightBody = 30,
-    minWidthBody = 100,
+    minWidthBody,
     name,
     onActiveItem,
     onClick,
@@ -688,6 +688,9 @@ export default function Dropdown({
             ? {
                   '--uktdd-body-max-height': `calc(${maxHeight}px - var(--uktdd-body-buffer))`,
               }
+            : null),
+        ...(minWidthBody != null && minWidthBody > 0
+            ? { '--uktdd-body-min-width': `${minWidthBody}px` }
             : null),
     };
 

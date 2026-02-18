@@ -12,6 +12,7 @@
     --uktdd-body-pad-left: 12px;
     --uktdd-body-pad-right: 12px;
     --uktdd-body-pad-top: 9px;
+    --uktdd-body-min-width: min(50px, 100%);
     --uktdd-label-pad-right: 10px;
 }
 
@@ -57,7 +58,7 @@
     position-try-fallbacks: --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
     min-height: 50px;
     max-height: var(--uktdd-body-max-height);
-    min-width: min(50px, 100%);
+    min-width: var(--uktdd-body-min-width);
     max-width: var(--uktdd-body-max-width);
     overflow: auto;
     z-index: 2;
