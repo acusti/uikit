@@ -12,6 +12,8 @@
         "@storybook/addon-docs": "^10",
         "@storybook/react-vite": "^10",
         "@types/react": "^19.2.10",
+        "@vitejs/plugin-react": "^5.0.4",
+        "babel-plugin-react-compiler": "^1",
         "core-js": "^3.48.0",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
