@@ -1,5 +1,18 @@
 # @acusti/dropdown
 
+## 0.53.0
+
+### Minor Changes
+
+- 48c735b: Use CSS anchor-scope to dramatically simplify Dropdown anchor
+  positioning and avoid the need for custom styles for each Dropdown
+  instance rendered on the page
+
+### Patch Changes
+
+- f578799: Remove auto-width constraints functionality that was causing
+  buggy behavior in some edge cases
+
 ## 0.52.0
 
 ### Minor Changes
