@@ -1,5 +1,11 @@
 # @acusti/styling
 
+## 2.1.2
+
+### Patch Changes
+
+- f15b75d: Modernize the font stack for the SYSTEM_UI_FONT constant
+
 ## 2.1.1
 
 ### Patch Changes

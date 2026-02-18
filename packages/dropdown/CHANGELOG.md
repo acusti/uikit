@@ -1,5 +1,13 @@
 # @acusti/dropdown
 
+## 0.54.0
+
+### Minor Changes
+
+- 8a6fd7f: Refactor CSS handling to minify styles in the prod build via
+  lightningcss and remove now useless @acusti/styling dependency (no
+  benefit from its minification functionality)
+
 ## 0.53.0
 
 ### Minor Changes
