@@ -2,7 +2,14 @@ import dts from 'unplugin-dts/vite';
 import { defineConfig as defineConfigVite } from 'vite';
 
 export const defineConfig = (options = {}) => {
-    const { entry = ['src/index.ts'], formats = ['es'], plugins = [], target } = options;
+    const {
+        build: buildOptions,
+        css,
+        entry = ['src/index.ts'],
+        formats = ['es'],
+        plugins = [],
+        target,
+    } = options;
 
     return defineConfigVite({
         build: {
@@ -25,7 +32,9 @@ export const defineConfig = (options = {}) => {
             },
             sourcemap: true,
             ...(target ? { target } : {}),
+            ...(buildOptions ?? {}),
         },
+        ...(css ? { css } : {}),
         plugins: [...plugins, dts({ exclude: ['**/*.test.ts', '**/*.test.tsx'] })],
     });
 };
