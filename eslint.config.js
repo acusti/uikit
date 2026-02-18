@@ -42,7 +42,14 @@ export default [
         languageOptions: {
             parser: tsParser,
             parserOptions: {
-                projectService: { allowDefaultProject: ['eslint.config.js'] },
+                projectService: {
+                    allowDefaultProject: [
+                        'eslint.config.js',
+                        'vite.config.base.js',
+                        'packages/*/vite.config.js',
+                        'packages/*/.storybook/*.ts',
+                    ],
+                },
             },
         },
         plugins: {
@@ -98,7 +105,7 @@ export default [
             ],
             'prefer-const': ['error', { destructuring: 'all' }],
             'react-compiler/react-compiler': [
-                'warn',
+                'error',
                 { ...compilerOptions, logger: undefined },
             ],
             'react-hooks/capitalized-calls': 'error', // avoid calling capitalized functions (should use JSX)
@@ -107,9 +114,9 @@ export default [
                 { enableDangerousAutofixThisMayCauseInfiniteLoops: true },
             ],
             'react-hooks/hooks': 'error', // largely reimplements the "rules-of-hooks" non-compiler rule
-            'react-hooks/todo': 'error',
             'react-hooks/rule-suppression': 'error',
             'react-hooks/syntax': 'error',
+            'react-hooks/todo': 'error',
             'react-hooks/unsupported-syntax': 'error',
             'react/jsx-no-leaked-render': ['warn', { validStrategies: ['ternary'] }],
             'react/jsx-sort-props': 'off',
@@ -149,6 +156,17 @@ export default [
             'jest-dom': jestDOMPlugin,
             'testing-library': testingLibraryPlugin,
         },
+        rules: {
+            ...jestPlugin.configs.recommended.rules,
+            ...jestDOMPlugin.configs.recommended.rules,
+            ...testingLibraryPlugin.configs.react.rules,
+            // the following rules require setup-test-env: import '@testing-library/jest-dom/vitest';
+            'jest-dom/prefer-empty': 'off',
+            'jest-dom/prefer-in-document': 'off',
+            'jest-dom/prefer-to-have-class': 'off',
+            'jest-dom/prefer-to-have-value': 'off',
+            'testing-library/no-manual-cleanup': 'off',
+        },
         settings: {
             jest: {
                 // we're using vitest which has a very similar API to jest
@@ -156,17 +174,6 @@ export default [
                 // set the jest version.
                 version: 28,
             },
-        },
-        rules: {
-            ...jestPlugin.configs.recommended.rules,
-            ...jestDOMPlugin.configs.recommended.rules,
-            ...testingLibraryPlugin.configs.react.rules,
-            'testing-library/no-manual-cleanup': 'off',
-            // the following rules require setup-test-env: import '@testing-library/jest-dom/vitest';
-            'jest-dom/prefer-empty': 'off',
-            'jest-dom/prefer-in-document': 'off',
-            'jest-dom/prefer-to-have-class': 'off',
-            'jest-dom/prefer-to-have-value': 'off',
         },
     },
 
