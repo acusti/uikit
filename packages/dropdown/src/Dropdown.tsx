@@ -28,7 +28,6 @@ import {
 import {
     BODY_CLASS_NAME,
     BODY_MAX_HEIGHT_VAR,
-    BODY_MAX_WIDTH_VAR,
     BODY_SELECTOR,
     LABEL_CLASS_NAME,
     LABEL_TEXT_CLASS_NAME,
@@ -680,7 +679,6 @@ export default function Dropdown({
     const boundingElement = getBoundingAncestor(dropdownBodyElement);
     const boundingElementRect = useBoundingClientRect(boundingElement);
     let maxHeight;
-    let maxWidth;
     if (
         dropdownBodyRect.top != null &&
         dropdownRect.top != null &&
@@ -691,20 +689,12 @@ export default function Dropdown({
         maxHeight = Math.round(
             dropdownBodyRect.top > dropdownRect.top ? maxHeightDown : maxHeightUp,
         );
-        const maxWidthLeft = dropdownBodyRect.right - boundingElementRect.left;
-        const maxWidthRight = boundingElementRect.right - dropdownBodyRect.left;
-        maxWidth = Math.round(
-            dropdownBodyRect.left > dropdownRect.left ? maxWidthRight : maxWidthLeft,
-        );
     }
 
     const style = {
         ...styleFromProps,
         ...(maxHeight != null && maxHeight > minHeightBody
             ? { [BODY_MAX_HEIGHT_VAR]: `calc(${maxHeight}px - var(--uktdd-body-buffer))` }
-            : null),
-        ...(maxWidth != null && maxWidth > minWidthBody
-            ? { [BODY_MAX_WIDTH_VAR]: `calc(${maxWidth}px - var(--uktdd-body-buffer))` }
             : null),
     };
 
