@@ -206,6 +206,49 @@ function extraneousEscapeCharactersTestCase() {
     });
 }
 
+function fencedJSONVariantsTestCase() {
+    expect(
+        parseAsJSON(`\
+\`\`\`json
+
+{
+  "heading": "News"
+}
+
+\`\`\``),
+    ).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { heading: 'News' },
+    });
+
+    expect(
+        parseAsJSON(`\
+\`\`\`JSON
+{
+  "heading": "News"
+}
+\`\`\``),
+    ).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { heading: 'News' },
+    });
+
+    expect(
+        parseAsJSON(`\
+  \`\`\`json
+  {
+    "heading": "News"
+  }
+  \`\`\``),
+    ).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { heading: 'News' },
+    });
+}
+
 function fencedJSONWithPercentSignsTestCase() {
     const response = `\
 \`\`\`json
@@ -358,49 +401,6 @@ function fencedJSONWithPercentSignsTestCase() {
             subheading:
                 'Rooted in the earth and woven with intention, our achievements reflect a commitment to a kinder, more sustainable world.',
         },
-    });
-}
-
-function fencedJSONVariantsTestCase() {
-    expect(
-        parseAsJSON(`\
-\`\`\`json
-
-{
-  "heading": "News"
-}
-
-\`\`\``),
-    ).toEqual({
-        postscript: '',
-        preamble: '',
-        value: { heading: 'News' },
-    });
-
-    expect(
-        parseAsJSON(`\
-\`\`\`JSON
-{
-  "heading": "News"
-}
-\`\`\``),
-    ).toEqual({
-        postscript: '',
-        preamble: '',
-        value: { heading: 'News' },
-    });
-
-    expect(
-        parseAsJSON(`\
-  \`\`\`json
-  {
-    "heading": "News"
-  }
-  \`\`\``),
-    ).toEqual({
-        postscript: '',
-        preamble: '',
-        value: { heading: 'News' },
     });
 }
 
