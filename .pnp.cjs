@@ -97,7 +97,7 @@ const RAW_RUNTIME_STATE =
     ["@acusti/matchmaking", ["workspace:packages/matchmaking"]],\
     ["@acusti/parsing", ["workspace:packages/parsing"]],\
     ["@acusti/post", ["workspace:packages/post"]],\
-    ["@acusti/styling", ["virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling", "workspace:packages/styling"]],\
+    ["@acusti/styling", ["workspace:packages/styling"]],\
     ["@acusti/textual", ["workspace:packages/textual"]],\
     ["@acusti/uikit", ["workspace:."]],\
     ["@acusti/uikit-docs", ["workspace:packages/docs"]],\
@@ -254,7 +254,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/__virtual__/@acusti-date-picker-virtual-56c5f591e6/1/packages/date-picker/",\
         "packageDependencies": [\
           ["@acusti/date-picker", "virtual:62e895eaa74935c5722a4de41d4984328b771f05bc9888b3fd8210e5282d0c5555d799ab7a4041d2fcfa758b27814e74dbaddade60b7b0a4795629e4e3c125c0#workspace:packages/date-picker"],\
-          ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
           ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.2"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
@@ -282,7 +281,6 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./packages/date-picker/",\
         "packageDependencies": [\
           ["@acusti/date-picker", "workspace:packages/date-picker"],\
-          ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
           ["@testing-library/dom", "npm:10.4.1"],\
           ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.2"],\
           ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
@@ -446,32 +444,6 @@ const RAW_RUNTIME_STATE =
       }]\
     ]],\
     ["@acusti/styling", [\
-      ["virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling", {\
-        "packageLocation": "./.yarn/__virtual__/@acusti-styling-virtual-1ab26d9af6/1/packages/styling/",\
-        "packageDependencies": [\
-          ["@acusti/styling", "virtual:42ba1efe27540225bc0e39545c970733c8d53f6ec1dba8054209f9065065055aa19797297531b5570ac14b89957f918e9364f5540989a288f82948c6bc571b07#workspace:packages/styling"],\
-          ["@testing-library/dom", "npm:10.4.1"],\
-          ["@testing-library/react", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:16.3.2"],\
-          ["@testing-library/user-event", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:14.6.1"],\
-          ["@types/react", "npm:19.2.10"],\
-          ["@types/react-dom", null],\
-          ["@vitejs/plugin-react", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#npm:5.1.2"],\
-          ["babel-plugin-react-compiler", "npm:1.0.0"],\
-          ["happy-dom", "npm:20.4.0"],\
-          ["react", "npm:19.2.4"],\
-          ["react-dom", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.2.4"],\
-          ["typescript", "patch:typescript@npm%3A5.9.2#optional!builtin<compat/typescript>::version=5.9.2&hash=5786d5"],\
-          ["unplugin-dts", "virtual:ae52462715931ea007dc50efba07d133bbd2707991d966b03dd50bc7d26895a233be9457b0dfcacf62c9e7732b6ee7fddb7ea173aaf1a49dde4d8dadb45358ba#npm:1.0.0-beta.6"],\
-          ["vite", "virtual:ae52462715931ea007dc50efba07d133bbd2707991d966b03dd50bc7d26895a233be9457b0dfcacf62c9e7732b6ee7fddb7ea173aaf1a49dde4d8dadb45358ba#npm:8.0.0-beta.11"],\
-          ["vitest", "virtual:afdae6bed2220ffeb070ee40379649c9baf1f40f92a18dda206ea109ee08e197c8d4ded52ffaeedb5def9932505c08fa82afb8ccafbb0155d514fb4046b48c2a#npm:4.0.18"]\
-        ],\
-        "packagePeers": [\
-          "@types/react-dom",\
-          "react-dom",\
-          "react"\
-        ],\
-        "linkType": "SOFT"\
-      }],\
       ["workspace:packages/styling", {\
         "packageLocation": "./packages/styling/",\
         "packageDependencies": [\

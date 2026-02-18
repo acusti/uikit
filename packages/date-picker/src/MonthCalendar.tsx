@@ -1,8 +1,7 @@
-import { Style } from '@acusti/styling';
 import clsx from 'clsx';
 import { Fragment } from 'react';
 
-import { ROOT_CLASS_NAME, STYLES } from './styles/month-calendar.js';
+import styles from './styles/month-calendar.css?inline';
 import {
     getDateFromMonthAndDay,
     getLastDateFromMonth,
@@ -26,6 +25,7 @@ export type Props = {
 type DateRangeDays = [null | number, null | number, null | number];
 
 const DAYS = Array(7).fill(null);
+const ROOT_CLASS_NAME = 'uktmonthcalendar';
 
 export default function MonthCalendar({
     className,
@@ -96,7 +96,9 @@ export default function MonthCalendar({
 
     return (
         <Fragment>
-            <Style href="@acusti/date-picker/MonthCalendar">{STYLES}</Style>
+            <style href="@acusti/date-picker/MonthCalendar" precedence="medium">
+                {styles}
+            </style>
             <div className={clsx(ROOT_CLASS_NAME, className, { 'is-range': isRange })}>
                 <div className={`${ROOT_CLASS_NAME}-month-title`}>
                     <h3 className={`${ROOT_CLASS_NAME}-month-title-text`}>{title}</h3>

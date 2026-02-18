@@ -1,0 +1,61 @@
+.uktdatepicker {
+    display: flex;
+    box-sizing: border-box;
+    padding: 40px 60px 60px;
+    flex: 1 1 auto;
+    position: relative;
+    max-width: 450px;
+
+    &.two-up {
+        max-width: 820px;
+    }
+}
+
+.uktdatepicker-range-arrow-wrap {
+    position: absolute;
+    top: 30px;
+    left: 0px;
+    display: flex;
+    justify-content: space-between;
+    height: 0px;
+    width: 100%;
+    padding: 0px 60px;
+    box-sizing: border-box;
+}
+
+.uktdatepicker-range-arrow {
+    background-color: transparent;
+    border: 0;
+    width: 35px;
+    height: 35px;
+    text-align: center;
+    cursor: pointer;
+
+    &.disabled {
+        color: #ccc;
+        cursor: default;
+    }
+
+    &:active {
+        transform: translateY(1px);
+    }
+
+    &.left-arrow,
+    &.right-arrow {
+        &:after {
+            content: "‹";
+            font-size: 24px;
+            line-height: 35px;
+        }
+    }
+
+    &.right-arrow:after {
+        content: "›";
+    }
+}
+
+.uktdatepicker-month-container {
+    display: flex;
+    flex: 1 1 auto;
+    justify-content: space-between;
+}

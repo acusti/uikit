@@ -1,0 +1,155 @@
+.uktmonthcalendar {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    box-sizing: border-box;
+    max-width: 325px;
+}
+
+.uktmonthcalendar-month-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+    box-sizing: border-box;
+    padding-bottom: 25px;
+}
+
+h3.uktmonthcalendar-month-title-text {
+    font-size: 18px;
+    line-height: 23px;
+    font-weight: 600;
+    color: #000;
+    margin: 0px;
+    text-align: center;
+}
+
+.uktmonthcalendar-month-week {
+    flex: 0 0 auto;
+    display: grid;
+    grid-column-gap: 0px;
+    grid-template-columns: repeat(auto-fit, minmax(46px, 1fr));
+    grid-auto-flow: dense;
+    box-sizing: border-box;
+    padding-bottom: 12px;
+
+    .week-day-item {
+        flex: 1 1 auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    span.week-day-item-text {
+        text-align: center;
+        font-size: 13px;
+        line-height: 21px;
+        margin: 0px;
+        color: #9a9a9a;
+    }
+}
+
+.uktmonthcalendar-month-days {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.uktmonthcalendar-month-row {
+    flex: 1 1 auto;
+    display: grid;
+    grid-column-gap: 0px;
+    grid-template-columns: repeat(auto-fit, minmax(46px, 1fr));
+    grid-auto-flow: dense;
+    margin-bottom: 1px;
+}
+
+.uktmonthcalendar-month-day-item {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    height: 46px;
+    width: 46px;
+    cursor: pointer;
+    border: none;
+    background-color: transparent;
+
+    &:disabled {
+        cursor: auto;
+    }
+
+    &.is-today span.month-day-item-text {
+        color: #eb4e3d;
+    }
+}
+
+.uktmonthcalendar.is-range .uktmonthcalendar-month-day-item {
+    &.is-selected {
+        background-color: #f6f6f6;
+    }
+
+    &.start-date {
+        background-color: #f6f6f6;
+        border-top-left-radius: 50%;
+        border-bottom-left-radius: 50%;
+    }
+
+    &.end-date {
+        background-color: #f6f6f6;
+        border-top-right-radius: 50%;
+        border-bottom-right-radius: 50%;
+    }
+}
+
+.uktmonthcalendar-month-day-item {
+    &.start-date,
+    &.end-date {
+        &:after {
+            background-color: #000;
+            opacity: 1;
+            visibility: visible;
+        }
+
+        span.month-day-item-text {
+            color: #fff;
+        }
+    }
+
+    &:hover:after,
+    &.is-today:hover:after {
+        border-color: #000;
+        opacity: 1;
+        visibility: visible;
+    }
+
+    &:after {
+        content: "";
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        border-radius: 50%;
+        border: 1px solid #000;
+        width: 43px;
+        height: 43px;
+        transition: opacity 0.25s ease-in-out;
+        opacity: 0;
+        visibility: hidden;
+    }
+
+    &.is-empty:after {
+        content: none;
+    }
+
+    span.month-day-item-text {
+        text-align: center;
+        font-size: 13px;
+        line-height: 21px;
+        margin: 0px;
+        color: #000;
+        position: relative;
+        z-index: 1;
+    }
+}

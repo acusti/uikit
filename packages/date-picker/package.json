@@ -61,7 +61,6 @@
         "vitest": "^4"
     },
     "dependencies": {
-        "@acusti/styling": "^2.1.1",
         "clsx": "^2"
     },
     "peerDependencies": {
