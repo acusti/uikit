@@ -1,5 +1,12 @@
 # @acusti/css-value-input
 
+## 2.3.0
+
+### Minor Changes
+
+-   - Updated dependencies
+        - @acusti/input-text@2.4.0
+
 ## 2.2.3
 
 ### Patch Changes
