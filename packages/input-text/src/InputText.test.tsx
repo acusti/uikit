@@ -122,20 +122,65 @@ describe('CSSValueInput.tsx', () => {
         expect(onChangeValue).not.toHaveBeenCalled();
     });
 
+    it('blurs the input by default when pressing Enter with submitOnEnter', async () => {
+        const user = userEvent.setup();
+        const onBlur = vi.fn();
+        const onSubmit = vi.fn();
+        render(
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    onSubmit();
+                }}
+            >
+                <InputText initialValue="hello" onBlur={onBlur} submitOnEnter />
+            </form>,
+        );
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+        await user.click(input);
+        await user.keyboard('{Enter}');
+
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+        expect(onBlur).toHaveBeenCalledTimes(1);
+    });
+
+    it('keeps focus when pressing Enter with submitOnEnter and keepFocusOnSubmit', async () => {
+        const user = userEvent.setup();
+        const onBlur = vi.fn();
+        const onSubmit = vi.fn();
+        render(
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    onSubmit();
+                }}
+            >
+                <InputText
+                    initialValue="hello"
+                    keepFocusOnSubmit
+                    onBlur={onBlur}
+                    submitOnEnter
+                />
+            </form>,
+        );
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+        await user.click(input);
+        await user.keyboard('{Enter}');
+
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+        expect(onBlur).not.toHaveBeenCalled();
+    });
+
     it('respects minHeight prop for multiLine inputs', async () => {
         const user = userEvent.setup();
         render(<InputText initialValue="" minHeight={100} multiLine rows={1} />);
         const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
-
         // Focus the textarea to trigger height calculation
         await user.click(textarea);
-
         // Initial height should be at least minHeight
         expect(parseFloat(textarea.style.height)).toBe(100);
-
         // Type some text
         await user.type(textarea, 'Line 1\nLine 2\nLine 3');
-
         // Height should still be at least minHeight
         expect(parseFloat(textarea.style.height)).toBe(100);
     });
@@ -155,12 +200,11 @@ describe('CSSValueInput.tsx', () => {
             />,
         );
         const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
-
         // Focus the textarea to trigger height calculation
         await user.click(textarea);
-
         // Initial height should be between minHeight and maxHeight
         const height = parseFloat(textarea.style.height);
+
         expect(height).toBeGreaterThanOrEqual(50);
         expect(height).toBeLessThanOrEqual(100);
     });

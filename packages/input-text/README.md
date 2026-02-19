@@ -203,10 +203,16 @@ type Props = {
     style?: CSSProperties;
 
     /**
-     * If true, pressing Enter submits the parent form or blurs the input.
+     * If true, pressing Enter submits the parent form and blurs by default.
+     * Set keepFocusOnSubmit to submit without blurring.
      * For multi-line inputs, Cmd/Ctrl+Enter always submits.
      */
     submitOnEnter?: boolean;
+    /**
+     * If true, pressing Enter while submitOnEnter is enabled keeps focus
+     * on the input instead of blurring.
+     */
+    keepFocusOnSubmit?: boolean;
 
     /** Tab order index */
     tabIndex?: number;
@@ -792,6 +798,12 @@ The component intelligently handles Enter key behavior based on context:
 <InputText
     submitOnEnter  // Enter submits form or blurs input
     type="search"
+/>
+
+// Chat-style single-line: submit and keep typing
+<InputText
+    keepFocusOnSubmit
+    submitOnEnter  // Enter submits without blurring
 />
 
 // Multi-line: Enter adds newline, Cmd/Ctrl+Enter submits

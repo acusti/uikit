@@ -39,6 +39,11 @@ export type Props = {
      * any point, the new value will override the local state of the input.
      */
     initialValue?: string;
+    /**
+     * If true, pressing enter/return while submitOnEnter is enabled keeps
+     * focus on the input instead of blurring.
+     */
+    keepFocusOnSubmit?: boolean;
     list?: string;
     max?: number;
     maxHeight?: null | number | string;
@@ -76,7 +81,8 @@ export type Props = {
     style?: CSSProperties;
     /**
      * If true, pressing enter/return submits the <form> that the input is a
-     * part of, or else blurs the input if no form is found.
+     * part of. By default, this also blurs the input unless
+     * keepFocusOnSubmit is true.
      */
     submitOnEnter?: boolean;
     tabIndex?: number;
@@ -98,6 +104,7 @@ export default function InputText({
     form,
     id,
     initialValue,
+    keepFocusOnSubmit,
     list,
     max,
     maxHeight,
@@ -275,8 +282,9 @@ export default function InputText({
         ) {
             event.preventDefault();
             event.currentTarget.closest('form')?.requestSubmit();
-            // always blur input on Enter when submitOnEnter is true
-            event.currentTarget.blur();
+            if (!keepFocusOnSubmit) {
+                event.currentTarget.blur();
+            }
             return;
         }
         // only discardOnEscape + doubleClickToEdit have custom Enter/Escape behavior

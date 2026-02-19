@@ -111,6 +111,44 @@ export const MultiLineInputWithSubmitOnEnterNoForm: Story = {
     },
 };
 
+function ChatLikeInputDemo() {
+    const [message, setMessage] = useState('');
+    const [messages, setMessages] = useState<Array<string>>([]);
+
+    return (
+        <form
+            onSubmit={(event) => {
+                event.preventDefault();
+                if (!message.trim()) return;
+                setMessages((previousMessages) => [...previousMessages, message.trim()]);
+                setMessage('');
+            }}
+        >
+            <pre>{messages.join('\n') || 'No messages yet'}</pre>
+            <InputText
+                className="input-text"
+                initialValue={message}
+                keepFocusOnSubmit
+                onChangeValue={setMessage}
+                placeholder="Type then press Enter"
+                submitOnEnter
+            />
+        </form>
+    );
+}
+
+export const ChatLikeInputWithSubmitOnEnter: Story = {
+    args: {
+        className: 'input-text',
+        keepFocusOnSubmit: true,
+        placeholder: 'Type then press Enter',
+        submitOnEnter: true,
+    },
+    render() {
+        return <ChatLikeInputDemo />;
+    },
+};
+
 const DOUBLE_CLICK_TO_EDIT_PROPS = {
     className: 'input-text-double-click-to-edit',
     doubleClickToEdit: true,
