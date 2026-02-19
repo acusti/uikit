@@ -11,9 +11,8 @@ rendering behavior and a collection of CSS utilities. It’s designed for
 modern React applications that need efficient, SSR-friendly styling with
 automatic optimization.
 
-> [!WARNING]
-> Maintenance mode only: this package is no longer under active feature
-> development. It receives critical fixes only.
+> [!WARNING] Maintenance mode only: this package is no longer under active
+> feature development. It receives critical fixes only.
 
 ## Key Features
 
