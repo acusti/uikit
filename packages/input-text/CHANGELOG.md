@@ -1,5 +1,14 @@
 # @acusti/input-text
 
+## 2.4.0
+
+### Minor Changes
+
+- 53cd03e: Add a `keepFocusOnSubmit` prop for `InputText` so
+  `submitOnEnter` can submit without blurring, which supports chat-style
+  compose flows where users send consecutive messages without manually
+  refocusing.
+
 ## 2.3.0
 
 ### Minor Changes
