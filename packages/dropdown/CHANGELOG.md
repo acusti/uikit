@@ -1,5 +1,12 @@
 # @acusti/dropdown
 
+## 0.54.1
+
+### Patch Changes
+
+- ab39855: Allow non-string (i.e. ReactNode) `props.label` values for
+  Dropdown
+
 ## 0.54.0
 
 ### Minor Changes

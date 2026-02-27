@@ -1,5 +1,14 @@
 # @acusti/uikit-docs
 
+## 0.4.9
+
+### Patch Changes
+
+- ab39855: Allow non-string (i.e. ReactNode) `props.label` values for
+  Dropdown
+- Updated dependencies [ab39855]
+    - @acusti/dropdown@0.54.1
+
 ## 0.4.8
 
 ### Patch Changes
