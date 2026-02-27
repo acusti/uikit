@@ -12,6 +12,28 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 const { Fragment } = React;
 
+function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
+    return (
+        <svg
+            aria-hidden="true"
+            fill="none"
+            focusable="false"
+            height="12"
+            viewBox="0 0 12 12"
+            width="12"
+            {...props}
+        >
+            <path
+                d="M2.5 4.5 6 8l3.5-3.5"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="1.5"
+            />
+        </svg>
+    );
+}
+
 const meta: Meta<typeof Dropdown> = {
     args: {
         onClick: fn(),
@@ -233,7 +255,18 @@ export const SearchableWithLabel: Story = {
         ),
         className: 'searchable-with-label',
         isSearchable: true,
-        label: 'Font size',
+        label: (
+            <span
+                style={{
+                    alignItems: 'center',
+                    display: 'inline-flex',
+                    gap: '0.25rem',
+                }}
+            >
+                Font size
+                <ChevronDownIcon />
+            </span>
+        ),
     },
 };
 

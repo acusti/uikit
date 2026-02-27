@@ -63,6 +63,18 @@ describe('@acusti/dropdown', () => {
         expect(screen.getByTestId('file-menu')).toBeTruthy();
     });
 
+    it('renders a non-string label value', () => {
+        render(
+            <Dropdown label={0}>
+                <ul data-testid="dropdown-list">
+                    <li>Item</li>
+                </ul>
+            </Dropdown>,
+        );
+
+        expect(screen.getByText('0')).toBeTruthy();
+    });
+
     it('triggers props.onClose and props.onOpen at the appropriate times', async () => {
         let closedCount = 0;
         const handleClose = () => closedCount++;

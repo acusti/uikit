@@ -59,7 +59,7 @@ export type Props = {
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
     keepOpenOnSubmit?: boolean;
-    label?: string;
+    label?: ReactNode;
     minHeightBody?: number;
     minWidthBody?: number;
     /**
@@ -655,7 +655,7 @@ export default function Dropdown({
         }
     }
 
-    if (label) {
+    if (label != null) {
         trigger = (
             <label className="uktdropdown-label">
                 <div className="uktdropdown-label-text">{label}</div>
