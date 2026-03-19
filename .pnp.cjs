@@ -139,7 +139,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-react-compiler", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0-rc.2"],\
           ["eslint-plugin-react-hooks", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.0.1"],\
           ["eslint-plugin-testing-library", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.16.0"],\
-          ["globals", "npm:17.3.0"],\
+          ["globals", "npm:17.4.0"],\
           ["happy-dom", "npm:20.7.0"],\
           ["prettier", "npm:3.8.1"],\
           ["react", "npm:19.2.4"],\
@@ -508,7 +508,7 @@ const RAW_RUNTIME_STATE =
           ["eslint-plugin-react-compiler", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:19.1.0-rc.2"],\
           ["eslint-plugin-react-hooks", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.0.1"],\
           ["eslint-plugin-testing-library", "virtual:afe4e4a1c85e0b022894420d9b3e04e61e9c8c5fe86707d0599325649d85a5d5c03732ca16e1484fddaba15449239efc39b69b9e5b4963f252ae7a4aee0b9a39#npm:7.16.0"],\
-          ["globals", "npm:17.3.0"],\
+          ["globals", "npm:17.4.0"],\
           ["happy-dom", "npm:20.7.0"],\
           ["prettier", "npm:3.8.1"],\
           ["react", "npm:19.2.4"],\
@@ -6385,10 +6385,10 @@ const RAW_RUNTIME_STATE =
         ],\
         "linkType": "HARD"\
       }],\
-      ["npm:17.3.0", {\
-        "packageLocation": "./.yarn/cache/globals-npm-17.3.0-a102428cc6-44ba2b7db9.zip/node_modules/globals/",\
+      ["npm:17.4.0", {\
+        "packageLocation": "./.yarn/cache/globals-npm-17.4.0-d04eded15b-ffad244617.zip/node_modules/globals/",\
         "packageDependencies": [\
-          ["globals", "npm:17.3.0"]\
+          ["globals", "npm:17.4.0"]\
         ],\
         "linkType": "HARD"\
       }]\
