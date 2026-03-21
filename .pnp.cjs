@@ -6155,17 +6155,17 @@ const RAW_RUNTIME_STATE =
         "packageLocation": "./.yarn/cache/flat-cache-npm-4.0.1-12bf2455f7-58ce851d90.zip/node_modules/flat-cache/",\
         "packageDependencies": [\
           ["flat-cache", "npm:4.0.1"],\
-          ["flatted", "npm:3.3.3"],\
+          ["flatted", "npm:3.4.2"],\
           ["keyv", "npm:4.5.4"]\
         ],\
         "linkType": "HARD"\
       }]\
     ]],\
     ["flatted", [\
-      ["npm:3.3.3", {\
-        "packageLocation": "./.yarn/cache/flatted-npm-3.3.3-ca455563b2-8c96c02fbe.zip/node_modules/flatted/",\
+      ["npm:3.4.2", {\
+        "packageLocation": "./.yarn/cache/flatted-npm-3.4.2-e32280259b-a9e78fe5c2.zip/node_modules/flatted/",\
         "packageDependencies": [\
-          ["flatted", "npm:3.3.3"]\
+          ["flatted", "npm:3.4.2"]\
         ],\
         "linkType": "HARD"\
       }]\
