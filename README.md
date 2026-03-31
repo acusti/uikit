@@ -87,7 +87,7 @@ publishing.
 To create a new changeset, run:
 
 ```bash
-bunx changeset
+bun changeset
 ```
 
 For the contents of the changesets, the format to document updated
@@ -101,12 +101,12 @@ updates) is:
 ```
 
 When you are ready to do a release, build all packages by running
-`bun run build`. This uses the repo's workspace runner to build packages in
+`bun run build`. This uses the repo’s workspace runner to build packages in
 dependency order. You can then update all package versions automatically by
 running:
 
 ```bash
-bunx changeset version
+bun changeset version
 ```
 
 Next, run `bun install` to refresh `bun.lock` and commit the version
@@ -117,7 +117,7 @@ if anything has changed), run:
 
 ```bash
 bun run build
-bunx changeset publish
+bun changeset publish
 git push --follow-tags
 ```
 
