@@ -1,5 +1,6 @@
 import dts from 'unplugin-dts/vite';
 import { defineConfig as defineConfigVite } from 'vite';
+import { configDefaults } from 'vitest/config';
 
 export const defineConfig = (options = {}) => {
     const {
@@ -36,6 +37,9 @@ export const defineConfig = (options = {}) => {
         },
         ...(css ? { css } : {}),
         plugins: [...plugins, dts({ exclude: ['**/*.test.ts', '**/*.test.tsx'] })],
+        test: {
+            exclude: [...configDefaults.exclude, '**/dist/**'],
+        },
     });
 };
 
