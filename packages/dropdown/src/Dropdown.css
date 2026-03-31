@@ -6,13 +6,18 @@
     --uktdd-body-bg-color-hover: rgb(105, 162, 249);
     --uktdd-body-color-hover: #fff;
     --uktdd-body-buffer: 10px;
-    --uktdd-body-max-height: calc(100vh - var(--uktdd-body-buffer));
-    --uktdd-body-max-width: calc(100vw - var(--uktdd-body-buffer));
+    --uktdd-body-max-height: calc(100dvh - var(--uktdd-body-buffer));
+    --uktdd-body-max-width: calc(100dvw - var(--uktdd-body-buffer));
+    --uktdd-body-min-height: 30px;
     --uktdd-body-pad-bottom: 9px;
     --uktdd-body-pad-left: 12px;
     --uktdd-body-pad-right: 12px;
     --uktdd-body-pad-top: 9px;
     --uktdd-body-min-width: min(50px, 100%);
+    --uktdd-body-position-area: bottom span-right;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
+    --uktdd-body-translate: 0 0;
     --uktdd-label-pad-right: 10px;
 }
 
@@ -49,22 +54,21 @@
 
 .uktdropdown-body {
     box-sizing: border-box;
-    position: absolute;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
     position-anchor: --uktdd-anchor;
-    top: anchor(bottom);
-    left: anchor(left);
-    bottom: auto;
-    right: auto;
+    position-area: var(--uktdd-body-position-area);
     position-try-order: most-height;
-    position-try-fallbacks: --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
-    min-height: 50px;
-    max-height: var(--uktdd-body-max-height);
-    min-width: var(--uktdd-body-min-width);
-    max-width: var(--uktdd-body-max-width);
-    overflow: auto;
+    position-try-fallbacks: var(--uktdd-body-position-try-fallbacks);
+    min-block-size: min(var(--uktdd-body-min-height), var(--uktdd-body-max-height));
+    max-block-size: min(var(--uktdd-body-max-height), 100%);
+    min-inline-size: min(var(--uktdd-body-min-width), var(--uktdd-body-max-width));
+    max-inline-size: var(--uktdd-body-max-width);
+    inline-size: max-content;
+    overflow: hidden;
+    translate: var(--uktdd-body-translate);
     z-index: 2;
-    padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right)
-        var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
     background-color: var(--uktdd-body-bg-color);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 
@@ -78,23 +82,28 @@
     }
 }
 
+.uktdropdown-content {
+    box-sizing: border-box;
+    min-block-size: 0;
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-gutter: stable;
+    padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right)
+        var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
+}
+
 @position-try --uktdd-top-left {
-    bottom: anchor(top);
-    left: anchor(left);
-    top: auto;
-    right: auto;
+    position-area: top span-right;
+}
+
+@position-try --uktdd-bottom-left {
+    position-area: bottom span-right;
 }
 
 @position-try --uktdd-bottom-right {
-    top: anchor(bottom);
-    right: anchor(right);
-    bottom: auto;
-    left: auto;
+    position-area: bottom span-left;
 }
 
 @position-try --uktdd-top-right {
-    bottom: anchor(top);
-    right: anchor(right);
-    top: auto;
-    left: auto;
+    position-area: top span-left;
 }

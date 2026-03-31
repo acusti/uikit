@@ -6,8 +6,8 @@
 [![bundle size](https://deno.bundlejs.com/badge?q=@acusti/dropdown)](https://bundlejs.com/?q=%40acusti%2Fdropdown)
 
 `Dropdown` is a React component that renders a menu-like UI with a trigger
-that the user clicks to disclose a dropdown positioned below the trigger.
-The body of the dropdown can include any DOM, and many dropdowns can be
+that the user clicks to disclose a dropdown anchored to that trigger. The
+body of the dropdown can include any DOM, and many dropdowns can be
 combined to form a multi-item menu, like the system menu in the top toolbar
 of macOS.
 
@@ -78,6 +78,39 @@ function CustomTrigger() {
 }
 ```
 
+## Layout Model
+
+`Dropdown` uses CSS anchor positioning for placement and prefers a
+CSS-first sizing model:
+
+- The trigger is the anchor
+- The dropdown body is an anchored shell
+- The inner content region becomes scrollable only when the content exceeds
+  the available space
+- Placement fallbacks are handled with `position-try-order: most-height`
+
+This means the dropdown tends to:
+
+- stay content-sized when the contents are small
+- expand to the available viewport space when more room is needed
+- become scrollable when the contents exceed that space
+
+Internally, the dropdown renders:
+
+- `.uktdropdown-body` as the anchored outer shell
+- `.uktdropdown-content` as the scrollable inner region
+
+Custom padding and overflow styling usually belongs on the content region,
+not the outer shell.
+
+For the most reliable anchor-positioning behavior:
+
+- pass exactly two children when you need a custom trigger
+- ensure the trigger resolves to a stable DOM element
+- keep the trigger first and the dropdown body second
+- prefer CSS variable overrides over custom `top`/`left`/`right` inset
+  rules
+
 ## API Reference
 
 ### Props
@@ -126,11 +159,11 @@ type Props = {
      */
     keepOpenOnSubmit?: boolean;
     /**
-     * Label text for the trigger button (when using single child syntax).
+     * Label content for the trigger button (when using single child syntax).
      */
-    label?: string;
+    label?: ReactNode;
     /**
-     * Minimum height for the dropdown body in pixels.
+     * Minimum height for the dropdown body in pixels. Defaults to 30.
      */
     minHeightBody?: number;
     /**
@@ -335,6 +368,60 @@ function InteractiveDropdown() {
     );
 }
 ```
+
+### Placement Customization with CSS Variables
+
+Placement is best customized in CSS instead of props. The component exposes
+CSS custom properties for the most common low-level placement controls:
+
+- `--uktdd-body-position-area`
+- `--uktdd-body-position-try-fallbacks`
+- `--uktdd-body-translate`
+- `--uktdd-body-min-height`
+- `--uktdd-body-min-width`
+- `--uktdd-body-max-height`
+- `--uktdd-body-max-width`
+
+Example:
+
+```css
+.settings-dropdown {
+    --uktdd-body-position-area: bottom span-left;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
+    --uktdd-body-translate: -8px 0;
+}
+
+.settings-dropdown .uktdropdown-body {
+    inline-size: 18rem;
+}
+```
+
+This approach keeps the public React API small while still allowing precise
+placement and sizing control when a product surface needs it.
+
+### End-Aligned, Content-Sized Menu
+
+For menus attached to controls near the right edge of the viewport, such as
+an avatar menu in a fixed header, prefer customizing alignment only and let
+the menu size itself from its contents.
+
+```css
+.avatar-menu {
+    --uktdd-body-position-area: bottom span-left;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-top-right, --uktdd-top-left, --uktdd-bottom-right;
+}
+```
+
+This keeps the menu:
+
+- aligned to the end edge of the trigger
+- content-sized by default
+- constrained only by the component’s max available space rules
+
+Avoid hardcoding width for this pattern unless the product explicitly needs
+a fixed-size menu.
 
 ## Keyboard Navigation & Accessibility
 

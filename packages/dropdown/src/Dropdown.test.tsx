@@ -75,6 +75,26 @@ describe('@acusti/dropdown', () => {
         expect(screen.getByText('0')).toBeTruthy();
     });
 
+    it('renders dropdown items inside .uktdropdown-content', async () => {
+        const user = userEvent.setup();
+        render(
+            <Dropdown minHeightBody={90}>
+                Menu
+                <ul data-testid="dropdown-list">
+                    <li>Item</li>
+                </ul>
+            </Dropdown>,
+        );
+
+        await user.click(screen.getByRole('button', { name: 'Menu' }));
+
+        expect(
+            screen.getByText('Item', {
+                selector: '.uktdropdown-body .uktdropdown-content li',
+            }),
+        ).toBeTruthy();
+    });
+
     it('triggers props.onClose and props.onOpen at the appropriate times', async () => {
         let closedCount = 0;
         const handleClose = () => closedCount++;

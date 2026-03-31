@@ -1,5 +1,4 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions */
-import useBoundingClientRect from '@acusti/use-bounding-client-rect';
 import useKeyboardEvents, {
     isEventTargetUsingKeyEvent,
 } from '@acusti/use-keyboard-events';
@@ -148,8 +147,6 @@ export default function Dropdown({
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [dropdownElement, setDropdownElement] = useState<MaybeHTMLElement>(null);
-    const [dropdownBodyElement, setDropdownBodyElement] =
-        useState<MaybeHTMLElement>(null);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
     const closingTimerRef = useRef<null | TimeoutID>(null);
     const isOpeningTimerRef = useRef<null | TimeoutID>(null);
@@ -664,29 +661,10 @@ export default function Dropdown({
         );
     }
 
-    const dropdownRect = useBoundingClientRect(dropdownElement);
-    const dropdownBodyRect = useBoundingClientRect(dropdownBodyElement);
-    const boundingElement = getBoundingAncestor(dropdownBodyElement);
-    const boundingElementRect = useBoundingClientRect(boundingElement);
-    let maxHeight;
-    if (
-        dropdownBodyRect.top != null &&
-        dropdownRect.top != null &&
-        boundingElementRect.top != null
-    ) {
-        const maxHeightUp = dropdownBodyRect.bottom - boundingElementRect.top;
-        const maxHeightDown = boundingElementRect.bottom - dropdownBodyRect.top;
-        maxHeight = Math.round(
-            dropdownBodyRect.top > dropdownRect.top ? maxHeightDown : maxHeightUp,
-        );
-    }
-
     const style = {
         ...styleFromProps,
-        ...(maxHeight != null && maxHeight > minHeightBody
-            ? {
-                  '--uktdd-body-max-height': `calc(${maxHeight}px - var(--uktdd-body-buffer))`,
-              }
+        ...(minHeightBody != null && minHeightBody > 0
+            ? { '--uktdd-body-min-height': `${minHeightBody}px` }
             : null),
         ...(minWidthBody != null && minWidthBody > 0
             ? { '--uktdd-body-min-width': `${minWidthBody}px` }
@@ -716,27 +694,19 @@ export default function Dropdown({
                 {trigger}
                 {/* TODO next version of Dropdown should use <Activity> for body https://react.dev/reference/react/Activity */}
                 {isOpen ? (
-                    <div className="uktdropdown-body" ref={setDropdownBodyElement}>
-                        {childrenCount > 1 ? (children as ChildrenTuple)[1] : children}
+                    <div
+                        className={clsx('uktdropdown-body', {
+                            'has-items': hasItems,
+                        })}
+                    >
+                        <div className="uktdropdown-content">
+                            {childrenCount > 1
+                                ? (children as ChildrenTuple)[1]
+                                : children}
+                        </div>
                     </div>
                 ) : null}
             </div>
         </Fragment>
     );
-}
-
-function getBoundingAncestor(element?: MaybeHTMLElement): MaybeHTMLElement {
-    while (element?.parentElement) {
-        // If we’ve reached the body, use that as boundingElement
-        if (element.parentElement.tagName === 'BODY') return element.parentElement;
-        // Only need to check one overflow direction, because if either direction
-        // is not visible, neither can be visible
-        if (getComputedStyle(element.parentElement).overflowX !== 'visible') {
-            return element.parentElement;
-        }
-
-        element = element.parentElement as MaybeHTMLElement;
-    }
-
-    return null;
 }
