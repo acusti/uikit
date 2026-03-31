@@ -119,37 +119,38 @@
 
 .searchable-with-label,
 .searchable-and-allow-create {
+    --uktdd-body-position-area: bottom span-left;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
+
     input,
     .uktdropdown-body {
-        width: 85px;
-    }
-
-    .uktdropdown-body {
-        left: revert;
-        right: anchor(right);
+        inline-size: 85px;
     }
 }
 
 .css-value-input-trigger {
+    --uktdd-body-position-area: bottom span-left;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
+    --uktdd-body-translate: -14px 0;
+
     .uktdropdown-body {
-        width: 110px;
-        left: revert;
-        right: anchor(right);
-        margin-right: 14px;
+        inline-size: 110px;
     }
 }
 
 .dropdown-without-items .uktdropdown-body {
-    width: 300px;
+    inline-size: 300px;
 }
 
 .textarea-trigger .uktdropdown-body {
-    width: 400px;
+    inline-size: 400px;
     font-size: 13px;
 }
 
 .checkboxes .uktdropdown-body {
-    width: 150px;
+    inline-size: 150px;
 }
 
 .checkboxes input[type="checkbox"] {
@@ -157,10 +158,12 @@
 }
 
 .overlapping-dropdown .uktdropdown-body {
-    margin-top: -22px;
-    margin-left: -10px;
-    width: 250px;
-    min-height: 200px;
+    inline-size: 250px;
+    min-block-size: 200px;
+}
+
+.overlapping-dropdown {
+    --uktdd-body-translate: -10px -22px;
 }
 
 .out-of-bounds-example input {
@@ -168,36 +171,7 @@
 }
 
 .out-of-bounds-example .uktdropdown-body {
-    width: 250px;
-}
-
-.position-right.uktdropdown {
-    /* position: absolute;
-    right: 65px; */
-}
-
-.out-of-bounds-example.no-direction-change.uktdropdown {
-    position: relative;
-    margin-top: 220px;
-}
-
-.out-of-bounds-example.no-direction-change .uktdropdown-trigger {
-    width: 255px;
-}
-
-.out-of-bounds-example.no-direction-change.uktdropdown .uktdropdown-body {
-    top: 100%;
-}
-
-#anchor--uikit-controls-dropdown--out-of-bounds-with-no-direction-change
-    .innerZoomElementWrapper
-    > * {
-    overflow: auto;
-    height: 200px;
-}
-
-#anchor--uikit-controls-dropdown--out-of-bounds-with-no-direction-change .sb-story {
-    height: 230px;
+    inline-size: 250px;
 }
 
 /* ---- Fixed Header Styles ---- */
@@ -344,6 +318,10 @@
     }
 
     .avatar-menu {
+        --uktdd-body-position-area: bottom span-left;
+        --uktdd-body-position-try-fallbacks:
+            --uktdd-top-right, --uktdd-top-left, --uktdd-bottom-right;
+
         .avatar-profile,
         .avatar-edit {
             width: 35px;
@@ -363,8 +341,10 @@
 
         .uktdropdown-body {
             box-sizing: border-box;
+        }
+
+        .uktdropdown-content {
             padding: 20px;
-            bottom: auto;
         }
 
         p {

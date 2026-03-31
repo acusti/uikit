@@ -401,12 +401,11 @@ const FIXED_HEADER_PROPS = {
         <button
             aria-label="Open user menu"
             className="avatar-profile has-avatar"
-            popoverTarget="avatar-menu-popover"
             style={{ backgroundImage: `url("https://picsum.photos/id/40/100/100")` }}
         >
             AP
         </button>,
-        <ul className="menu-list avatar-dropdown">
+        <div className="menu-list avatar-dropdown">
             <div
                 className="avatar-edit has-avatar"
                 style={{
@@ -423,7 +422,7 @@ const FIXED_HEADER_PROPS = {
                     Sign Out
                 </button>
             </form>
-        </ul>,
+        </div>,
     ] as const,
     className: 'avatar-menu',
 };
@@ -536,21 +535,5 @@ export const OutOfBoundsAtRight: Story = {
         isSearchable: true,
         name: 'outofboundsatright',
         placeholder: 'Fill available space',
-    },
-};
-
-export const OutOfBoundsWithNoDirectionChange: Story = {
-    args: {
-        children: (
-            <ul>
-                <li>Antarctica</li>
-                <li>Arctic Circle</li>
-                <li>North Pole</li>
-            </ul>
-        ),
-        className: 'out-of-bounds-example no-direction-change',
-        isSearchable: true,
-        name: 'outofboundsatbottomnodirectionchange',
-        placeholder: 'Show below even though it goes out of bounds',
     },
 };
