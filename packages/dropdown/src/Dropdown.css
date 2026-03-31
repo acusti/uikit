@@ -55,6 +55,7 @@
     left: anchor(left);
     bottom: auto;
     right: auto;
+    position-try-order: most-height;
     position-try-fallbacks: --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
     min-height: 50px;
     max-height: var(--uktdd-body-max-height);
