@@ -1,5 +1,17 @@
 # @acusti/uikit-docs
 
+## 0.5.0
+
+### Minor Changes
+
+- 81cf7ee: Update @acusti/dropdown stories to match improved fit-to-space
+  sizing and illustrate latest functionality and best practices
+
+### Patch Changes
+
+- Updated dependencies [be600a5]
+    - @acusti/dropdown@0.55.0
+
 ## 0.4.9
 
 ### Patch Changes
