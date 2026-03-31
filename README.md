@@ -77,35 +77,17 @@ repository.
 ## Tests
 
 The monorepo uses vitest to run its tests. To run tests across all
-packages, use `yarn test`. To run them in watch mode, use
-`yarn test:watch`.
+packages, use `bun run test`.
 
 ## Building and Publishing
 
 We use [changesets][] to maintain a changelog and manage versioning and
-publishing. Changesets is supposed to handle automatically updating any
-packages that depend on the changed packages, but it isn’t 100% accurate at
-that task. Yarn has its own [“Release Workflow” feature][], which will
-update versions and dependents with 100% accuracy. As such, the hybrid flow
-I have come up with is to first, run the following for each package that I
-have directly changed:
+publishing.
 
-```
-yarn workspace @acusti/{pkg} version patch
-```
+To create a new changeset, run:
 
-Then, make a note of each package that was bumped because the package
-depends on one or more of the packages receiving direct updates.
-
-Then run `git checkout .` (or Branch › Discard All Changes…) to undo all of
-the local changes.
-
-Now, we turn to changesets. To create a new changeset, run the following
-and select all packages identified in the previous step (including ones
-that depend on the changed packages):
-
-```
-yarn changeset
+```bash
+bunx changeset
 ```
 
 For the contents of the changesets, the format to document updated
@@ -119,39 +101,32 @@ updates) is:
 ```
 
 When you are ready to do a release, build all packages by running
-`yarn build`. This will trigger each packages’ build script in
-“topological” order, i.e. yarn will only run the command after all
-workspaces that it depends on through the `dependencies` field have
-successfully finished executing. You can then update all package versions
-automatically by running:
+`bun run build`. This uses the repo's workspace runner to build packages in
+dependency order. You can then update all package versions automatically by
+running:
 
-```
-yarn changeset version
+```bash
+bunx changeset version
 ```
 
-Next, run `yarn` to update the yarn.lock file and then commit the version
-updates with a message in the form of
-`:arrow_up: Bump package versions to _._._` if only one package (plus
-dependents if applicable) was updated or
-`Create new versions via changeset version` if many packages were updated.
+Next, run `bun install` to refresh `bun.lock` and commit the version
+updates.
 
 Lastly, to publish the new versions to npm (building all the packages first
 if anything has changed), run:
 
-```
-yarn build
-yarn changeset publish
+```bash
+bun run build
+bunx changeset publish
 git push --follow-tags
 ```
 
 ## Developing
 
-The run script for developing is `yarn dev`, which kicks off the default
+The run script for developing is `bun run dev`, which kicks off the default
 `storybook` command from `packages/docs/package.json` and runs storybook in
 watch mode. Changes to the source files (e.g.
 `packages/dropdown/src/Dropdown.tsx`) should trigger a rebuild, but if not,
-run `yarn build` to ensure it’s picked up.
+run `bun run build` to ensure it’s picked up.
 
 [changesets]: https://github.com/changesets/changesets
-[“Release Workflow” feature]: https://yarnpkg.com/features/release-workflow
-[open issue]: https://github.com/yarnpkg/berry/issues/1510

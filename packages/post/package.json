@@ -21,7 +21,8 @@
     ],
     "scripts": {
         "test": "vitest",
-        "build": "vite build"
+        "build": "vite build",
+        "tsc": "tsc --noEmit"
     },
     "repository": {
         "type": "git",

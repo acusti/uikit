@@ -6,7 +6,8 @@
     },
     "scripts": {
         "build": "storybook build -o dist",
-        "storybook": "storybook dev -p 6006"
+        "storybook": "storybook dev -p 6006",
+        "tsc": "tsc --noEmit"
     },
     "devDependencies": {
         "@storybook/addon-docs": "^10",

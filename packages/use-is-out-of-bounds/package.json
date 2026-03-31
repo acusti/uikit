@@ -50,6 +50,7 @@
         "react-dom": "^19 || ~0.0.0-experimental < 0.0.0-f"
     },
     "scripts": {
-        "build": "vite build"
+        "build": "vite build",
+        "tsc": "tsc --noEmit"
     }
 }

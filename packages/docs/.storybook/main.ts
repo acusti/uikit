@@ -15,7 +15,7 @@ const main: StorybookConfig = {
         name: getAbsolutePath('@storybook/react-vite'),
         options: {},
     },
-    stories: ['../stories/Introduction.mdx', '../stories/**/*.stories.@(js|jsx|ts|tsx)'],
+    stories: ['../stories/Introduction.mdx', '../stories/**/*.stories.@(ts|tsx)'],
     typescript: { check: false, reactDocgen: 'react-docgen' },
     async viteFinal(viteConfig) {
         const { mergeConfig } = await import('vite');
