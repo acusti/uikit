@@ -273,12 +273,29 @@ export default function InputText({
         if (onKeyDown) onKeyDown(event);
         // special handling is only for Enter and Escape keys
         if (event.key !== 'Enter' && event.key !== 'Escape') return;
-        if (
+        const isPlainEnter =
             event.key === 'Enter' &&
-            // for multi-line inputs, ⌘-Enter should always submit
-            (submitOnEnter || (multiLine && isPrimaryModifierPressed(event))) &&
-            // for multi-line inputs, shift/alt/ctrl-Enter should insert newlines
-            (!multiLine || (!event.shiftKey && !event.altKey && !event.ctrlKey))
+            !event.shiftKey &&
+            !event.altKey &&
+            !event.ctrlKey &&
+            !event.metaKey;
+        const isPrimaryModifierEnter =
+            event.key === 'Enter' &&
+            multiLine &&
+            isPrimaryModifierPressed(event) &&
+            !hasNonPrimaryModifier(event);
+
+        if (doubleClickToEdit && readOnlyState && isPlainEnter) {
+            event.preventDefault();
+            setReadOnlyState(false);
+            return;
+        }
+
+        if (
+            // Plain Enter submits when submitOnEnter is enabled.
+            (submitOnEnter && isPlainEnter) ||
+            // For multi-line inputs, the primary modifier + Enter should always submit.
+            isPrimaryModifierEnter
         ) {
             event.preventDefault();
             event.currentTarget.closest('form')?.requestSubmit();
@@ -287,20 +304,25 @@ export default function InputText({
             }
             return;
         }
-        // only discardOnEscape + doubleClickToEdit have custom Enter/Escape behavior
-        if (!discardOnEscape && !doubleClickToEdit) return;
 
-        if (event.key === 'Escape' && discardOnEscape) {
+        if (event.key === 'Escape') {
+            if (!discardOnEscape && !doubleClickToEdit) return;
             // reset input to last “committed” value
-            if (event.currentTarget.value !== committedValueRef.current) {
+            if (
+                discardOnEscape &&
+                event.currentTarget.value !== committedValueRef.current
+            ) {
                 event.currentTarget.value = committedValueRef.current;
                 // if the value changed, manually trigger onChange handlers
                 handleChange(event as unknown as ChangeEvent<InputElement>);
             }
-        } else if (event.key === 'Enter' && doubleClickToEdit && readOnlyState) {
-            setReadOnlyState(false);
+            event.currentTarget.blur();
+            return;
         }
-        // blur the input on Enter and Escape
+
+        if (!doubleClickToEdit || !isPlainEnter) return;
+
+        // While editing in doubleClickToEdit mode, plain Enter finishes editing.
         event.currentTarget.blur();
     };
 
@@ -358,6 +380,14 @@ const SUPPORTS_FIELD_SIZING =
     typeof CSS === 'undefined' ? true : CSS.supports('field-sizing', 'content');
 
 const IS_APPLE_REGEXP = /mac|iphone|ipad|ipod/i;
+
+function hasNonPrimaryModifier(event: KeyboardEvent<InputElement>) {
+    return (
+        event.shiftKey ||
+        event.altKey ||
+        (!isPrimaryModifierPressed(event) && (event.ctrlKey || event.metaKey))
+    );
+}
 
 function isHeightEmpty(
     value?: null | number | string,

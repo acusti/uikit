@@ -171,6 +171,175 @@ describe('CSSValueInput.tsx', () => {
         expect(onBlur).not.toHaveBeenCalled();
     });
 
+    it('allows Shift+Enter to insert a newline for multiLine submitOnEnter inputs with doubleClickToEdit', async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn();
+        render(
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    onSubmit();
+                }}
+            >
+                <InputText
+                    doubleClickToEdit
+                    initialValue="hello"
+                    multiLine
+                    submitOnEnter
+                />
+            </form>,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        await user.dblClick(textarea);
+        textarea.selectionStart = textarea.value.length;
+        textarea.selectionEnd = textarea.value.length;
+        await user.keyboard('{Shift>}{Enter}{/Shift}');
+        await user.type(textarea, 'world');
+
+        expect(textarea.value).toBe('hello\nworld');
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('enters edit mode when pressing Enter on a focused readOnly doubleClickToEdit input', async () => {
+        const user = userEvent.setup();
+        render(<InputText doubleClickToEdit initialValue="hello" />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+
+        expect(input.readOnly).toBe(true);
+
+        await user.click(input);
+        await user.keyboard('{Enter}');
+
+        expect(input.readOnly).toBe(false);
+        expect(input.matches(':focus')).toBe(true);
+    });
+
+    it('enters edit mode instead of submitting when pressing Enter on a focused readOnly multiLine input with submitOnEnter and doubleClickToEdit', async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn();
+        render(
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    onSubmit();
+                }}
+            >
+                <InputText
+                    doubleClickToEdit
+                    initialValue="hello"
+                    multiLine
+                    submitOnEnter
+                />
+            </form>,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        expect(textarea.readOnly).toBe(true);
+
+        await user.click(textarea);
+        await user.keyboard('{Enter}');
+
+        expect(textarea.readOnly).toBe(false);
+        expect(textarea.matches(':focus')).toBe(true);
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+
+    it('submits when pressing the primary modifier plus Enter while editing a multiLine input with submitOnEnter and doubleClickToEdit', async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn();
+        render(
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    onSubmit();
+                }}
+            >
+                <InputText
+                    doubleClickToEdit
+                    initialValue="hello"
+                    multiLine
+                    submitOnEnter
+                />
+            </form>,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        await user.dblClick(textarea);
+
+        // Use the current platform's primary modifier so this test is stable
+        // on both macOS and non-Apple environments.
+        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        if (/mac|iphone|ipad|ipod/i.test(globalThis.navigator?.platform ?? '')) {
+            await user.keyboard('{Meta>}{Enter}{/Meta}');
+        } else {
+            await user.keyboard('{Control>}{Enter}{/Control}');
+        }
+
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+        expect(textarea.readOnly).toBe(true);
+        expect(textarea.matches(':focus')).toBe(false);
+    });
+
+    it('submits when pressing Enter while already editing a multiLine input with submitOnEnter and doubleClickToEdit', async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn();
+        render(
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    onSubmit();
+                }}
+            >
+                <InputText
+                    doubleClickToEdit
+                    initialValue="hello"
+                    multiLine
+                    submitOnEnter
+                />
+            </form>,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        await user.dblClick(textarea);
+        await user.keyboard('{Enter}');
+
+        expect(onSubmit).toHaveBeenCalledTimes(1);
+        expect(textarea.readOnly).toBe(true);
+        expect(textarea.matches(':focus')).toBe(false);
+    });
+
+    it('discards changes when pressing Escape while editing a multiLine input with submitOnEnter and doubleClickToEdit', async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn();
+        render(
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    onSubmit();
+                }}
+            >
+                <InputText
+                    discardOnEscape
+                    doubleClickToEdit
+                    initialValue="hello"
+                    multiLine
+                    submitOnEnter
+                />
+            </form>,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        await user.dblClick(textarea);
+        await user.type(textarea, ' world');
+        await user.keyboard('{Escape}');
+
+        expect(textarea.value).toBe('hello');
+        expect(textarea.readOnly).toBe(true);
+        expect(textarea.matches(':focus')).toBe(false);
+        expect(onSubmit).not.toHaveBeenCalled();
+    });
+
     it('respects minHeight prop for multiLine inputs', async () => {
         const user = userEvent.setup();
         render(<InputText initialValue="" minHeight={100} multiLine rows={1} />);
