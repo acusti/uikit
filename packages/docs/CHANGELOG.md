@@ -1,5 +1,20 @@
 # @acusti/uikit-docs
 
+## 0.6.0
+
+### Minor Changes
+
+- d00a5c8: Fix controls panel in `InputText` stories and add a story for a
+  `multiLine` input with `submitOnEnter`, `doubleClickToEdit`, and
+  `discardOnEscape`
+
+### Patch Changes
+
+- Updated dependencies [eeb8097]
+- Updated dependencies [3ae0da5]
+    - @acusti/input-text@2.4.1
+    - @acusti/css-value-input@2.3.1
+
 ## 0.5.0
 
 ### Minor Changes

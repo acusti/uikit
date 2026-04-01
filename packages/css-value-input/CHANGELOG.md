@@ -1,5 +1,15 @@
 # @acusti/css-value-input
 
+## 2.3.1
+
+### Patch Changes
+
+- 3ae0da5: Adapt `CSSValueInput` to use the latest `InputText`
+  `submitOnEnter` behavior, plus added regression test coverage for
+  Enter-driven normalization and form submission.
+- Updated dependencies [eeb8097]
+    - @acusti/input-text@2.4.1
+
 ## 2.3.0
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
     "name": "@acusti/css-value-input",
-    "version": "2.3.0",
+    "version": "2.3.1",
     "description": "React component that renders a text input that can take and update a CSS value of a particular type with a default unit",
     "keywords": [
         "css",
@@ -40,7 +40,7 @@
     },
     "dependencies": {
         "@acusti/css-values": "^1.2.0",
-        "@acusti/input-text": "^2.4.0",
+        "@acusti/input-text": "^2.4.1",
         "clsx": "^2"
     },
     "devDependencies": {
