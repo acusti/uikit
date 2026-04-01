@@ -15,6 +15,17 @@
     }
 }
 
+.multi-line-input-double-click-to-edit {
+    border-color: transparent;
+    max-width: 300px;
+    resize: none;
+    width: 240px;
+
+    &:read-only {
+        cursor: pointer;
+    }
+}
+
 .multi-line-input-text {
     width: 240px;
 }

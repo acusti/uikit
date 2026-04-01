@@ -1,5 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import { type FormEvent, useState } from 'react';
+import { type ComponentProps, type FormEvent, useEffect, useState } from 'react';
 import { fn } from 'storybook/test';
 
 import InputText from '../../input-text/src/InputText.js';
@@ -7,6 +7,14 @@ import InputText from '../../input-text/src/InputText.js';
 import './InputText.css';
 
 const meta: Meta<typeof InputText> = {
+    args: {
+        onBlur: fn(),
+        onChange: fn(),
+        onChangeValue: fn(),
+        onFocus: fn(),
+        onKeyDown: fn(),
+        onKeyUp: fn(),
+    },
     component: InputText,
     parameters: {
         docs: {
@@ -29,13 +37,6 @@ export const EmptyInput: Story = {
     args: {
         className: 'input-text',
         name: 'empty',
-        // NOTE spies are a workaround for a bug related to implicit arg detection
-        onBlur: fn(),
-        onChange: fn(),
-        onChangeValue: fn(),
-        onFocus: fn(),
-        onKeyDown: fn(),
-        onKeyUp: fn(),
         placeholder: 'enter text here…',
     },
 };
@@ -86,7 +87,7 @@ const formatDate = new Intl.DateTimeFormat(undefined, {
 
 export const MultiLineInputWithSubmitOnEnter: Story = {
     args: SUBMIT_ON_ENTER_PROPS,
-    render() {
+    render(args) {
         const [lastSubmitDate, setLastSubmitDate] = useState<Date | null>(null);
         const lastSubmit = lastSubmitDate ? formatDate(lastSubmitDate) : 'never';
 
@@ -97,7 +98,7 @@ export const MultiLineInputWithSubmitOnEnter: Story = {
                     setLastSubmitDate(new Date());
                 }}
             >
-                <InputText {...SUBMIT_ON_ENTER_PROPS} />
+                <InputText {...args} />
                 <pre>Last submitted: {lastSubmit}</pre>
             </form>
         );
@@ -109,11 +110,35 @@ export const MultiLineInputWithSubmitOnEnterNoForm: Story = {
         ...SUBMIT_ON_ENTER_PROPS,
         name: `${SUBMIT_ON_ENTER_PROPS.name}-no-form`,
     },
+    render(args) {
+        const [lastSubmitDate, setLastSubmitDate] = useState<Date | null>(null);
+        const lastSubmit = lastSubmitDate ? formatDate(lastSubmitDate) : 'never';
+
+        return (
+            <>
+                <InputText
+                    {...args}
+                    onKeyDown={(event) => {
+                        args.onKeyDown?.(event);
+                        if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
+                            setLastSubmitDate(new Date());
+                        }
+                    }}
+                />
+                <pre>Last submitted: {lastSubmit}</pre>
+            </>
+        );
+    },
 };
 
-function ChatLikeInputDemo() {
-    const [message, setMessage] = useState('');
+function ChatLikeInputDemo(props: ComponentProps<typeof InputText>) {
+    const { initialValue, onChangeValue, ...inputProps } = props;
+    const [message, setMessage] = useState(initialValue ?? '');
     const [messages, setMessages] = useState<Array<string>>([]);
+
+    useEffect(() => {
+        setMessage(initialValue ?? '');
+    }, [initialValue]);
 
     return (
         <form
@@ -126,12 +151,12 @@ function ChatLikeInputDemo() {
         >
             <pre>{messages.join('\n') || 'No messages yet'}</pre>
             <InputText
-                className="input-text"
+                {...inputProps}
                 initialValue={message}
-                keepFocusOnSubmit
-                onChangeValue={setMessage}
-                placeholder="Type then press Enter"
-                submitOnEnter
+                onChangeValue={(value) => {
+                    onChangeValue?.(value);
+                    setMessage(value);
+                }}
             />
         </form>
     );
@@ -144,8 +169,8 @@ export const ChatLikeInputWithSubmitOnEnter: Story = {
         placeholder: 'Type then press Enter',
         submitOnEnter: true,
     },
-    render() {
-        return <ChatLikeInputDemo />;
+    render(args) {
+        return <ChatLikeInputDemo {...args} />;
     },
 };
 
@@ -178,6 +203,37 @@ export const InputWithDoubleClickToEditAndDiscardOnEscape: Story = {
         name: 'double-click-to-edit-and-discard-on-escape-input',
     },
 };
+
+const MULTI_LINE_INPUT_WITH_SUBMIT_ON_ENTER_AND_DOUBLE_CLICK_TO_EDIT_PROPS = {
+    ...SUBMIT_ON_ENTER_PROPS,
+    className: 'multi-line-input-double-click-to-edit',
+    discardOnEscape: true,
+    doubleClickToEdit: true,
+    initialValue:
+        'Double-click to edit this text, press Enter to submit, or Escape to discard.',
+    name: 'multi-line-submit-on-enter-and-double-click-to-edit-input',
+};
+
+export const MultiLineInputWithSubmitOnEnterAndDoubleClickToEditAndDiscardOnEscape: Story =
+    {
+        args: MULTI_LINE_INPUT_WITH_SUBMIT_ON_ENTER_AND_DOUBLE_CLICK_TO_EDIT_PROPS,
+        render(args) {
+            const [lastSubmitDate, setLastSubmitDate] = useState<Date | null>(null);
+            const lastSubmit = lastSubmitDate ? formatDate(lastSubmitDate) : 'never';
+
+            return (
+                <form
+                    onSubmit={(event: FormEvent<HTMLFormElement>) => {
+                        event.preventDefault();
+                        setLastSubmitDate(new Date());
+                    }}
+                >
+                    <InputText {...args} />
+                    <pre>Last submitted: {lastSubmit}</pre>
+                </form>
+            );
+        },
+    };
 
 export const InputWithAutoFocus: Story = {
     args: {
@@ -243,12 +299,12 @@ const MULTI_LINE_INPUT_IN_POPOVER_PROPS = {
 
 export const MultiLineInputInPopover: Story = {
     args: MULTI_LINE_INPUT_IN_POPOVER_PROPS,
-    render() {
+    render(args) {
         return (
             <>
                 <button popoverTarget="multi-line-input-popover">Open Popover</button>
                 <div id="multi-line-input-popover" popover="auto">
-                    <InputText {...MULTI_LINE_INPUT_IN_POPOVER_PROPS} />
+                    <InputText {...args} />
                 </div>
             </>
         );
@@ -265,14 +321,14 @@ const MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS = {
 
 export const MultiLineInputWithAutoFocusInPopover: Story = {
     args: MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS,
-    render() {
+    render(args) {
         return (
             <>
                 <button popoverTarget="multi-line-input-with-autofocus-popover">
                     Open Popover
                 </button>
                 <div id="multi-line-input-with-autofocus-popover" popover="auto">
-                    <InputText {...MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS} />
+                    <InputText {...args} />
                 </div>
             </>
         );
