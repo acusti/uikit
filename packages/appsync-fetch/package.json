@@ -1,42 +1,42 @@
 {
     "name": "@acusti/appsync-fetch",
     "version": "0.18.0",
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/index.js",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "files": [
-        "dist"
-    ],
     "description": "A lightweight node.js module for making requests to an AWS AppSync graphql API",
     "keywords": [
-        "node",
-        "fetch",
-        "request",
-        "promise",
-        "graphql",
         "appsync",
         "aws",
-        "typescript",
-        "ts"
+        "fetch",
+        "graphql",
+        "node",
+        "promise",
+        "request",
+        "ts",
+        "typescript"
     ],
-    "scripts": {
-        "test": "vitest",
-        "build": "vite build",
-        "tsc": "tsc --noEmit"
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/appsync-fetch#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
     },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
         "directory": "packages/appsync-fetch"
     },
-    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
-    "license": "Unlicense",
-    "bugs": {
-        "url": "https://github.com/acusti/uikit/issues"
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": "./dist/index.js",
+    "scripts": {
+        "test": "vitest",
+        "build": "vite build",
+        "tsc": "tsc --noEmit"
     },
-    "homepage": "https://github.com/acusti/uikit/tree/main/packages/appsync-fetch#readme",
     "dependencies": {
         "@acusti/aws-signature-v4": "^2.0.0",
         "@acusti/post": "^1.2.0"

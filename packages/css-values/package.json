@@ -1,41 +1,41 @@
 {
     "name": "@acusti/css-values",
     "version": "1.2.0",
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/index.js",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "files": [
-        "dist"
-    ],
     "description": "Utilities for parsing different types of CSS values with or without their units",
     "keywords": [
-        "utils",
-        "utilities",
         "css",
         "css-value",
-        "typescript",
-        "ts",
         "isomorphic",
-        "universal"
+        "ts",
+        "typescript",
+        "universal",
+        "utilities",
+        "utils"
     ],
-    "scripts": {
-        "test": "vitest",
-        "build": "vite build",
-        "tsc": "tsc --noEmit"
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/css-values#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
     },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
         "directory": "packages/css-values"
     },
-    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
-    "license": "Unlicense",
-    "bugs": {
-        "url": "https://github.com/acusti/uikit/issues"
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": "./dist/index.js",
+    "scripts": {
+        "test": "vitest",
+        "build": "vite build",
+        "tsc": "tsc --noEmit"
     },
-    "homepage": "https://github.com/acusti/uikit/tree/main/packages/css-values#readme",
     "devDependencies": {
         "typescript": "5.9.2",
         "unplugin-dts": "^1.0.0-beta.6",

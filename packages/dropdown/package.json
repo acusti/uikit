@@ -1,46 +1,51 @@
 {
     "name": "@acusti/dropdown",
     "version": "0.55.0",
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/Dropdown.js",
-    "main": "./dist/Dropdown.js",
-    "types": "./dist/Dropdown.d.ts",
-    "files": [
-        "dist"
-    ],
     "description": "React component that renders a dropdown with a trigger and supports searching, keyboard access, and more",
     "keywords": [
-        "react",
-        "react-component",
-        "dropdown",
-        "menu",
-        "combobox",
-        "search",
-        "typeahead",
         "a11y",
         "accessibility",
+        "combobox",
+        "dropdown",
         "key-navigation",
+        "menu",
+        "react",
+        "react-component",
+        "search",
         "ssr",
-        "typescript",
-        "ts"
+        "ts",
+        "typeahead",
+        "typescript"
     ],
-    "scripts": {
-        "test": "vitest",
-        "build": "vite build",
-        "tsc": "tsc --noEmit"
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/dropdown#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
     },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
         "directory": "packages/dropdown"
     },
-    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
-    "license": "Unlicense",
-    "bugs": {
-        "url": "https://github.com/acusti/uikit/issues"
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/Dropdown.js",
+    "types": "./dist/Dropdown.d.ts",
+    "exports": "./dist/Dropdown.js",
+    "scripts": {
+        "test": "vitest",
+        "build": "vite build",
+        "tsc": "tsc --noEmit"
     },
-    "homepage": "https://github.com/acusti/uikit/tree/main/packages/dropdown#readme",
+    "dependencies": {
+        "@acusti/matchmaking": "^0.10.0",
+        "@acusti/use-keyboard-events": "^0.11.0",
+        "clsx": "^2"
+    },
     "devDependencies": {
         "@testing-library/dom": "^10.4.1",
         "@testing-library/react": "^16.3.2",
@@ -55,11 +60,6 @@
         "unplugin-dts": "^1.0.0-beta.6",
         "vite": "^8.0.0-0",
         "vitest": "^4"
-    },
-    "dependencies": {
-        "@acusti/matchmaking": "^0.10.0",
-        "@acusti/use-keyboard-events": "^0.11.0",
-        "clsx": "^2"
     },
     "peerDependencies": {
         "react": "^19 || ~0.0.0-experimental < 0.0.0-f",

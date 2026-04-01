@@ -3,9 +3,39 @@
 // For a full list of overridable settings, and general information on folder-specific settings,
 // see the documentation: https://zed.dev/docs/configuring-zed#settings-files
 {
+    "languages": {
+        "CSS": {
+            "format_on_save": "on",
+            "formatter": [{ "language_server": { "name": "oxfmt" } }]
+        },
+        "JavaScript": {
+            "format_on_save": "on",
+            "formatter": [{ "language_server": { "name": "oxfmt" } }]
+        },
+        "TypeScript": {
+            "format_on_save": "on",
+            "formatter": [{ "language_server": { "name": "oxfmt" } }]
+        },
+        "TSX": {
+            "format_on_save": "on",
+            "formatter": [{ "language_server": { "name": "oxfmt" } }]
+        },
+        "JSON": {
+            "format_on_save": "on",
+            "formatter": [{ "language_server": { "name": "oxfmt" } }]
+        },
+        "Markdown": {
+            "format_on_save": "on",
+            "formatter": [{ "language_server": { "name": "oxfmt" } }]
+        }
+    },
     "lsp": {
-        "typescript": {
-            "tsdk": ".yarn/sdks/typescript/lib"
+        "oxfmt": {
+            "initialization_options": {
+                "settings": {
+                    "fmt.configPath": ".oxfmtrc.json"
+                }
+            }
         }
     }
 }

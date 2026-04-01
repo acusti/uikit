@@ -1,43 +1,48 @@
 {
     "name": "@acusti/css-value-input",
     "version": "2.3.0",
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/CSSValueInput.js",
-    "main": "./dist/CSSValueInput.js",
-    "types": "./dist/CSSValueInput.d.ts",
-    "files": [
-        "dist"
-    ],
     "description": "React component that renders a text input that can take and update a CSS value of a particular type with a default unit",
     "keywords": [
-        "react",
-        "react-component",
         "css",
         "css-value",
         "form",
         "input",
         "input-text",
+        "react",
+        "react-component",
         "ssr",
-        "typescript",
-        "ts"
+        "ts",
+        "typescript"
     ],
-    "scripts": {
-        "test": "vitest",
-        "build": "vite build",
-        "tsc": "tsc --noEmit"
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/css-value-input#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
     },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
         "directory": "packages/css-value-input"
     },
-    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
-    "license": "Unlicense",
-    "bugs": {
-        "url": "https://github.com/acusti/uikit/issues"
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/CSSValueInput.js",
+    "types": "./dist/CSSValueInput.d.ts",
+    "exports": "./dist/CSSValueInput.js",
+    "scripts": {
+        "test": "vitest",
+        "build": "vite build",
+        "tsc": "tsc --noEmit"
     },
-    "homepage": "https://github.com/acusti/uikit/tree/main/packages/css-value-input#readme",
+    "dependencies": {
+        "@acusti/css-values": "^1.2.0",
+        "@acusti/input-text": "^2.4.0",
+        "clsx": "^2"
+    },
     "devDependencies": {
         "@testing-library/dom": "^10.4.1",
         "@testing-library/react": "^16.3.2",
@@ -52,11 +57,6 @@
         "unplugin-dts": "^1.0.0-beta.6",
         "vite": "^8.0.0-0",
         "vitest": "^4"
-    },
-    "dependencies": {
-        "@acusti/css-values": "^1.2.0",
-        "@acusti/input-text": "^2.4.0",
-        "clsx": "^2"
     },
     "peerDependencies": {
         "react": "^19 || ~0.0.0-experimental < 0.0.0-f",

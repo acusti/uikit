@@ -1,42 +1,42 @@
 {
     "name": "@acusti/input-text",
     "version": "2.4.0",
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/InputText.js",
-    "main": "./dist/InputText.js",
-    "types": "./dist/InputText.d.ts",
-    "files": [
-        "dist"
-    ],
     "description": "React component that renders a semi-controlled input with multiLine and selectTextOnFocus support",
     "keywords": [
-        "react",
-        "react-component",
         "form",
         "input",
         "input-text",
-        "textarea",
+        "react",
+        "react-component",
         "ssr",
-        "typescript",
-        "ts"
+        "textarea",
+        "ts",
+        "typescript"
     ],
-    "scripts": {
-        "test": "vitest",
-        "build": "vite build",
-        "tsc": "tsc --noEmit"
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/input-text#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
     },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
         "directory": "packages/input-text"
     },
-    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
-    "license": "Unlicense",
-    "bugs": {
-        "url": "https://github.com/acusti/uikit/issues"
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/InputText.js",
+    "types": "./dist/InputText.d.ts",
+    "exports": "./dist/InputText.js",
+    "scripts": {
+        "test": "vitest",
+        "build": "vite build",
+        "tsc": "tsc --noEmit"
     },
-    "homepage": "https://github.com/acusti/uikit/tree/main/packages/input-text#readme",
     "devDependencies": {
         "@testing-library/dom": "^10.4.1",
         "@testing-library/react": "^16.3.2",

@@ -1,35 +1,39 @@
 {
     "name": "@acusti/use-bounding-client-rect",
     "version": "2.0.1",
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/useBoundingClientRect.js",
-    "main": "./dist/useBoundingClientRect.js",
-    "types": "./dist/useBoundingClientRect.d.ts",
-    "files": [
-        "dist"
-    ],
     "description": "React hook that returns the boundingClientRect for an element and triggers an update when those dimensions change",
     "keywords": [
+        "boundingClientRect",
+        "hooks",
         "react",
         "react-hooks",
-        "hooks",
-        "boundingClientRect",
-        "useBoundingClientRect",
+        "ts",
         "typescript",
-        "ts"
+        "useBoundingClientRect"
     ],
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/use-bounding-client-rect#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
+    },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
         "directory": "packages/use-bounding-client-rect"
     },
-    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
-    "license": "Unlicense",
-    "bugs": {
-        "url": "https://github.com/acusti/uikit/issues"
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/useBoundingClientRect.js",
+    "types": "./dist/useBoundingClientRect.d.ts",
+    "exports": "./dist/useBoundingClientRect.js",
+    "scripts": {
+        "build": "vite build",
+        "tsc": "tsc --noEmit"
     },
-    "homepage": "https://github.com/acusti/uikit/tree/main/packages/use-bounding-client-rect#readme",
     "devDependencies": {
         "@types/react": "^19.2.10",
         "@vitejs/plugin-react": "^5.0.4",
@@ -44,9 +48,5 @@
     "peerDependencies": {
         "react": "^19 || ~0.0.0-experimental < 0.0.0-f",
         "react-dom": "^19 || ~0.0.0-experimental < 0.0.0-f"
-    },
-    "scripts": {
-        "build": "vite build",
-        "tsc": "tsc --noEmit"
     }
 }

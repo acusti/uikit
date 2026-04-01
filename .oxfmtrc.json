@@ -1,0 +1,22 @@
+{
+    "$schema": "./node_modules/oxfmt/configuration_schema.json",
+    "arrowParens": "always",
+    "printWidth": 90,
+    "singleQuote": true,
+    "tabWidth": 4,
+    "trailingComma": "all",
+    "useTabs": false,
+    "overrides": [
+        {
+            "files": ["*.css", "*.scss"],
+            "options": { "singleQuote": false }
+        },
+        {
+            "files": ["*.md", "*.mdx", "*.markdown"],
+            "options": {
+                "printWidth": 75,
+                "proseWrap": "always"
+            }
+        }
+    ]
+}

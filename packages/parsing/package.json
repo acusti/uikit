@@ -1,39 +1,39 @@
 {
     "name": "@acusti/parsing",
     "version": "0.20.2",
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/index.js",
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "files": [
-        "dist"
-    ],
     "description": "Loosely parse a string as JSON with numerous affordances for syntax errors",
     "keywords": [
-        "parse",
-        "parsing",
+        "genai",
+        "generative-ai",
         "json",
         "llm",
-        "genai",
-        "generative-ai"
+        "parse",
+        "parsing"
     ],
-    "scripts": {
-        "test": "vitest",
-        "build": "vite build",
-        "tsc": "tsc --noEmit"
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/parsing#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
     },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
         "directory": "packages/parsing"
     },
-    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
-    "license": "Unlicense",
-    "bugs": {
-        "url": "https://github.com/acusti/uikit/issues"
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": "./dist/index.js",
+    "scripts": {
+        "test": "vitest",
+        "build": "vite build",
+        "tsc": "tsc --noEmit"
     },
-    "homepage": "https://github.com/acusti/uikit/tree/main/packages/parsing#readme",
     "devDependencies": {
         "typescript": "5.9.2",
         "unplugin-dts": "^1.0.0-beta.6",

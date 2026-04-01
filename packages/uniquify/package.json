@@ -1,47 +1,47 @@
 {
     "name": "@acusti/uniquify",
     "version": "0.8.1",
-    "type": "module",
-    "sideEffects": false,
-    "exports": "./dist/uniquify.js",
-    "main": "./dist/uniquify.js",
-    "types": "./dist/uniquify.d.ts",
-    "files": [
-        "dist"
-    ],
     "description": "Generate a unique string (e.g. for filenames or url slugs) using an incremental counter",
     "keywords": [
-        "unique",
-        "uniq",
         "file",
-        "name",
         "filename",
-        "url",
-        "slug",
-        "upload",
-        "utils",
-        "utilities",
-        "typescript",
-        "ts",
         "isomorphic",
-        "universal"
+        "name",
+        "slug",
+        "ts",
+        "typescript",
+        "uniq",
+        "unique",
+        "universal",
+        "upload",
+        "url",
+        "utilities",
+        "utils"
     ],
-    "scripts": {
-        "build": "vite build",
-        "test": "vitest",
-        "tsc": "tsc --noEmit"
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/uniquify#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
     },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
     "repository": {
         "type": "git",
         "url": "https://github.com/acusti/uikit.git",
         "directory": "packages/uniquify"
     },
-    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
-    "license": "Unlicense",
-    "bugs": {
-        "url": "https://github.com/acusti/uikit/issues"
+    "files": [
+        "dist"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/uniquify.js",
+    "types": "./dist/uniquify.d.ts",
+    "exports": "./dist/uniquify.js",
+    "scripts": {
+        "build": "vite build",
+        "test": "vitest",
+        "tsc": "tsc --noEmit"
     },
-    "homepage": "https://github.com/acusti/uikit/tree/main/packages/uniquify#readme",
     "devDependencies": {
         "typescript": "5.9.2",
         "unplugin-dts": "^1.0.0-beta.6",

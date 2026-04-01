@@ -1,51 +1,54 @@
 {
     "name": "@acusti/date-picker",
     "version": "0.16.0",
+    "description": "React component that renders a date picker with support for date ranges",
+    "keywords": [
+        "date",
+        "date-picker",
+        "date-range-picker",
+        "datepicker",
+        "daterangepicker",
+        "form",
+        "input",
+        "picker",
+        "react",
+        "react-component",
+        "ssr",
+        "ts",
+        "typescript"
+    ],
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/date-picker#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
+    },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/acusti/uikit.git",
+        "directory": "packages/date-picker"
+    },
+    "files": [
+        "dist"
+    ],
     "type": "module",
     "sideEffects": false,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
     "exports": {
         ".": {
             "types": "./dist/index.d.ts",
             "default": "./dist/index.js"
         }
     },
-    "main": "./dist/index.js",
-    "types": "./dist/index.d.ts",
-    "files": [
-        "dist"
-    ],
-    "description": "React component that renders a date picker with support for date ranges",
-    "keywords": [
-        "react",
-        "react-component",
-        "datepicker",
-        "date-picker",
-        "daterangepicker",
-        "date-range-picker",
-        "date",
-        "picker",
-        "form",
-        "input",
-        "ssr",
-        "typescript",
-        "ts"
-    ],
     "scripts": {
         "test": "vitest",
         "build": "vite build",
         "tsc": "tsc --noEmit"
     },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/acusti/uikit.git",
-        "directory": "packages/date-picker"
+    "dependencies": {
+        "clsx": "^2"
     },
-    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
-    "license": "Unlicense",
-    "bugs": {
-        "url": "https://github.com/acusti/uikit/issues"
-    },
-    "homepage": "https://github.com/acusti/uikit/tree/main/packages/date-picker#readme",
     "devDependencies": {
         "@testing-library/dom": "^10.4.1",
         "@testing-library/react": "^16.3.2",
@@ -60,9 +63,6 @@
         "unplugin-dts": "^1.0.0-beta.6",
         "vite": "^8.0.0-0",
         "vitest": "^4"
-    },
-    "dependencies": {
-        "clsx": "^2"
     },
     "peerDependencies": {
         "react": "^19 || ~0.0.0-experimental < 0.0.0-f",
