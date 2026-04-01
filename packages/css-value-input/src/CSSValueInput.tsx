@@ -274,6 +274,7 @@ export default function CSSValueInput({
                     placeholder={placeholder}
                     ref={ref}
                     selectTextOnFocus
+                    submitOnEnter
                     tabIndex={tabIndex}
                 />
             </div>

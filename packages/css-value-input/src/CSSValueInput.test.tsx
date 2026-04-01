@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { cleanup, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { afterEach, describe, expect, it } from 'vitest';
+import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import CSSValueInput from './CSSValueInput.js';
 
@@ -103,5 +103,26 @@ describe('CSSValueInput.tsx', () => {
         expect(input.value).toBe('3rad');
         await user.type(input, '-4.1{Enter}');
         expect(input.value).toBe('-4.1rad');
+    });
+
+    it('submits the ancestor form and normalizes the value on Enter', async () => {
+        const user = userEvent.setup();
+        const onSubmit = vi.fn();
+        render(
+            <form
+                onSubmit={(event) => {
+                    event.preventDefault();
+                    onSubmit();
+                }}
+            >
+                <CSSValueInput allowEmpty onSubmitValue={noop} unit="px" value="" />
+            </form>,
+        );
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+
+        await user.type(input, '14{Enter}');
+
+        expect(input.value).toBe('14px');
+        expect(onSubmit).toHaveBeenCalledTimes(1);
     });
 });
