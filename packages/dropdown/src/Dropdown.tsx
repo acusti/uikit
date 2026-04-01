@@ -116,7 +116,7 @@ export default function Dropdown({
     isSearchable,
     keepOpenOnSubmit = !hasItems,
     label,
-    minHeightBody = 30,
+    minHeightBody,
     minWidthBody,
     name,
     onActiveItem,

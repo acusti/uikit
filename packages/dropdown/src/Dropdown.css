@@ -87,7 +87,6 @@
     min-block-size: 0;
     overflow: auto;
     overscroll-behavior: contain;
-    scrollbar-gutter: stable;
     padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right)
         var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
 }
