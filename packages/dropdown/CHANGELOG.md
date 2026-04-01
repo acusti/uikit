@@ -1,5 +1,16 @@
 # @acusti/dropdown
 
+## 0.55.1
+
+### Patch Changes
+
+- d358734: Polish dropdown sizing defaults by removing
+  `scrollbar-gutter: stable` from `.uktdropdown-content` and by only
+  emitting `--uktdd-body-min-height` when `props.minHeightBody` is
+  explicitly provided. This avoids reserving an empty gutter for
+  always-visible scrollbars when the dropdown isn’t scrollable and keeps
+  the default `30px` min-height in the CSS and not as inline styles.
+
 ## 0.55.0
 
 ### Minor Changes
