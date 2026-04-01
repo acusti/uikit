@@ -1,0 +1,62 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+if ! command -v bunx >/dev/null 2>&1; then
+    echo "pre-commit: bunx is required to run oxfmt" >&2
+    exit 1
+fi
+
+declare -a files=()
+declare -a format_files=()
+declare -a partially_staged=()
+
+while IFS= read -r -d '' file; do
+    # skip deletions or paths outside working tree
+    [[ -f "$file" ]] || continue
+
+    case "$file" in
+        *.js|*.jsx|*.mjs|*.cjs|*.ts|*.tsx|*.json|*.jsonc|*.json5|*.yaml|*.yml|*.toml|*.html|*.css|*.scss|*.less|*.md|*.mdx|*.graphql|*.gql)
+            files+=("$file")
+            ;;
+        *)
+            ;;
+    esac
+done < <(git diff --cached --name-only --diff-filter=ACMR -z)
+
+if (( ${#files[@]} == 0 )); then
+    exit 0
+fi
+
+for file in "${files[@]}"; do
+    # If a file has unstaged changes, it is partially staged; formatting + re-adding
+    # would stage unrelated hunks and break atomic commits.
+    if git diff --quiet -- "$file"; then
+        format_files+=("$file")
+    else
+        partially_staged+=("$file")
+    fi
+done
+
+if (( ${#partially_staged[@]} > 0 )); then
+    echo "pre-commit: skipping partially staged file(s) to preserve selected hunks:"
+    for file in "${partially_staged[@]}"; do
+        echo "  - $file"
+    done
+fi
+
+if (( ${#format_files[@]} == 0 )); then
+    exit 0
+fi
+
+echo "pre-commit: formatting ${#format_files[@]} staged file(s) with oxfmt"
+bunx oxfmt \
+    --no-error-on-unmatched-pattern \
+    --config .oxfmtrc.json \
+    --ignore-path .gitignore \
+    --ignore-path .oxfmtignore \
+    "${format_files[@]}"
+
+git add -- "${format_files[@]}"
