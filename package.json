@@ -47,7 +47,7 @@
     },
     "devDependencies": {
         "@babel/core": "^7.28.6",
-        "@eslint/js": "^9.39.2",
+        "@eslint/js": "^10.0.1",
         "@microsoft/api-extractor": "^7.57.7",
         "@testing-library/dom": "^10.4.1",
         "@testing-library/react": "^16.3.2",
@@ -57,7 +57,7 @@
         "@typescript-eslint/eslint-plugin": "^8.48.1",
         "@typescript-eslint/parser": "^8.48.1",
         "@typescript-eslint/types": "^8.48.1",
-        "eslint": "^9.39.2",
+        "eslint": "^10.1.0",
         "eslint-config-prettier": "^10.1.8",
         "eslint-import-resolver-typescript": "^4.4.4",
         "eslint-plugin-canonical": "^5.1.3",
