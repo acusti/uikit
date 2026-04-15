@@ -7,7 +7,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import { addHandler, handlersData, isEventTargetUsingKeyEvent } from './handlers.js';
 
-const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
+const noop = () => {}; // eslint-disable-line no-empty-function
 
 describe('@acusti/use-keyboard-events', () => {
     describe('handlers', () => {

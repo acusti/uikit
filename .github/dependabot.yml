@@ -16,10 +16,6 @@ updates:
               patterns:
                   - '@babel/*'
                   - '@types/babel__core'
-          eslint:
-              patterns:
-                  - '@eslint/*'
-                  - 'eslint'
           eslint-plugins:
               patterns:
                   - 'eslint-plugin-*'
@@ -40,9 +36,9 @@ updates:
               patterns:
                   - '@storybook/*'
                   - 'storybook'
-          typescript-eslint:
+          oxlint:
               patterns:
-                  - '@typescript-eslint/*'
+                  - 'oxlint*'
           vite:
               patterns:
                   - '@vite*'

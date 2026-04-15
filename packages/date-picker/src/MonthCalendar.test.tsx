@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import MonthCalendar from './MonthCalendar.js';
 import { getMonthFromDate } from './utils.js';
 
-const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
+const noop = () => {}; // eslint-disable-line no-empty-function
 
 afterEach(cleanup);
 

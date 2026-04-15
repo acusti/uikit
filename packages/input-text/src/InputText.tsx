@@ -396,7 +396,7 @@ function isHeightEmpty(
 }
 
 function isPrimaryModifierPressed(event: KeyboardEvent<InputElement>) {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    // eslint-disable-next-line typescript/no-deprecated
     const platform = globalThis.navigator?.platform ?? '';
     return IS_APPLE_REGEXP.test(platform) ? event.metaKey : event.ctrlKey;
 }

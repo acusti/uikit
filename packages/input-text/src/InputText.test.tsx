@@ -269,7 +269,7 @@ describe('CSSValueInput.tsx', () => {
 
         // Use the current platform's primary modifier so this test is stable
         // on both macOS and non-Apple environments.
-        // eslint-disable-next-line @typescript-eslint/no-deprecated
+        // eslint-disable-next-line typescript/no-deprecated
         if (/mac|iphone|ipad|ipod/i.test(globalThis.navigator?.platform ?? '')) {
             await user.keyboard('{Meta>}{Enter}{/Meta}');
         } else {

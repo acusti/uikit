@@ -525,13 +525,13 @@ export function parseAsJSON(text: string): ParsedResult {
     if (!hasTextContent(postscript)) {
         postscript = '';
     }
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+    // eslint-disable-next-line typescript/strict-boolean-expressions
     if (postscript.length > 5 && (!value || postscript.length > index)) {
         const { postscript: remainingPostscript, value: remainingValue } =
             parseAsJSON(postscript);
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        // eslint-disable-next-line typescript/strict-boolean-expressions
         if (remainingValue) {
-            // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+            // eslint-disable-next-line typescript/strict-boolean-expressions
             if (!value)
                 return {
                     postscript: cleanThinkingText(remainingPostscript),

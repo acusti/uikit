@@ -5,7 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import CSSValueInput from './CSSValueInput.js';
 
-const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
+const noop = () => {}; // eslint-disable-line no-empty-function
 
 afterEach(cleanup);
 

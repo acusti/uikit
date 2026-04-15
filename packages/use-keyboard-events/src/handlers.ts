@@ -14,7 +14,7 @@ const PRIORITY_MIN = -50;
 const PRIORITY_MAX = 50;
 const PRIORITY_MODIFIER = PRIORITY_MIN * -1;
 
-const noop = () => {}; // eslint-disable-line @typescript-eslint/no-empty-function
+const noop = () => {}; // eslint-disable-line no-empty-function
 
 export function addHandler({
     eventType,
@@ -64,7 +64,7 @@ export function addHandler({
 const IS_APPLE_REGEXP = /mac|iphone|ipad|ipod/i;
 
 export function isPrimaryModifierPressed(event: KeyboardEvent) {
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
+    // eslint-disable-next-line typescript/no-deprecated
     const platform = globalThis.navigator?.platform ?? '';
     return IS_APPLE_REGEXP.test(platform) ? event.metaKey : event.ctrlKey;
 }

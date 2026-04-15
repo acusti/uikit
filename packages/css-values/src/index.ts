@@ -57,7 +57,7 @@ export const getCSSValueWithUnit = (payload: Payload): string => {
 };
 
 export const getMillisecondsFromCSSValue = (value: number | string): number => {
-    if (!value) return 0; // eslint-disable-line @typescript-eslint/strict-boolean-expressions
+    if (!value) return 0; // eslint-disable-line typescript/strict-boolean-expressions
     if (typeof value === 'number') return value;
     if (!CSS_UNIT_REGEX.time.test(value)) return 0;
 
