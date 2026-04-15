@@ -24,6 +24,10 @@
             "format_on_save": "on",
             "formatter": [{ "language_server": { "name": "oxfmt" } }]
         },
+        "YAML": {
+            "format_on_save": "on",
+            "formatter": [{ "language_server": { "name": "oxfmt" } }]
+        },
         "Markdown": {
             "format_on_save": "on",
             "formatter": [{ "language_server": { "name": "oxfmt" } }]
