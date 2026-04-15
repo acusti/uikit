@@ -1,4 +1,4 @@
-import http, { IncomingMessage } from 'node:http';
+import http, { type IncomingMessage } from 'node:http';
 import https from 'node:https';
 import { URL } from 'node:url';
 
@@ -102,7 +102,10 @@ export const post = async <ResponseJSON>(url: string, options: FetchOptions) => 
         // If error came from JSON parsing, use response.statusText as message and throw
         if (error instanceof SyntaxError && error.message.indexOf('JSON') !== -1) {
             let errorMessage = `Received ${response.statusCode} response`;
-            if (response.statusMessage) {
+            if (
+                typeof response.statusMessage === 'string' &&
+                response.statusMessage !== ''
+            ) {
                 errorMessage += ': ' + response.statusMessage;
             }
             throw new Error(errorMessage);

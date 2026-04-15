@@ -243,7 +243,7 @@ const getHeadersWithAuthorization = async (
     fetchOptions: FetchOptions,
     {
         accessKeyId,
-        region = REGION || getRegionFromResource(resource),
+        region = REGION === '' ? getRegionFromResource(resource) : REGION,
         secretAccessKey,
         service = DEFAULT_SERVICE,
         sessionToken,
