@@ -1,8 +1,10 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "../../tsconfig.base.json",
     "compilerOptions": {
-        "outDir": "dist",
-        "rootDir": "src"
+        "outDir": "./dist",
+        "rootDir": "./src"
     },
+    "include": ["src/**/*"],
+    "exclude": ["dist", "node_modules"],
     "references": [{ "path": "../styling" }]
 }

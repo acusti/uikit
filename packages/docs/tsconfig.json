@@ -1,9 +1,11 @@
 {
-    "extends": "../../tsconfig.json",
+    "extends": "../../tsconfig.base.json",
     "compilerOptions": {
         "moduleResolution": "bundler",
         "noEmit": true
     },
+    "include": [".storybook/**/*", "stories/**/*"],
+    "exclude": ["dist", "node_modules"],
     "references": [
         { "path": "../css-value-input" },
         { "path": "../date-picker" },
