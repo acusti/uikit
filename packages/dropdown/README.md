@@ -462,3 +462,18 @@ For accessibility, the component focuses on semantic HTML structure and
 keyboard navigation. It works best when you use appropriate HTML elements
 in your dropdown content (like `<ul>` and `<li>` for lists, `<button>`
 elements for actions, etc.).
+
+### ARIA attributes
+
+The trigger automatically receives `aria-haspopup`, `aria-expanded`, and
+`aria-controls` pointing to the open body. The popup role is chosen based
+on the dropdown’s mode:
+
+- `aria-haspopup="listbox"` when `isSearchable` is true (combobox pattern)
+- `aria-haspopup="menu"` when `hasItems` is true (the default)
+- `aria-haspopup="dialog"` when `hasItems={false}` (interactive content)
+
+The open body element also receives a matching `role` and an `id` so screen
+readers can associate the trigger with its popup. If your custom trigger
+already specifies any of these ARIA props, your values win — the component
+only fills in what you haven’t set.

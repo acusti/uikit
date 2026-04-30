@@ -5,14 +5,16 @@ import useKeyboardEvents, {
 import clsx from 'clsx';
 import {
     Children,
+    cloneElement,
     type CSSProperties,
     Fragment,
     isValidElement,
-    type JSX,
     type MouseEvent as ReactMouseEvent,
+    type ReactElement,
     type ReactNode,
     type SyntheticEvent,
     useEffect,
+    useId,
     useRef,
     useState,
 } from 'react';
@@ -46,7 +48,7 @@ export type Props = {
     /**
      * Can take a single React element or exactly two renderable children.
      */
-    children: ChildrenTuple | JSX.Element;
+    children: ChildrenTuple | ReactElement;
     className?: string;
     disabled?: boolean;
     /**
@@ -147,6 +149,8 @@ export default function Dropdown({
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [dropdownElement, setDropdownElement] = useState<MaybeHTMLElement>(null);
+    const bodyId = useId();
+    const popupRole = isSearchable ? 'listbox' : hasItems ? 'menu' : 'dialog';
     const inputElementRef = useRef<HTMLInputElement | null>(null);
     const closingTimerRef = useRef<null | TimeoutID>(null);
     const isOpeningTimerRef = useRef<null | TimeoutID>(null);
@@ -631,6 +635,9 @@ export default function Dropdown({
         if (isSearchable) {
             trigger = (
                 <input
+                    aria-controls={bodyId}
+                    aria-expanded={isOpen}
+                    aria-haspopup={popupRole}
                     autoComplete="off"
                     className="uktdropdown-trigger"
                     defaultValue={value ?? ''}
@@ -645,11 +652,27 @@ export default function Dropdown({
             );
         } else {
             trigger = (
-                <button className="uktdropdown-trigger" tabIndex={0} type="button">
+                <button
+                    aria-controls={bodyId}
+                    aria-expanded={isOpen}
+                    aria-haspopup={popupRole}
+                    className="uktdropdown-trigger"
+                    tabIndex={0}
+                    type="button"
+                >
                     {trigger}
                 </button>
             );
         }
+    } else {
+        // For a consumer-provided trigger, add ARIA props (letting the consumer
+        // override by specifying their own).
+        const triggerProps = trigger.props as Record<string, unknown>;
+        trigger = cloneElement(trigger as ReactElement<Record<string, unknown>>, {
+            'aria-controls': triggerProps['aria-controls'] ?? bodyId,
+            'aria-expanded': triggerProps['aria-expanded'] ?? isOpen,
+            'aria-haspopup': triggerProps['aria-haspopup'] ?? popupRole,
+        });
     }
 
     if (label != null) {
@@ -698,6 +721,8 @@ export default function Dropdown({
                         className={clsx('uktdropdown-body', {
                             'has-items': hasItems,
                         })}
+                        id={bodyId}
+                        role={popupRole}
                     >
                         <div className="uktdropdown-content">
                             {childrenCount > 1

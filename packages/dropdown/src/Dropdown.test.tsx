@@ -95,6 +95,126 @@ describe('@acusti/dropdown', () => {
         ).toBeTruthy();
     });
 
+    describe('ARIA attributes', () => {
+        it('links the generated button trigger to the menu popup', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            expect(trigger.getAttribute('aria-expanded')).toBe('false');
+            expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
+            expect(trigger.getAttribute('aria-controls')).toBeTruthy();
+
+            await user.click(trigger);
+
+            const popup = screen.getByRole('menu');
+            expect(trigger.getAttribute('aria-expanded')).toBe('true');
+            expect(trigger.getAttribute('aria-controls')).toBe(popup.id);
+        });
+
+        it('uses listbox semantics for searchable dropdowns', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable>
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('textbox');
+            expect(trigger.getAttribute('aria-expanded')).toBe('false');
+            expect(trigger.getAttribute('aria-haspopup')).toBe('listbox');
+
+            await user.click(trigger);
+
+            const popup = screen.getByRole('listbox');
+            expect(trigger.getAttribute('aria-expanded')).toBe('true');
+            expect(trigger.getAttribute('aria-controls')).toBe(popup.id);
+        });
+
+        it('uses dialog semantics when the dropdown has no selectable items', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    Settings
+                    <form>
+                        <label>
+                            Full name
+                            <input name="name" />
+                        </label>
+                    </form>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Settings' });
+            expect(trigger.getAttribute('aria-haspopup')).toBe('dialog');
+
+            await user.click(trigger);
+
+            const popup = screen.getByRole('dialog');
+            expect(trigger.getAttribute('aria-expanded')).toBe('true');
+            expect(trigger.getAttribute('aria-controls')).toBe(popup.id);
+        });
+
+        it('adds default ARIA props to custom triggers without replacing consumer values', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    <button
+                        aria-controls="custom-popup"
+                        aria-expanded
+                        aria-haspopup="tree"
+                    >
+                        Custom
+                    </button>
+                    <ul>
+                        <li>Custom Item</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Custom' });
+            expect(trigger.getAttribute('aria-controls')).toBe('custom-popup');
+            expect(trigger.getAttribute('aria-expanded')).toBe('true');
+            expect(trigger.getAttribute('aria-haspopup')).toBe('tree');
+
+            await user.click(trigger);
+
+            expect(screen.getByRole('menu').id).not.toBe('custom-popup');
+            expect(trigger.getAttribute('aria-expanded')).toBe('true');
+        });
+
+        it('fills missing ARIA props on custom triggers', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    <button>Custom</button>
+                    <ul>
+                        <li>Custom Item</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Custom' });
+            expect(trigger.getAttribute('aria-expanded')).toBe('false');
+            expect(trigger.getAttribute('aria-haspopup')).toBe('menu');
+
+            await user.click(trigger);
+
+            const popup = screen.getByRole('menu');
+            expect(trigger.getAttribute('aria-expanded')).toBe('true');
+            expect(trigger.getAttribute('aria-controls')).toBe(popup.id);
+        });
+    });
+
     it('triggers props.onClose and props.onOpen at the appropriate times', async () => {
         let closedCount = 0;
         const handleClose = () => closedCount++;
