@@ -98,10 +98,24 @@ This means the dropdown tends to:
 Internally, the dropdown renders:
 
 - `.uktdropdown-body` as the anchored outer shell
-- `.uktdropdown-content` as the scrollable inner region
+- `.uktdropdown-content` as the scrollable inner region with default
+  padding
 
-Custom padding and overflow styling usually belongs on the content region,
-not the outer shell.
+Custom padding and overflow styling belongs on the content region, not the
+outer shell. Note that `.uktdropdown-content` already applies default
+padding (see the `--uktdd-body-pad-*` variables below), so your body
+element does **not** need its own padding:
+
+```tsx
+// ✗ Don’t double-pad — the content region already has padding
+<Dropdown>
+    <button>Open</button>
+    <div style={{ padding: 16 }}>…</div>
+</Dropdown>
+
+// ✓ Override default padding via CSS variables if needed
+// .my-dropdown { --uktdd-body-pad-top: 16px; /* etc */ }
+```
 
 For the most reliable anchor-positioning behavior:
 
@@ -110,6 +124,12 @@ For the most reliable anchor-positioning behavior:
 - keep the trigger first and the dropdown body second
 - prefer CSS variable overrides over custom `top`/`left`/`right` inset
   rules
+
+For placement recipes, see
+[Placement Customization](#placement-customization-with-css-variables)
+below. If your trigger sits near the right edge of the viewport, the
+[End-Aligned, Content-Sized Menu](#end-aligned-content-sized-menu) example
+is the one you want.
 
 ## API Reference
 
@@ -337,12 +357,17 @@ function MultiSelectDropdown() {
 
 ### Dropdown with Interactive Content
 
+For dropdowns whose body is a form (inputs, date pickers, buttons that
+aren’t meant to submit a value), pass `hasItems={false}`. This disables the
+item-selection keyboard model and, importantly, prevents clicks inside the
+body from closing the dropdown via `onSubmitItem`.
+
 ```tsx
 function InteractiveDropdown() {
     return (
         <Dropdown hasItems={false}>
             <button>Settings</button>
-            <div style={{ padding: '16px' }}>
+            <div>
                 <label>
                     Full name:{' '}
                     <input
