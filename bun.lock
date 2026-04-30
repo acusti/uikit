@@ -122,7 +122,7 @@
     },
     "packages/docs": {
       "name": "@acusti/uikit-docs",
-      "version": "0.6.0",
+      "version": "0.6.1",
       "dependencies": {
         "@acusti/css-value-input": "workspace:^",
         "@acusti/date-picker": "workspace:^",
@@ -147,7 +147,7 @@
     },
     "packages/dropdown": {
       "name": "@acusti/dropdown",
-      "version": "0.55.1",
+      "version": "0.56.0",
       "dependencies": {
         "@acusti/matchmaking": "^0.10.0",
         "@acusti/use-keyboard-events": "^0.11.0",
