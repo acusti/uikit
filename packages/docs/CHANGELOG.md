@@ -1,5 +1,14 @@
 # @acusti/uikit-docs
 
+## 0.6.2
+
+### Patch Changes
+
+- Updated dependencies [d8a9ead]
+    - @acusti/css-value-input@2.3.2
+- Updated dependencies [6c9ccff8]
+    - @acusti/input-text@2.4.2
+
 ## 0.6.1
 
 ### Patch Changes
