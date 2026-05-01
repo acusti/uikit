@@ -1,5 +1,12 @@
 # @acusti/input-text
 
+## 2.4.2
+
+### Patch Changes
+
+- 518150d: Add support for forwarding `props.onPaste` to the underlying
+  input or textarea.
+
 ## 2.4.1
 
 ### Patch Changes
