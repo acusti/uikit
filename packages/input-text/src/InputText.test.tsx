@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -50,6 +50,36 @@ describe('CSSValueInput.tsx', () => {
         expect(textarea.value).toBe(longText);
         await user.type(textarea, '{Enter}New line');
         expect(textarea.value).toBe(longText + '\nNew line');
+    });
+
+    it('triggers onPaste for text inputs and multi-line inputs', () => {
+        const pasteTargets: Array<EventTarget | null> = [];
+        const onPaste = vi.fn((event) => {
+            pasteTargets.push(event.currentTarget);
+        });
+        const { rerender } = render(<InputText onPaste={onPaste} />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+
+        fireEvent.paste(input, {
+            clipboardData: {
+                getData: () => 'from clipboard',
+            },
+        });
+
+        expect(onPaste).toHaveBeenCalledTimes(1);
+        expect(pasteTargets[0]).toBe(input);
+
+        rerender(<InputText multiLine onPaste={onPaste} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+
+        fireEvent.paste(textarea, {
+            clipboardData: {
+                getData: () => 'from clipboard',
+            },
+        });
+
+        expect(onPaste).toHaveBeenCalledTimes(2);
+        expect(pasteTargets[1]).toBe(textarea);
     });
 
     it('triggers onChange and onChangeValue when discarding changes via Escape with discardOnEscape', async () => {

@@ -1,5 +1,6 @@
 import {
     type ChangeEvent,
+    type ClipboardEvent,
     type CSSProperties,
     type FocusEvent,
     type InputHTMLAttributes,
@@ -68,6 +69,7 @@ export type Props = {
     onFocus?: (event: FocusEvent<InputElement>) => unknown;
     onKeyDown?: (event: KeyboardEvent<InputElement>) => unknown;
     onKeyUp?: (event: KeyboardEvent<InputElement>) => unknown;
+    onPaste?: (event: ClipboardEvent<InputElement>) => unknown;
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
@@ -121,6 +123,7 @@ export default function InputText({
     onFocus,
     onKeyDown,
     onKeyUp,
+    onPaste,
     pattern,
     placeholder,
     readOnly,
@@ -360,6 +363,7 @@ export default function InputText({
             onFocus={handleFocus}
             onKeyDown={handleKeyDown}
             onKeyUp={onKeyUp}
+            onPaste={onPaste}
             onSelect={handleSelect}
             pattern={pattern}
             placeholder={placeholder}

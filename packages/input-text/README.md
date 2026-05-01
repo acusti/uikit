@@ -175,6 +175,9 @@ type Props = {
     /** Standard key up event handler */
     onKeyUp?: (event: KeyboardEvent<InputElement>) => unknown;
 
+    /** Standard paste event handler */
+    onPaste?: (event: ClipboardEvent<InputElement>) => unknown;
+
     /** Regular expression pattern for validation */
     pattern?: string;
 

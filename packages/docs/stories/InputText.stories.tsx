@@ -14,6 +14,7 @@ const meta: Meta<typeof InputText> = {
         onFocus: fn(),
         onKeyDown: fn(),
         onKeyUp: fn(),
+        onPaste: fn(),
     },
     component: InputText,
     parameters: {
