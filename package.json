@@ -55,7 +55,7 @@
         "@types/react": "^19.2.10",
         "eslint-plugin-perfectionist": "^5.4.0",
         "eslint-plugin-react-compiler": "^19.1.0-0",
-        "eslint-plugin-react-hooks": "7.0.1",
+        "eslint-plugin-react-hooks": "7.1.1",
         "happy-dom": "^20.4.0",
         "oxfmt": "^0.49.0",
         "oxlint": "^1",
