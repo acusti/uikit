@@ -41,8 +41,13 @@ export type Props = {
      */
     allowCreate?: boolean;
     /**
-     * Boolean indicating if the user can submit an empty value (i.e. clear
-     * the value). Defaults to true.
+     * Boolean indicating if submitting with no item active emits an empty
+     * value (i.e. clears the value). Only has an effect when the dropdown has a
+     * text input to source that value from — a searchable dropdown’s search
+     * input, or a text input inside a custom trigger. With no such input there
+     * is no value to submit, so submitting with nothing selected is a no-op
+     * regardless; clear such a dropdown with an explicit empty-valued item
+     * instead. Defaults to true.
      */
     allowEmpty?: boolean;
     /**
@@ -233,11 +238,24 @@ export default function Dropdown({
         if (!hasItemsRef.current) return;
 
         const element = getActiveItemElement(dropdownElement);
-        if (!element && !allowCreateRef.current) {
-            // If not allowEmpty, don’t allow submitting an empty item
-            if (!allowEmptyRef.current) return;
-            // If we have an input element as trigger & the user didn’t clear the text, do nothing
-            if (inputElementRef.current?.value) return;
+        if (!element) {
+            // With nothing selected, the only possible value comes from a text
+            // input (a searchable dropdown’s input, or one inside a custom
+            // trigger). No input means there’s no value to submit at all, so
+            // bail regardless of allowCreate/allowEmpty instead of firing an
+            // empty-valued onSubmitItem consumers have to defend against. (To
+            // let such a dropdown clear its value, give it an explicit
+            // empty-valued item, which submits as a normal active selection.)
+            if (!inputElementRef.current) return;
+            if (inputElementRef.current.value) {
+                // Non-empty text matching no item is a created value
+                if (!allowCreateRef.current) return;
+            } else if (!allowEmptyRef.current) {
+                // A cleared input is an empty (clearing) submit, which
+                // allowEmpty gates even when allowCreate is set — “creating”
+                // an empty value is clearing, not creating
+                return;
+            }
         }
 
         let itemLabel = element?.innerText ?? '';

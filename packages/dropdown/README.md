@@ -143,8 +143,13 @@ type Props = {
      */
     allowCreate?: boolean;
     /**
-     * Boolean indicating if the user can submit an empty value (i.e. clear
-     * the value). Defaults to true.
+     * Boolean indicating if submitting with no item active emits an empty
+     * value (i.e. clears the value). Only has an effect when the dropdown has a
+     * text input to source that value from — a searchable dropdown’s search
+     * input, or a text input inside a custom trigger. With no such input there
+     * is no value to submit, so submitting with nothing selected is a no-op
+     * regardless; clear such a dropdown with an explicit empty-valued item
+     * instead. Defaults to true.
      */
     allowEmpty?: boolean;
     /**
