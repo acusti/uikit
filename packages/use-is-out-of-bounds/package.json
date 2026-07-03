@@ -33,7 +33,7 @@
     "types": "./dist/useIsOutOfBounds.d.ts",
     "exports": "./dist/useIsOutOfBounds.js",
     "scripts": {
-        "build": "vite build",
+        "build": "vite build && tsc -p tsconfig.build.json",
         "tsc": "tsc --noEmit"
     },
     "dependencies": {
@@ -41,11 +41,9 @@
     },
     "devDependencies": {
         "@types/react": "^19.2.10",
-        "@vitejs/plugin-react": "^6.0.1",
         "react": "^19.2.4",
         "react-dom": "^19.2.4",
         "typescript": "7.0.1-rc",
-        "unplugin-dts": "^1.0.0-beta.6",
         "vite": "^8.0.0-0",
         "vitest": "^4"
     },

@@ -6,6 +6,7 @@ export const defineConfig: (options?: {
     entry?: string[];
     formats?: string[];
     plugins?: NonNullable<UserConfig['plugins']>;
+    react?: boolean | 'no-compiler';
     target?: string;
 }) => UserConfig;
 

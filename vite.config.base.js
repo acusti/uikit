@@ -1,4 +1,5 @@
-import dts from 'unplugin-dts/vite';
+import babel from '@rolldown/plugin-babel';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { defineConfig as defineConfigVite } from 'vite';
 import { configDefaults } from 'vitest/config';
 
@@ -9,6 +10,7 @@ export const defineConfig = (options = {}) => {
         entry = ['src/index.ts'],
         formats = ['es'],
         plugins = [],
+        react: isReact = false,
         target,
     } = options;
 
@@ -36,7 +38,15 @@ export const defineConfig = (options = {}) => {
             ...(buildOptions ?? {}),
         },
         ...(css ? { css } : {}),
-        plugins: [...plugins, dts({ exclude: ['**/*.test.ts', '**/*.test.tsx'] })],
+        plugins: [
+            ...(isReact ? [react()] : []),
+            // react: 'no-compiler' opts out of the React Compiler transform
+            // (for code that by design accesses refs during render)
+            ...(isReact === true
+                ? [babel({ presets: [reactCompilerPreset(compilerOptions)] })]
+                : []),
+            ...plugins,
+        ],
         test: {
             exclude: [...configDefaults.exclude, '**/dist/**'],
         },

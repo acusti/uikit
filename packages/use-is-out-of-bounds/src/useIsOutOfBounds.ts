@@ -124,7 +124,7 @@ const useIsOutOfBounds = (element?: MaybeHTMLElement): OutOfBounds => {
 
     if (bottom || left || right || top) {
         const style = computedStyleRef.current ?? getComputedStyle(element);
-        computedStyleRef.current ??= style;
+        computedStyleRef.current = style;
         const isUpward = getIsCurrentDirectionBefore({
             length: elementHeight,
             positionAfter: parseFloat(style.getPropertyValue('bottom')),

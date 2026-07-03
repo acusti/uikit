@@ -38,13 +38,12 @@
     "types": "./dist/uniquify.d.ts",
     "exports": "./dist/uniquify.js",
     "scripts": {
-        "build": "vite build",
+        "build": "vite build && tsc -p tsconfig.build.json",
         "test": "vitest",
         "tsc": "tsc --noEmit"
     },
     "devDependencies": {
         "typescript": "7.0.1-rc",
-        "unplugin-dts": "^1.0.0-beta.6",
         "vite": "^8.0.0-0",
         "vitest": "^4"
     }
