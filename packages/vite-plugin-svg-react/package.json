@@ -1,0 +1,60 @@
+{
+    "name": "@acusti/vite-plugin-svg-react",
+    "version": "0.0.0",
+    "description": "Vite ≥8 (rolldown-native) plugin that imports SVG files as typed React components via ?react",
+    "keywords": [
+        "oxc",
+        "react",
+        "rolldown",
+        "svg",
+        "svgr",
+        "ts",
+        "typescript",
+        "vite",
+        "vite-plugin"
+    ],
+    "homepage": "https://github.com/acusti/uikit/tree/main/packages/vite-plugin-svg-react#readme",
+    "bugs": {
+        "url": "https://github.com/acusti/uikit/issues"
+    },
+    "license": "Unlicense",
+    "author": "andrew patton <andrew@acusti.ca> (https://www.acusti.ca)",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/acusti/uikit.git",
+        "directory": "packages/vite-plugin-svg-react"
+    },
+    "files": [
+        "client.d.ts",
+        "dist"
+    ],
+    "type": "module",
+    "sideEffects": false,
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": "./dist/index.js",
+        "./client": {
+            "types": "./client.d.ts"
+        }
+    },
+    "scripts": {
+        "test": "vitest",
+        "build": "vite build && tsc -p tsconfig.build.json",
+        "tsc": "tsc --noEmit"
+    },
+    "dependencies": {
+        "@svgr/core": "^8.1",
+        "@svgr/plugin-jsx": "^8.1"
+    },
+    "devDependencies": {
+        "@types/node": "^26.1.0",
+        "@types/react": "^19.2.17",
+        "typescript": "7.0.1-rc",
+        "vite": "^8.0.0-0",
+        "vitest": "^4"
+    },
+    "peerDependencies": {
+        "vite": ">=8.0.0"
+    }
+}
