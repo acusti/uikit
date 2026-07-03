@@ -30,6 +30,7 @@ fetch utility, and more_
 | **[@acusti/use-bounding-client-rect][]** | [![latest version](https://img.shields.io/npm/v/@acusti/use-bounding-client-rect?style=flat-square)](https://www.npmjs.com/package/@acusti/use-bounding-client-rect) | React hook for getting an element’s `boundingClientRect`                                                 |
 | **[@acusti/use-is-out-of-bounds][]**     | [![latest version](https://img.shields.io/npm/v/@acusti/use-is-out-of-bounds?style=flat-square)](https://www.npmjs.com/package/@acusti/use-is-out-of-bounds)         | React hook to check if an element overlaps its bounds                                                    |
 | **[@acusti/use-keyboard-events][]**      | [![latest version](https://img.shields.io/npm/v/@acusti/use-keyboard-events?style=flat-square)](https://www.npmjs.com/package/@acusti/use-keyboard-events)           | React hook for adding key event listeners to your UI                                                     |
+| **[@acusti/vite-plugin-svg-react][]**    | [![latest version](https://img.shields.io/npm/v/@acusti/vite-plugin-svg-react?style=flat-square)](https://www.npmjs.com/package/@acusti/vite-plugin-svg-react)       | Vite ≥ 8 rolldown-native plugin that imports SVGs as typed React components                              |
 
 [@acusti/appsync-fetch]:
     https://github.com/acusti/uikit/tree/main/packages/appsync-fetch
@@ -64,6 +65,8 @@ fetch utility, and more_
     https://github.com/acusti/uikit/tree/main/packages/use-is-out-of-bounds
 [@acusti/use-keyboard-events]:
     https://github.com/acusti/uikit/tree/main/packages/use-keyboard-events
+[@acusti/vite-plugin-svg-react]:
+    https://github.com/acusti/uikit/tree/main/packages/vite-plugin-svg-react
 [@acusti/webcrypto]:
     https://github.com/acusti/uikit/tree/main/packages/webcrypto
 
