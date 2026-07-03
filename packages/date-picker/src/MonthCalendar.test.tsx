@@ -38,11 +38,8 @@ describe('MonthCalendar.tsx', () => {
 
         // Get all day buttons (not empty ones)
         const dayButtons = screen
-            .getAllByRole('button')
-            .filter(
-                (button: HTMLButtonElement) =>
-                    Boolean(button.textContent) && !button.disabled,
-            );
+            .getAllByRole<HTMLButtonElement>('button')
+            .filter((button) => Boolean(button.textContent) && !button.disabled);
 
         // None of the buttons should have is-today class since we're showing a past month
         dayButtons.forEach((button) => {

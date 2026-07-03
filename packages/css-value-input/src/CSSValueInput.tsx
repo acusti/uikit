@@ -7,7 +7,7 @@ import {
     getUnitFromCSSValue,
     roundToPrecision,
 } from '@acusti/css-values';
-import InputText from '@acusti/input-text';
+import InputText, { type InputElement } from '@acusti/input-text';
 import clsx from 'clsx';
 import {
     type ChangeEvent,
@@ -39,11 +39,11 @@ export type Props = {
     max?: number;
     min?: number;
     name?: string;
-    onBlur?: (event: FocusEvent<HTMLInputElement>) => unknown;
-    onChange?: (event: ChangeEvent<HTMLInputElement>) => unknown;
-    onFocus?: (event: FocusEvent<HTMLInputElement>) => unknown;
-    onKeyDown?: (event: KeyboardEvent<HTMLInputElement>) => unknown;
-    onKeyUp?: (event: KeyboardEvent<HTMLInputElement>) => unknown;
+    onBlur?: (event: FocusEvent<InputElement>) => unknown;
+    onChange?: (event: ChangeEvent<InputElement>) => unknown;
+    onFocus?: (event: FocusEvent<InputElement>) => unknown;
+    onKeyDown?: (event: KeyboardEvent<InputElement>) => unknown;
+    onKeyUp?: (event: KeyboardEvent<InputElement>) => unknown;
     /**
      * Custom event handler triggered when the user presses enter/return
      * or blurs the input after making a change. Hitting esc will restore
@@ -100,13 +100,13 @@ export default function CSSValueInput({
         submittedValueRef.current = value ?? '';
     }, [value]);
 
-    const handleSubmitValue = (event: SyntheticEvent<HTMLInputElement>) => {
+    const handleSubmitValue = (event: SyntheticEvent<InputElement>) => {
         // Store last submittedValue (used to reset value on invalid input)
         submittedValueRef.current = event.currentTarget.value;
         onSubmitValue(event.currentTarget.value);
     };
 
-    const handleBlur = (event: FocusEvent<HTMLInputElement>) => {
+    const handleBlur = (event: FocusEvent<InputElement>) => {
         const input = event.currentTarget;
         if (onBlur) onBlur(event);
 
@@ -218,7 +218,7 @@ export default function CSSValueInput({
         return `${nextValue}${nextUnit}`;
     };
 
-    const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyDown = (event: KeyboardEvent<InputElement>) => {
         const input = event.currentTarget;
         if (onKeyDown) onKeyDown(event);
         if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
@@ -238,7 +238,7 @@ export default function CSSValueInput({
         input.value = nextValue;
     };
 
-    const handleKeyUp = (event: KeyboardEvent<HTMLInputElement>) => {
+    const handleKeyUp = (event: KeyboardEvent<InputElement>) => {
         if (onKeyUp) onKeyUp(event);
         // If this is the key up from ↑ or ↓ keys, time to handleSubmitValue
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {

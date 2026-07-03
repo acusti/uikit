@@ -15,8 +15,11 @@
         "@acusti/use-keyboard-events": "workspace:^"
     },
     "devDependencies": {
+        "@babel/core": "^7.29.0",
+        "@rolldown/plugin-babel": "^0.2.3",
         "@storybook/addon-docs": "^10",
         "@storybook/react-vite": "^10",
+        "@types/babel__core": "^7.20.5",
         "@types/react": "^19.2.10",
         "@vitejs/plugin-react": "^6.0.1",
         "babel-plugin-react-compiler": "^1",

@@ -1,5 +1,6 @@
+import babel from '@rolldown/plugin-babel';
 import { type StorybookConfig } from '@storybook/react-vite';
-import react from '@vitejs/plugin-react';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { dirname, join } from 'path';
 
 import { compilerOptions } from '../../../vite.config.base.js';
@@ -22,11 +23,8 @@ const main: StorybookConfig = {
 
         return mergeConfig(viteConfig, {
             plugins: [
-                react({
-                    babel: {
-                        plugins: [['babel-plugin-react-compiler', compilerOptions]],
-                    },
-                }),
+                react(),
+                babel({ presets: [reactCompilerPreset(compilerOptions)] }),
             ],
         });
     },
