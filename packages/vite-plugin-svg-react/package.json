@@ -1,6 +1,6 @@
 {
     "name": "@acusti/vite-plugin-svg-react",
-    "version": "0.0.0",
+    "version": "0.1.0",
     "description": "Vite ≥8 (rolldown-native) plugin that imports SVG files as typed React components via ?react",
     "keywords": [
         "oxc",
