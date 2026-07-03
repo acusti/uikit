@@ -45,6 +45,10 @@ export function useStyles(styles: string, initialHref?: string) {
     useEffect(() => {
         if (!styles) return;
 
+        // Syncs state with the module-level styleCache when the key props
+        // change; must stay in the effect so the referenceCount increment
+        // pairs with the cleanup decrement (e.g. under StrictMode).
+        // oxlint-disable-next-line react/react-compiler
         handleKeyUpdate(initialHref ?? styles);
         return () => {
             const existingItem = styleCache.get(styles);

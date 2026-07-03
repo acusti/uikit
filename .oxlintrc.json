@@ -10,14 +10,7 @@
         "suspicious": "off"
     },
     "plugins": ["typescript", "react", "jsx-a11y", "vitest"],
-    "jsPlugins": [
-        "eslint-plugin-react-compiler",
-        {
-            "name": "react-hooks-js",
-            "specifier": "eslint-plugin-react-hooks"
-        },
-        "eslint-plugin-perfectionist"
-    ],
+    "jsPlugins": ["eslint-plugin-perfectionist"],
     "ignorePatterns": ["**/build/", "**/node_modules/", "**/public/"],
     "rules": {
         "jsx-a11y/click-events-have-key-events": "error",
@@ -36,37 +29,9 @@
             }
         ],
         "prefer-const": ["error", { "destructuring": "all" }],
-        "react-compiler/react-compiler": [
-            "error",
-            {
-                "environment": {
-                    "enableTreatRefLikeIdentifiersAsRefs": true
-                }
-            }
-        ],
-        "react-hooks-js/exhaustive-deps": [
-            "error",
-            {
-                "enableDangerousAutofixThisMayCauseInfiniteLoops": true
-            }
-        ],
-        "react-hooks-js/component-hook-factories": "error",
-        "react-hooks-js/config": "error",
-        "react-hooks-js/error-boundaries": "error",
-        "react-hooks-js/gating": "error",
-        "react-hooks-js/globals": "error",
-        "react-hooks-js/immutability": "error",
-        "react-hooks-js/incompatible-library": "warn",
-        "react-hooks-js/preserve-manual-memoization": "error",
-        "react-hooks-js/purity": "error",
-        "react-hooks-js/refs": "error",
-        "react-hooks-js/rules-of-hooks": "error",
-        "react-hooks-js/set-state-in-effect": "error",
-        "react-hooks-js/set-state-in-render": "error",
-        "react-hooks-js/static-components": "error",
-        "react-hooks-js/todo": "error",
-        "react-hooks-js/unsupported-syntax": "error",
-        "react-hooks-js/use-memo": "error",
+        "react/react-compiler": ["error", { "reportAllBailouts": true }],
+        "react/exhaustive-deps": "error",
+        "react/rules-of-hooks": "error",
         "react/no-unknown-property": [
             "error",
             {
