@@ -112,10 +112,11 @@ running:
 bun changeset version
 ```
 
-Next, run `bun install` to refresh `bun.lock` and commit the version
-updates.
+Next, commit the version updates (don’t run `bun install` yet — saving the
+lockfile refresh for after publishing keeps the release tags that
+`bun changeset publish` creates pointing at the version commit).
 
-Lastly, to publish the new versions to npm (building all the packages first
+Then, to publish the new versions to npm (building all the packages first
 if anything has changed), run:
 
 ```bash
@@ -123,6 +124,13 @@ bun run build
 bun changeset publish
 git push --follow-tags
 ```
+
+Lastly, run `bun install` to update any internal workspace dependency
+ranges in `bun.lock` and, if it produces changes, commit and push the
+refreshed lockfile. When a release bumps no internal dependency ranges,
+this is a no-op: bun skips the lockfile write when only workspace `version`
+fields changed (publishing doesn’t read them — versions come from each
+`package.json` — and they sync on the next real lockfile write).
 
 ## Developing
 
