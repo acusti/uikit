@@ -1,5 +1,42 @@
 # @acusti/dropdown
 
+## 0.57.0
+
+### Minor Changes
+
+- cc77ba4: Stop firing onSubmitItem with an empty value when a
+  non-searchable dropdown is submitted with no item active
+
+    A menu-style (non-searchable) Dropdown defaults to `allowEmpty`, so
+    pressing Enter/Space with nothing highlighted — or releasing the
+    pointer on non-item menu chrome (a title, padding, the list gap) —
+    fired `onSubmitItem({ value: '' })`. Consumers that pass the submitted
+    value straight through (for example casting it to an enum) could
+    persist that empty value and trip downstream validation. An empty value
+    is now only emitted when the dropdown has a text input to source it
+    from — a searchable dropdown's input, or a text input inside a custom
+    trigger; a dropdown with no input and nothing selected is a no-op.
+    Submitting an item whose `data-ukt-value` is explicitly empty still
+    works. `allowEmpty` is now also enforced when `allowCreate` is set:
+    submitting a cleared input with no active item no longer emits an empty
+    value when `allowEmpty={false}`.
+
+### Patch Changes
+
+- f86e693: Rebuild with the modernized build pipeline
+
+    The published artifacts are now built with @vitejs/plugin-react v6 (oxc
+    JSX transform) with the React Compiler applied via
+    @rolldown/plugin-babel and `reactCompilerPreset`, replacing the
+    previous plugin-react v5 Babel pipeline; type declarations are emitted
+    by the native TypeScript 7 compiler instead of unplugin-dts. Output is
+    verified equivalent: React Compiler memoization is present with zero
+    compiler bailouts, and declarations are unchanged apart from preserving
+    inline `type` qualifiers on imports. No API or behavior changes.
+
+- Updated dependencies [f86e693]
+    - @acusti/use-keyboard-events@0.11.1
+
 ## 0.56.0
 
 ### Minor Changes

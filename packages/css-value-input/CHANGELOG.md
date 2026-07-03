@@ -1,5 +1,43 @@
 # @acusti/css-value-input
 
+## 2.4.0
+
+### Minor Changes
+
+- f86e693: Type CSSValueInput's event handler props with InputText's
+  `InputElement` union instead of `HTMLInputElement`
+
+    `onBlur`, `onChange`, `onFocus`, `onKeyDown` and `onKeyUp` now receive
+    events typed as `InputElement`
+    (`HTMLInputElement | HTMLTextAreaElement`, exported by
+    `@acusti/input-text`), matching what the underlying InputText component
+    declares. Runtime behavior is unchanged — CSSValueInput always renders
+    a single-line input, so events only ever originate from an
+    `HTMLInputElement`.
+
+    Handlers with inferred parameter types (inline arrow functions) are
+    unaffected. Handlers explicitly annotated with `HTMLInputElement` event
+    types (e.g. `(event: FocusEvent<HTMLInputElement>) => ...`) will no
+    longer typecheck under TypeScript 6+ (which enables
+    `strictFunctionTypes` by default); annotate them with `InputElement`
+    instead.
+
+### Patch Changes
+
+- f86e693: Rebuild with the modernized build pipeline
+
+    The published artifacts are now built with @vitejs/plugin-react v6 (oxc
+    JSX transform) with the React Compiler applied via
+    @rolldown/plugin-babel and `reactCompilerPreset`, replacing the
+    previous plugin-react v5 Babel pipeline; type declarations are emitted
+    by the native TypeScript 7 compiler instead of unplugin-dts. Output is
+    verified equivalent: React Compiler memoization is present with zero
+    compiler bailouts, and declarations are unchanged apart from preserving
+    inline `type` qualifiers on imports. No API or behavior changes.
+
+- Updated dependencies [f86e693]
+    - @acusti/input-text@2.4.3
+
 ## 2.3.2
 
 ### Patch Changes
