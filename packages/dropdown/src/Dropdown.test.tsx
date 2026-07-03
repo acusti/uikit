@@ -729,4 +729,212 @@ describe('@acusti/dropdown', () => {
             );
         });
     });
+
+    describe('submitting with no active item', () => {
+        it('does not call onSubmitItem when a non-searchable dropdown is submitted with nothing selected', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+
+            render(
+                <Dropdown onSubmitItem={handleSubmitItem}>
+                    Menu
+                    <ul>
+                        <li data-ukt-item data-ukt-value="one">
+                            One
+                        </li>
+                        <li data-ukt-item data-ukt-value="two">
+                            Two
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Menu' }));
+            // Dropdown is open with nothing highlighted; submitting must be a
+            // no-op, not an empty-valued onSubmitItem.
+            await user.keyboard('{Enter}');
+
+            expect(handleSubmitItem).not.toHaveBeenCalled();
+        });
+
+        it('does not call onSubmitItem when the pointer is released on non-item menu chrome', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+
+            render(
+                <Dropdown onSubmitItem={handleSubmitItem}>
+                    Menu
+                    <div>
+                        <h5 data-testid="menu-title">Pick one</h5>
+                        <ul>
+                            <li data-ukt-item data-ukt-value="one">
+                                One
+                            </li>
+                        </ul>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Menu' }));
+            await user.click(screen.getByTestId('menu-title'));
+
+            expect(handleSubmitItem).not.toHaveBeenCalled();
+        });
+
+        it('does not call onSubmitItem when allowCreate is set but there is no input to source a value', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+
+            // allowCreate has nothing to create from without a text input, so
+            // submitting with nothing selected must still be a no-op rather
+            // than bypassing the empty-submit guard.
+            render(
+                <Dropdown allowCreate onSubmitItem={handleSubmitItem}>
+                    Menu
+                    <ul>
+                        <li data-ukt-item data-ukt-value="one">
+                            One
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Menu' }));
+            await user.keyboard('{Enter}');
+
+            expect(handleSubmitItem).not.toHaveBeenCalled();
+        });
+
+        it('still submits an item whose value is explicitly empty', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+
+            render(
+                <Dropdown onSubmitItem={handleSubmitItem}>
+                    Menu
+                    <ul>
+                        <li data-ukt-item data-ukt-value="">
+                            Clear
+                        </li>
+                        <li data-ukt-item data-ukt-value="one">
+                            One
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Menu' }));
+            await user.click(screen.getByText('Clear'));
+
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ label: 'Clear', value: '' }),
+            );
+        });
+
+        it('still lets a searchable dropdown submit an empty (cleared) value', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+
+            render(
+                <Dropdown isSearchable onSubmitItem={handleSubmitItem}>
+                    <ul>
+                        <li data-ukt-item data-ukt-value="one">
+                            One
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('textbox');
+            await user.click(input);
+            // Empty input + allowEmpty (default) → an explicit clear submit.
+            await user.keyboard('{Enter}');
+
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: '' }),
+            );
+        });
+
+        it('still lets a custom text-input trigger submit an empty (cleared) value when not searchable', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+
+            // No isSearchable, but the custom trigger contains a text input,
+            // which Dropdown adopts as its value source. Clearing it and
+            // submitting is a real empty value, not the value-less menu case.
+            render(
+                <Dropdown onSubmitItem={handleSubmitItem}>
+                    <input aria-label="amount" />
+                    <ul>
+                        <li data-ukt-item data-ukt-value="one">
+                            One
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('textbox', { name: 'amount' });
+            await user.click(input);
+            await user.keyboard('{Enter}');
+
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: '' }),
+            );
+        });
+
+        it('enforces allowEmpty={false} on the allowCreate path (cleared input does not submit)', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+
+            render(
+                <Dropdown
+                    allowCreate
+                    allowEmpty={false}
+                    isSearchable
+                    onSubmitItem={handleSubmitItem}
+                >
+                    <ul>
+                        <li data-ukt-item data-ukt-value="one">
+                            One
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('textbox');
+            await user.click(input);
+            // Cleared input + no active item: an empty “creation” is a clear,
+            // so allowEmpty must gate it even though allowCreate is set.
+            await user.keyboard('{Enter}');
+
+            expect(handleSubmitItem).not.toHaveBeenCalled();
+        });
+
+        it('still lets allowCreate with default allowEmpty submit a cleared value', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+
+            render(
+                <Dropdown allowCreate isSearchable onSubmitItem={handleSubmitItem}>
+                    <ul>
+                        <li data-ukt-item data-ukt-value="one">
+                            One
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('textbox');
+            await user.click(input);
+            await user.keyboard('{Enter}');
+
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: '' }),
+            );
+        });
+    });
 });
