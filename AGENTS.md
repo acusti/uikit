@@ -38,6 +38,30 @@ bun run tsc
 bun run format
 ```
 
+## Commits
+
+- One commit per logical change, limited to the files it touches — optimize
+  for useful `git blame`. Prefer a small commit fixing one thing over one
+  commit fixing several unrelated things; bundle only if each fix is
+  explained in the message.
+- Commit messages say what changed and why, not what prompted it — no
+  catch-all "Address review feedback (round 4)" messages.
+- Squash a small commit into the one that introduced the feature when
+  separate history adds no blame value.
+- Never create merge commits. Keep history linear: rebase onto the target
+  branch instead of merging it in (e.g. `git pull --rebase`,
+  `git rebase origin/main`).
+
+## Pull Request Reviews
+
+- Treat PR review comments as an issue tracker: reply on each actionable
+  comment's own thread, documenting how it was addressed — the change that
+  was made (a commit reference is helpful), or the rationale if we're not
+  making one.
+
 ## Known caveat
 
-- In sandboxed or network-restricted environments, `packages/post/src/index.test.ts` has 2 tests that may fail because they depend on `countries.trevorblades.com`; treat those as expected external failures unless the task is about that integration
+- In sandboxed or network-restricted environments,
+  `packages/post/src/index.test.ts` has 2 tests that may fail because they
+  depend on `countries.trevorblades.com`; treat those as expected external
+  failures unless the task is about that integration
