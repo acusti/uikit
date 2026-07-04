@@ -56,11 +56,6 @@ export type Props = {
     children: ChildrenTuple | ReactElement;
     className?: string;
     disabled?: boolean;
-    /**
-     * Group identifier string links dropdowns together into a menu
-     * (like macOS top menubar).
-     */
-    group?: string;
     hasItems?: boolean;
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
