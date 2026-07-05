@@ -13,17 +13,34 @@ import {
     type ReactElement,
     type ReactNode,
     type SyntheticEvent,
+    useContext,
     useEffect,
     useId,
+    useMemo,
     useRef,
     useState,
 } from 'react';
 
+import {
+    DropdownContext,
+    type DropdownContextValue,
+    MenubarContext,
+    type SubmenuRegistration,
+} from './context.js';
 import styles from './Dropdown.css?inline';
 import {
+    annotateParentItems,
+    collapseItem,
+    collapseItemsOutsidePath,
+    expandItem,
     getActiveItemElement,
     getItemElements,
-    ITEM_SELECTOR,
+    getItemForTarget,
+    getItemPath,
+    getLevelRoot,
+    getParentItem,
+    getSubmenuOfItem,
+    isItemExpanded,
     setActiveItem,
 } from './helpers.js';
 
@@ -31,8 +48,15 @@ export type Item = {
     element: MaybeHTMLElement;
     event: Event | SyntheticEvent<HTMLElement>;
     label: string;
+    /**
+     * Ancestor parent items from the root level down to the item’s
+     * immediate parent. Empty for top-level items.
+     */
+    path: Array<ItemPathEntry>;
     value: string;
 };
+
+export type ItemPathEntry = { label: string; value: string };
 
 export type Props = {
     /**
@@ -60,6 +84,10 @@ export type Props = {
     isOpenOnMount?: boolean;
     isSearchable?: boolean;
     keepOpenOnSubmit?: boolean;
+    /**
+     * Label content for the trigger button (when using single child syntax).
+     * For a nested (submenu) Dropdown, this is the parent item’s content.
+     */
     label?: ReactNode;
     minHeightBody?: number;
     minWidthBody?: number;
@@ -104,10 +132,29 @@ type TimeoutID = ReturnType<typeof setTimeout>;
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 const CLICKABLE_SELECTOR = 'button, a[href], input[type="button"], input[type="submit"]';
+const FOCUSABLE_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]';
 const TEXT_INPUT_SELECTOR =
     'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea';
 
-export default function Dropdown({
+// Matches macOS: quick, natural arrowing past parent items never flashes
+// their submenus, but a brief pause discloses. Frame-stepping macOS menus
+// puts its delay around 200–250ms; anything much shorter flashes
+const SUBMENU_DISCLOSURE_DELAY = 200;
+
+export default function Dropdown(props: Props) {
+    const parentDropdown = useContext(DropdownContext);
+    // A Dropdown nested inside another dropdown’s body is a submenu: it
+    // renders as a parent item and delegates to the root dropdown’s engine.
+    // A nested Dropdown with hasItems={false} isn’t a menu, so it renders as
+    // an independent anchored dropdown instead (e.g. an info popover inside
+    // a form dropdown)
+    if (parentDropdown && props.hasItems !== false) {
+        return <SubmenuDropdown {...props} parentDropdown={parentDropdown} />;
+    }
+    return <RootDropdown {...props} />;
+}
+
+function RootDropdown({
     allowCreate,
     allowEmpty = true,
     children,
@@ -151,6 +198,7 @@ export default function Dropdown({
     const [dropdownElement, setDropdownElement] = useState<MaybeHTMLElement>(null);
     const bodyId = useId();
     const popupRole = isSearchable ? 'listbox' : hasItems ? 'menu' : 'dialog';
+    const menubar = useContext(MenubarContext);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
     const closingTimerRef = useRef<null | TimeoutID>(null);
     const isOpeningTimerRef = useRef<null | TimeoutID>(null);
@@ -158,6 +206,9 @@ export default function Dropdown({
     const clearEnteredCharactersTimerRef = useRef<null | TimeoutID>(null);
     const enteredCharactersRef = useRef<string>('');
     const mouseDownPositionRef = useRef<MousePosition | null>(null);
+    const disclosureTimerRef = useRef<null | TimeoutID>(null);
+    const pendingDisclosureItemRef = useRef<MaybeHTMLElement>(null);
+    const submenuRegistrationsRef = useRef<Set<SubmenuRegistration>>(new Set());
 
     const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
@@ -213,17 +264,143 @@ export default function Dropdown({
         }
     }, [isOpen]);
 
+    // Nested (submenu) Dropdowns register here so their scoped callbacks
+    // (onActiveItem/onOpen/onClose/onSubmitItem) can be dispatched to them
+    const dropdownContextValue: DropdownContextValue = useMemo(
+        () => ({
+            registerSubmenu(registration: SubmenuRegistration) {
+                submenuRegistrationsRef.current.add(registration);
+                return () => {
+                    submenuRegistrationsRef.current.delete(registration);
+                };
+            },
+        }),
+        [],
+    );
+
+    const dispatchToSubmenus = (key: 'onActiveItem' | 'onSubmitItem', payload: Item) => {
+        if (!payload.element) return;
+        for (const registration of submenuRegistrationsRef.current) {
+            if (registration.element.contains(payload.element)) {
+                registration[key]?.(payload);
+            }
+        }
+    };
+
+    const handleActiveItem = (payload: Item) => {
+        onActiveItem?.(payload);
+        dispatchToSubmenus('onActiveItem', payload);
+    };
+
+    const handleToggleSubmenu = (item: HTMLElement, isExpanded: boolean) => {
+        for (const registration of submenuRegistrationsRef.current) {
+            if (registration.element === item) {
+                (isExpanded ? registration.onOpen : registration.onClose)?.();
+            }
+        }
+    };
+
+    const clearDisclosureTimer = () => {
+        if (disclosureTimerRef.current != null) {
+            clearTimeout(disclosureTimerRef.current);
+            disclosureTimerRef.current = null;
+        }
+        pendingDisclosureItemRef.current = null;
+    };
+
+    // Clear the disclosure intent timer on unmount so it can’t fire against
+    // unmounted DOM or dispatch submenu callbacks after teardown
+    useEffect(() => clearDisclosureTimer, []);
+
+    // A parent item discloses its submenu after a short intent delay whenever
+    // it becomes (and stays) the deepest active item, for pointer and keyboard
+    // alike; submenus off the active path collapse immediately
+    const syncSubmenuDisclosure = () => {
+        if (!dropdownElement) return;
+        const activeElement = getActiveItemElement(dropdownElement);
+        collapseItemsOutsidePath(dropdownElement, activeElement, handleToggleSubmenu);
+        const submenu = activeElement ? getSubmenuOfItem(activeElement) : null;
+        if (activeElement && submenu && !isItemExpanded(activeElement)) {
+            // A timer already pending for this item keeps its original start time
+            if (pendingDisclosureItemRef.current === activeElement) return;
+            clearDisclosureTimer();
+            pendingDisclosureItemRef.current = activeElement;
+            disclosureTimerRef.current = setTimeout(() => {
+                disclosureTimerRef.current = null;
+                pendingDisclosureItemRef.current = null;
+                if (!activeElement.hasAttribute('data-ukt-active')) return;
+                expandItem(activeElement, handleToggleSubmenu);
+            }, SUBMENU_DISCLOSURE_DELAY);
+            return;
+        }
+        clearDisclosureTimer();
+    };
+
     const closeDropdown = () => {
         setIsOpen(false);
         setIsOpening(false);
         mouseDownPositionRef.current = null;
+        clearDisclosureTimer();
         if (closingTimerRef.current != null) {
             clearTimeout(closingTimerRef.current);
             closingTimerRef.current = null;
         }
     };
 
+    const focusTrigger = () => {
+        const firstChild = dropdownElement?.firstElementChild as MaybeHTMLElement;
+        if (!firstChild) return;
+        const focusable = firstChild.matches(FOCUSABLE_SELECTOR)
+            ? firstChild
+            : (firstChild.querySelector(FOCUSABLE_SELECTOR) as MaybeHTMLElement);
+        focusable?.focus();
+    };
+
+    // Register with an enclosing Menubar (one open menu at a time, ←/→
+    // moves between menus, hover-to-switch once any menu is open). Closing
+    // goes through closeDropdown so pending timers (submenu disclosure,
+    // close delay) can’t fire against a menu the menubar already closed.
+    useEffect(() => {
+        if (!menubar || !dropdownElement) return;
+        return menubar.registerMember({
+            close: closeDropdown,
+            element: dropdownElement,
+            focusTrigger,
+            isOpen: () => isOpenRef.current,
+            open: () => setIsOpen(true),
+        });
+    });
+
+    useEffect(() => {
+        if (isOpen && menubar && dropdownElement) {
+            menubar.notifyOpened(dropdownElement);
+        }
+    }, [dropdownElement, isOpen, menubar]);
+
     const handleSubmitItem = (event: Event | React.SyntheticEvent<HTMLElement>) => {
+        const element = hasItemsRef.current
+            ? getActiveItemElement(dropdownElement)
+            : null;
+
+        const submenuOfActive = element ? getSubmenuOfItem(element) : null;
+        if (element && submenuOfActive) {
+            // Parent items disclose; they never submit
+            clearDisclosureTimer();
+            expandItem(element, handleToggleSubmenu);
+            if (currentInputMethodRef.current === 'keyboard' && dropdownElement) {
+                const firstItem = getItemElements(dropdownElement, submenuOfActive)?.[0];
+                if (firstItem) {
+                    setActiveItem({
+                        dropdownElement,
+                        element: firstItem,
+                        event,
+                        onActiveItem: handleActiveItem,
+                    });
+                }
+            }
+            return;
+        }
+
         if (isOpenRef.current && !keepOpenOnSubmitRef.current) {
             // A short timeout before closing is better UX when user selects an item so dropdown
             // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
@@ -232,7 +409,6 @@ export default function Dropdown({
 
         if (!hasItemsRef.current) return;
 
-        const element = getActiveItemElement(dropdownElement);
         if (!element) {
             // With nothing selected, the only possible value comes from a text
             // input (a searchable dropdown’s input, or one inside a custom
@@ -298,12 +474,15 @@ export default function Dropdown({
             }
         }
 
-        onSubmitItemRef.current?.({
+        const payload: Item = {
             element,
             event,
             label: itemLabel,
+            path: getItemPath(element),
             value: nextValue,
-        });
+        };
+        onSubmitItemRef.current?.(payload);
+        dispatchToSubmenus('onSubmitItem', payload);
     };
 
     const handleMouseMove = ({ clientX, clientY }: ReactMouseEvent<HTMLElement>) => {
@@ -328,18 +507,28 @@ export default function Dropdown({
         // Ensure we have the dropdown root HTMLElement
         if (!dropdownElement) return;
 
-        const itemElements = getItemElements(dropdownElement);
-        if (!itemElements) return;
-
         const eventTarget = event.target as HTMLElement;
-        const item = eventTarget.closest(ITEM_SELECTOR) as MaybeHTMLElement;
-        const element = item ?? eventTarget;
-        for (const itemElement of itemElements) {
-            if (itemElement === element) {
-                setActiveItem({ dropdownElement, element, event, onActiveItem });
-                return;
-            }
+        if (!eventTarget.closest('.uktdropdown-body')) return;
+
+        // Hover inside an open nested dropdown belongs to that dropdown
+        const hoveredRoot = eventTarget.closest('.uktdropdown');
+        if (
+            hoveredRoot !== dropdownElement &&
+            hoveredRoot?.classList.contains('is-open')
+        ) {
+            return;
         }
+
+        const item = getItemForTarget(dropdownElement, eventTarget);
+        if (!item) return;
+
+        setActiveItem({
+            dropdownElement,
+            element: item,
+            event,
+            onActiveItem: handleActiveItem,
+        });
+        syncSubmenuDisclosure();
     };
 
     const handleMouseOut = (event: ReactMouseEvent<HTMLElement>) => {
@@ -352,6 +541,7 @@ export default function Dropdown({
         }
         // If user moused out of activeItem (not into a descendant), it’s no longer active
         delete activeItem.dataset.uktActive;
+        syncSubmenuDisclosure();
     };
 
     const handleMouseDown = (event: ReactMouseEvent<HTMLElement>) => {
@@ -382,8 +572,26 @@ export default function Dropdown({
         }
 
         const eventTarget = event.target as HTMLElement;
+
+        // Clicks inside an open nested dropdown belong to that dropdown
+        const clickedRoot = eventTarget.closest('.uktdropdown');
+        if (
+            clickedRoot !== dropdownElement &&
+            clickedRoot?.classList.contains('is-open') &&
+            dropdownElement?.contains(clickedRoot)
+        ) {
+            return;
+        }
+
+        // A click only counts as inside the body if the closest body element
+        // belongs to this dropdown (a nested dropdown’s trigger sits inside
+        // the outer body, but the outer body isn’t the nested one’s own)
+        const targetBody = eventTarget.closest('.uktdropdown-body');
+        const isInOwnBody = Boolean(
+            targetBody && targetBody.closest('.uktdropdown') === dropdownElement,
+        );
         // If click was outside dropdown body, don’t trigger submit
-        if (!eventTarget.closest('.uktdropdown-body')) {
+        if (!isInOwnBody) {
             // Don’t close dropdown if isOpening or search input is focused
             if (
                 !isOpeningRef.current &&
@@ -396,6 +604,29 @@ export default function Dropdown({
 
         // If dropdown has no items and click was within dropdown body, do nothing
         if (!hasItemsRef.current) return;
+
+        if (dropdownElement) {
+            const clickedItem = getItemForTarget(dropdownElement, eventTarget);
+            if (clickedItem) {
+                // Submit the item the click actually landed on: sync the
+                // active item to it in case they diverge (e.g. active was
+                // set via keyboard, then user clicked elsewhere)
+                setActiveItem({
+                    dropdownElement,
+                    element: clickedItem,
+                    event,
+                    onActiveItem: handleActiveItem,
+                });
+            } else if (getActiveItemElement(dropdownElement)) {
+                // A click that doesn’t land on an item — body padding, a
+                // separator, or a disabled item (pointer-events: none
+                // retargets its clicks to the container) — must not submit
+                // the previously active item: like macOS, it does nothing.
+                // With no active item it falls through, so a body click
+                // can still submit an input-sourced value
+                return;
+            }
+        }
 
         handleSubmitItem(event);
     };
@@ -412,6 +643,18 @@ export default function Dropdown({
         };
 
         const isEventTargetingDropdown = dropdownElement.contains(eventTarget);
+
+        // Key events originating inside an open nested dropdown are that
+        // dropdown’s business (e.g. an info popover nested in this body)
+        const nestedRoot = eventTarget.closest?.('.uktdropdown');
+        if (
+            nestedRoot &&
+            nestedRoot !== dropdownElement &&
+            dropdownElement.contains(nestedRoot) &&
+            nestedRoot.classList.contains('is-open')
+        ) {
+            return;
+        }
 
         if (!isOpenRef.current) {
             // If dropdown is closed, don’t handle key events if event target isn’t within dropdown
@@ -456,9 +699,10 @@ export default function Dropdown({
                     // If props.allowCreate, only override the input’s value with an
                     // exact text match so user can enter a value not in items
                     isExactMatch: allowCreateRef.current,
-                    onActiveItem,
+                    onActiveItem: handleActiveItem,
                     text: enteredCharactersRef.current,
                 });
+                syncSubmenuDisclosure();
 
                 if (clearEnteredCharactersTimerRef.current != null) {
                     clearTimeout(clearEnteredCharactersTimerRef.current);
@@ -487,41 +731,107 @@ export default function Dropdown({
         ) {
             // Close dropdown if hasItems or event target not using key events
             if (hasItemsRef.current || !isTargetUsingKeyEvents) {
+                // Escape closes the whole menu — submenus included — and
+                // returns focus to the element that opened it. Focus before
+                // closing: a searchable trigger input opens the dropdown on
+                // focus, so its synchronous onFocus must land before the
+                // close state update for the close to win the batch
+                focusTrigger();
                 closeDropdown();
             }
             return;
         }
 
-        // Handle ↑/↓ arrows
+        // Handle arrow keys
         if (hasItemsRef.current) {
             if (key === 'ArrowUp') {
                 onEventHandled();
                 if (altKey || metaKey) {
-                    setActiveItem({ dropdownElement, event, index: 0, onActiveItem });
+                    setActiveItem({
+                        dropdownElement,
+                        event,
+                        index: 0,
+                        onActiveItem: handleActiveItem,
+                    });
                 } else {
                     setActiveItem({
                         dropdownElement,
                         event,
                         indexAddend: -1,
-                        onActiveItem,
+                        onActiveItem: handleActiveItem,
                     });
                 }
+                syncSubmenuDisclosure();
                 return;
             }
             if (key === 'ArrowDown') {
                 onEventHandled();
                 if (altKey || metaKey) {
                     // Using a negative index counts back from the end
-                    setActiveItem({ dropdownElement, event, index: -1, onActiveItem });
+                    setActiveItem({
+                        dropdownElement,
+                        event,
+                        index: -1,
+                        onActiveItem: handleActiveItem,
+                    });
                 } else {
                     setActiveItem({
                         dropdownElement,
                         event,
                         indexAddend: 1,
-                        onActiveItem,
+                        onActiveItem: handleActiveItem,
                     });
                 }
+                syncSubmenuDisclosure();
                 return;
+            }
+            // ←/→ dive into and surface out of submenus (and move between
+            // menus in a menubar); leave them alone when a text input has focus
+            if (!isTargetUsingKeyEvents) {
+                if (key === 'ArrowRight') {
+                    const activeElement = getActiveItemElement(dropdownElement);
+                    const submenu = activeElement
+                        ? getSubmenuOfItem(activeElement)
+                        : null;
+                    if (activeElement && submenu) {
+                        onEventHandled();
+                        clearDisclosureTimer();
+                        expandItem(activeElement, handleToggleSubmenu);
+                        const firstItem = getItemElements(dropdownElement, submenu)?.[0];
+                        if (firstItem) {
+                            setActiveItem({
+                                dropdownElement,
+                                element: firstItem,
+                                event,
+                                onActiveItem: handleActiveItem,
+                            });
+                        }
+                        return;
+                    }
+                    if (menubar) {
+                        onEventHandled();
+                        menubar.moveOpen(dropdownElement, 1);
+                    }
+                    return;
+                }
+                if (key === 'ArrowLeft') {
+                    const activeElement = getActiveItemElement(dropdownElement);
+                    const levelRoot = activeElement ? getLevelRoot(activeElement) : null;
+                    if (levelRoot) {
+                        onEventHandled();
+                        clearDisclosureTimer();
+                        const parentItem = getParentItem(levelRoot);
+                        if (parentItem) {
+                            collapseItem(parentItem, handleToggleSubmenu);
+                        }
+                        return;
+                    }
+                    if (menubar) {
+                        onEventHandled();
+                        menubar.moveOpen(dropdownElement, -1);
+                    }
+                    return;
+                }
             }
         }
     };
@@ -618,7 +928,7 @@ export default function Dropdown({
                 // If props.allowCreate, only override the input’s value with an
                 // exact text match so user can enter a value not in items
                 isExactMatch: allowCreateRef.current,
-                onActiveItem,
+                onActiveItem: handleActiveItem,
                 text: enteredCharactersRef.current,
             });
         };
@@ -642,6 +952,11 @@ export default function Dropdown({
                 inputElement.removeEventListener('input', handleInput);
             }
         };
+    };
+
+    // Fill in parent-item/submenu ARIA when the body mounts (open)
+    const handleBodyRef = (ref: HTMLDivElement | null) => {
+        if (ref) annotateParentItems(ref);
     };
 
     if (!isValidElement(trigger)) {
@@ -735,12 +1050,15 @@ export default function Dropdown({
                             'has-items': hasItems,
                         })}
                         id={bodyId}
+                        ref={handleBodyRef}
                         role={popupRole}
                     >
                         <div className="uktdropdown-content">
-                            {childrenCount > 1
-                                ? (children as ChildrenTuple)[1]
-                                : children}
+                            <DropdownContext.Provider value={dropdownContextValue}>
+                                {childrenCount > 1
+                                    ? (children as ChildrenTuple)[1]
+                                    : children}
+                            </DropdownContext.Provider>
                         </div>
                     </div>
                 ) : null}
@@ -748,3 +1066,94 @@ export default function Dropdown({
         </Fragment>
     );
 }
+
+const INERT_SUBMENU_PROPS = [
+    'allowCreate',
+    'allowEmpty',
+    'isOpenOnMount',
+    'isSearchable',
+    'keepOpenOnSubmit',
+    'minHeightBody',
+    'minWidthBody',
+    'name',
+    'placeholder',
+    'tabIndex',
+    'value',
+] as const;
+
+// The nested (submenu) rendering of Dropdown: a parent item that discloses a
+// child menu. It renders the data-ukt-submenu protocol and registers with the
+// root dropdown, whose engine handles all interaction.
+function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }) {
+    const {
+        children,
+        className,
+        disabled,
+        label,
+        onActiveItem,
+        onClose,
+        onOpen,
+        onSubmitItem,
+        parentDropdown,
+        style,
+    } = props;
+
+    const itemRef = useRef<HTMLLIElement | null>(null);
+
+    useEffect(() => {
+        const element = itemRef.current;
+        if (!element) return;
+        return parentDropdown.registerSubmenu({
+            element,
+            onActiveItem,
+            onClose,
+            onOpen,
+            onSubmitItem,
+        });
+    }, [onActiveItem, onClose, onOpen, onSubmitItem, parentDropdown]);
+
+    // Misuse feedback is unconditional, like the children-count error above
+    const warnedRef = useRef(false);
+    useEffect(() => {
+        if (warnedRef.current) return;
+        const inertProps = INERT_SUBMENU_PROPS.filter(
+            (propName) => props[propName] !== undefined,
+        );
+        if (!inertProps.length) return;
+        warnedRef.current = true;
+        console.error(
+            `@acusti/dropdown: ${inertProps.join(', ')} only apply to a top-level Dropdown and are ignored on a nested (submenu) Dropdown.`,
+        );
+    });
+
+    const childrenCount = Children.count(children);
+    let labelContent: ReactNode = label;
+    let body: ReactNode = children;
+    if (childrenCount > 1) {
+        labelContent = (children as ChildrenTuple)[0];
+        body = (children as ChildrenTuple)[1];
+    }
+
+    const submenu = isValidElement(body) ? (
+        cloneElement(body as ReactElement<Record<string, unknown>>, {
+            'data-ukt-submenu': '',
+        })
+    ) : (
+        <div data-ukt-submenu="">{body}</div>
+    );
+
+    return (
+        <li
+            aria-disabled={disabled || undefined}
+            className={className}
+            data-ukt-item=""
+            ref={itemRef}
+            style={style}
+        >
+            {labelContent}
+            {submenu}
+        </li>
+    );
+}
+
+export { default as Menubar, type MenubarProps } from './Menubar.js';
