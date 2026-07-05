@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Minimal repository-specific guidance for coding agents.
+Minimal repo-specific guidance for coding agents.
 
 ## Commands
 
@@ -20,7 +20,6 @@ bun run format:check
 
 ## Repo-specific facts
 
-- Package manager: `bun@1.3.9`
 - `bun run build` builds workspaces in dependency order and excludes `@acusti/uikit-docs`
 - `bun run buildall` includes the docs package
 - `bun run dev` starts Storybook for `@acusti/uikit-docs`
