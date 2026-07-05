@@ -144,6 +144,30 @@
     inline-size: 300px;
 }
 
+.uktmenubar {
+    .uktdropdown-trigger {
+        border: 1px solid #666;
+        border-left: 0;
+        border-right: 0;
+        border-radius: 0;
+        padding: 5px 7px;
+    }
+}
+
+.uktmenubar .uktdropdown {
+    font-size: 13px;
+
+    &:first-child .uktdropdown-trigger {
+        border-left: 1px solid #666;
+        padding-left: 11px;
+    }
+
+    &:last-child .uktdropdown-trigger {
+        border-right: 1px solid #666;
+        padding-right: 11px;
+    }
+}
+
 .textarea-trigger .uktdropdown-body {
     inline-size: 400px;
     font-size: 13px;

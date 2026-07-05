@@ -2,7 +2,7 @@ import { fn } from 'storybook/test';
 import * as React from 'react';
 
 import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
-import Dropdown from '../../dropdown/src/Dropdown.js';
+import Dropdown, { Menubar } from '../../dropdown/src/Dropdown.js';
 
 import './CSSValueInput.css';
 import './Dropdown.css';
@@ -535,5 +535,156 @@ export const OutOfBoundsAtRight: Story = {
         isSearchable: true,
         name: 'outofboundsatright',
         placeholder: 'Fill available space',
+    },
+};
+
+export const SubmenuDropdown: Story = {
+    args: {
+        children: [
+            'Format',
+            <ul>
+                <li data-ukt-item>Bold</li>
+                <li data-ukt-item>Italic</li>
+                <li data-ukt-item>Underline</li>
+                <Dropdown label="Align">
+                    <ul>
+                        <li data-ukt-value="left">Left</li>
+                        <li data-ukt-value="center">Center</li>
+                        <li data-ukt-value="right">Right</li>
+                        <li data-ukt-value="justify">Justify</li>
+                    </ul>
+                </Dropdown>
+                <Dropdown label="Spacing">
+                    <ul>
+                        <li data-ukt-value="1">Single</li>
+                        <li data-ukt-value="1.5">1.5 Lines</li>
+                        <li data-ukt-value="2">Double</li>
+                        <Dropdown label="Custom">
+                            <ul>
+                                <li data-ukt-value="0.5">0.5 Lines</li>
+                                <li data-ukt-value="3">Triple</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>
+            </ul>,
+        ] as const,
+        className: 'submenu-example',
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'A `Dropdown` nested inside another dropdown’s body renders as a parent item that discloses a submenu. Pause on a parent item to disclose its submenu (pointer or arrow keys), press → to dive in, ← to surface back out. Parent items never submit; `onSubmitItem` fires only for leaf items, with the leaf’s ancestor `path` in the payload.',
+            },
+        },
+    },
+};
+
+export const MenubarAppMenu: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: '`Menubar` combines sibling dropdowns into a single menu like the system menu in the top toolbar of macOS: one menu open at a time, ←/→ move between menus, and once any menu is open, hovering another trigger switches to it.',
+            },
+        },
+    },
+    render() {
+        return (
+            <Menubar>
+                <Dropdown onSubmitItem={fn()}>
+                    File
+                    <ul>
+                        <li data-ukt-item>New Window</li>
+                        <li data-ukt-item>New Tab</li>
+                        <Dropdown label="Open Recent">
+                            <ul>
+                                <li data-ukt-item>project-a</li>
+                                <li data-ukt-item>project-b</li>
+                                <li data-ukt-item>project-c</li>
+                            </ul>
+                        </Dropdown>
+                        <li data-ukt-item>Close Window</li>
+                    </ul>
+                </Dropdown>
+                <Dropdown onSubmitItem={fn()}>
+                    Edit
+                    <ul>
+                        <li data-ukt-item>Undo</li>
+                        <li data-ukt-item>Redo</li>
+                        <Dropdown label="Find">
+                            <ul>
+                                <li data-ukt-item>Find…</li>
+                                <li data-ukt-item>Find Next</li>
+                                <li data-ukt-item>Find Previous</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>
+                <Dropdown onSubmitItem={fn()}>
+                    View
+                    <ul>
+                        <li data-ukt-item>Zoom In</li>
+                        <li data-ukt-item>Zoom Out</li>
+                        <li data-ukt-item>Actual Size</li>
+                    </ul>
+                </Dropdown>
+            </Menubar>
+        );
+    },
+};
+
+export const NestedInfoPopover: Story = {
+    args: {
+        children: [
+            'Layout',
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ alignItems: 'center', display: 'flex', gap: '0.25rem' }}>
+                    <CSSValueInput
+                        cssValueType="length"
+                        label="Width"
+                        onSubmitValue={() => {}}
+                        placeholder="100vw"
+                        unit="vw"
+                    />
+                    <Dropdown hasItems={false}>
+                        <button aria-label="About width" type="button">
+                            ℹ️
+                        </button>
+                        <p style={{ margin: 0, maxWidth: '16rem' }}>
+                            Width accepts any CSS length. Use the ↑/↓ arrow keys in the
+                            input to step the current value.
+                        </p>
+                    </Dropdown>
+                </div>
+                <div style={{ alignItems: 'center', display: 'flex', gap: '0.25rem' }}>
+                    <CSSValueInput
+                        cssValueType="length"
+                        label="Rotation"
+                        onSubmitValue={() => {}}
+                        placeholder="0deg"
+                        step={5}
+                        unit="deg"
+                    />
+                    <Dropdown hasItems={false}>
+                        <button aria-label="About rotation" type="button">
+                            ℹ️
+                        </button>
+                        <p style={{ margin: 0, maxWidth: '16rem' }}>
+                            Rotation accepts any CSS angle (deg, rad, turn) and steps by
+                            5deg with the ↑/↓ arrow keys.
+                        </p>
+                    </Dropdown>
+                </div>
+            </div>,
+        ] as const,
+        className: 'nested-info-popover',
+        hasItems: false,
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'A `Dropdown` nested with `hasItems={false}` isn’t a submenu — it renders as an independent anchored dropdown inside the outer body, like these ℹ️ info popovers describing each input. Interacting with the popover doesn’t close or submit the outer dropdown, and Escape closes the innermost open dropdown first.',
+            },
+        },
     },
 };
