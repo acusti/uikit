@@ -17,8 +17,18 @@
     --uktdd-body-position-area: bottom span-right;
     --uktdd-body-position-try-fallbacks:
         --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
-    --uktdd-body-translate: 0 0;
+    /* any translate value except none makes the box a containing block for
+       its fixed-position submenus, constraining and clipping them, so only
+       set a translate on dropdowns without submenus */
+    --uktdd-body-translate: none;
+    --uktdd-body-color: canvastext;
+    --uktdd-body-bg-color-path: #dcdcdc;
+    --uktdd-body-color-path: currentColor;
     --uktdd-label-pad-right: 0.625em;
+    --uktdd-submenu-position-area: inline-end span-block-end;
+    --uktdd-submenu-position-try-fallbacks: --uktdd-submenu-inline-start;
+    --uktdd-submenu-translate: none;
+    --uktdd-menubar-trigger-bg-color-active: rgba(0, 0, 0, 0.12);
 }
 
 .uktdropdown,
@@ -80,6 +90,96 @@
         background-color: var(--uktdd-body-bg-color-hover);
         color: var(--uktdd-body-color-hover);
     }
+
+    /* an active item is on the path — not deepest — while a deeper highlight
+       exists or the pointer is inside its submenu; macOS mutes the parent
+       even when the pointer is over a separator or disabled submenu item */
+    [data-ukt-active]:has([data-ukt-submenu] [data-ukt-active]),
+    [data-ukt-active]:has([data-ukt-submenu]:hover) {
+        background-color: var(--uktdd-body-bg-color-path);
+        color: var(--uktdd-body-color-path);
+    }
+
+    [data-ukt-item][aria-disabled="true"] {
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    /* the expanded parent item anchors its submenu; anchor-scope keeps each
+       level’s submenu bound to its own parent item */
+    [data-ukt-item] {
+        anchor-scope: --uktdd-submenu-anchor;
+    }
+
+    /* parent items get a macOS-style disclosure chevron, right-aligned */
+    :is([data-ukt-item], [data-ukt-value])[aria-haspopup="menu"] {
+        position: relative;
+        padding-inline-end: 2em;
+
+        &::after {
+            content: "";
+            position: absolute;
+            inset-inline-end: 0.9em;
+            inset-block-start: 50%;
+            inline-size: 0.3em;
+            block-size: 0.3em;
+            border-block-start: 0.14em solid currentColor;
+            border-inline-end: 0.14em solid currentColor;
+            translate: 0 -50%;
+            rotate: 45deg;
+        }
+
+        &:dir(rtl)::after {
+            rotate: -45deg;
+        }
+    }
+
+    [data-ukt-item][aria-expanded="true"] {
+        anchor-name: --uktdd-submenu-anchor;
+
+        > [data-ukt-submenu] {
+            display: block;
+        }
+    }
+
+    [data-ukt-submenu] {
+        box-sizing: border-box;
+        display: none;
+        /* an explicit color so items don’t inherit the white highlight color
+           from their active parent item (the submenu is its DOM child) */
+        color: var(--uktdd-body-color);
+        position: fixed;
+        position-anchor: --uktdd-submenu-anchor;
+        position-area: var(--uktdd-submenu-position-area);
+        position-try-fallbacks: var(--uktdd-submenu-position-try-fallbacks);
+        translate: var(--uktdd-submenu-translate);
+        z-index: 2;
+        margin: 0;
+        padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right)
+            var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
+        inline-size: max-content;
+        max-inline-size: var(--uktdd-body-max-width);
+        max-block-size: var(--uktdd-body-max-height);
+        overflow: auto;
+        overscroll-behavior: contain;
+        list-style: none;
+        background-color: var(--uktdd-body-bg-color);
+        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+    }
+}
+
+.uktmenubar {
+    display: flex;
+    align-items: stretch;
+    width: max-content;
+    font-family: var(--uktdd-font-family);
+
+    /* the open menu’s trigger reads as active, like the highlighted item in
+       the macOS menu bar; the default tints over whatever background the
+       trigger already has, so it works regardless of how it’s styled */
+    .uktdropdown.is-open .uktdropdown-trigger {
+        box-shadow: inset 0 0 0 100vmax var(--uktdd-menubar-trigger-bg-color-active);
+    }
 }
 
 .uktdropdown-content {
@@ -105,4 +205,8 @@
 
 @position-try --uktdd-top-right {
     position-area: top span-left;
+}
+
+@position-try --uktdd-submenu-inline-start {
+    position-area: inline-start span-block-end;
 }
