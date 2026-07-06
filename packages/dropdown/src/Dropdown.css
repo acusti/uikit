@@ -9,16 +9,16 @@
     --uktdd-body-max-height: calc(100dvh - var(--uktdd-body-buffer));
     --uktdd-body-max-width: calc(100dvw - var(--uktdd-body-buffer));
     --uktdd-body-min-height: 30px;
-    --uktdd-body-pad-bottom: 9px;
-    --uktdd-body-pad-left: 12px;
-    --uktdd-body-pad-right: 12px;
-    --uktdd-body-pad-top: 9px;
+    --uktdd-body-pad-bottom: 0.5em;
+    --uktdd-body-pad-left: 0.6875em;
+    --uktdd-body-pad-right: 0.6875em;
+    --uktdd-body-pad-top: 0.5em;
     --uktdd-body-min-width: min(50px, 100%);
     --uktdd-body-position-area: bottom span-right;
     --uktdd-body-position-try-fallbacks:
         --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
     --uktdd-body-translate: 0 0;
-    --uktdd-label-pad-right: 10px;
+    --uktdd-label-pad-right: 0.625em;
 }
 
 .uktdropdown,
