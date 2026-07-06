@@ -548,6 +548,11 @@ Submenu semantics:
   [Keyboard Navigation](#keyboard-navigation--accessibility).
 - A parent item’s open state is carried by its `aria-expanded` attribute,
   which is also the styling hook for submenu visibility.
+- With the pointer, an open submenu tracks mouse intent: moving diagonally
+  from the parent item toward the submenu keeps it open even as the pointer
+  crosses sibling items along the way (the macOS “safe triangle” between
+  the pointer and the submenu’s near edge). Moving straight onto a sibling
+  — or pausing mid-diagonal — switches to that item as usual.
 
 ### The `data-ukt-submenu` protocol
 
