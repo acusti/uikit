@@ -129,6 +129,20 @@ export const getActiveItemElement = (dropdownElement: MaybeHTMLElement) => {
     return actives ? actives[actives.length - 1] : null;
 };
 
+// The deepest expanded parent item — the one whose submenu is the innermost
+// open one — in document order
+export const getDeepestExpandedItem = (
+    dropdownElement: MaybeHTMLElement,
+): MaybeHTMLElement => {
+    if (!dropdownElement) return null;
+    const expanded = (
+        Array.from(
+            dropdownElement.querySelectorAll('[aria-expanded="true"]'),
+        ) as Array<HTMLElement>
+    ).filter((element) => element.matches(ITEM_SELECTOR));
+    return expanded.length ? expanded[expanded.length - 1] : null;
+};
+
 export const isItemExpanded = (item: HTMLElement) =>
     item.getAttribute('aria-expanded') === 'true';
 
@@ -376,4 +390,19 @@ export const setActiveItem = ({
     }
 
     return nextActiveItem;
+};
+
+export type Point = { x: number; y: number };
+
+// Whether a point is inside (or on an edge of) triangle a-b-c, from the sign
+// of the cross product for each edge: all the same sign ⇒ inside
+export const isPointInTriangle = (p: Point, a: Point, b: Point, c: Point): boolean => {
+    const cross = (u: Point, v: Point, w: Point) =>
+        (u.x - w.x) * (v.y - w.y) - (v.x - w.x) * (u.y - w.y);
+    const d1 = cross(p, a, b);
+    const d2 = cross(p, b, c);
+    const d3 = cross(p, c, a);
+    const hasNegative = d1 < 0 || d2 < 0 || d3 < 0;
+    const hasPositive = d1 > 0 || d2 > 0 || d3 > 0;
+    return !(hasNegative && hasPositive);
 };

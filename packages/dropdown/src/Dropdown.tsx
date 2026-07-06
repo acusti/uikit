@@ -34,6 +34,7 @@ import {
     collapseItemsOutsidePath,
     expandItem,
     getActiveItemElement,
+    getDeepestExpandedItem,
     getItemElements,
     getItemForTarget,
     getItemPath,
@@ -41,6 +42,8 @@ import {
     getParentItem,
     getSubmenuOfItem,
     isItemExpanded,
+    isPointInTriangle,
+    type Point,
     setActiveItem,
 } from './helpers.js';
 
@@ -141,6 +144,11 @@ const TEXT_INPUT_SELECTOR =
 // puts its delay around 200–250ms; anything much shorter flashes
 const SUBMENU_DISCLOSURE_DELAY = 200;
 
+// How long the pointer can dwell inside the safe area (heading toward an open
+// submenu) before we give up and switch to whatever it’s actually over. Reset
+// on every move, so it only fires on a pause — motion keeps the submenu open
+const SAFE_AREA_TIMEOUT = 300;
+
 export default function Dropdown(props: Props) {
     const parentDropdown = useContext(DropdownContext);
     // A Dropdown nested inside another dropdown’s body is a submenu: it
@@ -209,6 +217,11 @@ function RootDropdown({
     const disclosureTimerRef = useRef<null | TimeoutID>(null);
     const pendingDisclosureItemRef = useRef<MaybeHTMLElement>(null);
     const submenuRegistrationsRef = useRef<Set<SubmenuRegistration>>(new Set());
+    const pointerRef = useRef<Point | null>(null);
+    const lastMouseEventRef = useRef<MouseEvent | null>(null);
+    const safeAreaRef = useRef<{ apex: Point; parent: HTMLElement } | null>(null);
+    const safeAreaTimerRef = useRef<null | TimeoutID>(null);
+    const wasInSafeAreaRef = useRef<boolean>(false);
 
     const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
@@ -336,11 +349,126 @@ function RootDropdown({
         clearDisclosureTimer();
     };
 
+    const clearSafeAreaTimer = () => {
+        if (safeAreaTimerRef.current != null) {
+            clearTimeout(safeAreaTimerRef.current);
+            safeAreaTimerRef.current = null;
+        }
+    };
+
+    // Clear the safe-area give-up timer on unmount so it can’t fire against
+    // unmounted DOM
+    useEffect(() => clearSafeAreaTimer, []);
+
+    // The safe area is the triangle from where the pointer last sat on the
+    // open submenu’s parent (the apex) to that submenu’s two near corners.
+    // While the pointer is inside it, it’s traveling toward the submenu, so the
+    // submenu stays open even as the pointer crosses sibling items — the macOS
+    // diagonal behavior
+    const isPointerInSafeArea = (x: number, y: number): boolean => {
+        const safeArea = safeAreaRef.current;
+        if (!safeArea || !isItemExpanded(safeArea.parent)) return false;
+        const submenu = getSubmenuOfItem(safeArea.parent);
+        if (!submenu) return false;
+        const submenuRect = submenu.getBoundingClientRect();
+        const parentRect = safeArea.parent.getBoundingClientRect();
+        // Submenus can open to either side; the near edge is the one facing
+        // the parent item
+        const nearX =
+            submenuRect.left >= parentRect.right - 1
+                ? submenuRect.left
+                : submenuRect.right;
+        return isPointInTriangle(
+            { x, y },
+            safeArea.apex,
+            { x: nearX, y: submenuRect.top },
+            { x: nearX, y: submenuRect.bottom },
+        );
+    };
+
+    // The pointer left the safe area (or paused in it without reaching the
+    // submenu): stop protecting the submenu and switch to whatever the pointer
+    // is over now. Passing the target avoids an elementFromPoint read; the
+    // give-up timer has no event, so it falls back to hit-testing the pointer
+    const commitPointerTarget = (targetElement?: MaybeHTMLElement) => {
+        clearSafeAreaTimer();
+        safeAreaRef.current = null;
+        wasInSafeAreaRef.current = false;
+        const pointer = pointerRef.current;
+        const target =
+            targetElement ??
+            (pointer
+                ? (dropdownElement?.ownerDocument.elementFromPoint(
+                      pointer.x,
+                      pointer.y,
+                  ) as MaybeHTMLElement)
+                : null);
+        if (!dropdownElement || !target || !dropdownElement.contains(target)) return;
+        const item = getItemForTarget(dropdownElement, target);
+        const event = lastMouseEventRef.current;
+        // Only reachable via mouse events, so a real mouse event is on hand
+        if (item && event) {
+            setActiveItem({
+                dropdownElement,
+                element: item,
+                event,
+                onActiveItem: handleActiveItem,
+            });
+        }
+        syncSubmenuDisclosure();
+    };
+
+    // Track the pointer against the open submenu’s safe area: anchor the apex
+    // while over the parent item, and (re)arm the give-up timer while traveling
+    // toward the submenu so only a pause — not motion — ends the protection
+    const trackSafeArea = (event: ReactMouseEvent<HTMLElement>) => {
+        // Safe-area intent only applies to an open menu with items; skip the
+        // per-move DOM query otherwise (mousemove is a hot path)
+        if (!dropdownElement || !isOpenRef.current || !hasItemsRef.current) return;
+        const pointer = { x: event.clientX, y: event.clientY };
+        pointerRef.current = pointer;
+        lastMouseEventRef.current = event.nativeEvent;
+        const parent = getDeepestExpandedItem(dropdownElement);
+        if (!parent) {
+            safeAreaRef.current = null;
+            wasInSafeAreaRef.current = false;
+            clearSafeAreaTimer();
+            return;
+        }
+        const target = event.target as HTMLElement;
+        const submenu = getSubmenuOfItem(parent);
+        const isOverParent =
+            parent.contains(target) && !(submenu?.contains(target) ?? false);
+        if (isOverParent) {
+            safeAreaRef.current = { apex: pointer, parent };
+            wasInSafeAreaRef.current = false;
+            clearSafeAreaTimer();
+            return;
+        }
+        // A newly-open submenu we haven’t anchored an apex for yet
+        if (safeAreaRef.current?.parent !== parent) {
+            safeAreaRef.current = null;
+        }
+        clearSafeAreaTimer();
+        if (isPointerInSafeArea(pointer.x, pointer.y)) {
+            wasInSafeAreaRef.current = true;
+            safeAreaTimerRef.current = setTimeout(commitPointerTarget, SAFE_AREA_TIMEOUT);
+        } else if (wasInSafeAreaRef.current) {
+            // Just crossed out of the triangle. The pointer may still be over
+            // the same sibling it entered while protected, so no mouseover will
+            // fire — re-evaluate and activate whatever it’s on now
+            commitPointerTarget(target);
+        }
+    };
+
     const closeDropdown = () => {
         setIsOpen(false);
         setIsOpening(false);
         mouseDownPositionRef.current = null;
         clearDisclosureTimer();
+        clearSafeAreaTimer();
+        safeAreaRef.current = null;
+        wasInSafeAreaRef.current = false;
         if (closingTimerRef.current != null) {
             clearTimeout(closingTimerRef.current);
             closingTimerRef.current = null;
@@ -485,8 +613,10 @@ function RootDropdown({
         dispatchToSubmenus('onSubmitItem', payload);
     };
 
-    const handleMouseMove = ({ clientX, clientY }: ReactMouseEvent<HTMLElement>) => {
+    const handleMouseMove = (event: ReactMouseEvent<HTMLElement>) => {
+        const { clientX, clientY } = event;
         currentInputMethodRef.current = 'mouse';
+        trackSafeArea(event);
         const initialPosition = mouseDownPositionRef.current;
         if (!initialPosition) return;
         if (
@@ -519,6 +649,9 @@ function RootDropdown({
             return;
         }
 
+        // Heading toward an open submenu: keep it open even over sibling items
+        if (isPointerInSafeArea(event.clientX, event.clientY)) return;
+
         const item = getItemForTarget(dropdownElement, eventTarget);
         if (!item) return;
 
@@ -533,6 +666,18 @@ function RootDropdown({
 
     const handleMouseOut = (event: ReactMouseEvent<HTMLElement>) => {
         if (!hasItemsRef.current) return;
+        // The pointer left the dropdown entirely: drop the safe area so its
+        // give-up timer can’t later fire on a stale position, and fall through
+        // to the normal collapse (mousemove has stopped, so nothing else will)
+        const relatedTarget = event.relatedTarget as Node | null;
+        const isLeavingDropdown = !dropdownElement?.contains(relatedTarget);
+        if (isLeavingDropdown) {
+            clearSafeAreaTimer();
+            safeAreaRef.current = null;
+            wasInSafeAreaRef.current = false;
+        }
+        // Heading toward an open submenu: don’t clear the active item / collapse
+        if (isPointerInSafeArea(event.clientX, event.clientY)) return;
         const activeItem = getActiveItemElement(dropdownElement);
         if (!activeItem) return;
         const eventRelatedTarget = event.relatedTarget as HTMLElement;
