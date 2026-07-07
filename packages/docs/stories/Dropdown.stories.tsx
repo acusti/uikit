@@ -36,10 +36,7 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 
 const meta: Meta<typeof Dropdown> = {
     args: {
-        onClick: fn(),
         onClose: fn(),
-        onMouseDown: fn(),
-        onMouseUp: fn(),
         onOpen: fn(),
         onSubmitItem: fn(),
     },
