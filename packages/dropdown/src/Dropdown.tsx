@@ -92,8 +92,6 @@ export type Props = {
      * For a nested (submenu) Dropdown, this is the parent item’s content.
      */
     label?: ReactNode;
-    minHeightBody?: number;
-    minWidthBody?: number;
     /**
      * Only usable in conjunction with {isSearchable: true}.
      * Used as search input’s name.
@@ -173,8 +171,6 @@ function RootDropdown({
     isSearchable,
     keepOpenOnSubmit = !hasItems,
     label,
-    minHeightBody,
-    minWidthBody,
     name,
     onActiveItem,
     onClick,
@@ -1168,16 +1164,6 @@ function RootDropdown({
         );
     }
 
-    const style = {
-        ...styleFromProps,
-        ...(minHeightBody != null && minHeightBody > 0
-            ? { '--uktdd-body-min-height': `${minHeightBody}px` }
-            : null),
-        ...(minWidthBody != null && minWidthBody > 0
-            ? { '--uktdd-body-min-width': `${minWidthBody}px` }
-            : null),
-    };
-
     return (
         <Fragment>
             <style href="@acusti/dropdown/Dropdown" precedence="medium">
@@ -1196,7 +1182,7 @@ function RootDropdown({
                 onMouseOver={handleMouseOver}
                 onMouseUp={handleMouseUp}
                 ref={handleRef}
-                style={style}
+                style={styleFromProps}
             >
                 {trigger}
                 {/* TODO next version of Dropdown should use <Activity> for body https://react.dev/reference/react/Activity */}
@@ -1230,8 +1216,6 @@ const INERT_SUBMENU_PROPS = [
     'isOpenOnMount',
     'isSearchable',
     'keepOpenOnSubmit',
-    'minHeightBody',
-    'minWidthBody',
     'name',
     'placeholder',
     'tabIndex',
