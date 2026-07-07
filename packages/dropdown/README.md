@@ -161,6 +161,22 @@ For the most reliable anchor-positioning behavior:
 - prefer CSS variable overrides over custom `top`/`left`/`right` inset
   rules
 
+The body renders in the top layer using the
+[Popover API](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API),
+which is what makes the anchor positioning robust. A top-layer element’s
+containing block is always the viewport, so an ancestor with a `transform`,
+`scale`, `filter`, `backdrop-filter`, `perspective`,
+`will-change: transform`, or `contain` can’t capture the `position: fixed`
+body. Were the body a normal descendant instead, any such ancestor would
+become its containing block and its placement math would be measured
+against that box rather than the viewport — `position-try` fallbacks stop
+firing, and the base `position-area` can even resolve to the wrong side.
+Because the body is in the top layer, none of that applies and no
+consumer-side de-transforming is needed. The body uses `popover="manual"`,
+so this component keeps control of dismissal: outside-click, focus, and
+iframe handling are unchanged, and a searchable trigger’s input stays open
+while you interact with it.
+
 For placement recipes, see
 [Placement Customization](#placement-customization-with-css-variables)
 below. If your trigger sits near the right edge of the viewport, the
@@ -448,7 +464,8 @@ CSS custom properties for the most common low-level placement controls:
 
 - `--uktdd-body-position-area`
 - `--uktdd-body-position-try-fallbacks`
-- `--uktdd-body-translate`
+- `--uktdd-body-gap` (space between the trigger and the body)
+- `--uktdd-body-translate` (legacy; prefer `--uktdd-body-gap`)
 - `--uktdd-body-min-height`
 - `--uktdd-body-min-width`
 - `--uktdd-body-max-height`
@@ -461,7 +478,7 @@ Example:
     --uktdd-body-position-area: bottom span-left;
     --uktdd-body-position-try-fallbacks:
         --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
-    --uktdd-body-translate: -8px 0;
+    --uktdd-body-gap: 8px;
 }
 
 .settings-dropdown .uktdropdown-body {
@@ -472,10 +489,17 @@ Example:
 This approach keeps the public React API small while still allowing precise
 placement and sizing control when a product surface needs it.
 
-One caveat for dropdowns with submenus: any `--uktdd-body-translate` value
-except `none` (the default) makes the dropdown body a containing block for
-its fixed-position submenus, which constrains and clips them — only nudge
-dropdowns without submenus.
+Prefer `--uktdd-body-gap` for the space between the trigger and the body.
+It is applied as a symmetric `margin-block`, so the gap lands on whichever
+side the body attaches to and auto-reverses when `position-try` flips the
+body above the trigger — a static `translate` keeps pointing the same way
+and overlaps the trigger after a flip. A margin also establishes no
+containing block, so `--uktdd-body-gap` is safe on dropdowns with submenus.
+
+`--uktdd-body-translate` remains for fine 2-D nudges, but comes with a
+caveat for dropdowns with submenus: any value except `none` (the default)
+makes the dropdown body a containing block for its fixed-position submenus,
+which constrains and clips them — only nudge dropdowns without submenus.
 
 ### End-Aligned, Content-Sized Menu
 
@@ -499,6 +523,28 @@ This keeps the menu:
 
 Avoid hardcoding width for this pattern unless the product explicitly needs
 a fixed-size menu.
+
+### Centered Menus
+
+To center a menu over its trigger, use a `span-all` tile, not a `center`
+tile. A `center` tile is only as wide as the trigger, so a body wider than
+the trigger always overflows it — and `position-try` refuses to select a
+fallback that overflows, so a `bottom center` → `top center` setup never
+flips. `span-all` centers over the trigger identically but spans the full
+width, so it flips cleanly and clamps to the viewport near an edge; the
+package’s `position-try-order: most-height` then picks the taller side:
+
+```css
+.centered-menu {
+    --uktdd-body-position-area: bottom span-all;
+    --uktdd-body-position-try-fallbacks: --centered-menu-top;
+}
+
+/* define the flipped fallback in your own CSS */
+@position-try --centered-menu-top {
+    position-area: top span-all;
+}
+```
 
 ## Submenus
 
@@ -605,9 +651,14 @@ Placement custom properties follow the established naming scheme:
 
 - `--uktdd-submenu-position-area` (default: `inline-end span-block-end`)
 - `--uktdd-submenu-position-try-fallbacks`
-- `--uktdd-submenu-translate` (default: `none`; like
-  `--uktdd-body-translate`, any other value makes that box a containing
-  block that constrains and clips the submenus nested inside it)
+- `--uktdd-submenu-gap` (space between the parent item and the submenu;
+  applied as a symmetric `margin-inline`, the inline-axis counterpart to
+  `--uktdd-body-gap`, so it auto-reverses when the submenu flips to the
+  opposite side)
+- `--uktdd-submenu-translate` (default: `none`; legacy, prefer
+  `--uktdd-submenu-gap`. Like `--uktdd-body-translate`, any other value
+  makes that box a containing block that constrains and clips the submenus
+  nested inside it)
 
 Parent items render a macOS-style disclosure chevron, drawn in CSS with the
 item’s `::after` pseudo-element and colored with `currentColor` so it
