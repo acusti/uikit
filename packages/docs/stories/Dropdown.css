@@ -198,6 +198,56 @@
     inline-size: 250px;
 }
 
+/* A transformed ancestor would become the containing block for a normal
+   fixed-position body and break its anchor positioning; because the body
+   renders in the top layer, this panel’s transform doesn’t affect it. */
+.transformed-ancestor-panel {
+    box-sizing: border-box;
+    align-self: center;
+    width: 320px;
+    max-width: 100%;
+    margin: 2rem 0;
+    padding: 1.5rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    background-color: #f6f6f6;
+    transform: rotate(-3deg) scale(0.94);
+}
+
+.transformed-ancestor-note {
+    margin: 0 0 1rem;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #555;
+}
+
+.transformed-ancestor-note code {
+    font-size: 11px;
+}
+
+/* span-all centers the body over the trigger like `center` would, but on a
+   full-width tile that flips (a `center` tile never does — see the fallback) */
+.centered-menu {
+    /* centered in the canvas so the span-all body has room to center over the
+       trigger rather than clamping against the viewport’s left edge */
+    align-self: center;
+    --uktdd-body-position-area: bottom span-all;
+    --uktdd-body-position-try-fallbacks: --centered-menu-top;
+
+    .uktdropdown-body {
+        inline-size: 200px;
+    }
+}
+
+@position-try --centered-menu-top {
+    position-area: top span-all;
+}
+
+.gap-example {
+    --uktdd-body-gap: 10px;
+    --uktdd-submenu-gap: 8px;
+}
+
 /* ---- Fixed Header Styles ---- */
 :root {
     --ui-clr-1000: #ffffff;

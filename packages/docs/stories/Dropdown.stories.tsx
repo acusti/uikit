@@ -538,6 +538,60 @@ export const OutOfBoundsAtRight: Story = {
     },
 };
 
+export const TransformedAncestor: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'The dropdown body renders in the top layer, so an ancestor with a `transform` (or `filter`, `contain`, etc.) can’t become its containing block and throw off placement. This card is `transform`ed — scaled and rotated — yet the menu still anchors to its trigger and renders upright at full scale instead of being captured by the card. Before top-layer rendering, an ancestor transform broke positioning and its `position-try` fallbacks, which consumers had to work around by de-transforming.',
+            },
+        },
+    },
+    render() {
+        return (
+            <div className="transformed-ancestor-panel">
+                <p className="transformed-ancestor-note">
+                    This card has <code>transform: rotate(-3deg) scale(0.94)</code>. The
+                    menu below still anchors correctly.
+                </p>
+                <Dropdown className="transformed-ancestor" onSubmitItem={fn()}>
+                    Edit
+                    <ul>
+                        <li data-ukt-value="cut">Cut</li>
+                        <li data-ukt-value="copy">Copy</li>
+                        <li data-ukt-value="paste">Paste</li>
+                        <li data-ukt-value="select-all">Select All</li>
+                        <li data-ukt-value="delete">Delete</li>
+                    </ul>
+                </Dropdown>
+            </div>
+        );
+    },
+};
+
+export const CenteredMenu: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'Center a menu over its trigger with a `span-all` position-area tile. A `center` tile is only as wide as the trigger, so a wider body overflows it and `position-try` never selects a flipped fallback; `span-all` centers identically but spans the full width, so it flips cleanly (and clamps to the viewport) when there isn’t room below.',
+            },
+        },
+    },
+    render() {
+        return (
+            <Dropdown className="centered-menu" onSubmitItem={fn()}>
+                Insert
+                <ul>
+                    <li data-ukt-value="image">Image…</li>
+                    <li data-ukt-value="table">Table</li>
+                    <li data-ukt-value="chart">Chart</li>
+                    <li data-ukt-value="page-break">Page Break</li>
+                    <li data-ukt-value="horizontal-rule">Horizontal Rule</li>
+                </ul>
+            </Dropdown>
+        );
+    },
+};
+
 export const SubmenuDropdown: Story = {
     args: {
         children: [
@@ -577,6 +631,36 @@ export const SubmenuDropdown: Story = {
                 story: 'A `Dropdown` nested inside another dropdown’s body renders as a parent item that discloses a submenu. Pause on a parent item to disclose its submenu (pointer or arrow keys), press → to dive in, ← to surface back out. Parent items never submit; `onSubmitItem` fires only for leaf items, with the leaf’s ancestor `path` in the payload.',
             },
         },
+    },
+};
+
+export const WithGaps: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: '`--uktdd-body-gap` adds space between the trigger and the body (as a symmetric `margin-block`), and `--uktdd-submenu-gap` does the same between a parent item and its submenu (as `margin-inline`). Because they’re margins, the gap auto-reverses to whichever side the box attaches to when `position-try` flips it, and — unlike a `translate` — establishes no containing block, so it’s safe with submenus. This dropdown sets a 10px body gap and an 8px submenu gap.',
+            },
+        },
+    },
+    render() {
+        return (
+            <Dropdown className="gap-example" onSubmitItem={fn()}>
+                Format
+                <ul>
+                    <li data-ukt-item>Bold</li>
+                    <li data-ukt-item>Italic</li>
+                    <li data-ukt-item>Underline</li>
+                    <Dropdown label="Align">
+                        <ul>
+                            <li data-ukt-value="left">Left</li>
+                            <li data-ukt-value="center">Center</li>
+                            <li data-ukt-value="right">Right</li>
+                            <li data-ukt-value="justify">Justify</li>
+                        </ul>
+                    </Dropdown>
+                </ul>
+            </Dropdown>
+        );
     },
 };
 
