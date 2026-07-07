@@ -78,7 +78,7 @@ describe('@acusti/dropdown', () => {
     it('renders dropdown items inside .uktdropdown-content', async () => {
         const user = userEvent.setup();
         render(
-            <Dropdown minHeightBody={90}>
+            <Dropdown>
                 Menu
                 <ul data-testid="dropdown-list">
                     <li>Item</li>

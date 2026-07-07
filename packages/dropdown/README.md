@@ -253,14 +253,6 @@ type Props = {
      */
     label?: ReactNode;
     /**
-     * Minimum height for the dropdown body in pixels. Defaults to 30.
-     */
-    minHeightBody?: number;
-    /**
-     * Minimum width for the dropdown body in pixels.
-     */
-    minWidthBody?: number;
-    /**
      * Name attribute for the search input (requires isSearchable: true).
      */
     name?: string;
@@ -653,10 +645,9 @@ Most props keep their meaning, scoped to the submenu:
 - `className`/`style`: applied to the parent item element
 
 Props that only make sense at the top level (`allowCreate`, `allowEmpty`,
-`isOpenOnMount`, `isSearchable`, `keepOpenOnSubmit`, `minHeightBody`,
-`minWidthBody`, `name`, `placeholder`, `tabIndex`, `value`) are ignored on
-a nested dropdown and warn (unconditionally, matching the children-count
-misuse error).
+`isOpenOnMount`, `isSearchable`, `keepOpenOnSubmit`, `name`, `placeholder`,
+`tabIndex`, `value`) are ignored on a nested dropdown and warn
+(unconditionally, matching the children-count misuse error).
 
 ### Submenu placement and styling
 
