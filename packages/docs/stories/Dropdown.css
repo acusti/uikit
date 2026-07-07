@@ -133,11 +133,11 @@
     --uktdd-body-position-area: bottom span-left;
     --uktdd-body-position-try-fallbacks:
         --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
-    /* a horizontal alignment nudge, not a trigger↔body gap, so it stays on
-       the legacy translate knob rather than --uktdd-body-gap */
-    --uktdd-body-translate: -14px 0;
 
     .uktdropdown-body {
+        /* a horizontal alignment nudge, not a trigger↔body gap; set as a raw
+           translate since this dropdown has no submenus for it to clip */
+        translate: -14px 0;
         inline-size: 110px;
     }
 }
@@ -186,12 +186,9 @@
 .overlapping-dropdown .uktdropdown-body {
     inline-size: 250px;
     min-block-size: 200px;
-}
-
-.overlapping-dropdown {
-    /* translate deliberately pulls the body back over the trigger; a gap only
-       ever adds distance, so this overlap needs the legacy translate knob */
-    --uktdd-body-translate: -10px -22px;
+    /* deliberately pulls the body back over the trigger — a gap only adds
+       distance, so this overlap uses a raw translate (no submenus to clip) */
+    translate: -10px -22px;
 }
 
 .out-of-bounds-example input {

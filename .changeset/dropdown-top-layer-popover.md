@@ -1,5 +1,5 @@
 ---
-'@acusti/dropdown': minor
+'@acusti/dropdown': major
 ---
 
 Render the dropdown body in the top layer and add margin-based gap knobs
@@ -28,11 +28,15 @@ so consumer-side de-transforming workarounds are no longer needed.
 - New `--uktdd-body-gap` and `--uktdd-submenu-gap` custom properties
   (default `0`) express the space between the trigger and the body (as a
   symmetric `margin-block`) and between a parent item and its submenu (as
-  `margin-inline`). Unlike the `--uktdd-body-translate`/
-  `--uktdd-submenu-translate` knobs they supersede, a margin auto-reverses
-  to the attached side when `position-try` flips the box, and establishes
-  no containing block, so it is safe on dropdowns with submenus; the
-  translate knobs remain for legacy 2-D nudges
+  `margin-inline`). A margin auto-reverses to the attached side when
+  `position-try` flips the box and establishes no containing block, so it
+  is safe on dropdowns with submenus
+- **Breaking:** the `--uktdd-body-translate` and
+  `--uktdd-submenu-translate` custom properties are removed.
+  `--uktdd-body-gap`/`--uktdd-submenu-gap` cover the trigger↔body and
+  item↔submenu spacing; for an offset a gap can’t express (a horizontal
+  nudge or a deliberate overlap), set `translate` on `.uktdropdown-body`
+  directly
 - README documents the top-layer rendering, the gap knobs, and that a
   `center` `position-area` tile never flips (use a full-width `span-all`
   tile to center over the trigger instead)

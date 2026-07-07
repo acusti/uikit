@@ -482,7 +482,6 @@ CSS custom properties for the most common low-level placement controls:
 - `--uktdd-body-position-area`
 - `--uktdd-body-position-try-fallbacks`
 - `--uktdd-body-gap` (space between the trigger and the body)
-- `--uktdd-body-translate` (legacy; prefer `--uktdd-body-gap`)
 - `--uktdd-body-min-height`
 - `--uktdd-body-min-width`
 - `--uktdd-body-max-height`
@@ -506,17 +505,17 @@ Example:
 This approach keeps the public React API small while still allowing precise
 placement and sizing control when a product surface needs it.
 
-Prefer `--uktdd-body-gap` for the space between the trigger and the body.
-It is applied as a symmetric `margin-block`, so the gap lands on whichever
+Use `--uktdd-body-gap` for the space between the trigger and the body. It
+is applied as a symmetric `margin-block`, so the gap lands on whichever
 side the body attaches to and auto-reverses when `position-try` flips the
-body above the trigger — a static `translate` keeps pointing the same way
-and overlaps the trigger after a flip. A margin also establishes no
-containing block, so `--uktdd-body-gap` is safe on dropdowns with submenus.
+body above the trigger. A margin establishes no containing block, so
+`--uktdd-body-gap` is safe on dropdowns with submenus.
 
-`--uktdd-body-translate` remains for fine 2-D nudges, but comes with a
-caveat for dropdowns with submenus: any value except `none` (the default)
-makes the dropdown body a containing block for its fixed-position submenus,
-which constrains and clips them — only nudge dropdowns without submenus.
+For an offset a gap can’t express — a horizontal nudge, or deliberately
+overlapping the trigger — set `translate` on `.uktdropdown-body` directly.
+A `translate` makes the body a containing block for its fixed-position
+submenus, which constrains and clips them, so reserve it for dropdowns
+without submenus.
 
 ### End-Aligned, Content-Sized Menu
 
@@ -672,10 +671,6 @@ Placement custom properties follow the established naming scheme:
   applied as a symmetric `margin-inline`, the inline-axis counterpart to
   `--uktdd-body-gap`, so it auto-reverses when the submenu flips to the
   opposite side)
-- `--uktdd-submenu-translate` (default: `none`; legacy, prefer
-  `--uktdd-submenu-gap`. Like `--uktdd-body-translate`, any other value
-  makes that box a containing block that constrains and clips the submenus
-  nested inside it)
 
 Parent items render a macOS-style disclosure chevron, drawn in CSS with the
 item’s `::after` pseudo-element and colored with `currentColor` so it
