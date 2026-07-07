@@ -22,9 +22,11 @@ so consumer-side de-transforming workarounds are no longer needed.
   light-dismiss (`popover="auto"`) would not
 - Submenus still anchor to their parent item and escape the body’s
   `overflow: hidden` in the top layer; the body’s `z-index` is dropped
-  since the top layer handles stacking, and the UA popover styles
-  (`inset`/`margin`/`border`/`padding`/`color`) are reset so they can’t
-  override the anchor-positioning layout
+  since the top layer handles stacking, and the UA popover box resets
+  (`inset`/`block-size`/`margin`/`border`/`padding`) are applied at a
+  specificity that also overrides a consuming app’s global `[popover]`
+  styles, so neither the UA defaults nor a consumer’s popover CSS can break
+  the anchor-positioning layout
 - New `--uktdd-body-gap` and `--uktdd-submenu-gap` custom properties
   (default `0`) express the space between the trigger and the body (as a
   symmetric `margin-block`) and between a parent item and its submenu (as
