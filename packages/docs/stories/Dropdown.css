@@ -133,6 +133,8 @@
     --uktdd-body-position-area: bottom span-left;
     --uktdd-body-position-try-fallbacks:
         --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
+    /* a horizontal alignment nudge, not a trigger↔body gap, so it stays on
+       the legacy translate knob rather than --uktdd-body-gap */
     --uktdd-body-translate: -14px 0;
 
     .uktdropdown-body {
@@ -187,6 +189,8 @@
 }
 
 .overlapping-dropdown {
+    /* translate deliberately pulls the body back over the trigger; a gap only
+       ever adds distance, so this overlap needs the legacy translate knob */
     --uktdd-body-translate: -10px -22px;
 }
 
@@ -272,7 +276,7 @@
     padding: 25px;
     display: grid;
     position: fixed;
-    height: 200px; /* position fallbacks need vertical room in offset parent to take effect */
+    height: 200px; /* fixed header height */
     inset: 0;
     bottom: auto;
     font-family: system-ui;
