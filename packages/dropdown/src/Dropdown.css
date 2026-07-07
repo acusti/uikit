@@ -19,15 +19,10 @@
         --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
     /* gap between the trigger and the body, applied as a symmetric
        margin-block so it lands on whichever side the body attaches to and
-       auto-reverses when position-try flips it above/below the trigger.
-       Unlike a translate, a margin establishes no containing block, so it’s
-       safe on dropdowns with submenus — prefer it over --uktdd-body-translate */
+       auto-reverses when position-try flips it above/below the trigger. A
+       margin establishes no containing block, so it’s safe on dropdowns with
+       submenus */
     --uktdd-body-gap: 0px;
-    /* legacy static offset; any value except none makes the box a containing
-       block for its fixed-position submenus, constraining and clipping them,
-       so only set a translate on dropdowns without submenus. Prefer
-       --uktdd-body-gap, which has neither limitation */
-    --uktdd-body-translate: none;
     --uktdd-body-color: canvastext;
     --uktdd-body-bg-color-path: #dcdcdc;
     --uktdd-body-color-path: currentColor;
@@ -37,7 +32,6 @@
     /* like --uktdd-body-gap but on the inline axis, since submenus open to
        the side; auto-reverses when they flip to the opposite inline edge */
     --uktdd-submenu-gap: 0px;
-    --uktdd-submenu-translate: none;
     --uktdd-menubar-trigger-bg-color-active: rgba(0, 0, 0, 0.12);
 }
 
@@ -99,7 +93,6 @@
     border: 0;
     padding: 0;
     color: inherit;
-    translate: var(--uktdd-body-translate);
     background-color: var(--uktdd-body-bg-color);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
 
@@ -173,7 +166,6 @@
         position-anchor: --uktdd-submenu-anchor;
         position-area: var(--uktdd-submenu-position-area);
         position-try-fallbacks: var(--uktdd-submenu-position-try-fallbacks);
-        translate: var(--uktdd-submenu-translate);
         z-index: 2;
         margin-block: 0;
         margin-inline: var(--uktdd-submenu-gap);
