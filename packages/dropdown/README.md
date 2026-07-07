@@ -183,6 +183,23 @@ below. If your trigger sits near the right edge of the viewport, the
 [End-Aligned, Content-Sized Menu](#end-aligned-content-sized-menu) example
 is the one you want.
 
+## Browser Support
+
+`Dropdown` relies on two web-platform features, both now
+[Baseline](https://web.dev/baseline) across Chrome, Edge, Firefox, and
+Safari:
+
+- **CSS anchor positioning** (`anchor-name`, `position-area`,
+  `@position-try`) places and re-flows the body —
+  [Baseline 2026](https://developer.mozilla.org/en-US/docs/Web/CSS/anchor-name)
+- the **Popover API** (`popover` plus `showPopover()`) renders the body in
+  the top layer —
+  [Baseline 2024](https://developer.mozilla.org/en-US/docs/Web/API/Popover_API)
+
+These are _newly available_ Baseline features: they work in up-to-date
+browser versions but not in ones predating that support, which the
+component requires.
+
 ## API Reference
 
 ### Props
