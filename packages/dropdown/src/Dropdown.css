@@ -82,16 +82,10 @@
     inline-size: max-content;
     overflow: hidden;
     /* the body renders in the top layer via popover="manual" so an ancestor’s
-       transform / filter / contain can’t become its containing block; reset
-       the UA popover styles (inset / margin / border / padding / block-size /
-       color) that would otherwise override the anchor-positioning layout, and
-       let the top layer handle stacking instead of a z-index */
-    inset: auto;
-    block-size: auto;
-    margin-block: var(--uktdd-body-gap);
-    margin-inline: 0;
-    border: 0;
-    padding: 0;
+       transform / filter / contain can’t become its containing block, and the
+       top layer handles stacking (no z-index). The UA-popover box resets that
+       must beat a consumer’s global [popover] styles live in the
+       div.uktdropdown-body rule below; these cosmetics stay overridable */
     color: inherit;
     background-color: var(--uktdd-body-bg-color);
     box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
@@ -180,6 +174,21 @@
         background-color: var(--uktdd-body-bg-color);
         box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
     }
+}
+
+/* The body is a popover, so a consumer’s global [popover] rules match it and
+   tie .uktdropdown-body on specificity (both 0,1,0), letting source order
+   decide — which can clobber the body’s box geometry. Reset the UA-popover box
+   at div.uktdropdown-body (0,1,1): the lightest bump that still beats a bare
+   [popover] (0,1,0), so the layout holds regardless of a consumer’s popover
+   styles, while the body’s cosmetics stay overridable at 0,1,0. */
+div.uktdropdown-body {
+    inset: auto;
+    block-size: auto;
+    margin-block: var(--uktdd-body-gap);
+    margin-inline: 0;
+    border: 0;
+    padding: 0;
 }
 
 .uktmenubar {
