@@ -109,7 +109,12 @@ export type Props = {
      * Used as search input’s placeholder.
      */
     placeholder?: string;
-    style?: CSSProperties;
+    /**
+     * Applied to the dropdown root element. Also accepts the component’s CSS
+     * custom properties (e.g. `--uktdd-body-min-width`) for per-instance
+     * placement and sizing, which plain `CSSProperties` rejects.
+     */
+    style?: CSSProperties & Record<`--${string}`, string | number | undefined>;
     /**
      * Only usable in conjunction with {isSearchable: true}.
      * Used as search input’s tabIndex.
