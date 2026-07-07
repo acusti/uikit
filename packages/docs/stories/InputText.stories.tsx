@@ -304,7 +304,11 @@ export const MultiLineInputInPopover: Story = {
         return (
             <>
                 <button popoverTarget="multi-line-input-popover">Open Popover</button>
-                <div id="multi-line-input-popover" popover="auto">
+                <div
+                    className="input-demo-popover"
+                    id="multi-line-input-popover"
+                    popover="auto"
+                >
                     <InputText {...args} />
                 </div>
             </>
@@ -328,7 +332,11 @@ export const MultiLineInputWithAutoFocusInPopover: Story = {
                 <button popoverTarget="multi-line-input-with-autofocus-popover">
                     Open Popover
                 </button>
-                <div id="multi-line-input-with-autofocus-popover" popover="auto">
+                <div
+                    className="input-demo-popover"
+                    id="multi-line-input-with-autofocus-popover"
+                    popover="auto"
+                >
                     <InputText {...args} />
                 </div>
             </>

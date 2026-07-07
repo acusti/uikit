@@ -44,7 +44,7 @@
     transition: all 0.25s ease-in-out;
 }
 
-[popover] {
+.input-demo-popover {
     border: 0;
     box-shadow: 0px 3px 16px 1px rgba(0, 0, 0, 0.5);
     padding: 25px 30px;
