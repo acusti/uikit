@@ -1099,9 +1099,20 @@ function RootDropdown({
         };
     };
 
-    // Fill in parent-item/submenu ARIA when the body mounts (open)
+    // When the body mounts (open): fill in parent-item/submenu ARIA, and
+    // render it in the top layer via popover so an ancestor’s transform /
+    // filter / contain can’t become the containing block for the fixed body
+    // and break its anchor positioning + fallbacks. popover="manual" keeps
+    // dismissal under this component’s own listeners (see handleRef), which
+    // preserves iframe support and searchable/text-input triggers that native
+    // light-dismiss would close on any outside pointerdown.
     const handleBodyRef = (ref: HTMLDivElement | null) => {
-        if (ref) annotateParentItems(ref);
+        if (!ref) return;
+        annotateParentItems(ref);
+        // The Popover API is Baseline 2024, so showPopover() needs no feature
+        // detection; the body is mounted only while open, so this runs once
+        // per open and won’t throw on an already-open body.
+        ref.showPopover();
     };
 
     if (!isValidElement(trigger)) {
@@ -1195,6 +1206,7 @@ function RootDropdown({
                             'has-items': hasItems,
                         })}
                         id={bodyId}
+                        popover="manual"
                         ref={handleBodyRef}
                         role={popupRole}
                     >

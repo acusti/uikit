@@ -1,3 +1,5 @@
+import { fileURLToPath } from 'node:url';
+
 import babel from '@rolldown/plugin-babel';
 import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import { defineConfig as defineConfigVite } from 'vite';
@@ -49,6 +51,7 @@ export const defineConfig = (options = {}) => {
         ],
         test: {
             exclude: [...configDefaults.exclude, '**/dist/**'],
+            setupFiles: [fileURLToPath(new URL('./vitest.setup.js', import.meta.url))],
         },
     });
 };
