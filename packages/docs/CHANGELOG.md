@@ -1,5 +1,15 @@
 # @acusti/uikit-docs
 
+## 0.6.4-alpha.0
+
+### Patch Changes
+
+- Updated dependencies [9ef9990]
+- Updated dependencies [a14147e]
+- Updated dependencies [9f9e85f]
+- Updated dependencies [38c4851]
+    - @acusti/dropdown@1.0.0-alpha.0
+
 ## 0.6.3
 
 ### Patch Changes

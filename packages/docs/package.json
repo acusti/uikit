@@ -1,6 +1,6 @@
 {
     "name": "@acusti/uikit-docs",
-    "version": "0.6.3",
+    "version": "0.6.4-alpha.0",
     "scripts": {
         "build": "storybook build -o dist",
         "storybook": "storybook dev -p 6006",

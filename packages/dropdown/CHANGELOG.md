@@ -1,5 +1,132 @@
 # @acusti/dropdown
 
+## 1.0.0-alpha.0
+
+### Major Changes
+
+- 9ef9990: Remove the `minHeightBody` and `minWidthBody` props
+
+    These props were only sugar for the `--uktdd-body-min-height` /
+    `--uktdd-body-min-width` CSS custom properties, and they had no `max`
+    counterparts (max sizing was already CSS-only), so they left the sizing
+    API half in props and half in CSS. Placement and sizing are customized
+    in CSS, so set the body’s minimum size with the CSS variables directly
+    — e.g. `style={{ '--uktdd-body-min-width': '180px' }}` or a rule on the
+    dropdown’s class. The `style` prop’s type now accepts the component’s
+    CSS custom properties, so that inline form type-checks without a cast.
+
+- a14147e: Render the dropdown body in the top layer and add margin-based
+  gap knobs for robust anchor positioning
+
+    The dropdown body now renders in the top layer via `popover="manual"`.
+    A top-layer element’s containing block is always the viewport, so an
+    ancestor with a `transform`, `scale`, `filter`, `backdrop-filter`,
+    `perspective`, `will-change: transform`, or `contain` can no longer
+    capture the `position: fixed` body and break its placement —
+    `position-try` fallbacks that used to stop firing (and base
+    `position-area` directions that could resolve to the wrong side) now
+    work regardless of a consumer’s ancestors, so consumer-side
+    de-transforming workarounds are no longer needed.
+    - Dismissal stays under the component’s control (`popover="manual"`
+      plus the existing `mousedown`/`mouseup`/`focusin` listeners on
+      `document` and the owner document), so outside-click, focus, and
+      iframe handling are unchanged and searchable/text-input triggers —
+      whose input sits outside the body — keep the body open while you
+      interact with them, which native light-dismiss (`popover="auto"`)
+      would not
+    - Submenus still anchor to their parent item and escape the body’s
+      `overflow: hidden` in the top layer; the body’s `z-index` is dropped
+      since the top layer handles stacking, and the UA popover box resets
+      (`inset`/`block-size`/`margin`/`border`/`padding`) are applied at a
+      specificity that also overrides a consuming app’s global `[popover]`
+      styles, so neither the UA defaults nor a consumer’s popover CSS can
+      break the anchor-positioning layout
+    - New `--uktdd-body-gap` and `--uktdd-submenu-gap` custom properties
+      (default `0`) express the space between the trigger and the body (as
+      a symmetric `margin-block`) and between a parent item and its submenu
+      (as `margin-inline`). A margin auto-reverses to the attached side
+      when `position-try` flips the box and establishes no containing
+      block, so it is safe on dropdowns with submenus
+    - **Breaking:** the `--uktdd-body-translate` and
+      `--uktdd-submenu-translate` custom properties are removed.
+      `--uktdd-body-gap`/`--uktdd-submenu-gap` cover the trigger↔body and
+      item↔submenu spacing; for an offset a gap can’t express (a horizontal
+      nudge or a deliberate overlap), set `translate` on
+      `.uktdropdown-body` directly
+    - README documents the top-layer rendering, the gap knobs, and that a
+      `center` `position-area` tile never flips (use a full-width
+      `span-all` tile to center over the trigger instead)
+
+### Minor Changes
+
+- 9f9e85f: Add nested submenus and the Menubar component
+
+    Dropdowns now compose: nesting a `Dropdown` inside another dropdown’s
+    body renders it as a parent item that discloses a submenu, and the new
+    `Menubar` named export combines sibling dropdowns into a macOS-style
+    menu bar.
+    - Submenus nest to arbitrary depth and are declared either by nesting
+      `Dropdown` components or by authoring the `data-ukt-submenu` markup
+      protocol directly — the component form compiles to the attribute form
+    - Parent items disclose and never submit; `onSubmitItem` fires only for
+      leaf items, and the `Item` payload gains a `path` array reporting the
+      leaf’s ancestor parent items (empty for top-level items)
+    - macOS-style disclosure: a parent item highlights immediately when it
+      becomes active (pointer or arrow keys) and discloses its submenu
+      after a short intent delay with the highlight staying on the parent;
+      → dives into the submenu, ← surfaces back out, and Escape closes the
+      whole menu and returns focus to the trigger
+    - The active path is one `data-ukt-active` item per open level, with
+      the deepest item getting the primary highlight and ancestors a muted
+      one (new `--uktdd-body-bg-color-path`/`--uktdd-body-color-path`
+      custom properties); parent-item open state is carried by
+      `aria-expanded`
+    - Submenus reuse the anchor-positioning layout model (the expanded
+      parent item is the anchor) with new `--uktdd-submenu-position-area`,
+      `--uktdd-submenu-position-try-fallbacks`, and
+      `--uktdd-submenu-translate` custom properties; parent items render a
+      macOS-style disclosure chevron (drawn in CSS, restylable via
+      `[aria-haspopup='menu']::after`), and submenu bodies get an explicit
+      text color via the new `--uktdd-body-color` custom property (default
+      `canvastext`) so an active parent’s highlight color can’t inherit
+      into its submenu’s items
+    - The `--uktdd-body-translate` default changed from `0 0` to the
+      rendering-identical `none`: any other value makes the body a
+      containing block for its fixed-position submenus, which constrains
+      and clips them, so translate nudges are now opt-in per dropdown and
+      documented as incompatible with submenus
+    - Parent items and submenus get ARIA filled in automatically
+      (`aria-haspopup`/`aria-expanded`/`aria-controls` and
+      `role="menu"`/`id`), only where the consumer hasn’t set it
+    - `Menubar` renders `role="menubar"`, keeps at most one menu open,
+      switches menus on hover once any menu is open, roves focus between
+      triggers with ←/→ (sliding the open menu when one is open, wrapping
+      at the ends), gives the open menu’s trigger an active-state
+      background (new `--uktdd-menubar-trigger-bg-color-active` custom
+      property, tinting over the trigger’s own background), and supersedes
+      the `group` prop, which was declared in the `Props` type but never
+      implemented and has been removed
+    - A `Dropdown` nested with `hasItems={false}` isn’t a submenu — it
+      renders as an independent anchored dropdown inside the outer body
+      (e.g. an ℹ️ info popover next to an input in a form dropdown);
+      interacting with it doesn’t close or submit the outer dropdown, and
+      Escape closes the innermost open dropdown first
+
+- 38c4851: Add mouse-intent (safe-area) tracking so submenus don't close
+  when the pointer cuts diagonally toward them
+
+    When a submenu is open and the pointer moves diagonally from the parent
+    item toward the submenu, its path often crosses sibling items in the
+    parent menu. Previously that collapsed the submenu the instant the
+    pointer touched a sibling. Now the dropdown tracks the triangle from
+    where the pointer left the parent item to the open submenu's two near
+    corners (the macOS "diagonal" behavior): while the pointer stays inside
+    that triangle it's heading toward the submenu, so the submenu stays
+    open even over sibling items. A pause inside the triangle (rather than
+    continued motion) gives up and switches to the item under the pointer,
+    and a direct move onto a sibling (outside the triangle) switches
+    immediately as before. Pointer-only; keyboard navigation is unaffected.
+
 ## 0.57.0
 
 ### Minor Changes

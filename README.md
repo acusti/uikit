@@ -143,6 +143,7 @@ once, so anything still on an unmerged branch won’t be included.
 ```bash
 bun changeset pre enter alpha   # writes .changeset/pre.json — commit it
 bun changeset version           # applies pending changesets, e.g. → 1.0.0-alpha.0
+bun run build
 bun changeset publish --tag alpha
 ```
 
