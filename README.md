@@ -135,8 +135,10 @@ fields changed (publishing doesn’t read them — versions come from each
 ### Prereleases (alpha)
 
 To ship a prerelease instead of a stable version, enter changesets’
-prerelease (`pre`) mode first — from `main`, with the changesets to release
-already merged:
+prerelease (`pre`) mode first — from `main`, once every changeset file
+(`.changeset/*.md`) you want in the release has merged there.
+`bun changeset version` (below) consumes all pending changeset files at
+once, so anything still on an unmerged branch won’t be included.
 
 ```bash
 bun changeset pre enter alpha   # writes .changeset/pre.json — commit it
