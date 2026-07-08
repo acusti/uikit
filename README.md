@@ -144,7 +144,7 @@ once, so anything still on an unmerged branch won’t be included.
 bun changeset pre enter alpha   # writes .changeset/pre.json — commit it
 bun changeset version           # applies pending changesets, e.g. → 1.0.0-alpha.0
 bun run build
-bun changeset publish --tag alpha
+bun changeset publish           # in pre mode, auto-publishes to the alpha dist-tag
 ```
 
 Iterate by adding changesets and re-running `bun changeset version` (→
@@ -159,10 +159,12 @@ bun changeset publish
 
 Three things worth knowing:
 
-- **Pass `--tag` when publishing a prerelease.** `bun changeset publish`
-  targets the `latest` dist-tag by default even for a `-alpha` version, so
-  without `--tag alpha` (or `next`) the prerelease lands on `latest` and a
-  plain `npm install` would pull it.
+- **Don’t pass `--tag` in pre mode** — `bun changeset publish` rejects it
+  and publishes to the pre tag (`alpha`) automatically: each package that
+  already has a stable release goes to the `alpha` dist-tag and `latest`
+  stays put. (A package with no prior stable release is published to
+  `latest` instead, so `npm install` still resolves — only relevant when
+  prereleasing a brand-new package.)
 - **Prerelease mode is repo-wide.** `.changeset/pre.json` puts the whole
   monorepo into prerelease mode; while it’s active, every package with a
   pending changeset versions as a prerelease. Finish a package’s
