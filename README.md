@@ -132,6 +132,43 @@ this is a no-op: bun skips the lockfile write when only workspace `version`
 fields changed (publishing doesn’t read them — versions come from each
 `package.json` — and they sync on the next real lockfile write).
 
+### Prereleases (alpha)
+
+To ship a prerelease instead of a stable version, enter changesets’
+prerelease (`pre`) mode first — from `main`, with the changesets to release
+already merged:
+
+```bash
+bun changeset pre enter alpha   # writes .changeset/pre.json — commit it
+bun changeset version           # applies pending changesets, e.g. → 1.0.0-alpha.0
+bun changeset publish --tag alpha
+```
+
+Iterate by adding changesets and re-running `bun changeset version` (→
+`1.0.0-alpha.1`, `…alpha.2`). To graduate to a stable release, exit
+prerelease mode, then version and publish as usual:
+
+```bash
+bun changeset pre exit
+bun changeset version           # drops the suffix, e.g. → 1.0.0
+bun changeset publish
+```
+
+Three things worth knowing:
+
+- **Pass `--tag` when publishing a prerelease.** `bun changeset publish`
+  targets the `latest` dist-tag by default even for a `-alpha` version, so
+  without `--tag alpha` (or `next`) the prerelease lands on `latest` and a
+  plain `npm install` would pull it.
+- **Prerelease mode is repo-wide.** `.changeset/pre.json` puts the whole
+  monorepo into prerelease mode; while it’s active, every package with a
+  pending changeset versions as a prerelease. Finish a package’s
+  alpha→stable cycle and `bun changeset pre exit` before releasing
+  unrelated packages normally.
+- **A `major` changeset takes `0.x` straight to `1.0.0`.** Changesets
+  applies the literal semver bump regardless of being pre-1.0 — there’s no
+  “0.x major = minor” downgrade.
+
 ## Developing
 
 The run script for developing is `bun run dev`, which kicks off the default
