@@ -22,6 +22,7 @@
         "@acusti/vite-plugin-svg-react": "0.1.0"
     },
     "changesets": [
+        "dropdown-nested-independent-menu",
         "dropdown-remove-min-body-props",
         "dropdown-top-layer-popover",
         "nested-dropdown-submenus",
