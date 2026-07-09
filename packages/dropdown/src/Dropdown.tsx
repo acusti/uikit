@@ -461,7 +461,7 @@ function RootDropdown({
         }
     };
 
-    const closeDropdown = () => {
+    const closeDropdown = (options?: { keepMenubarEngaged?: boolean }) => {
         setIsOpen(false);
         setIsOpening(false);
         mouseDownPositionRef.current = null;
@@ -472,6 +472,13 @@ function RootDropdown({
         if (closingTimerRef.current != null) {
             clearTimeout(closingTimerRef.current);
             closingTimerRef.current = null;
+        }
+        // A self-dismissal — Escape, an outside click, or an item selection —
+        // takes an enclosing menubar out of menu-mode. Switching menus,
+        // clearing the open menu on hover, and focus changes pass
+        // keepMenubarEngaged to stay in menu-mode.
+        if (menubar && dropdownElement && !options?.keepMenubarEngaged) {
+            menubar.notifyClosed(dropdownElement);
         }
     };
 
@@ -491,7 +498,7 @@ function RootDropdown({
     useEffect(() => {
         if (!menubar || !dropdownElement) return;
         return menubar.registerMember({
-            close: closeDropdown,
+            close: () => closeDropdown({ keepMenubarEngaged: true }),
             element: dropdownElement,
             focusTrigger,
             isOpen: () => isOpenRef.current,
@@ -1037,7 +1044,10 @@ function RootDropdown({
                 return;
             }
 
-            closeDropdown();
+            // Losing focus — including the focus shift when the body unmounts
+            // on close — doesn’t end a menubar’s menu-mode; that takes a
+            // deliberate dismissal (Escape, outside click, item select).
+            closeDropdown({ keepMenubarEngaged: true });
         };
 
         document.addEventListener('focusin', handleGlobalFocusIn);

@@ -766,8 +766,16 @@ Menubar behaviors:
 
 - renders `role="menubar"`; each dropdown trigger is a menubar item
 - at most one menu in the bar is open at a time
-- once any menu is open, hovering another trigger switches to that menu
-  without a click (matching macOS menubar behavior)
+- opening a trigger’s menu (by click or keyboard) engages the bar
+  (menu-mode). While engaged, hovering or focusing another trigger switches
+  to that menu without a click, matching the macOS menu bar
+- while engaged, hovering a non-menu control in the bar (e.g. a plain
+  button placed alongside the dropdowns) closes the open menu but keeps the
+  bar engaged, so hovering back onto a trigger reopens a menu; sliding
+  across the gaps between triggers leaves the open menu alone
+- a deliberate dismissal — **Escape**, a click outside the bar, or
+  selecting an item — leaves menu-mode, after which hovering a trigger no
+  longer opens its menu until a menu is opened again to re-engage the bar
 - **←/→** move between menus, wrapping at the ends: with the bar focused
   they move focus between triggers, and while a menu is open they slide the
   open menu to the adjacent trigger — unless the active item is a parent

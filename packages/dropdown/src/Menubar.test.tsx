@@ -90,6 +90,102 @@ describe('@acusti/dropdown Menubar', () => {
         expect(screen.queryByTestId('edit-menu')).toBe(null);
     });
 
+    const renderMenubarWithButton = () =>
+        render(
+            <Menubar>
+                <Dropdown>
+                    File
+                    <ul data-testid="file-menu">
+                        <li data-ukt-item>New</li>
+                    </ul>
+                </Dropdown>
+                <button type="button">Run</button>
+                <Dropdown>
+                    Edit
+                    <ul data-testid="edit-menu">
+                        <li data-ukt-item>Undo</li>
+                    </ul>
+                </Dropdown>
+            </Menubar>,
+        );
+
+    it('clears the open menu when the pointer moves onto a non-menu button, staying engaged', async () => {
+        const user = userEvent.setup();
+        renderMenubarWithButton();
+
+        await user.click(screen.getByRole('button', { name: 'File' }));
+        expect(screen.getByTestId('file-menu')).toBeTruthy();
+
+        // Hovering the plain button closes the open menu…
+        fireEvent.mouseOver(screen.getByRole('button', { name: 'Run' }));
+        expect(screen.queryByTestId('file-menu')).toBe(null);
+
+        // …but the bar stays engaged, so hovering a trigger reopens a menu
+        // without another click
+        fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+        expect(screen.getByTestId('edit-menu')).toBeTruthy();
+    });
+
+    it('keeps the open menu when the pointer crosses the bar’s own padding', async () => {
+        const user = userEvent.setup();
+        renderMenubarWithButton();
+
+        await user.click(screen.getByRole('button', { name: 'File' }));
+        expect(screen.getByTestId('file-menu')).toBeTruthy();
+
+        // The gaps between triggers aren’t interactive controls, so sliding
+        // across them leaves the open menu alone (seamless menu-to-menu hover)
+        fireEvent.mouseOver(screen.getByRole('menubar'));
+        expect(screen.getByTestId('file-menu')).toBeTruthy();
+    });
+
+    it('stops reopening menus on hover once the bar is dismissed with Escape', async () => {
+        const user = userEvent.setup();
+        renderMenubarWithButton();
+
+        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.keyboard('{Escape}');
+        expect(screen.queryByTestId('file-menu')).toBe(null);
+
+        // Escape is a deliberate dismissal, so it leaves menu-mode: hovering a
+        // trigger no longer opens a menu until a click re-engages the bar
+        fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+        expect(screen.queryByTestId('edit-menu')).toBe(null);
+    });
+
+    it('drops engagement when the dropdown that engaged the bar unmounts', async () => {
+        const user = userEvent.setup();
+        const Bar = ({ showFile }: { showFile: boolean }) => (
+            <Menubar>
+                {showFile ? (
+                    <Dropdown>
+                        File
+                        <ul data-testid="file-menu">
+                            <li data-ukt-item>New</li>
+                        </ul>
+                    </Dropdown>
+                ) : null}
+                <Dropdown>
+                    Edit
+                    <ul data-testid="edit-menu">
+                        <li data-ukt-item>Undo</li>
+                    </ul>
+                </Dropdown>
+            </Menubar>
+        );
+        const { rerender } = render(<Bar showFile />);
+
+        await user.click(screen.getByRole('button', { name: 'File' }));
+        expect(screen.getByTestId('file-menu')).toBeTruthy();
+
+        // Remove the engaged dropdown without dismissing it. With the engaging
+        // member gone, the bar is no longer engaged, so hovering another
+        // trigger doesn’t reopen a menu.
+        rerender(<Bar showFile={false} />);
+        fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+        expect(screen.queryByTestId('edit-menu')).toBe(null);
+    });
+
     it('switches the open menu when focus moves to another trigger', async () => {
         const user = userEvent.setup();
         renderMenubar();
