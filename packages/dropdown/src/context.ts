@@ -20,6 +20,7 @@ export const DropdownContext = createContext<DropdownContextValue | null>(null);
 
 export type MenubarContextValue = {
     moveOpen: (fromElement: HTMLElement, direction: -1 | 1) => void;
+    notifyClosed: (element: HTMLElement) => void;
     notifyOpened: (element: HTMLElement) => void;
     registerMember: (member: MenubarMember) => () => void;
 };
