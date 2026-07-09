@@ -709,12 +709,22 @@ The default rule, shown here for reference:
 }
 ```
 
-### Nested non-menu dropdowns
+### Nested independent dropdowns
 
-Nesting means submenu only for menus. A nested `Dropdown` with
-`hasItems={false}` isn’t a menu, so it renders as an independent anchored
-dropdown instead of a parent item — for example, an ℹ️ button next to an
-input in a form dropdown that opens an info popover about the input:
+Submenus are a menu concept: a `Dropdown` becomes a submenu only when it’s
+a menu nested inside another menu. Anything else nests as an
+**independent** anchored dropdown — opening on click and selecting items on
+click (no hover-disclosed parent item), with its interactions never
+touching the outer dropdown. Two cases qualify:
+
+- a `hasItems={false}` `Dropdown` (a dialog/popover) nested anywhere — e.g.
+  an ℹ️ info popover next to an input in a form dropdown (below);
+- any `Dropdown` nested inside a `hasItems={false}` dropdown — e.g. a
+  self-contained picker embedded in a larger dialog, which keeps full
+  click-to-select on its `data-ukt-value` items.
+
+For example, an ℹ️ button next to an input in a form dropdown that opens an
+info popover about the input:
 
 ```tsx
 <Dropdown hasItems={false}>

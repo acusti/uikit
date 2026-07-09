@@ -14,8 +14,8 @@ export type SubmenuRegistration = {
     onSubmitItem?: (payload: Item) => void;
 };
 
-// Provided by the root Dropdown; a Dropdown that finds this context renders
-// as a submenu (parent item + data-ukt-submenu) instead of a root dropdown.
+// Provided by a menu Dropdown; a Dropdown that finds this context renders as a
+// submenu (parent item + data-ukt-submenu) instead of a root dropdown.
 export const DropdownContext = createContext<DropdownContextValue | null>(null);
 
 export type MenubarContextValue = {

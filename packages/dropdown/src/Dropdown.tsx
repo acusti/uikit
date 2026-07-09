@@ -154,11 +154,10 @@ const SAFE_AREA_TIMEOUT = 300;
 
 export default function Dropdown(props: Props) {
     const parentDropdown = useContext(DropdownContext);
-    // A Dropdown nested inside another dropdown’s body is a submenu: it
-    // renders as a parent item and delegates to the root dropdown’s engine.
-    // A nested Dropdown with hasItems={false} isn’t a menu, so it renders as
-    // an independent anchored dropdown instead (e.g. an info popover inside
-    // a form dropdown)
+    // A Dropdown nested inside a menu dropdown’s body renders as a submenu
+    // (a parent item delegating to the root engine). A hasItems={false}
+    // dropdown provides no submenu context, so a Dropdown nested inside one —
+    // or a hasItems={false} Dropdown anywhere — renders independently instead.
     if (parentDropdown && props.hasItems !== false) {
         return <SubmenuDropdown {...props} parentDropdown={parentDropdown} />;
     }
@@ -1202,7 +1201,9 @@ function RootDropdown({
                         role={popupRole}
                     >
                         <div className="uktdropdown-content">
-                            <DropdownContext.Provider value={dropdownContextValue}>
+                            <DropdownContext.Provider
+                                value={hasItems ? dropdownContextValue : null}
+                            >
                                 {childrenCount > 1
                                     ? (children as ChildrenTuple)[1]
                                     : children}
