@@ -1569,5 +1569,45 @@ describe('@acusti/dropdown', () => {
             // the outer menu stays open
             expect(screen.getByText('Beta')).toBeTruthy();
         });
+
+        it('renders a menu Dropdown nested inside a hasItems={false} dropdown as an independent, click-selectable picker', () => {
+            const handleSubmitItem = vi.fn();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Score report</button>
+                    <div>
+                        <Dropdown onSubmitItem={handleSubmitItem}>
+                            <button type="button">Page goal</button>
+                            <ul>
+                                <li data-ukt-value="gamma">Gamma</li>
+                                <li data-ukt-value="delta">Delta</li>
+                            </ul>
+                        </Dropdown>
+                    </div>
+                </Dropdown>,
+            );
+
+            const outer = screen.getByText('Score report');
+            fireEvent.mouseDown(outer);
+            fireEvent.mouseUp(outer);
+
+            // the inner menu isn’t promoted to a submenu, so its list isn’t in
+            // the DOM until it’s opened (a submenu renders its items eagerly)
+            expect(document.body.querySelector('[data-ukt-value="delta"]')).toBe(null);
+
+            const inner = screen.getByText('Page goal');
+            fireEvent.mouseDown(inner);
+            fireEvent.mouseUp(inner);
+
+            // plain click-to-select on a data-ukt-value item fires onSubmitItem
+            const item = screen.getByText('Delta');
+            fireEvent.mouseOver(item);
+            fireEvent.mouseDown(item);
+            fireEvent.mouseUp(item);
+
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'delta' }),
+            );
+        });
     });
 });
