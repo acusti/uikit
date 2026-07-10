@@ -25,6 +25,7 @@
         "dropdown-nested-independent-menu",
         "dropdown-remove-min-body-props",
         "dropdown-top-layer-popover",
+        "menubar-stay-engaged-on-non-menu-hover",
         "nested-dropdown-submenus",
         "submenu-mouse-intent"
     ]
