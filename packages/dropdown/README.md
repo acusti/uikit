@@ -267,6 +267,14 @@ type Props = {
     onMouseUp?: (event: React.MouseEvent<HTMLElement>) => unknown;
     onOpen?: () => unknown;
     /**
+     * Opens the dropdown when the pointer hovers the trigger, and closes it a
+     * short moment after the pointer leaves the trigger and body entirely (the
+     * close is delayed so crossing the gap between them, or pausing over
+     * either, doesn’t flicker-close it). Click and keyboard opening keep
+     * working as usual alongside it.
+     */
+    openOnHover?: boolean;
+    /**
      * Called when an item is selected. The payload includes:
      * - element: The DOM element that was clicked
      * - event: The click or keyboard event
@@ -426,6 +434,29 @@ function MultiSelectDropdown() {
     );
 }
 ```
+
+### Open on Hover
+
+```tsx
+function HoverMenu() {
+    return (
+        <Dropdown openOnHover>
+            <button type="button">Account</button>
+            <ul>
+                <li>Profile</li>
+                <li>Settings</li>
+                <li>Sign out</li>
+            </ul>
+        </Dropdown>
+    );
+}
+```
+
+Click and keyboard opening (Enter/Space while focused) still work —
+hovering is an additional way in, not a replacement. This makes the most
+sense for a dropdown whose body is inspectable at a glance (a short menu, a
+preview card); for anything the user needs to click into, keep the default
+click-to-open behavior so a stray hover doesn’t pop it open.
 
 ### Dropdown with Interactive Content
 
@@ -645,9 +676,11 @@ Most props keep their meaning, scoped to the submenu:
 - `className`/`style`: applied to the parent item element
 
 Props that only make sense at the top level (`allowCreate`, `allowEmpty`,
-`isOpenOnMount`, `isSearchable`, `keepOpenOnSubmit`, `name`, `placeholder`,
-`tabIndex`, `value`) are ignored on a nested dropdown and warn
-(unconditionally, matching the children-count misuse error).
+`isOpenOnMount`, `isSearchable`, `keepOpenOnSubmit`, `name`, `openOnHover`,
+`placeholder`, `tabIndex`, `value`) are ignored on a nested dropdown and
+warn (unconditionally, matching the children-count misuse error). A submenu
+already discloses on hover intent — see [Submenus](#submenus) — so
+`openOnHover` has nothing to add there.
 
 ### Submenu placement and styling
 

@@ -105,6 +105,14 @@ export type Props = {
     onOpen?: () => unknown;
     onSubmitItem?: (payload: Item) => void;
     /**
+     * Opens the dropdown when the pointer hovers the trigger, and closes it a
+     * short moment after the pointer leaves the trigger and body entirely (the
+     * close is delayed so crossing the gap between them, or pausing over
+     * either, doesn’t flicker-close it). Click and keyboard opening keep
+     * working as usual alongside it.
+     */
+    openOnHover?: boolean;
+    /**
      * Only usable in conjunction with {isSearchable: true}.
      * Used as search input’s placeholder.
      */
@@ -152,6 +160,11 @@ const SUBMENU_DISCLOSURE_DELAY = 200;
 // on every move, so it only fires on a pause — motion keeps the submenu open
 const SAFE_AREA_TIMEOUT = 300;
 
+// props.openOnHover opens immediately on hover, but closing waits a beat so
+// that crossing the trigger/body gap (or a placement fallback moving the body
+// somewhere the pointer briefly leaves) doesn’t flicker-close it
+const HOVER_CLOSE_DELAY = 150;
+
 export default function Dropdown(props: Props) {
     const parentDropdown = useContext(DropdownContext);
     // A Dropdown nested inside a menu dropdown’s body renders as a submenu
@@ -183,6 +196,7 @@ function RootDropdown({
     onMouseUp,
     onOpen,
     onSubmitItem,
+    openOnHover,
     placeholder,
     style: styleFromProps,
     tabIndex,
@@ -222,6 +236,7 @@ function RootDropdown({
     const safeAreaRef = useRef<{ apex: Point; parent: HTMLElement } | null>(null);
     const safeAreaTimerRef = useRef<null | TimeoutID>(null);
     const wasInSafeAreaRef = useRef<boolean>(false);
+    const hoverCloseTimerRef = useRef<null | TimeoutID>(null);
 
     const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
@@ -461,12 +476,24 @@ function RootDropdown({
         }
     };
 
+    const clearHoverCloseTimer = () => {
+        if (hoverCloseTimerRef.current != null) {
+            clearTimeout(hoverCloseTimerRef.current);
+            hoverCloseTimerRef.current = null;
+        }
+    };
+
+    // Clear props.openOnHover’s close timer on unmount so it can’t fire against
+    // unmounted DOM
+    useEffect(() => clearHoverCloseTimer, []);
+
     const closeDropdown = (options?: { keepMenubarEngaged?: boolean }) => {
         setIsOpen(false);
         setIsOpening(false);
         mouseDownPositionRef.current = null;
         clearDisclosureTimer();
         clearSafeAreaTimer();
+        clearHoverCloseTimer();
         safeAreaRef.current = null;
         wasInSafeAreaRef.current = false;
         if (closingTimerRef.current != null) {
@@ -480,6 +507,28 @@ function RootDropdown({
         if (menubar && dropdownElement && !options?.keepMenubarEngaged) {
             menubar.notifyClosed(dropdownElement);
         }
+    };
+
+    // The pointer entered the trigger or (if open) the body: cancel any
+    // pending close and, if props.openOnHover and not already open, open now
+    const handleDropdownMouseEnter = () => {
+        clearHoverCloseTimer();
+        if (!openOnHover || isOpenRef.current) return;
+        setIsOpen(true);
+        setIsOpening(false);
+    };
+
+    // The pointer left the trigger and body entirely: if open, arm the
+    // close-intent timer (a re-entry before it fires cancels it above, so
+    // crossing the trigger/body gap doesn’t flicker)
+    const handleDropdownMouseLeave = () => {
+        if (!openOnHover || !isOpenRef.current || hoverCloseTimerRef.current != null) {
+            return;
+        }
+        hoverCloseTimerRef.current = setTimeout(() => {
+            hoverCloseTimerRef.current = null;
+            closeDropdown();
+        }, HOVER_CLOSE_DELAY);
     };
 
     const focusTrigger = () => {
@@ -1191,6 +1240,8 @@ function RootDropdown({
                 })}
                 onClick={onClick}
                 onMouseDown={handleMouseDown}
+                onMouseEnter={handleDropdownMouseEnter}
+                onMouseLeave={handleDropdownMouseLeave}
                 onMouseMove={handleMouseMove}
                 onMouseOut={handleMouseOut}
                 onMouseOver={handleMouseOver}
@@ -1233,6 +1284,7 @@ const INERT_SUBMENU_PROPS = [
     'isSearchable',
     'keepOpenOnSubmit',
     'name',
+    'openOnHover',
     'placeholder',
     'tabIndex',
     'value',
