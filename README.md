@@ -145,6 +145,7 @@ bun changeset pre enter alpha   # writes .changeset/pre.json — commit it
 bun changeset version           # applies pending changesets, e.g. → 1.0.0-alpha.0
 bun run build
 bun changeset publish           # in pre mode, auto-publishes to the alpha dist-tag
+git push --follow-tags
 ```
 
 Iterate by adding changesets and re-running `bun changeset version` (→
@@ -154,7 +155,9 @@ prerelease mode, then version and publish as usual:
 ```bash
 bun changeset pre exit
 bun changeset version           # drops the suffix, e.g. → 1.0.0
+bun run build
 bun changeset publish
+git push --follow-tags
 ```
 
 Three things worth knowing:
