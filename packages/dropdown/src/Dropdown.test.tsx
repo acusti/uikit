@@ -1610,4 +1610,95 @@ describe('@acusti/dropdown', () => {
             );
         });
     });
+
+    describe('openOnHover', () => {
+        it('does not open on hover by default', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    <ul data-testid="dropdown-list">
+                        <li>Option</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.hover(screen.getByRole('button'));
+            await new Promise((resolve) => setTimeout(resolve, 200));
+            expect(screen.queryByTestId('dropdown-list')).toBe(null);
+        });
+
+        it('opens the dropdown immediately on hover', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown openOnHover>
+                    <ul data-testid="dropdown-list">
+                        <li>Option</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.hover(screen.getByRole('button'));
+            expect(screen.getByTestId('dropdown-list')).toBeTruthy();
+        });
+
+        it('closes after the pointer leaves the trigger and body', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown openOnHover>
+                    <ul data-testid="dropdown-list">
+                        <li>Option</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button');
+            await user.hover(trigger);
+            expect(screen.getByTestId('dropdown-list')).toBeTruthy();
+
+            await user.unhover(trigger);
+            await waitFor(
+                () => expect(screen.queryByTestId('dropdown-list')).toBe(null),
+                { timeout: 1000 },
+            );
+        });
+
+        it('stays open when the pointer moves from the trigger into the body before the close delay elapses', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown openOnHover>
+                    <ul data-testid="dropdown-list">
+                        <li>Option</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button');
+            await user.hover(trigger);
+            expect(screen.getByTestId('dropdown-list')).toBeTruthy();
+
+            await user.unhover(trigger);
+            await user.hover(screen.getByTestId('dropdown-list'));
+
+            // held well past the close-intent delay
+            await new Promise((resolve) => setTimeout(resolve, 300));
+            expect(screen.getByTestId('dropdown-list')).toBeTruthy();
+        });
+
+        it('still opens on a click without a preceding hover (e.g. touch)', () => {
+            render(
+                <Dropdown openOnHover>
+                    <ul data-testid="dropdown-list">
+                        <li>Option</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // A tap fires mousedown/mouseup with no hover in between, so the
+            // click-to-open path — not hover — is what opens it here
+            const trigger = screen.getByRole('button');
+            fireEvent.mouseDown(trigger);
+            fireEvent.mouseUp(trigger);
+            expect(screen.getByTestId('dropdown-list')).toBeTruthy();
+        });
+    });
 });
