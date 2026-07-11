@@ -661,6 +661,41 @@ export const WithGaps: Story = {
     },
 };
 
+export const OpenOnHover: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'With `openOnHover`, the dropdown opens as soon as the pointer hovers the trigger and closes a short moment after the pointer leaves the trigger and body entirely (the close is delayed so crossing the gap between them, or pausing over either, doesn’t flicker-close it). Click and keyboard opening keep working alongside it. Best for a menu you can take in at a glance — an account menu, a preview — so a stray hover doesn’t reveal something the user has to click into.',
+            },
+        },
+    },
+    render() {
+        return (
+            <Dropdown className="open-on-hover-example" onSubmitItem={fn()} openOnHover>
+                <button
+                    className="uktdropdown-trigger"
+                    style={{
+                        alignItems: 'center',
+                        display: 'inline-flex',
+                        gap: '0.25rem',
+                    }}
+                    type="button"
+                >
+                    Account
+                    <ChevronDownIcon />
+                </button>
+                <ul>
+                    <li data-ukt-value="profile">Profile</li>
+                    <li data-ukt-value="settings">Settings</li>
+                    <li data-ukt-value="billing">Billing</li>
+                    <li className="separator" />
+                    <li data-ukt-value="sign-out">Sign out</li>
+                </ul>
+            </Dropdown>
+        );
+    },
+};
+
 export const MenubarAppMenu: Story = {
     parameters: {
         docs: {
