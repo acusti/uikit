@@ -23,6 +23,7 @@
     },
     "changesets": [
         "dropdown-nested-independent-menu",
+        "dropdown-open-on-hover",
         "dropdown-remove-min-body-props",
         "dropdown-top-layer-popover",
         "menubar-stay-engaged-on-non-menu-hover",
