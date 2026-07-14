@@ -14,9 +14,9 @@
     --uktdd-body-pad-right: 0.6875em;
     --uktdd-body-pad-top: 0.5em;
     --uktdd-body-min-width: min(50px, 100%);
-    --uktdd-body-position-area: bottom span-right;
+    --uktdd-body-position-area: block-end span-inline-end;
     --uktdd-body-position-try-fallbacks:
-        --uktdd-top-left, --uktdd-bottom-right, --uktdd-top-right;
+        --uktdd-top-start, --uktdd-bottom-end, --uktdd-top-end;
     /* gap between the trigger and the body, applied as a symmetric
        margin-block so it lands on whichever side the body attaches to and
        auto-reverses when position-try flips it above/below the trigger. A
@@ -214,20 +214,29 @@ div.uktdropdown-body {
         var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
 }
 
-@position-try --uktdd-top-left {
-    position-area: top span-right;
+/* Named for the aligned edge (start/end), not the direction the body
+   extends toward — e.g. top-start opens above the trigger with their
+   inline-start edges flush, and the body can extend past the trigger’s
+   inline-end edge. Both axes use logical keywords (block-start/-end,
+   span-inline-start/-end rather than top/bottom, span-left/-right):
+   position-area doesn’t allow mixing a physical keyword on one axis with a
+   logical one on the other, and logical keeps the alignment correct in
+   RTL. block-start/block-end read as top/bottom in the near-universal
+   horizontal-tb writing mode. */
+@position-try --uktdd-top-start {
+    position-area: block-start span-inline-end;
 }
 
-@position-try --uktdd-bottom-left {
-    position-area: bottom span-right;
+@position-try --uktdd-bottom-start {
+    position-area: block-end span-inline-end;
 }
 
-@position-try --uktdd-bottom-right {
-    position-area: bottom span-left;
+@position-try --uktdd-bottom-end {
+    position-area: block-end span-inline-start;
 }
 
-@position-try --uktdd-top-right {
-    position-area: top span-left;
+@position-try --uktdd-top-end {
+    position-area: block-start span-inline-start;
 }
 
 @position-try --uktdd-submenu-inline-start {
