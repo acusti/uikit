@@ -730,6 +730,78 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('value as a { value, label } pair', () => {
+        it('shows the pair’s label as the searchable input’s value', () => {
+            render(
+                <Dropdown
+                    isSearchable
+                    value={{ label: 'Warm & Welcoming', value: 'warm' }}
+                >
+                    <ul>
+                        <li data-ukt-value="warm">Warm & Welcoming</li>
+                        <li data-ukt-value="bold">Bold & Direct</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+                'Warm & Welcoming',
+            );
+        });
+
+        it('still shows a bare string value verbatim in the searchable input', () => {
+            render(
+                <Dropdown isSearchable value="Regular">
+                    <ul>
+                        <li data-ukt-value="Regular">Regular</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+                'Regular',
+            );
+        });
+
+        it('detects a no-op by the value identity, not the displayed label', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+            render(
+                <Dropdown
+                    onSubmitItem={handleSubmitItem}
+                    value={{ label: 'Warm & Welcoming', value: 'warm' }}
+                >
+                    Voice
+                    <ul>
+                        <li data-testid="warm" data-ukt-item data-ukt-value="warm">
+                            Warm & Welcoming
+                        </li>
+                        <li data-testid="bold" data-ukt-item data-ukt-value="bold">
+                            Bold & Direct
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Voice' });
+            await user.click(trigger);
+            // Re-selecting the already-selected item — matched on the 'warm'
+            // identity, not its 'Warm & Welcoming' label — is a no-op.
+            await user.click(screen.getByTestId('warm'));
+            expect(handleSubmitItem).not.toHaveBeenCalled();
+
+            // Wait out the close timeout before reopening.
+            await new Promise((resolve) => setTimeout(resolve, 100));
+
+            await user.click(trigger);
+            await user.click(screen.getByTestId('bold'));
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ label: 'Bold & Direct', value: 'bold' }),
+            );
+        });
+    });
+
     describe('submitting with no active item', () => {
         it('does not call onSubmitItem when a non-searchable dropdown is submitted with nothing selected', async () => {
             const handleSubmitItem = vi.fn();

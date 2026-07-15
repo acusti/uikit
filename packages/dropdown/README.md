@@ -292,10 +292,15 @@ type Props = {
      */
     tabIndex?: number;
     /**
-     * Current value of the search input (requires isSearchable: true).
-     * Used for controlled components and change detection.
+     * The dropdown’s controlled value. Pass a bare identifier when an item’s
+     * stored value and its displayed label are the same, or a { value, label }
+     * pair when they differ (e.g. a human-readable label shown for a stored
+     * id) — the same { value, label } shape onSubmitItem reports back. Used for
+     * change detection (skipping onSubmitItem when the already-selected item is
+     * re-submitted); the label is shown as the search input’s value when
+     * isSearchable is true.
      */
-    value?: string;
+    value?: string | { label: string; value: string };
 };
 ```
 
