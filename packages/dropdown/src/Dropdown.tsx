@@ -129,10 +129,15 @@ export type Props = {
      */
     tabIndex?: number;
     /**
-     * Used as search input’s value if props.isSearchable === true
-     * Used to determine if value has changed to avoid triggering onSubmitItem if not
+     * The dropdown’s controlled value. Pass a bare identifier when an item’s
+     * stored value and its displayed label are the same, or a { value, label }
+     * pair when they differ (e.g. a human-readable label shown for a stored
+     * id) — the same { value, label } shape onSubmitItem reports back. The
+     * value determines whether the value has changed, to avoid triggering
+     * onSubmitItem when the already-selected item is re-submitted; the label is
+     * used as the search input’s value when props.isSearchable === true.
      */
-    value?: string;
+    value?: string | { label: string; value: string };
 };
 
 type ChildrenTuple = [ReactNode, ReactNode] | readonly [ReactNode, ReactNode];
@@ -215,6 +220,14 @@ function RootDropdown({
         trigger = (children as ChildrenTuple)[0];
     }
 
+    // The value prop is either a bare identifier (its stored value and its
+    // displayed label are the same) or a { value, label } pair when they
+    // differ. valueIdentity drives change detection / no-op matching against an
+    // item’s data-ukt-value; valueLabel is what a searchable dropdown shows in
+    // its input.
+    const valueIdentity = typeof value === 'string' ? value : value?.value;
+    const valueLabel = typeof value === 'string' ? value : value?.label;
+
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [dropdownElement, setDropdownElement] = useState<MaybeHTMLElement>(null);
@@ -247,7 +260,7 @@ function RootDropdown({
     const onCloseRef = useRef(onClose);
     const onOpenRef = useRef(onOpen);
     const onSubmitItemRef = useRef(onSubmitItem);
-    const valueRef = useRef(value);
+    const valueRef = useRef(valueIdentity);
 
     useEffect(() => {
         allowCreateRef.current = allowCreate;
@@ -259,7 +272,7 @@ function RootDropdown({
         onCloseRef.current = onClose;
         onOpenRef.current = onOpen;
         onSubmitItemRef.current = onSubmitItem;
-        valueRef.current = value;
+        valueRef.current = valueIdentity;
     }, [
         allowCreate,
         allowEmpty,
@@ -270,7 +283,7 @@ function RootDropdown({
         onClose,
         onOpen,
         onSubmitItem,
-        value,
+        valueIdentity,
     ]);
 
     const isMountedRef = useRef(false);
@@ -1183,7 +1196,7 @@ function RootDropdown({
                     aria-haspopup={popupRole}
                     autoComplete="off"
                     className="uktdropdown-trigger"
-                    defaultValue={value ?? ''}
+                    defaultValue={valueLabel ?? ''}
                     disabled={disabled}
                     name={name}
                     onFocus={() => setIsOpen(true)}

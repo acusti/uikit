@@ -290,6 +290,54 @@ export const SearchableAndAllowCreate: Story = {
     },
 };
 
+const COUNTRIES = [
+    { label: 'Australia', value: 'AU' },
+    { label: 'Brazil', value: 'BR' },
+    { label: 'Canada', value: 'CA' },
+    { label: 'Germany', value: 'DE' },
+    { label: 'Japan', value: 'JP' },
+    { label: 'United Kingdom', value: 'GB' },
+    { label: 'United States', value: 'US' },
+] as const;
+
+export const LabelDifferentFromValue: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'When an item’s stored value differs from its display label — here an ISO country code stored under the country name — pass `value` as a `{ value, label }` pair. The `value` drives change detection and matching against each item’s `data-ukt-value`, while the `label` is shown in the searchable input (and is what you type to filter). `onSubmitItem` reports the same `{ value, label }` shape back, so a controlled consumer feeds it straight into state — no mapping a label back to an id. The selected code is stored and echoed below; a bare string `value` still works when an item’s value and label are the same.',
+            },
+        },
+    },
+    render() {
+        const [country, setCountry] = React.useState('US');
+        const selected = COUNTRIES.find(({ value }) => value === country);
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <Dropdown
+                    isSearchable
+                    label="Country"
+                    onSubmitItem={({ value }) => setCountry(value)}
+                    placeholder="Search countries…"
+                    value={
+                        selected ? { label: selected.label, value: selected.value } : ''
+                    }
+                >
+                    <ul>
+                        {COUNTRIES.map(({ label, value }) => (
+                            <li data-ukt-value={value} key={value}>
+                                {label}
+                            </li>
+                        ))}
+                    </ul>
+                </Dropdown>
+                <p style={{ margin: 0 }}>
+                    Stored value: <code>{country}</code>
+                </p>
+            </div>
+        );
+    },
+};
+
 export const CSSValueInputTrigger: Story = {
     args: {
         allowCreate: true,
