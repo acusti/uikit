@@ -25,6 +25,7 @@
         "dropdown-nested-independent-menu",
         "dropdown-open-on-hover",
         "dropdown-remove-min-body-props",
+        "dropdown-rename-position-try-fallbacks",
         "dropdown-top-layer-popover",
         "menubar-stay-engaged-on-non-menu-hover",
         "nested-dropdown-submenus",
