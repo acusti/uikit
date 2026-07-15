@@ -135,7 +135,10 @@ export type Props = {
      * id) — the same { value, label } shape onSubmitItem reports back. The
      * value determines whether the value has changed, to avoid triggering
      * onSubmitItem when the already-selected item is re-submitted; the label is
-     * used as the search input’s value when props.isSearchable === true.
+     * used as the search input’s value when props.isSearchable === true. A bare
+     * identifier is resolved to its label from the matching child’s
+     * data-ukt-value in the body — so children whose value and label differ
+     * need no explicit label; a { value, label } pair states it.
      */
     value?: string | { label: string; value: string };
 };
@@ -182,6 +185,46 @@ export default function Dropdown(props: Props) {
     return <RootDropdown {...props} />;
 }
 
+// Find the item in `children` whose data-ukt-value matches `value` and return
+// its text as the label, so a bare identifier value shows the matching item’s
+// label without a separate options/label lookup. Returns undefined if no item
+// matches (the caller then falls back to the identifier itself). A
+// { value, label } value overrides this when the derived text isn’t right.
+function getLabelFromChildren(children: ReactNode, value: string): string | undefined {
+    let label: string | undefined;
+    const visit = (node: ReactNode) => {
+        if (label != null) return;
+        Children.forEach(node, (child) => {
+            if (label != null || !isValidElement(child)) return;
+            const childProps = child.props as {
+                children?: ReactNode;
+                'data-ukt-value'?: unknown;
+            };
+            if (childProps['data-ukt-value'] === value) {
+                label = getNodeText(childProps.children).replace(/\s+/g, ' ').trim();
+                return;
+            }
+            visit(childProps.children);
+        });
+    };
+    visit(children);
+    return label;
+}
+
+// Concatenate the text (string/number leaves) of a React node, approximating
+// the rendered innerText the dropdown uses as an item’s label.
+function getNodeText(node: ReactNode): string {
+    let text = '';
+    Children.forEach(node, (child) => {
+        if (typeof child === 'string' || typeof child === 'number') {
+            text += child;
+        } else if (isValidElement(child)) {
+            text += getNodeText((child.props as { children?: ReactNode }).children);
+        }
+    });
+    return text;
+}
+
 function RootDropdown({
     allowCreate,
     allowEmpty = true,
@@ -224,9 +267,15 @@ function RootDropdown({
     // displayed label are the same) or a { value, label } pair when they
     // differ. valueIdentity drives change detection / no-op matching against an
     // item’s data-ukt-value; valueLabel is what a searchable dropdown shows in
-    // its input.
+    // its input. For a bare identifier, the label is resolved from the matching
+    // child (data-ukt-value in the body), so children with distinct values and
+    // labels need no separate label; a { value, label } pair states it
+    // explicitly.
     const valueIdentity = typeof value === 'string' ? value : value?.value;
-    const valueLabel = typeof value === 'string' ? value : value?.label;
+    const valueLabel =
+        typeof value !== 'string'
+            ? value?.label
+            : (getLabelFromChildren(children, value) ?? value);
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);

@@ -300,11 +300,41 @@ const COUNTRIES = [
     { label: 'United States', value: 'US' },
 ] as const;
 
+export const LabelDerivedFromChildren: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'When you render the items yourself, a bare string `value` displays the label of the child whose `data-ukt-value` matches it — so items whose value and label differ (an ISO country code shown as the country name) need no `{ value, label }` pair. Type to filter by the visible label; `onSubmitItem` reports { value, label }. The derived label is the matching item’s text — pass a `{ value, label }` pair to override it when that text isn’t what you want shown in the input.',
+            },
+        },
+    },
+    render() {
+        const [country, setCountry] = React.useState('US');
+        return (
+            <Dropdown
+                isSearchable
+                label="Country"
+                onSubmitItem={({ value }) => setCountry(value)}
+                placeholder="Search countries…"
+                value={country}
+            >
+                <ul>
+                    {COUNTRIES.map(({ label, value }) => (
+                        <li data-ukt-value={value} key={value}>
+                            {label}
+                        </li>
+                    ))}
+                </ul>
+            </Dropdown>
+        );
+    },
+};
+
 export const LabelDifferentFromValue: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'When an item’s stored value differs from its display label — here an ISO country code stored under the country name — pass `value` as a `{ value, label }` pair. The `value` drives change detection and matching against each item’s `data-ukt-value`, while the `label` is shown in the searchable input (and is what you type to filter). `onSubmitItem` reports the same `{ value, label }` shape back, so a controlled consumer feeds it straight into state — no mapping a label back to an id. The selected code is stored and echoed below; a bare string `value` still works when an item’s value and label are the same.',
+                story: 'A `{ value, label }` pair states the displayed label explicitly, overriding the text that would otherwise be derived from the matching item. Here the list items carry the ISO code for scannability, but the collapsed input shows just the country name. `value` drives change detection and matching against each item’s `data-ukt-value`, and `onSubmitItem` reports the same `{ value, label }` shape back, so a controlled consumer feeds it straight into state.',
             },
         },
     },
@@ -325,7 +355,7 @@ export const LabelDifferentFromValue: Story = {
                     <ul>
                         {COUNTRIES.map(({ label, value }) => (
                             <li data-ukt-value={value} key={value}>
-                                {label}
+                                {label} · {value}
                             </li>
                         ))}
                     </ul>
