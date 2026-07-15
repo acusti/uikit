@@ -298,7 +298,9 @@ type Props = {
      * id) — the same { value, label } shape onSubmitItem reports back. Used for
      * change detection (skipping onSubmitItem when the already-selected item is
      * re-submitted); the label is shown as the search input’s value when
-     * isSearchable is true.
+     * isSearchable is true. A bare identifier resolves to its label from the
+     * matching child’s data-ukt-value in the body, so children whose value
+     * and label differ need no explicit label.
      */
     value?: string | { label: string; value: string };
 };

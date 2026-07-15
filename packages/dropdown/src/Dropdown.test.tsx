@@ -802,6 +802,54 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('deriving the label from children', () => {
+        it('shows the matching child’s text as the input label for a bare value', () => {
+            render(
+                <Dropdown isSearchable value="warm">
+                    <ul>
+                        <li data-ukt-value="warm">Warm &amp; Welcoming</li>
+                        <li data-ukt-value="bold">Bold &amp; Direct</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+                'Warm & Welcoming',
+            );
+        });
+
+        it('concatenates a matching child’s nested text for the derived label', () => {
+            render(
+                <Dropdown isSearchable value="400">
+                    <ul>
+                        <li data-ukt-value="400">
+                            <span className="item-title">Font Weight - </span>
+                            400
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+                'Font Weight - 400',
+            );
+        });
+
+        it('lets a { value, label } pair override the label derived from children', () => {
+            render(
+                <Dropdown isSearchable value={{ label: 'Toasty', value: 'warm' }}>
+                    <ul>
+                        <li data-ukt-value="warm">Warm &amp; Welcoming</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+                'Toasty',
+            );
+        });
+    });
+
     describe('submitting with no active item', () => {
         it('does not call onSubmitItem when a non-searchable dropdown is submitted with nothing selected', async () => {
             const handleSubmitItem = vi.fn();
