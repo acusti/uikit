@@ -15,6 +15,10 @@
         height: calc(200vh - 110px);
         width: calc(200vw - 270px);
     }
+
+    &:has(.direction-recipes) {
+        height: 480px;
+    }
 }
 
 .sb-story {
@@ -119,9 +123,9 @@
 
 .searchable-with-label,
 .searchable-and-allow-create {
-    --uktdd-body-position-area: bottom span-left;
+    --uktdd-body-position-area: block-end span-inline-start;
     --uktdd-body-position-try-fallbacks:
-        --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
+        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
 
     input,
     .uktdropdown-body {
@@ -130,9 +134,9 @@
 }
 
 .css-value-input-trigger {
-    --uktdd-body-position-area: bottom span-left;
+    --uktdd-body-position-area: block-end span-inline-start;
     --uktdd-body-position-try-fallbacks:
-        --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
+        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
 
     .uktdropdown-body {
         /* a horizontal alignment nudge, not a trigger↔body gap; set as a raw
@@ -247,6 +251,57 @@
 .gap-example {
     --uktdd-body-gap: 10px;
     --uktdd-submenu-gap: 8px;
+}
+
+/* the four --uktdd-body-position-area / --uktdd-body-position-try-fallbacks
+   recipes from the README’s direction cheatsheet. position-try-order:
+   most-height picks whichever side of the viewport has more room, not
+   merely “enough” room, so the two rows sit close to the canvas’s top and
+   bottom edges respectively — the bottom-opening pair near the top (room
+   below dominates) and the top-opening pair near the bottom (room above
+   dominates) — so each recipe’s primary placement wins on its own terms
+   instead of most-height overriding it toward whichever edge happens to
+   have more empty canvas */
+.direction-recipes {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    block-size: 100%;
+    padding-block: 1.5rem;
+}
+
+.direction-recipes-row {
+    display: flex;
+    justify-content: center;
+    gap: 5rem;
+}
+
+.direction-recipes .uktdropdown-body {
+    inline-size: 140px;
+}
+
+.direction-bottom-start {
+    --uktdd-body-position-area: block-end span-inline-end;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-top-start, --uktdd-bottom-end, --uktdd-top-end;
+}
+
+.direction-bottom-end {
+    --uktdd-body-position-area: block-end span-inline-start;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
+}
+
+.direction-top-start {
+    --uktdd-body-position-area: block-start span-inline-end;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-bottom-start, --uktdd-top-end, --uktdd-bottom-end;
+}
+
+.direction-top-end {
+    --uktdd-body-position-area: block-start span-inline-start;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start;
 }
 
 /* ---- Fixed Header Styles ---- */
@@ -393,9 +448,9 @@
     }
 
     .avatar-menu {
-        --uktdd-body-position-area: bottom span-left;
+        --uktdd-body-position-area: block-end span-inline-start;
         --uktdd-body-position-try-fallbacks:
-            --uktdd-top-right, --uktdd-top-left, --uktdd-bottom-right;
+            --uktdd-top-end, --uktdd-top-start, --uktdd-bottom-end;
 
         .avatar-profile,
         .avatar-edit {
