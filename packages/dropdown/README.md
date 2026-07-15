@@ -574,7 +574,10 @@ trigger pinned to the bottom of the viewport, near the inline-end edge):
 }
 ```
 
-See the `DirectionRecipes` story for a live demo of all four.
+See the [`DirectionRecipes` story][] for a live demo of all four.
+
+[`DirectionRecipes` story]:
+    https://uikit.acusti.ca/?path=/docs/uikit-controls-Dropdown--docs#direction-recipes
 
 Use `--uktdd-body-gap` for the space between the trigger and the body. It
 is applied as a symmetric `margin-block`, so the gap lands on whichever
