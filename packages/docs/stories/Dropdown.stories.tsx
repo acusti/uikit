@@ -589,6 +589,51 @@ export const CenteredMenu: Story = {
     },
 };
 
+const DIRECTION_RECIPE_ROWS = [
+    [
+        { className: 'direction-bottom-start', label: 'Bottom Start (default)' },
+        { className: 'direction-bottom-end', label: 'Bottom End' },
+    ],
+    [
+        { className: 'direction-top-start', label: 'Top Start' },
+        { className: 'direction-top-end', label: 'Top End' },
+    ],
+] as const;
+
+export const DirectionRecipes: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallbacks` (see the README’s “Changing the Default Direction” section for the full cheatsheet). Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. The bottom pair sits near the top of the canvas and the top pair near the bottom, so each opens toward the side with more room rather than `position-try-order: most-height` overriding it toward whichever side has more empty canvas.',
+            },
+        },
+    },
+    render() {
+        return (
+            <div className="direction-recipes">
+                {DIRECTION_RECIPE_ROWS.map((row) => (
+                    <div className="direction-recipes-row" key={row[0].className}>
+                        {row.map(({ className, label }) => (
+                            <Dropdown
+                                className={className}
+                                key={className}
+                                onSubmitItem={fn()}
+                            >
+                                {label}
+                                <ul>
+                                    <li data-ukt-value="one">Item one</li>
+                                    <li data-ukt-value="two">Item two</li>
+                                    <li data-ukt-value="three">Item three</li>
+                                </ul>
+                            </Dropdown>
+                        ))}
+                    </div>
+                ))}
+            </div>
+        );
+    },
+};
+
 export const SubmenuDropdown: Story = {
     args: {
         children: [

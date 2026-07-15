@@ -514,9 +514,9 @@ Example:
 
 ```css
 .settings-dropdown {
-    --uktdd-body-position-area: bottom span-left;
+    --uktdd-body-position-area: block-end span-inline-start;
     --uktdd-body-position-try-fallbacks:
-        --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
+        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
     --uktdd-body-gap: 8px;
 }
 
@@ -527,6 +527,54 @@ Example:
 
 This approach keeps the public React API small while still allowing precise
 placement and sizing control when a product surface needs it.
+
+### Changing the Default Direction
+
+`--uktdd-body-position-area` and `--uktdd-body-position-try-fallbacks`
+always change together. `--uktdd-body-position-area` is the primary
+placement, used whenever it fits in the viewport — that’s what actually
+determines the direction a dropdown opens by default. The fallbacks list is
+only consulted when the primary placement doesn’t fit, so overriding it
+alone changes nothing in the common case where the primary already fits.
+Overriding the primary alone works, but leaves behind a fallback cascade
+tuned for the old primary — in a cramped viewport, the dropdown can fall
+back toward the direction you just moved away from.
+
+The four `@position-try` blocks the component ships (`--uktdd-top-start`,
+`--uktdd-top-end`, `--uktdd-bottom-start`, `--uktdd-bottom-end`) are named
+for the aligned edge, not the direction the body extends toward: `start`
+opens with the body’s inline-start edge flush with the trigger’s
+inline-start edge (extending toward inline-end), and `end` is the mirror
+image. This also means they’re RTL-safe — `start`/`end` follow the
+document’s writing direction the way `left`/`right` wouldn’t. The values
+pair `block-start`/`block-end` with `span-inline-start`/`span-inline-end`
+rather than `top`/`bottom` — `position-area` doesn’t allow mixing a
+physical keyword on one axis with a logical one on the other — though
+`block-start`/`block-end` read as `top`/`bottom` in the near-universal
+horizontal-tb writing mode.
+
+Pick the row matching the direction you want, and set both variables to its
+pair:
+
+| Direction                           | `--uktdd-body-position-area`    | `--uktdd-body-position-try-fallbacks`                         |
+| ----------------------------------- | ------------------------------- | ------------------------------------------------------------- |
+| Bottom, start-aligned (the default) | `block-end span-inline-end`     | `--uktdd-top-start, --uktdd-bottom-end, --uktdd-top-end`      |
+| Bottom, end-aligned                 | `block-end span-inline-start`   | `--uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start`    |
+| Top, start-aligned                  | `block-start span-inline-end`   | `--uktdd-bottom-start, --uktdd-top-end, --uktdd-bottom-end`   |
+| Top, end-aligned                    | `block-start span-inline-start` | `--uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start` |
+
+For example, to make a dropdown open upward and end-aligned (useful for a
+trigger pinned to the bottom of the viewport, near the inline-end edge):
+
+```css
+.bottom-toolbar-dropdown {
+    --uktdd-body-position-area: block-start span-inline-start;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start;
+}
+```
+
+See the `DirectionRecipes` story for a live demo of all four.
 
 Use `--uktdd-body-gap` for the space between the trigger and the body. It
 is applied as a symmetric `margin-block`, so the gap lands on whichever
@@ -548,9 +596,9 @@ the menu size itself from its contents.
 
 ```css
 .avatar-menu {
-    --uktdd-body-position-area: bottom span-left;
+    --uktdd-body-position-area: block-end span-inline-start;
     --uktdd-body-position-try-fallbacks:
-        --uktdd-top-right, --uktdd-top-left, --uktdd-bottom-right;
+        --uktdd-top-end, --uktdd-top-start, --uktdd-bottom-end;
 }
 ```
 
