@@ -225,8 +225,10 @@ type Props = {
      * Can take a single React element or exactly two renderable children.
      * - Single child: The dropdown body (trigger will be auto-generated button)
      * - Two children: [trigger, body]
+     * Optional only when `options` is provided (which renders the body), in
+     * which case a single child is used as the trigger.
      */
-    children: ReactNode | [ReactNode, ReactNode];
+    children?: ReactNode | [ReactNode, ReactNode];
     className?: string;
     disabled?: boolean;
     /**
@@ -282,6 +284,16 @@ type Props = {
      * - value: The value attribute or text content
      */
     onSubmitItem?: (payload: Item) => void;
+    /**
+     * A data-driven alternative to rendering the dropdown body yourself: pass
+     * the selectable items as { label, value } pairs and the dropdown renders
+     * the list (each as `<li data-ukt-value={value}>{label}</li>`) and derives
+     * the searchable input’s displayed label from the option matching
+     * props.value — so props.value can be the bare value identifier. With
+     * options, children (if any) is the trigger. Provide your own body via
+     * children instead when items need custom markup, grouping, or submenus.
+     */
+    options?: ReadonlyArray<{ label: string; value: string }>;
     /**
      * Placeholder text for the search input (requires isSearchable: true).
      */

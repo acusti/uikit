@@ -368,6 +368,29 @@ export const LabelDifferentFromValue: Story = {
     },
 };
 
+export const OptionsProp: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'Instead of hand-writing the body, pass the selectable items as `options` ({ label, value } pairs): the dropdown renders the list and derives the searchable input’s label from `props.value`, so `value` is just the bare identifier (the country code) — no looking its label up and no `<li>` items to write. `onSubmitItem` still reports { label, value }. Reach for children instead when items need custom markup, grouping, or submenus.',
+            },
+        },
+    },
+    render() {
+        const [country, setCountry] = React.useState('US');
+        return (
+            <Dropdown
+                isSearchable
+                label="Country"
+                onSubmitItem={({ value }) => setCountry(value)}
+                options={COUNTRIES}
+                placeholder="Search countries…"
+                value={country}
+            />
+        );
+    },
+};
+
 export const CSSValueInputTrigger: Story = {
     args: {
         allowCreate: true,
