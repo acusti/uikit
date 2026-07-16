@@ -38,6 +38,7 @@ import {
     getItemElements,
     getItemForTarget,
     getItemPath,
+    getLabelFromChildren,
     getLevelRoot,
     getParentItem,
     getSubmenuOfItem,
@@ -183,46 +184,6 @@ export default function Dropdown(props: Props) {
         return <SubmenuDropdown {...props} parentDropdown={parentDropdown} />;
     }
     return <RootDropdown {...props} />;
-}
-
-// Find the item in `children` whose data-ukt-value matches `value` and return
-// its text as the label, so a bare identifier value shows the matching item’s
-// label without a separate options/label lookup. Returns undefined if no item
-// matches (the caller then falls back to the identifier itself). A
-// { value, label } value overrides this when the derived text isn’t right.
-function getLabelFromChildren(children: ReactNode, value: string): string | undefined {
-    let label: string | undefined;
-    const visit = (node: ReactNode) => {
-        if (label != null) return;
-        Children.forEach(node, (child) => {
-            if (label != null || !isValidElement(child)) return;
-            const childProps = child.props as {
-                children?: ReactNode;
-                'data-ukt-value'?: unknown;
-            };
-            if (childProps['data-ukt-value'] === value) {
-                label = getNodeText(childProps.children).replace(/\s+/g, ' ').trim();
-                return;
-            }
-            visit(childProps.children);
-        });
-    };
-    visit(children);
-    return label;
-}
-
-// Concatenate the text (string/number leaves) of a React node, approximating
-// the rendered innerText the dropdown uses as an item’s label.
-function getNodeText(node: ReactNode): string {
-    let text = '';
-    Children.forEach(node, (child) => {
-        if (typeof child === 'string' || typeof child === 'number') {
-            text += child;
-        } else if (isValidElement(child)) {
-            text += getNodeText((child.props as { children?: ReactNode }).children);
-        }
-    });
-    return text;
 }
 
 function RootDropdown({
