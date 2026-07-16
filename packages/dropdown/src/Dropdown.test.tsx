@@ -773,10 +773,10 @@ describe('@acusti/dropdown', () => {
                 >
                     Voice
                     <ul>
-                        <li data-testid="warm" data-ukt-item data-ukt-value="warm">
+                        <li data-testid="warm" data-ukt-value="warm">
                             Warm & Welcoming
                         </li>
-                        <li data-testid="bold" data-ukt-item data-ukt-value="bold">
+                        <li data-testid="bold" data-ukt-value="bold">
                             Bold & Direct
                         </li>
                     </ul>
@@ -807,8 +807,8 @@ describe('@acusti/dropdown', () => {
             render(
                 <Dropdown isSearchable value="warm">
                     <ul>
-                        <li data-ukt-value="warm">Warm &amp; Welcoming</li>
-                        <li data-ukt-value="bold">Bold &amp; Direct</li>
+                        <li data-ukt-value="warm">Warm & Welcoming</li>
+                        <li data-ukt-value="bold">Bold & Direct</li>
                     </ul>
                 </Dropdown>,
             );
@@ -839,7 +839,7 @@ describe('@acusti/dropdown', () => {
             render(
                 <Dropdown isSearchable value={{ label: 'Toasty', value: 'warm' }}>
                     <ul>
-                        <li data-ukt-value="warm">Warm &amp; Welcoming</li>
+                        <li data-ukt-value="warm">Warm & Welcoming</li>
                     </ul>
                 </Dropdown>,
             );
