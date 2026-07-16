@@ -5,6 +5,9 @@
     --uktdd-body-bg-color: #fff;
     --uktdd-body-bg-color-hover: rgb(105, 162, 249);
     --uktdd-body-color-hover: #fff;
+    /* the persistent tint on the item matching props.value (the current
+       selection), shown even after the active/hover highlight moves off it */
+    --uktdd-body-bg-color-selected: rgba(0, 0, 0, 0.06);
     --uktdd-body-buffer: 10px;
     --uktdd-body-max-height: calc(100dvh - var(--uktdd-body-buffer));
     --uktdd-body-max-width: calc(100dvw - var(--uktdd-body-buffer));
@@ -92,6 +95,10 @@
 
     &.has-items {
         user-select: none;
+    }
+
+    [aria-selected="true"] {
+        background-color: var(--uktdd-body-bg-color-selected);
     }
 
     [data-ukt-active] {

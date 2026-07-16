@@ -900,6 +900,52 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('revealing the current value on open', () => {
+        it('marks the item matching value active and aria-selected when opened', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown value="bold">
+                    Voice
+                    <ul>
+                        <li data-testid="warm" data-ukt-value="warm">
+                            Warm
+                        </li>
+                        <li data-testid="bold" data-ukt-value="bold">
+                            Bold
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Voice' }));
+
+            const bold = screen.getByTestId('bold');
+            expect(bold.hasAttribute('data-ukt-active')).toBe(true);
+            expect(bold.getAttribute('aria-selected')).toBe('true');
+            expect(screen.getByTestId('warm').hasAttribute('data-ukt-active')).toBe(
+                false,
+            );
+        });
+
+        it('activates no item when the value matches none', async () => {
+            const user = userEvent.setup();
+            const { container } = render(
+                <Dropdown value="unknown">
+                    Voice
+                    <ul>
+                        <li data-ukt-value="warm">Warm</li>
+                        <li data-ukt-value="bold">Bold</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Voice' }));
+
+            expect(container.querySelector('[data-ukt-active]')).toBeNull();
+            expect(container.querySelector('[aria-selected="true"]')).toBeNull();
+        });
+    });
+
     describe('submitting with no active item', () => {
         it('does not call onSubmitItem when a non-searchable dropdown is submitted with nothing selected', async () => {
             const handleSubmitItem = vi.fn();

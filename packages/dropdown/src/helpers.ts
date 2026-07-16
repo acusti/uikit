@@ -309,7 +309,10 @@ const setActiveChain = (dropdownElement: HTMLElement, element: HTMLElement) => {
 type BaseSetActiveItemPayload = {
     dropdownElement: HTMLElement;
     element?: null;
-    event: Event | SyntheticEvent<HTMLElement>;
+    // Optional so an item can be activated programmatically (e.g. revealing the
+    // current value on open); it’s only used to build the onActiveItem payload,
+    // which is skipped when there’s no event to report.
+    event?: Event | SyntheticEvent<HTMLElement>;
     index?: null;
     indexAddend?: null;
     isExactMatch?: null;
@@ -406,15 +409,18 @@ export const setActiveItem = ({
     }
 
     setActiveChain(dropdownElement, nextActiveItem);
-    const label = getItemLabel(nextActiveItem);
-    const value = nextActiveItem.dataset.uktValue ?? label;
-    onActiveItem?.({
-        element: nextActiveItem,
-        event,
-        label,
-        path: getItemPath(nextActiveItem),
-        value,
-    });
+    // A programmatic activation (no event) still moves the highlight and scrolls
+    // the item into view, but has no event to report to onActiveItem.
+    if (event) {
+        const label = getItemLabel(nextActiveItem);
+        onActiveItem?.({
+            element: nextActiveItem,
+            event,
+            label,
+            path: getItemPath(nextActiveItem),
+            value: nextActiveItem.dataset.uktValue ?? label,
+        });
+    }
     // Find closest scrollable parent and ensure that next active item is visible
     let { parentElement } = nextActiveItem;
     let scrollableParent = null;
