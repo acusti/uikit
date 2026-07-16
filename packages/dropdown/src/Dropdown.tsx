@@ -229,22 +229,27 @@ function RootDropdown({
     if (childrenCount > 1) {
         trigger = (children as ChildrenTuple)[0];
     }
+    // The body is the node rendered inside .uktdropdown-body: the second of
+    // two children, or the only child.
+    const body = childrenCount > 1 ? (children as ChildrenTuple)[1] : children;
 
     // The value prop is either a bare identifier (its stored value and its
     // displayed label are the same) or a { label, value } pair when they
     // differ. valueIdentity drives change detection / no-op matching against an
     // item’s data-ukt-value; valueLabel is what a searchable dropdown shows in
     // its input. For a bare identifier, the label is resolved from the matching
-    // child (data-ukt-value in the body), so children with distinct values and
-    // labels need no separate label; a { label, value } pair states it
-    // explicitly. Only a searchable dropdown displays the label, so skip the
-    // per-render children walk entirely for anything else.
+    // child (data-ukt-value in the body — derivation walks the same node the
+    // body renders, so a data-ukt-value in a custom trigger can’t match), so
+    // children with distinct values and labels need no separate label; a
+    // { label, value } pair states it explicitly. Only a searchable dropdown
+    // displays the label, so skip the per-render walk entirely for anything
+    // else.
     const valueIdentity = typeof value === 'string' ? value : value?.value;
     const valueLabel = !isSearchable
         ? undefined
         : typeof value !== 'string'
           ? value?.label
-          : (getLabelFromChildren(children, value) ?? value);
+          : (getLabelFromChildren(body, value) ?? value);
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
@@ -1296,9 +1301,7 @@ function RootDropdown({
                             <DropdownContext.Provider
                                 value={hasItems ? dropdownContextValue : null}
                             >
-                                {childrenCount > 1
-                                    ? (children as ChildrenTuple)[1]
-                                    : children}
+                                {body}
                             </DropdownContext.Provider>
                         </div>
                     </div>
