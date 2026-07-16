@@ -947,6 +947,21 @@ readers can associate the trigger with its popup. If your custom trigger
 already specifies any of these ARIA props, your values win — the component
 only fills in what you haven’t set.
 
+Item roles are filled in the same way when the body opens: items receive
+`role="option"` in a searchable (listbox) dropdown or `role="menuitem"` in
+a menu (always `menuitem` inside a submenu), and the `<ul>`/`<ol>` wrappers
+around them receive `role="presentation"` so the listbox or menu owns its
+items directly rather than through an intervening list. A natively
+interactive item (a button, link, or input) or one with a role you set
+yourself keeps its own role.
+
+Opening also reveals the current selection: the item matching `props.value`
+becomes the active item (so keyboard navigation starts from the current
+selection) and is scrolled into view. In a searchable (listbox) dropdown it
+additionally receives `aria-selected="true"` (`aria-selected` isn’t valid
+on a `menuitem`); the persistent tint on the selected item is themeable via
+the `--uktdd-body-bg-color-selected` custom property.
+
 Submenus and menubars extend the same pattern automatically:
 
 - parent items receive `aria-haspopup="menu"` and `aria-expanded`, and
