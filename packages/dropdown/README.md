@@ -302,13 +302,23 @@ type Props = {
      * matching child’s data-ukt-value in the body, so children whose value
      * and label differ need no explicit label.
      */
-    value?: string | { label: string; value: string };
+    value?: ItemValue | string;
 };
 ```
 
-### Item Type
+### Item Types
+
+Both types are exported alongside the component:
 
 ```ts
+/**
+ * A { label, value } pair naming an item: value is the stored value (the
+ * item’s data-ukt-value) and label is its displayed text. Accepted by the
+ * value prop when an item’s value and label differ; also the shape of an
+ * Item’s path entries.
+ */
+type ItemValue = { label: string; value: string };
+
 type Item = {
     element: HTMLElement | null;
     event: Event | React.SyntheticEvent<HTMLElement>;
@@ -317,7 +327,7 @@ type Item = {
      * Ancestor parent items from the root level down to the item’s
      * immediate parent. Empty for top-level items.
      */
-    path: Array<{ label: string; value: string }>;
+    path: Array<ItemValue>;
     value: string;
 };
 ```
@@ -675,7 +685,7 @@ Submenu semantics:
 
 - Parent items disclose; they never submit. `onSubmitItem` fires only for
   leaf items, and the payload’s `path` reports the leaf’s ancestor parent
-  items (see the [`Item` type](#item-type) above), so leaves with the same
+  items (see the [`Item` type](#item-types) above), so leaves with the same
   value in different submenus are distinguishable.
 - Submenus nest to arbitrary depth — a submenu body can itself contain
   nested dropdowns.
