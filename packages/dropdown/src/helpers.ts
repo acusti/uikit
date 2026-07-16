@@ -1,5 +1,5 @@
 import { getBestMatch } from '@acusti/matchmaking';
-import { type SyntheticEvent } from 'react';
+import { Children, isValidElement, type ReactNode, type SyntheticEvent } from 'react';
 
 import { type Item } from './Dropdown.js';
 
@@ -40,6 +40,49 @@ export const getItemLabel = (item: HTMLElement): string => {
         submenu.remove();
     }
     return (clone.textContent ?? '').trim();
+};
+
+// Concatenate the text (string/number leaves) of a React node, approximating
+// the rendered innerText the dropdown uses as an item’s label.
+const getNodeText = (node: ReactNode): string => {
+    let text = '';
+    Children.forEach(node, (child) => {
+        if (typeof child === 'string' || typeof child === 'number') {
+            text += child;
+        } else if (isValidElement(child)) {
+            text += getNodeText((child.props as { children?: ReactNode }).children);
+        }
+    });
+    return text;
+};
+
+// Find the item in `children` whose data-ukt-value matches `value` and return
+// its text as the label, so a bare identifier value shows the matching item’s
+// label without a separate options/label lookup. Returns undefined if no item
+// matches (the caller then falls back to the identifier itself). A
+// { value, label } value overrides this when the derived text isn’t right.
+export const getLabelFromChildren = (
+    children: ReactNode,
+    value: string,
+): string | undefined => {
+    let label: string | undefined;
+    const visit = (node: ReactNode) => {
+        if (label != null) return;
+        Children.forEach(node, (child) => {
+            if (label != null || !isValidElement(child)) return;
+            const childProps = child.props as {
+                children?: ReactNode;
+                'data-ukt-value'?: unknown;
+            };
+            if (childProps['data-ukt-value'] === value) {
+                label = getNodeText(childProps.children).replace(/\s+/g, ' ').trim();
+                return;
+            }
+            visit(childProps.children);
+        });
+    };
+    visit(children);
+    return label;
 };
 
 // Ancestor parent items from the root level down to the element’s immediate parent
