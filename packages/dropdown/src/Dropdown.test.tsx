@@ -850,6 +850,65 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('options prop', () => {
+        const OPTIONS = [
+            { label: 'United States', value: 'US' },
+            { label: 'Canada', value: 'CA' },
+            { label: 'Germany', value: 'DE' },
+        ];
+
+        it('renders the list from options and derives the input label from a bare value', async () => {
+            const user = userEvent.setup();
+            render(<Dropdown isSearchable options={OPTIONS} value="CA" />);
+
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+                'Canada',
+            );
+
+            await user.click(screen.getByRole('textbox'));
+            const values = Array.from(
+                screen.getByRole('listbox').querySelectorAll('[data-ukt-value]'),
+            ).map((item) => item.getAttribute('data-ukt-value'));
+            expect(values).toEqual(['US', 'CA', 'DE']);
+        });
+
+        it('submits the selected option’s value and label', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+            render(
+                <Dropdown
+                    isSearchable
+                    onSubmitItem={handleSubmitItem}
+                    options={OPTIONS}
+                    value="US"
+                />,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+            await user.click(
+                screen.getByRole('listbox').querySelector('[data-ukt-value="DE"]')!,
+            );
+
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ label: 'Germany', value: 'DE' }),
+            );
+        });
+
+        it('uses a provided child as the trigger alongside options', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown options={OPTIONS} value="US">
+                    <button type="button">Country</button>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Country' }));
+            expect(
+                screen.getByRole('menu').querySelector('[data-ukt-value="DE"]'),
+            ).toBeTruthy();
+        });
+    });
+
     describe('submitting with no active item', () => {
         it('does not call onSubmitItem when a non-searchable dropdown is submitted with nothing selected', async () => {
             const handleSubmitItem = vi.fn();

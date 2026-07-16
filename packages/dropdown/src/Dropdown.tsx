@@ -62,6 +62,14 @@ export type Item = {
 
 export type ItemPathEntry = { label: string; value: string };
 
+/**
+ * A selectable option as a { label, value } pair: `value` is the stored value
+ * (mirrored into the item’s data-ukt-value) and `label` is the displayed text.
+ * Used by the `options` prop and accepted by the `value` prop when an item’s
+ * value and label differ.
+ */
+export type DropdownOption = { label: string; value: string };
+
 export type Props = {
     /**
      * Boolean indicating if the user can submit a value not already in the
@@ -80,8 +88,10 @@ export type Props = {
     allowEmpty?: boolean;
     /**
      * Can take a single React element or exactly two renderable children.
+     * Optional only when `options` is provided (which renders the body), in
+     * which case a single child is used as the trigger.
      */
-    children: ChildrenTuple | ReactElement;
+    children?: ChildrenTuple | ReactElement;
     className?: string;
     disabled?: boolean;
     hasItems?: boolean;
@@ -114,6 +124,16 @@ export type Props = {
      */
     openOnHover?: boolean;
     /**
+     * A data-driven alternative to rendering the dropdown body yourself: pass
+     * the selectable items as { label, value } pairs and the dropdown renders
+     * the list (each as `<li data-ukt-value={value}>{label}</li>`) and derives
+     * the searchable input’s displayed label from the option matching
+     * props.value — so props.value can be the bare value identifier. With
+     * options, children (if any) is the trigger. Provide your own body via
+     * children instead when items need custom markup, grouping, or submenus.
+     */
+    options?: ReadonlyArray<DropdownOption>;
+    /**
      * Only usable in conjunction with {isSearchable: true}.
      * Used as search input’s placeholder.
      */
@@ -137,11 +157,11 @@ export type Props = {
      * value determines whether the value has changed, to avoid triggering
      * onSubmitItem when the already-selected item is re-submitted; the label is
      * used as the search input’s value when props.isSearchable === true. A bare
-     * identifier is resolved to its label from the matching child’s
-     * data-ukt-value in the body — so children whose value and label differ
-     * need no explicit label; a { label, value } pair states it.
+     * identifier is resolved to its label from props.options, or else from the
+     * matching child’s data-ukt-value in the body — so children whose value and
+     * label differ need no explicit label; a { label, value } pair states it.
      */
-    value?: string | { label: string; value: string };
+    value?: DropdownOption | string;
 };
 
 type ChildrenTuple = [ReactNode, ReactNode] | readonly [ReactNode, ReactNode];
@@ -206,21 +226,33 @@ function RootDropdown({
     onOpen,
     onSubmitItem,
     openOnHover,
+    options,
     placeholder,
     style: styleFromProps,
     tabIndex,
     value,
 }: Props) {
     const childrenCount = Children.count(children);
-    if (childrenCount !== 1 && childrenCount !== 2) {
-        if (childrenCount === 0) {
-            throw new Error(CHILDREN_ERROR + ' Received no children.');
+    if (options == null) {
+        if (childrenCount !== 1 && childrenCount !== 2) {
+            if (childrenCount === 0) {
+                throw new Error(CHILDREN_ERROR + ' Received no children.');
+            }
+            console.error(`${CHILDREN_ERROR} Received ${childrenCount} children.`);
         }
-        console.error(`${CHILDREN_ERROR} Received ${childrenCount} children.`);
+    } else if (childrenCount > 1) {
+        console.error(
+            `@acusti/dropdown: with \`options\`, children is only the optional trigger, but received ${childrenCount} children.`,
+        );
     }
 
+    // With options, the (optional) single child is the trigger and the body is
+    // rendered from the options; otherwise the trigger is the first of two
+    // children.
     let trigger: React.ReactNode;
-    if (childrenCount > 1) {
+    if (options != null) {
+        if (childrenCount >= 1) trigger = Children.toArray(children)[0];
+    } else if (childrenCount > 1) {
         trigger = (children as ChildrenTuple)[0];
     }
 
@@ -229,14 +261,16 @@ function RootDropdown({
     // differ. valueIdentity drives change detection / no-op matching against an
     // item’s data-ukt-value; valueLabel is what a searchable dropdown shows in
     // its input. For a bare identifier, the label is resolved from the matching
-    // child (data-ukt-value in the body), so children with distinct values and
-    // labels need no separate label; a { label, value } pair states it
-    // explicitly.
+    // option (with props.options) or the matching child (data-ukt-value in the
+    // body), so children with distinct values and labels need no separate
+    // label; a { label, value } pair states it explicitly.
     const valueIdentity = typeof value === 'string' ? value : value?.value;
     const valueLabel =
         typeof value !== 'string'
             ? value?.label
-            : (getLabelFromChildren(children, value) ?? value);
+            : ((options
+                  ? options.find((option) => option.value === value)?.label
+                  : getLabelFromChildren(children, value)) ?? value);
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
@@ -510,7 +544,7 @@ function RootDropdown({
     // unmounted DOM
     useEffect(() => clearHoverCloseTimer, []);
 
-    const closeDropdown = (options?: { keepMenubarEngaged?: boolean }) => {
+    const closeDropdown = (closeOptions?: { keepMenubarEngaged?: boolean }) => {
         setIsOpen(false);
         setIsOpening(false);
         mouseDownPositionRef.current = null;
@@ -527,7 +561,7 @@ function RootDropdown({
         // takes an enclosing menubar out of menu-mode. Switching menus,
         // clearing the open menu on hover, and focus changes pass
         // keepMenubarEngaged to stay in menu-mode.
-        if (menubar && dropdownElement && !options?.keepMenubarEngaged) {
+        if (menubar && dropdownElement && !closeOptions?.keepMenubarEngaged) {
             menubar.notifyClosed(dropdownElement);
         }
     };
@@ -1288,9 +1322,22 @@ function RootDropdown({
                             <DropdownContext.Provider
                                 value={hasItems ? dropdownContextValue : null}
                             >
-                                {childrenCount > 1
-                                    ? (children as ChildrenTuple)[1]
-                                    : children}
+                                {options ? (
+                                    <ul>
+                                        {options.map((option) => (
+                                            <li
+                                                data-ukt-value={option.value}
+                                                key={option.value}
+                                            >
+                                                {option.label}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                ) : childrenCount > 1 ? (
+                                    (children as ChildrenTuple)[1]
+                                ) : (
+                                    children
+                                )}
                             </DropdownContext.Provider>
                         </div>
                     </div>
@@ -1308,6 +1355,7 @@ const INERT_SUBMENU_PROPS = [
     'keepOpenOnSubmit',
     'name',
     'openOnHover',
+    'options',
     'placeholder',
     'tabIndex',
     'value',
