@@ -304,7 +304,7 @@ export const LabelDerivedFromChildren: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'When you render the items yourself, a bare string `value` displays the label of the child whose `data-ukt-value` matches it — so items whose value and label differ (an ISO country code shown as the country name) need no `{ value, label }` pair. Type to filter by the visible label; `onSubmitItem` reports { value, label }. The derived label is the matching item’s text — pass a `{ value, label }` pair to override it when that text isn’t what you want shown in the input.',
+                story: 'When you render the items yourself, a bare string `value` displays the label of the child whose `data-ukt-value` matches it — so items whose value and label differ (an ISO country code shown as the country name) need no `{ label, value }` pair. Type to filter by the visible label; `onSubmitItem` reports { label, value }. The derived label is the matching item’s text — pass a `{ label, value }` pair to override it when that text isn’t what you want shown in the input.',
             },
         },
     },
@@ -334,7 +334,7 @@ export const LabelDifferentFromValue: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'A `{ value, label }` pair states the displayed label explicitly, overriding the text that would otherwise be derived from the matching item. Here the list items carry the ISO code for scannability, but the collapsed input shows just the country name. `value` drives change detection and matching against each item’s `data-ukt-value`, and `onSubmitItem` reports the same `{ value, label }` shape back, so a controlled consumer feeds it straight into state.',
+                story: 'A `{ label, value }` pair states the displayed label explicitly, overriding the text that would otherwise be derived from the matching item. Here the list items carry the ISO code for scannability, but the collapsed input shows just the country name. `value` drives change detection and matching against each item’s `data-ukt-value`, and `onSubmitItem` reports the same `{ label, value }` shape back, so a controlled consumer feeds it straight into state.',
             },
         },
     },

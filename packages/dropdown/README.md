@@ -293,9 +293,9 @@ type Props = {
     tabIndex?: number;
     /**
      * The dropdown’s controlled value. Pass a bare identifier when an item’s
-     * stored value and its displayed label are the same, or a { value, label }
+     * stored value and its displayed label are the same, or a { label, value }
      * pair when they differ (e.g. a human-readable label shown for a stored
-     * id) — the same { value, label } shape onSubmitItem reports back. Used for
+     * id) — the same { label, value } shape onSubmitItem reports back. Used for
      * change detection (skipping onSubmitItem when the already-selected item is
      * re-submitted); the label is shown as the search input’s value when
      * isSearchable is true. A bare identifier resolves to its label from the

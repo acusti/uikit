@@ -60,7 +60,7 @@ const getNodeText = (node: ReactNode): string => {
 // its text as the label, so a bare identifier value shows the matching item’s
 // label without a separate options/label lookup. Returns undefined if no item
 // matches (the caller then falls back to the identifier itself). A
-// { value, label } value overrides this when the derived text isn’t right.
+// { label, value } value overrides this when the derived text isn’t right.
 export const getLabelFromChildren = (
     children: ReactNode,
     value: string,
