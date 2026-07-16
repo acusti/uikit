@@ -231,12 +231,14 @@ function RootDropdown({
     // its input. For a bare identifier, the label is resolved from the matching
     // child (data-ukt-value in the body), so children with distinct values and
     // labels need no separate label; a { label, value } pair states it
-    // explicitly.
+    // explicitly. Only a searchable dropdown displays the label, so skip the
+    // per-render children walk entirely for anything else.
     const valueIdentity = typeof value === 'string' ? value : value?.value;
-    const valueLabel =
-        typeof value !== 'string'
-            ? value?.label
-            : (getLabelFromChildren(children, value) ?? value);
+    const valueLabel = !isSearchable
+        ? undefined
+        : typeof value !== 'string'
+          ? value?.label
+          : (getLabelFromChildren(children, value) ?? value);
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
