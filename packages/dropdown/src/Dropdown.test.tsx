@@ -870,6 +870,21 @@ describe('@acusti/dropdown', () => {
             );
         });
 
+        it('derives an explicit empty-valued (clearing) item’s label for an empty value', () => {
+            render(
+                <Dropdown isSearchable value="">
+                    <ul>
+                        <li data-ukt-value="">None</li>
+                        <li data-ukt-value="warm">Warm & Welcoming</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // The cleared state is a selection of the empty-valued item, so
+            // the input shows that item’s label rather than the placeholder.
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('None');
+        });
+
         it('lets a { label, value } pair override the label derived from children', () => {
             render(
                 <Dropdown isSearchable value={{ label: 'Toasty', value: 'warm' }}>
