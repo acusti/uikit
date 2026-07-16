@@ -901,7 +901,7 @@ describe('@acusti/dropdown', () => {
     });
 
     describe('revealing the current value on open', () => {
-        it('marks the item matching value active and aria-selected when opened', async () => {
+        it('makes the item matching value the active item when opened', async () => {
             const user = userEvent.setup();
             render(
                 <Dropdown value="bold">
@@ -919,9 +919,7 @@ describe('@acusti/dropdown', () => {
 
             await user.click(screen.getByRole('button', { name: 'Voice' }));
 
-            const bold = screen.getByTestId('bold');
-            expect(bold.hasAttribute('data-ukt-active')).toBe(true);
-            expect(bold.getAttribute('aria-selected')).toBe('true');
+            expect(screen.getByTestId('bold').hasAttribute('data-ukt-active')).toBe(true);
             expect(screen.getByTestId('warm').hasAttribute('data-ukt-active')).toBe(
                 false,
             );
@@ -943,6 +941,72 @@ describe('@acusti/dropdown', () => {
 
             expect(container.querySelector('[data-ukt-active]')).toBeNull();
             expect(container.querySelector('[aria-selected="true"]')).toBeNull();
+        });
+    });
+
+    describe('listbox and menu item roles', () => {
+        it('gives searchable dropdown items role=option and neutralizes the list', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable value="bold">
+                    <ul data-testid="list">
+                        <li data-testid="warm" data-ukt-value="warm">
+                            Warm
+                        </li>
+                        <li data-testid="bold" data-ukt-value="bold">
+                            Bold
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+
+            expect(screen.getByTestId('list').getAttribute('role')).toBe('presentation');
+            expect(screen.getByTestId('warm').getAttribute('role')).toBe('option');
+            expect(screen.getByTestId('bold').getAttribute('role')).toBe('option');
+            expect(screen.getByTestId('bold').getAttribute('aria-selected')).toBe('true');
+            expect(screen.getByTestId('warm').hasAttribute('aria-selected')).toBe(false);
+        });
+
+        it('gives menu dropdown items role=menuitem and no aria-selected', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown value="bold">
+                    Menu
+                    <ul>
+                        <li data-testid="warm" data-ukt-value="warm">
+                            Warm
+                        </li>
+                        <li data-testid="bold" data-ukt-value="bold">
+                            Bold
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Menu' }));
+
+            expect(screen.getByTestId('warm').getAttribute('role')).toBe('menuitem');
+            expect(screen.getByTestId('bold').getAttribute('role')).toBe('menuitem');
+            expect(screen.getByTestId('bold').hasAttribute('aria-selected')).toBe(false);
+        });
+
+        it('does not override a consumer-set item role', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable>
+                    <ul>
+                        <li data-testid="item" data-ukt-value="x" role="menuitemradio">
+                            X
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+
+            expect(screen.getByTestId('item').getAttribute('role')).toBe('menuitemradio');
         });
     });
 

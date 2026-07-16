@@ -222,6 +222,38 @@ export const annotateParentItems = (bodyElement: MaybeHTMLElement) => {
     }
 };
 
+// Fill in the item roles the consumer hasn’t set: options in a searchable
+// (listbox) dropdown, menuitems in a menu — and always menuitems inside a
+// submenu, which is itself a menu (annotateParentItems gives it role="menu").
+// The <ul>/<ol> wrappers around the items get role="presentation" so their
+// implicit list role doesn’t sit between the listbox/menu and its items; a
+// submenu already carries role="menu", so its own role is left intact.
+export const annotateItemRoles = (
+    bodyElement: MaybeHTMLElement,
+    popupRole: 'listbox' | 'menu',
+) => {
+    if (!bodyElement) return;
+    for (const list of Array.from(bodyElement.querySelectorAll('ul, ol'))) {
+        if (!list.hasAttribute('role') && list.querySelector(ITEM_SELECTOR)) {
+            list.setAttribute('role', 'presentation');
+        }
+    }
+    for (const item of Array.from(
+        bodyElement.querySelectorAll(ITEM_SELECTOR),
+    ) as Array<HTMLElement>) {
+        // Leave a consumer-set role, and a natively interactive item’s own role
+        // (a button/link/input item keeps its element semantics), alone.
+        if (
+            item.hasAttribute('role') ||
+            item.matches('a[href], button, input, select, textarea')
+        ) {
+            continue;
+        }
+        const isMenuItem = popupRole === 'menu' || getLevelRoot(item) != null;
+        item.setAttribute('role', isMenuItem ? 'menuitem' : 'option');
+    }
+};
+
 export const expandItem = (item: HTMLElement, onToggleSubmenu?: OnToggleSubmenu) => {
     const submenu = getSubmenuOfItem(item);
     if (!submenu) return;
