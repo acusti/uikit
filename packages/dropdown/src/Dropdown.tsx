@@ -56,11 +56,17 @@ export type Item = {
      * Ancestor parent items from the root level down to the item’s
      * immediate parent. Empty for top-level items.
      */
-    path: Array<ItemPathEntry>;
+    path: Array<ItemValue>;
     value: string;
 };
 
-export type ItemPathEntry = { label: string; value: string };
+/**
+ * A { label, value } pair naming an item: `value` is the stored value (the
+ * item’s data-ukt-value) and `label` is its displayed text. Accepted by the
+ * value prop when an item’s value and label differ; also the shape of an
+ * Item’s path entries.
+ */
+export type ItemValue = { label: string; value: string };
 
 export type Props = {
     /**
@@ -141,7 +147,7 @@ export type Props = {
      * data-ukt-value in the body — so children whose value and label differ
      * need no explicit label; a { label, value } pair states it.
      */
-    value?: string | { label: string; value: string };
+    value?: ItemValue | string;
 };
 
 type ChildrenTuple = [ReactNode, ReactNode] | readonly [ReactNode, ReactNode];

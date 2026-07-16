@@ -15,4 +15,6 @@ map it back to an id. `value` now also accepts a `{ label, value }` pair —
 the same shape `onSubmitItem` reports back, so a controlled consumer can
 feed back what it received. `value` drives change detection and item
 matching; `label` is shown as the searchable input’s value. A bare string
-still works unchanged (its value and label are the same).
+still works unchanged (its value and label are the same). The pair shape is
+exported as the `ItemValue` type, mirroring `Item`; it’s also the shape of
+an `Item`’s `path` entries, replacing the `ItemPathEntry` export.
