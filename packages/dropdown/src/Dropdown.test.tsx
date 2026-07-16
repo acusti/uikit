@@ -992,6 +992,30 @@ describe('@acusti/dropdown', () => {
             expect(screen.getByTestId('bold').hasAttribute('aria-selected')).toBe(false);
         });
 
+        it('moves aria-selected to the submitted item when the body stays open', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable keepOpenOnSubmit value="bold">
+                    <ul>
+                        <li data-testid="warm" data-ukt-value="warm">
+                            Warm
+                        </li>
+                        <li data-testid="bold" data-ukt-value="bold">
+                            Bold
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+            expect(screen.getByTestId('bold').getAttribute('aria-selected')).toBe('true');
+
+            await user.click(screen.getByTestId('warm'));
+
+            expect(screen.getByTestId('warm').getAttribute('aria-selected')).toBe('true');
+            expect(screen.getByTestId('bold').hasAttribute('aria-selected')).toBe(false);
+        });
+
         it('does not override a consumer-set item role', async () => {
             const user = userEvent.setup();
             render(

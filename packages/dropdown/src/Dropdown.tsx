@@ -670,6 +670,25 @@ function RootDropdown({
         // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
         if (valueRef.current && valueRef.current === nextValue) return;
 
+        // When the body stays open after submit (keepOpenOnSubmit), move
+        // aria-selected to the submitted option so the open-time annotation
+        // doesn’t go stale; a closing body unmounts, so reopening re-derives
+        // it from props.value. Listbox only — aria-selected isn’t valid on a
+        // menuitem.
+        if (
+            element &&
+            dropdownElement &&
+            keepOpenOnSubmitRef.current &&
+            popupRole === 'listbox'
+        ) {
+            for (const selected of Array.from(
+                dropdownElement.querySelectorAll('[aria-selected="true"]'),
+            )) {
+                selected.removeAttribute('aria-selected');
+            }
+            element.setAttribute('aria-selected', 'true');
+        }
+
         // If the item is clickable or contains exactly one clickable element, invoke it
         // (but only if the event didn’t already originate from that element)
         if (element) {
@@ -1202,6 +1221,10 @@ function RootDropdown({
     // dismissal under this component’s own listeners (see handleRef), which
     // preserves iframe support and searchable/text-input triggers that native
     // light-dismiss would close on any outside pointerdown.
+    // These annotations run once per open (the body unmounts on close and is
+    // annotated fresh each time); items rendered into an already-open body —
+    // async-loaded or consumer-filtered — aren’t annotated until the next
+    // open. Known limitation until it’s needed.
     const handleBodyRef = (ref: HTMLDivElement | null) => {
         if (!ref) return;
         annotateParentItems(ref);
