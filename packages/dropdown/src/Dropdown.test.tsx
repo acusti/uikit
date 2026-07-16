@@ -730,7 +730,7 @@ describe('@acusti/dropdown', () => {
         });
     });
 
-    describe('value as a { value, label } pair', () => {
+    describe('value as a { label, value } pair', () => {
         it('shows the pair’s label as the searchable input’s value', () => {
             render(
                 <Dropdown
@@ -835,7 +835,7 @@ describe('@acusti/dropdown', () => {
             );
         });
 
-        it('lets a { value, label } pair override the label derived from children', () => {
+        it('lets a { label, value } pair override the label derived from children', () => {
             render(
                 <Dropdown isSearchable value={{ label: 'Toasty', value: 'warm' }}>
                     <ul>

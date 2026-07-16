@@ -131,15 +131,15 @@ export type Props = {
     tabIndex?: number;
     /**
      * The dropdown’s controlled value. Pass a bare identifier when an item’s
-     * stored value and its displayed label are the same, or a { value, label }
+     * stored value and its displayed label are the same, or a { label, value }
      * pair when they differ (e.g. a human-readable label shown for a stored
-     * id) — the same { value, label } shape onSubmitItem reports back. The
+     * id) — the same { label, value } shape onSubmitItem reports back. The
      * value determines whether the value has changed, to avoid triggering
      * onSubmitItem when the already-selected item is re-submitted; the label is
      * used as the search input’s value when props.isSearchable === true. A bare
      * identifier is resolved to its label from the matching child’s
      * data-ukt-value in the body — so children whose value and label differ
-     * need no explicit label; a { value, label } pair states it.
+     * need no explicit label; a { label, value } pair states it.
      */
     value?: string | { label: string; value: string };
 };
@@ -225,12 +225,12 @@ function RootDropdown({
     }
 
     // The value prop is either a bare identifier (its stored value and its
-    // displayed label are the same) or a { value, label } pair when they
+    // displayed label are the same) or a { label, value } pair when they
     // differ. valueIdentity drives change detection / no-op matching against an
     // item’s data-ukt-value; valueLabel is what a searchable dropdown shows in
     // its input. For a bare identifier, the label is resolved from the matching
     // child (data-ukt-value in the body), so children with distinct values and
-    // labels need no separate label; a { value, label } pair states it
+    // labels need no separate label; a { label, value } pair states it
     // explicitly.
     const valueIdentity = typeof value === 'string' ? value : value?.value;
     const valueLabel =
