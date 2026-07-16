@@ -368,6 +368,40 @@ export const LabelDifferentFromValue: Story = {
     },
 };
 
+export const OpensToCurrentValue: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'A controlled dropdown opens with the item matching `props.value` marked `aria-selected`, made the active item (so keyboard navigation starts there), and scrolled into view. Here the value sits far down a long list, so opening jumps straight to it rather than the top. Theme the persistent selection tint with the `--uktdd-body-bg-color-selected` custom property.',
+            },
+        },
+    },
+    render() {
+        const items = Array.from({ length: 40 }, (_, index) => ({
+            label: `Item ${index + 1}`,
+            value: String(index + 1),
+        }));
+        const [value, setValue] = React.useState('31');
+        return (
+            <Dropdown
+                isSearchable
+                label="Item"
+                onSubmitItem={({ value: submitted }) => setValue(submitted)}
+                placeholder="Search items…"
+                value={value}
+            >
+                <ul>
+                    {items.map(({ label, value: itemValue }) => (
+                        <li data-ukt-value={itemValue} key={itemValue}>
+                            {label}
+                        </li>
+                    ))}
+                </ul>
+            </Dropdown>
+        );
+    },
+};
+
 export const CSSValueInputTrigger: Story = {
     args: {
         allowCreate: true,

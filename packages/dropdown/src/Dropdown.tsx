@@ -1208,6 +1208,19 @@ function RootDropdown({
         // detection; the body is mounted only while open, so this runs once
         // per open and won’t throw on an already-open body.
         ref.showPopover();
+        // Reveal the current value on open: mark the item whose data-ukt-value
+        // matches it aria-selected, make it the active item (so keyboard
+        // navigation starts there), and scroll it into view — so a controlled
+        // dropdown opens showing (and at) its current selection.
+        if (valueIdentity != null && dropdownElement) {
+            const selectedItem = getItemElements(dropdownElement)?.find(
+                (item) => item.dataset.uktValue === valueIdentity,
+            );
+            if (selectedItem) {
+                selectedItem.setAttribute('aria-selected', 'true');
+                setActiveItem({ dropdownElement, element: selectedItem });
+            }
+        }
     };
 
     if (!isValidElement(trigger)) {
