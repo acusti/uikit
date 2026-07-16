@@ -29,6 +29,7 @@ import {
 } from './context.js';
 import styles from './Dropdown.css?inline';
 import {
+    annotateItemRoles,
     annotateParentItems,
     collapseItem,
     collapseItemsOutsidePath,
@@ -1204,20 +1205,24 @@ function RootDropdown({
     const handleBodyRef = (ref: HTMLDivElement | null) => {
         if (!ref) return;
         annotateParentItems(ref);
+        if (popupRole !== 'dialog') annotateItemRoles(ref, popupRole);
         // The Popover API is Baseline 2024, so showPopover() needs no feature
         // detection; the body is mounted only while open, so this runs once
         // per open and won’t throw on an already-open body.
         ref.showPopover();
-        // Reveal the current value on open: mark the item whose data-ukt-value
-        // matches it aria-selected, make it the active item (so keyboard
-        // navigation starts there), and scroll it into view — so a controlled
-        // dropdown opens showing (and at) its current selection.
+        // Reveal the current value on open: mark the matching option
+        // aria-selected (listbox only — aria-selected isn’t valid on a
+        // menuitem), make it the active item (so keyboard navigation starts
+        // there), and scroll it into view — so a controlled dropdown opens
+        // showing (and at) its current selection.
         if (valueIdentity != null && dropdownElement) {
             const selectedItem = getItemElements(dropdownElement)?.find(
                 (item) => item.dataset.uktValue === valueIdentity,
             );
             if (selectedItem) {
-                selectedItem.setAttribute('aria-selected', 'true');
+                if (popupRole === 'listbox') {
+                    selectedItem.setAttribute('aria-selected', 'true');
+                }
                 setActiveItem({ dropdownElement, element: selectedItem });
             }
         }
