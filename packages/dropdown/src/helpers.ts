@@ -43,14 +43,22 @@ export const getItemLabel = (item: HTMLElement): string => {
 };
 
 // Concatenate the text (string/number leaves) of a React node, approximating
-// the rendered innerText the dropdown uses as an item’s label.
+// the rendered innerText the dropdown uses as an item’s label. Submenu
+// subtrees are excluded, matching getItemLabel (and innerText, which omits
+// the collapsed — hidden — submenu), so a parent item’s derived label agrees
+// with its select-time label.
 const getNodeText = (node: ReactNode): string => {
     let text = '';
     Children.forEach(node, (child) => {
         if (typeof child === 'string' || typeof child === 'number') {
             text += child;
         } else if (isValidElement(child)) {
-            text += getNodeText((child.props as { children?: ReactNode }).children);
+            const childProps = child.props as {
+                children?: ReactNode;
+                'data-ukt-submenu'?: unknown;
+            };
+            if (childProps['data-ukt-submenu'] !== undefined) return;
+            text += getNodeText(childProps.children);
         }
     });
     return text;
@@ -74,7 +82,11 @@ export const getLabelFromChildren = (
                 children?: ReactNode;
                 'data-ukt-value'?: unknown;
             };
-            if (childProps['data-ukt-value'] === value) {
+            const uktValue = childProps['data-ukt-value'];
+            // Compare as strings: the DOM stringifies dataset values, so
+            // data-ukt-value={400} matches value="400" when selected and
+            // must also match here.
+            if (uktValue != null && String(uktValue) === value) {
                 label = getNodeText(childProps.children).replace(/\s+/g, ' ').trim();
                 return;
             }

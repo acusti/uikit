@@ -835,6 +835,41 @@ describe('@acusti/dropdown', () => {
             );
         });
 
+        it('excludes submenu subtrees from the derived label', () => {
+            render(
+                <Dropdown isSearchable value="fruits">
+                    <ul>
+                        <li data-ukt-value="fruits">
+                            Fruits
+                            <ul data-ukt-submenu="">
+                                <li data-ukt-value="apple">Apple</li>
+                                <li data-ukt-value="banana">Banana</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+                'Fruits',
+            );
+        });
+
+        it('matches a numeric data-ukt-value against a bare string value', () => {
+            render(
+                <Dropdown isSearchable value="400">
+                    <ul>
+                        <li data-ukt-value={400}>Regular</li>
+                        <li data-ukt-value={700}>Bold</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+                'Regular',
+            );
+        });
+
         it('lets a { label, value } pair override the label derived from children', () => {
             render(
                 <Dropdown isSearchable value={{ label: 'Toasty', value: 'warm' }}>
