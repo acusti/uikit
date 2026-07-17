@@ -728,7 +728,7 @@ Like items, submenus are ultimately declared in the DOM. A nested
 ```html
 <li data-ukt-item aria-haspopup="menu" aria-expanded="false">
     Align
-    <ul data-ukt-submenu role="menu">
+    <ul data-ukt-submenu role="menu" popover="manual">
         …
     </ul>
 </li>
@@ -740,6 +740,9 @@ compiles to the attribute form. Rules for direct authoring:
 
 - the `data-ukt-submenu` element must be a descendant of its parent item
   element
+- the submenu discloses in the top layer as a popover; the component sets
+  `popover="manual"`, and the engine adds it if your markup omits it, so
+  you don’t manage `display` (visibility follows the popover open state)
 - in a level whose items include a submenu, mark all of that level’s items
   explicitly with `data-ukt-item` or `data-ukt-value`; purely flat levels —
   including flat submenu bodies — fall back to the automatic item-detection
@@ -767,8 +770,12 @@ already discloses on hover intent — see [Submenus](#submenus) — so
 
 Submenus reuse the dropdown’s anchor-positioning layout model: the expanded
 parent item is the anchor, and the submenu opens at its inline-end,
-top-aligned, falling back to the opposite side when out of bounds.
-Placement custom properties follow the established naming scheme:
+top-aligned, falling back to the opposite side when out of bounds. Like the
+body, a submenu renders in the top layer (`popover="manual"`), so its
+containing block is the viewport — no ancestor (including the body’s own
+top-layer box) can capture it and clip or shift its placement, which keeps
+it flush to the parent item’s edge across browsers. Placement custom
+properties follow the established naming scheme:
 
 - `--uktdd-submenu-position-area` (default: `inline-end span-block-end`)
 - `--uktdd-submenu-position-try-fallbacks`
@@ -790,18 +797,12 @@ theming menu colors.
 
 The active path is fully styleable: `data-ukt-active` marks one item per
 open level (a parent item stays active while you navigate its submenu), and
-`aria-expanded="true"` marks open parent items. The default submenu
-visibility rule, shown here for reference:
-
-```css
-[data-ukt-submenu] {
-    display: none;
-}
-
-[aria-expanded='true'] > [data-ukt-submenu] {
-    display: block;
-}
-```
+`aria-expanded="true"` marks open parent items. Submenu visibility is not a
+`display` rule you own: each submenu is a `popover="manual"` element the
+component shows and hides (via `showPopover`/`hidePopover`) as its parent
+item expands and collapses, so it discloses in the top layer and the UA’s
+`:popover-open` state controls whether it renders. Don’t set `display` on
+`[data-ukt-submenu]` — it would fight that state.
 
 Following macOS, the default styles distinguish the deepest active item —
 the one keyboard input operates on — from its ancestors on the active path.
