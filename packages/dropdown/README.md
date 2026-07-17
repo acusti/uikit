@@ -123,13 +123,17 @@ CSS-first sizing model:
 - The dropdown body is an anchored shell
 - The inner content region becomes scrollable only when the content exceeds
   the available space
-- Placement fallbacks are handled with `position-try-order: most-height`
+- The body opens in its authored direction whenever it fits there, falling
+  back through the other placements in order and only squeezing-to-scroll
+  when it fits nowhere at its natural size (see
+  [Changing the Default Direction](#changing-the-default-direction))
 
 This means the dropdown tends to:
 
 - stay content-sized when the contents are small
-- expand to the available viewport space when more room is needed
-- become scrollable when the contents exceed that space
+- open in the direction you asked for, as long as that side can hold it
+- expand to the available viewport space, and become scrollable, only when
+  the contents exceed the room the chosen side has
 
 Internally, the dropdown renders:
 
@@ -596,6 +600,14 @@ See the [`DirectionRecipes` story][] for a live demo of all four.
 [`DirectionRecipes` story]:
     https://uikit.acusti.ca/?path=/docs/uikit-controls-Dropdown--docs#direction-recipes
 
+The primary placement wins whenever the body fits there at its natural
+size, then the fallbacks are tried in order — the body opens in the
+direction you asked for as long as that side can hold it, and never flips
+to the opposite side just because the viewport happens to have more empty
+space there. Only when the body fits in none of those placements does it
+size itself to the block-axis space its preferred side has and let the
+content scroll, so it never overflows the viewport or covers the trigger.
+
 Use `--uktdd-body-gap` for the space between the trigger and the body. It
 is applied as a symmetric `margin-block`, so the gap lands on whichever
 side the body attaches to and auto-reverses when `position-try` flips the
@@ -638,8 +650,9 @@ tile. A `center` tile is only as wide as the trigger, so a body wider than
 the trigger always overflows it — and `position-try` refuses to select a
 fallback that overflows, so a `bottom center` → `top center` setup never
 flips. `span-all` centers over the trigger identically but spans the full
-width, so it flips cleanly and clamps to the viewport near an edge; the
-package’s `position-try-order: most-height` then picks the taller side:
+width, so it flips cleanly and clamps to the viewport near an edge. The
+menu opens below by default and flips above only when it doesn’t fit below;
+list the flipped fallback so that flip is available:
 
 ```css
 .centered-menu {
