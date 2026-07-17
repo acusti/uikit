@@ -58,7 +58,7 @@
       "version": "2.4.0",
       "dependencies": {
         "@acusti/css-values": "^1.2.0",
-        "@acusti/input-text": "^2.4.2",
+        "@acusti/input-text": "^2.4.3",
         "clsx": "^2",
       },
       "devDependencies": {
@@ -112,7 +112,7 @@
     },
     "packages/docs": {
       "name": "@acusti/uikit-docs",
-      "version": "0.6.3",
+      "version": "0.6.4-alpha.0",
       "dependencies": {
         "@acusti/css-value-input": "workspace:^",
         "@acusti/date-picker": "workspace:^",
@@ -140,10 +140,10 @@
     },
     "packages/dropdown": {
       "name": "@acusti/dropdown",
-      "version": "0.57.0",
+      "version": "1.0.0-alpha.4",
       "dependencies": {
         "@acusti/matchmaking": "^0.10.0",
-        "@acusti/use-keyboard-events": "^0.11.0",
+        "@acusti/use-keyboard-events": "^0.11.1",
         "clsx": "^2",
       },
       "devDependencies": {
@@ -306,7 +306,7 @@
     },
     "packages/vite-plugin-svg-react": {
       "name": "@acusti/vite-plugin-svg-react",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "@svgr/core": "^8.1",
         "@svgr/plugin-jsx": "^8.1",
