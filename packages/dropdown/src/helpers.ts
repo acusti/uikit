@@ -250,6 +250,12 @@ export const annotateItemRoles = (
             continue;
         }
         const isMenuItem = popupRole === 'menu' || getLevelRoot(item) != null;
+        // A top-level parent item in a listbox would pair role="option" with
+        // the aria-haspopup/aria-expanded that annotateParentItems gives it —
+        // invalid ARIA (an option can’t disclose a popup), and no valid role
+        // exists for a submenu parent inside a listbox, so leave its role to
+        // the consumer. (In a menu, menuitem is correct for parents.)
+        if (!isMenuItem && getSubmenuOfItem(item)) continue;
         item.setAttribute('role', isMenuItem ? 'menuitem' : 'option');
     }
 };

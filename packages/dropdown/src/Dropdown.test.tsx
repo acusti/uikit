@@ -992,6 +992,93 @@ describe('@acusti/dropdown', () => {
             expect(screen.getByTestId('bold').hasAttribute('aria-selected')).toBe(false);
         });
 
+        it('does not give a listbox submenu parent item role=option', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable>
+                    <ul>
+                        <li data-testid="plain" data-ukt-value="plain">
+                            Plain
+                        </li>
+                        <li data-testid="parent" data-ukt-item>
+                            Fruits
+                            <ul data-ukt-submenu="">
+                                <li data-testid="nested" data-ukt-value="apple">
+                                    Apple
+                                </li>
+                            </ul>
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+
+            expect(screen.getByTestId('plain').getAttribute('role')).toBe('option');
+            // A parent item’s aria-haspopup/aria-expanded are invalid on an
+            // option, so its role is left to the consumer
+            expect(screen.getByTestId('parent').hasAttribute('role')).toBe(false);
+            expect(screen.getByTestId('parent').getAttribute('aria-haspopup')).toBe(
+                'menu',
+            );
+            expect(screen.getByTestId('nested').getAttribute('role')).toBe('menuitem');
+        });
+
+        it('leaves selection ARIA alone when the consumer authors aria-selected', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable value="bold">
+                    <ul>
+                        <li aria-selected="true" data-testid="warm" data-ukt-value="warm">
+                            Warm
+                        </li>
+                        <li data-testid="bold" data-ukt-value="bold">
+                            Bold
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+
+            // The consumer marked warm selected, so the reveal must not add a
+            // second selected option for the item matching props.value
+            expect(screen.getByTestId('bold').hasAttribute('aria-selected')).toBe(false);
+            expect(screen.getByTestId('warm').getAttribute('aria-selected')).toBe('true');
+        });
+
+        it('scopes the aria-selected move on submit to the popup body', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable keepOpenOnSubmit value="bold">
+                    <button aria-selected="true" data-testid="trigger" type="button">
+                        Voice
+                    </button>
+                    <ul>
+                        <li data-testid="warm" data-ukt-value="warm">
+                            Warm
+                        </li>
+                        <li data-testid="bold" data-ukt-value="bold">
+                            Bold
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByTestId('trigger'));
+            expect(screen.getByTestId('bold').getAttribute('aria-selected')).toBe('true');
+
+            await user.click(screen.getByTestId('warm'));
+
+            expect(screen.getByTestId('warm').getAttribute('aria-selected')).toBe('true');
+            expect(screen.getByTestId('bold').hasAttribute('aria-selected')).toBe(false);
+            // The move never reaches outside the popup body (e.g. a custom
+            // trigger’s own aria-selected)
+            expect(screen.getByTestId('trigger').getAttribute('aria-selected')).toBe(
+                'true',
+            );
+        });
+
         it('moves aria-selected to the submitted item when the body stays open', async () => {
             const user = userEvent.setup();
             render(
