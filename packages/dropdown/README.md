@@ -959,8 +959,10 @@ Opening also reveals the current selection: the item matching `props.value`
 becomes the active item (so keyboard navigation starts from the current
 selection) and is scrolled into view. In a searchable (listbox) dropdown it
 additionally receives `aria-selected="true"` (`aria-selected` isn’t valid
-on a `menuitem`); the persistent tint on the selected item is themeable via
-the `--uktdd-body-bg-color-selected` custom property.
+on a `menuitem`) — unless you author `aria-selected` on items yourself, in
+which case the component leaves selection ARIA entirely to you, as with any
+ARIA you set. The persistent tint on the selected item is themeable via the
+`--uktdd-body-bg-color-selected` custom property.
 
 Submenus and menubars extend the same pattern automatically:
 

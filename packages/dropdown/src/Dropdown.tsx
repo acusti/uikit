@@ -259,6 +259,12 @@ function RootDropdown({
     const popupRole = isSearchable ? 'listbox' : hasItems ? 'menu' : 'dialog';
     const menubar = useContext(MenubarContext);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
+    // Whether the consumer authors aria-selected in the body themselves, in
+    // which case this component’s aria-selected fill-ins stand down (set per
+    // open in handleBodyRef)
+    const consumerOwnsAriaSelectedRef = useRef(false);
+    // Body elements already annotated this open (see handleBodyRef)
+    const annotatedBodiesRef = useRef<WeakSet<HTMLElement>>(new WeakSet());
     const closingTimerRef = useRef<null | TimeoutID>(null);
     const isOpeningTimerRef = useRef<null | TimeoutID>(null);
     const currentInputMethodRef = useRef<'keyboard' | 'mouse'>('mouse');
@@ -674,15 +680,18 @@ function RootDropdown({
         // aria-selected to the submitted option so the open-time annotation
         // doesn’t go stale; a closing body unmounts, so reopening re-derives
         // it from props.value. Listbox only — aria-selected isn’t valid on a
-        // menuitem.
+        // menuitem — scoped to the popup body (never a custom trigger’s own
+        // aria-selected), and skipped entirely when the consumer authors
+        // aria-selected themselves.
         if (
             element &&
-            dropdownElement &&
             keepOpenOnSubmitRef.current &&
-            popupRole === 'listbox'
+            popupRole === 'listbox' &&
+            !consumerOwnsAriaSelectedRef.current
         ) {
+            const bodyElement = element.closest('.uktdropdown-body');
             for (const selected of Array.from(
-                dropdownElement.querySelectorAll('[aria-selected="true"]'),
+                bodyElement?.querySelectorAll('[aria-selected="true"]') ?? [],
             )) {
                 selected.removeAttribute('aria-selected');
             }
@@ -1227,6 +1236,21 @@ function RootDropdown({
     // open. Known limitation until it’s needed.
     const handleBodyRef = (ref: HTMLDivElement | null) => {
         if (!ref) return;
+        // An inline ref callback re-attaches (and re-runs) on every re-render
+        // while the body is open, but everything below must run exactly once
+        // per open: showPopover() throws on an already-shown popover, and the
+        // ownership check would read the reveal’s own aria-selected annotation
+        // back as consumer-authored. Each open mounts a fresh body element, so
+        // latch per element (a WeakSet, to hold no unmounted bodies alive).
+        if (annotatedBodiesRef.current.has(ref)) return;
+        annotatedBodiesRef.current.add(ref);
+        // A consumer-authored aria-selected anywhere in the just-mounted body
+        // (whether "true" or "false") means the consumer manages selection
+        // ARIA themselves: the reveal below and the keepOpenOnSubmit move in
+        // handleSubmitItem both stand down, so a single-select listbox never
+        // ends up with two selected options (the usual your-values-win rule).
+        consumerOwnsAriaSelectedRef.current =
+            ref.querySelector('[aria-selected]') != null;
         annotateParentItems(ref);
         if (popupRole !== 'dialog') annotateItemRoles(ref, popupRole);
         // The Popover API is Baseline 2024, so showPopover() needs no feature
@@ -1247,7 +1271,7 @@ function RootDropdown({
                 (item) => item.dataset.uktValue === valueIdentity,
             );
             if (selectedItem) {
-                if (popupRole === 'listbox') {
+                if (popupRole === 'listbox' && !consumerOwnsAriaSelectedRef.current) {
                     selectedItem.setAttribute('aria-selected', 'true');
                 }
                 setActiveItem({ dropdownElement, element: selectedItem });
