@@ -1237,7 +1237,11 @@ function RootDropdown({
         // aria-selected (listbox only — aria-selected isn’t valid on a
         // menuitem), make it the active item (so keyboard navigation starts
         // there), and scroll it into view — so a controlled dropdown opens
-        // showing (and at) its current selection.
+        // showing (and at) its current selection. The lookup is deliberately
+        // top-level only (getItemElements filters to the root level):
+        // search/typeahead also match per level, and no native menu opens
+        // with submenus pre-expanded, so a value matching only a submenu
+        // item is a graceful no-op, like a value matching nothing.
         if (valueIdentity != null && dropdownElement) {
             const selectedItem = getItemElements(dropdownElement)?.find(
                 (item) => item.dataset.uktValue === valueIdentity,
