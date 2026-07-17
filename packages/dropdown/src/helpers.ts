@@ -206,6 +206,12 @@ let submenuIdCounter = 0;
 const ensureSubmenuARIA = (item: HTMLElement, submenu: HTMLElement) => {
     if (!submenu.hasAttribute('role')) submenu.setAttribute('role', 'menu');
     if (!submenu.id) submenu.id = `uktdd-submenu-${++submenuIdCounter}`;
+    // Normalize the submenu to a manual popover for consumers who author raw
+    // data-ukt-submenu markup (SubmenuDropdown already sets it); a bare or auto
+    // popover would light-dismiss and desync from the engine’s show/hidePopover.
+    if (submenu.getAttribute('popover') !== 'manual') {
+        submenu.setAttribute('popover', 'manual');
+    }
     if (!item.hasAttribute('aria-haspopup')) item.setAttribute('aria-haspopup', 'menu');
     if (!item.hasAttribute('aria-expanded')) item.setAttribute('aria-expanded', 'false');
     if (!item.hasAttribute('aria-controls')) {

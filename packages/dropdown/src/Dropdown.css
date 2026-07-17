@@ -170,31 +170,71 @@
         }
     }
 
+    /* the expanded item anchors its submenu; its disclosure is driven by the
+       submenu’s popover open state (showPopover on expand), not a display
+       toggle here */
     [data-ukt-item][aria-expanded="true"] {
         anchor-name: --uktdd-submenu-anchor;
+    }
 
-        > [data-ukt-submenu] {
-            display: block;
-        }
+    /* the submenu renders in the top layer via popover="manual", like the
+       body, so no ancestor — including the body’s own popover box — can
+       become the containing block for the fixed submenu and clip or shift its
+       anchor placement. (Safari shifts a position-area box back inside its
+       containing block on both axes, which pulled the submenu in over its
+       parent menu when the body was that containing block.) The popover
+       attribute plus its UA `:not(:popover-open)` rule handle hide-when-
+       collapsed, so there’s no display toggle; showPopover/hidePopover track
+       the item’s expanded state. The UA-popover box reset (inset/border) lives
+       here — the selector already outweighs a bare [popover] on specificity —
+       while the cosmetics stay overridable. */
+
+    /* Until popover="manual" is applied — SubmenuDropdown sets it on render,
+       ensureSubmenuARIA adds it when the body opens — a submenu has no UA
+       :not(:popover-open) rule to hide it. Keep it hidden here so raw
+       data-ukt-submenu markup inserted into an already-open body (annotated
+       only on the next open) doesn’t flash visible and uncontrolled. Once the
+       attribute is present this stops matching, leaving visibility to the
+       popover open state (no author display to fight :popover-open). */
+    [data-ukt-submenu]:not([popover]) {
+        display: none;
     }
 
     [data-ukt-submenu] {
         box-sizing: border-box;
-        display: none;
+        inset: auto;
+        border: 0;
+        block-size: auto;
         /* an explicit color so items don’t inherit the white highlight color
            from their active parent item (the submenu is its DOM child) */
         color: var(--uktdd-body-color);
         position: fixed;
         position-anchor: --uktdd-submenu-anchor;
         position-area: var(--uktdd-submenu-position-area);
-        position-try-fallbacks: var(--uktdd-submenu-position-try-fallbacks);
+        /* same strict-fit + fill-last-resort model as the body (see the
+           .uktdropdown-body rule): a too-tall submenu sizes to its block-axis
+           space and scrolls instead of clipping past the viewport edge, and
+           the four --uktdd-fill variants keep it as near the primary
+           placement as possible before flipping inline or block */
+        position-try-fallbacks:
+            var(--uktdd-submenu-position-try-fallbacks),
+            --uktdd-fill,
+            --uktdd-fill flip-inline,
+            --uktdd-fill flip-block,
+            --uktdd-fill flip-block flip-inline;
         z-index: 2;
         margin-block: 0;
         margin-inline: var(--uktdd-submenu-gap);
+        /* the shared --uktdd-fill subtracts --uktdd-body-gap to keep the body’s
+           block-axis margins inside the fill region; a submenu’s block margins
+           are 0 (its gap is inline), so zero it here to avoid shortening a
+           filled submenu when a consumer sets a body gap */
+        --uktdd-body-gap: 0;
         padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right)
             var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
         inline-size: max-content;
         max-inline-size: var(--uktdd-body-max-width);
+        min-block-size: min(var(--uktdd-body-min-height), var(--uktdd-body-max-height));
         max-block-size: var(--uktdd-body-max-height);
         overflow: auto;
         overscroll-behavior: contain;

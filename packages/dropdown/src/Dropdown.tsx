@@ -364,6 +364,16 @@ function RootDropdown({
     };
 
     const handleToggleSubmenu = (item: HTMLElement, isExpanded: boolean) => {
+        // Show/hide the submenu in the top layer (popover="manual"), like the
+        // body, so no ancestor can become its containing block and shift its
+        // anchor placement. Gate on the current state so a redundant toggle is
+        // a no-op instead of a showPopover/hidePopover that throws.
+        const submenu = getSubmenuOfItem(item);
+        if (submenu) {
+            const isShown = submenu.matches(':popover-open');
+            if (isExpanded && !isShown) submenu.showPopover();
+            else if (!isExpanded && isShown) submenu.hidePopover();
+        }
         for (const registration of submenuRegistrationsRef.current) {
             if (registration.element === item) {
                 (isExpanded ? registration.onOpen : registration.onClose)?.();
@@ -1446,12 +1456,19 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
         body = (children as ChildrenTuple)[1];
     }
 
+    // popover="manual" renders the submenu in the top layer (see the
+    // [data-ukt-submenu] CSS and handleToggleSubmenu), escaping the body’s
+    // containing block so its anchor placement is correct across browsers. The
+    // root dropdown’s engine calls showPopover/hidePopover as the item toggles.
     const submenu = isValidElement(body) ? (
         cloneElement(body as ReactElement<Record<string, unknown>>, {
             'data-ukt-submenu': '',
+            popover: 'manual',
         })
     ) : (
-        <div data-ukt-submenu="">{body}</div>
+        <div data-ukt-submenu="" popover="manual">
+            {body}
+        </div>
     );
 
     return (
