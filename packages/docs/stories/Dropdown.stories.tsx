@@ -716,7 +716,7 @@ export const DirectionRecipes: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallbacks` (see the README’s “Changing the Default Direction” section for the full cheatsheet). Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. The bottom pair sits near the top of the canvas and the top pair near the bottom, so each opens toward the side with more room rather than `position-try-order: most-height` overriding it toward whichever side has more empty canvas.',
+                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallbacks` (see the README’s “Changing the Default Direction” section for the full cheatsheet). Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. Each recipe opens in its named direction whenever that side has room, independent of where the trigger sits; the bottom pair is placed near the top of the canvas and the top pair near the bottom only so each menu opens into empty space instead of overlapping the other row.',
             },
         },
     },

@@ -254,14 +254,11 @@
 }
 
 /* the four --uktdd-body-position-area / --uktdd-body-position-try-fallbacks
-   recipes from the README’s direction cheatsheet. position-try-order:
-   most-height picks whichever side of the viewport has more room, not
-   merely “enough” room, so the two rows sit close to the canvas’s top and
-   bottom edges respectively — the bottom-opening pair near the top (room
-   below dominates) and the top-opening pair near the bottom (room above
-   dominates) — so each recipe’s primary placement wins on its own terms
-   instead of most-height overriding it toward whichever edge happens to
-   have more empty canvas */
+   recipes from the README’s direction cheatsheet. Each recipe opens in its
+   named direction wherever the trigger sits, so this layout is purely
+   cosmetic: the rows sit near the canvas’s top and bottom edges — the
+   bottom-opening pair up top, the top-opening pair down low — only so each
+   menu opens into empty space instead of overlapping the other row */
 .direction-recipes {
     display: flex;
     flex-direction: column;
