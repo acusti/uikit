@@ -262,7 +262,7 @@ function RootDropdown({
     // Whether the consumer authors aria-selected in the body themselves, in
     // which case this component’s aria-selected fill-ins stand down (set per
     // open in handleBodyRef)
-    const consumerOwnsAriaSelectedRef = useRef(false);
+    const consumerOwnsARIASelectedRef = useRef(false);
     // Body elements already annotated this open (see handleBodyRef)
     const annotatedBodiesRef = useRef<WeakSet<HTMLElement>>(new WeakSet());
     const closingTimerRef = useRef<null | TimeoutID>(null);
@@ -687,7 +687,7 @@ function RootDropdown({
             element &&
             keepOpenOnSubmitRef.current &&
             popupRole === 'listbox' &&
-            !consumerOwnsAriaSelectedRef.current
+            !consumerOwnsARIASelectedRef.current
         ) {
             const bodyElement = element.closest('.uktdropdown-body');
             for (const selected of Array.from(
@@ -1249,7 +1249,7 @@ function RootDropdown({
         // ARIA themselves: the reveal below and the keepOpenOnSubmit move in
         // handleSubmitItem both stand down, so a single-select listbox never
         // ends up with two selected options (the usual your-values-win rule).
-        consumerOwnsAriaSelectedRef.current =
+        consumerOwnsARIASelectedRef.current =
             ref.querySelector('[aria-selected]') != null;
         annotateParentItems(ref);
         if (popupRole !== 'dialog') annotateItemRoles(ref, popupRole);
@@ -1271,7 +1271,7 @@ function RootDropdown({
                 (item) => item.dataset.uktValue === valueIdentity,
             );
             if (selectedItem) {
-                if (popupRole === 'listbox' && !consumerOwnsAriaSelectedRef.current) {
+                if (popupRole === 'listbox' && !consumerOwnsARIASelectedRef.current) {
                     selectedItem.setAttribute('aria-selected', 'true');
                 }
                 setActiveItem({ dropdownElement, element: selectedItem });

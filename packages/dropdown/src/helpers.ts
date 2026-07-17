@@ -203,7 +203,7 @@ export const isItemExpanded = (item: HTMLElement) =>
 
 let submenuIdCounter = 0;
 
-const ensureSubmenuAria = (item: HTMLElement, submenu: HTMLElement) => {
+const ensureSubmenuARIA = (item: HTMLElement, submenu: HTMLElement) => {
     if (!submenu.hasAttribute('role')) submenu.setAttribute('role', 'menu');
     if (!submenu.id) submenu.id = `uktdd-submenu-${++submenuIdCounter}`;
     if (!item.hasAttribute('aria-haspopup')) item.setAttribute('aria-haspopup', 'menu');
@@ -218,7 +218,7 @@ export const annotateParentItems = (bodyElement: MaybeHTMLElement) => {
     if (!bodyElement) return;
     for (const submenu of Array.from(bodyElement.querySelectorAll(SUBMENU_SELECTOR))) {
         const item = getParentItem(submenu as HTMLElement);
-        if (item) ensureSubmenuAria(item, submenu as HTMLElement);
+        if (item) ensureSubmenuARIA(item, submenu as HTMLElement);
     }
 };
 
@@ -263,7 +263,7 @@ export const annotateItemRoles = (
 export const expandItem = (item: HTMLElement, onToggleSubmenu?: OnToggleSubmenu) => {
     const submenu = getSubmenuOfItem(item);
     if (!submenu) return;
-    ensureSubmenuAria(item, submenu);
+    ensureSubmenuARIA(item, submenu);
     if (isItemExpanded(item)) return;
     item.setAttribute('aria-expanded', 'true');
     onToggleSubmenu?.(item, true);
