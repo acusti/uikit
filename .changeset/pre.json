@@ -22,11 +22,17 @@
         "@acusti/vite-plugin-svg-react": "0.1.0"
     },
     "changesets": [
+        "dropdown-derive-label-from-children",
+        "dropdown-listbox-roles",
         "dropdown-nested-independent-menu",
         "dropdown-open-on-hover",
+        "dropdown-prefer-authored-direction",
         "dropdown-remove-min-body-props",
         "dropdown-rename-position-try-fallbacks",
+        "dropdown-reveal-value-on-open",
+        "dropdown-submenu-top-layer",
         "dropdown-top-layer-popover",
+        "dropdown-value-label-pair",
         "menubar-stay-engaged-on-non-menu-hover",
         "nested-dropdown-submenus",
         "submenu-mouse-intent"

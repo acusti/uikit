@@ -1,6 +1,6 @@
 {
     "name": "@acusti/dropdown",
-    "version": "1.0.0-alpha.4",
+    "version": "1.0.0-alpha.5",
     "description": "React component that renders a dropdown with a trigger and supports searching, keyboard access, and more",
     "keywords": [
         "a11y",

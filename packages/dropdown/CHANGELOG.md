@@ -1,5 +1,120 @@
 # @acusti/dropdown
 
+## 1.0.0-alpha.5
+
+### Major Changes
+
+- 0f2a467: Make the authored placement direction win whenever it fits,
+  instead of letting `position-try-order: most-height` override it. The
+  body (and each submenu) now uses its `--uktdd-body-position-area` primary
+  placement — and then its `--uktdd-body-position-try-fallbacks` in order —
+  accepting the first that fits at the box’s natural size, and only
+  squeezing-and-scrolling as a last resort. Previously
+  `position-try-order: most-height` re-sorted the candidates by available
+  height, so a dropdown told to open above with ample room above could
+  still open below merely because the viewport had more empty space there.
+
+    Removed `position-try-order: most-height` from `.uktdropdown-body` and
+    dropped the `100%` term from its base `max-block-size` (a placement is
+    now accepted only when the body fits it at natural size, so it no
+    longer silently shrinks under the primary). When the body fits nowhere
+    at natural size, four appended `--uktdd-fill` fallbacks size it to the
+    available block-axis space and let `.uktdropdown-content` scroll,
+    staying as close to the primary placement as possible: same side first,
+    flipping inline alignment only to escape a horizontal-overflow
+    rejection, and flipping to the opposite block side only when the
+    preferred side is under `--uktdd-body-min-height`. Submenus gained a
+    `min-block-size` so the same too-short-side rejection applies to them.
+
+    **Migration:** if you relied on `most-height` to auto-open a dropdown
+    toward whichever side had more room (for example the README’s
+    centered-menu recipe, which flipped `bottom span-all` to `top span-all`
+    on the taller side), it now stays on its primary side while that side
+    can hold the body and flips only when the body doesn’t fit there. Set
+    `--uktdd-body-position-area` to the side you actually want as the
+    default, and list the flipped side first in
+    `--uktdd-body-position-try-fallbacks`. If you referenced `--uktdd-fill`
+    as a custom `@position-try` name, rename yours — it’s now shipped by
+    the package.
+
+- 78c7086: Render submenus in the top layer via `popover="manual"`, the
+  same way the body already is, so no ancestor — including the body’s own
+  top-layer popover box — can become the containing block for a submenu and
+  shift its anchor placement. Previously each submenu was a plain
+  `position: fixed` element, so its placement depended on which box the
+  browser treated as its containing block. In Safari (which, per spec,
+  shifts a `position-area` box back inside its containing block on both
+  axes) the submenu was clamped into the parent menu’s box and rendered
+  overlapping its parent item instead of flush to the item’s inline-end
+  edge; Chrome happened to look correct only because of a Chromium bug that
+  skips the inline-axis shift.
+
+    The submenu’s disclosure is now driven by its popover open state
+    (`showPopover`/`hidePopover`, tracked to the parent item’s expanded
+    state) rather than a CSS `display` toggle, matching the body. This also
+    makes submenus immune to a transformed/filtered/contained ancestor
+    becoming their containing block, the same guarantee the body gained
+    from top-layer rendering. Consumers styling `[data-ukt-submenu]` should
+    not set `display` on it (the popover open state controls visibility)
+    and should expect it to render in the top layer.
+
+### Minor Changes
+
+- 8e47cee: Derive a bare value’s label from the matching child
+
+    Showing the current value’s label in a controlled searchable dropdown
+    previously meant passing a `{ label, value }` pair. When you render the
+    body yourself, the dropdown now reads the label from the child whose
+    `data-ukt-value` matches a bare string `value` — so
+    `<li data-ukt-value="warm">Warm & Welcoming</li>` with `value="warm"`
+    displays “Warm & Welcoming” with no extra prop. The derived text
+    approximates the item’s rendered `innerText`; pass a `{ label, value }`
+    pair to override it when that isn’t what you want shown.
+
+- d3a24b8: Add listbox and menu item roles
+
+    On open, the dropdown fills in the ARIA roles a consumer hasn’t set:
+    `option` on items in a searchable (listbox) dropdown and `menuitem` in
+    a menu — and always `menuitem` inside a submenu, which is itself a
+    menu. The `<ul>`/`<ol>` wrappers around items get `role="presentation"`
+    so the listbox/menu owns its items directly instead of through an
+    intervening list. A natively interactive item (button, link, input) and
+    any item with a consumer-set role keep their own role, and a submenu
+    parent item in a listbox gets no role at all (its disclosure ARIA is
+    invalid on an `option`). (`aria-selected` on the current option is set
+    by the reveal-on-open behavior — unless aria-selected is
+    consumer-authored, in which case selection ARIA is left entirely to the
+    consumer.)
+
+- a8111ed: Reveal the current value when the dropdown opens
+
+    A controlled dropdown now opens with the item whose `data-ukt-value`
+    matches `props.value` made the active item (so keyboard navigation
+    starts from it) and scrolled into view — so a long list opens showing,
+    and scrolled to, the current selection instead of the top. In a
+    searchable (listbox) dropdown the item is also marked `aria-selected`
+    (`aria-selected` isn’t valid on a `menuitem`, so menus get the active
+    highlight without it). The persistent selection tint is themeable via
+    the new `--uktdd-body-bg-color-selected` custom property.
+
+- bc8cbbe: Accept a `{ label, value }` pair for the value prop so item
+  labels can differ from values
+
+    The `value` prop was a single string doing double duty: the searchable
+    input’s displayed text _and_ the identity compared against each item’s
+    `data-ukt-value` for change detection. When an item’s stored value
+    differs from its human-readable label (e.g. a copy-voice id `warm`
+    shown as “Warm & Welcoming”), those two roles conflict — displaying the
+    label forces `value` to _be_ the label, so submitting reports the label
+    and consumers have to map it back to an id. `value` now also accepts a
+    `{ label, value }` pair — the same shape `onSubmitItem` reports back,
+    so a controlled consumer can feed back what it received. `value` drives
+    change detection and item matching; `label` is shown as the searchable
+    input’s value. A bare string still works unchanged (its value and label
+    are the same). The pair shape is exported as the `ItemValue` type,
+    mirroring `Item`; it’s also the shape of an `Item`’s `path` entries,
+    replacing the `ItemPathEntry` export.
+
 ## 1.0.0-alpha.4
 
 ### Major Changes
