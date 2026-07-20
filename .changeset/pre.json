@@ -32,6 +32,7 @@
         "dropdown-reveal-value-on-open",
         "dropdown-submenu-top-layer",
         "dropdown-top-layer-popover",
+        "dropdown-unmatched-value-placeholder",
         "dropdown-value-label-pair",
         "menubar-stay-engaged-on-non-menu-hover",
         "nested-dropdown-submenus",
