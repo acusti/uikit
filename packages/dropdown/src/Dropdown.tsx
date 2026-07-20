@@ -242,15 +242,19 @@ function RootDropdown({
     // child (data-ukt-value in the body — derivation walks the same node the
     // body renders, so a data-ukt-value in a custom trigger can’t match), so
     // children with distinct values and labels need no separate label; a
-    // { label, value } pair states it explicitly. Only a searchable dropdown
-    // displays the label, so skip the per-render walk entirely for anything
-    // else.
+    // { label, value } pair states it explicitly. A bare value that matches no
+    // child has no known label — a value is an identity, not display text — so
+    // it falls back to the placeholder (an empty input), not to the raw
+    // identifier. The exception is allowCreate, where an unmatched value is an
+    // entry the user created (a typed value not among the items) and must still
+    // show as typed. Only a searchable dropdown displays the label, so skip the
+    // per-render walk entirely for anything else.
     const valueIdentity = typeof value === 'string' ? value : value?.value;
     const valueLabel = !isSearchable
         ? undefined
         : typeof value !== 'string'
           ? value?.label
-          : (getLabelFromChildren(body, value) ?? value);
+          : (getLabelFromChildren(body, value) ?? (allowCreate ? value : undefined));
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
