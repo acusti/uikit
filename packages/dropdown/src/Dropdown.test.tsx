@@ -885,6 +885,49 @@ describe('@acusti/dropdown', () => {
             expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('None');
         });
 
+        it('shows the placeholder for an undefined value, even with an empty-valued item', () => {
+            render(
+                <Dropdown isSearchable placeholder="Mixed" value={undefined}>
+                    <ul>
+                        <li data-ukt-value="">Inherit</li>
+                        <li data-ukt-value="400">Normal</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // undefined is “no value”, distinct from the empty string (a real
+            // value that resolves to its item’s label): the input stays empty
+            // and shows its placeholder rather than the empty-valued item’s
+            // label. This is the “Mixed” state a font-weight select uses when
+            // several weights are selected at once, separate from an explicit
+            // empty-valued “Inherit” option (value: '').
+            const input = screen.getByRole('textbox') as HTMLInputElement;
+            expect(input.value).toBe('');
+            expect(input.placeholder).toBe('Mixed');
+        });
+
+        it('shows an empty-valued { label, value } pair’s label over a matching item’s', () => {
+            render(
+                <Dropdown
+                    isSearchable
+                    placeholder="Mixed"
+                    value={{ label: 'Inherit', value: '' }}
+                >
+                    <ul>
+                        <li data-ukt-value="">Inherit option</li>
+                        <li data-ukt-value="400">Normal</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // The pair states the label explicitly, so an empty-valued
+            // selection (the “Inherit” state) shows the pair’s label — not the
+            // matching item’s text, and not the placeholder.
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+                'Inherit',
+            );
+        });
+
         it('lets a { label, value } pair override the label derived from children', () => {
             render(
                 <Dropdown isSearchable value={{ label: 'Toasty', value: 'warm' }}>
