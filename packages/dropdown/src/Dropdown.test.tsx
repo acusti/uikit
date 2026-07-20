@@ -855,6 +855,40 @@ describe('@acusti/dropdown', () => {
             );
         });
 
+        it('falls back to the placeholder when a bare value matches no item', () => {
+            render(
+                <Dropdown isSearchable placeholder="Pick one" value="warm">
+                    <ul>
+                        <li data-ukt-value="bold">Bold & Direct</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // A value is an identity, not display text: with no matching item
+            // there’s no known label, so the input stays empty and shows its
+            // placeholder rather than the raw identifier.
+            const input = screen.getByRole('textbox') as HTMLInputElement;
+            expect(input.value).toBe('');
+            expect(input.placeholder).toBe('Pick one');
+        });
+
+        it('shows an unmatched value verbatim when allowCreate is set', () => {
+            render(
+                <Dropdown allowCreate isSearchable value="650">
+                    <ul>
+                        <li data-ukt-value="400">Normal</li>
+                        <li data-ukt-value="700">Bold</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // allowCreate means an unmatched value is a legitimately created
+            // entry (a value the user typed that isn’t among the items), so it
+            // must still display as typed rather than fall back to the
+            // placeholder.
+            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('650');
+        });
+
         it('matches a numeric data-ukt-value against a bare string value', () => {
             render(
                 <Dropdown isSearchable value="400">
