@@ -627,6 +627,14 @@ the last-resort fill also prefers the upward side. In these fill placements
 the body spans the trigger (centered over it, shifted inward as needed to
 stay on-screen) rather than keeping the primary placement’s edge alignment.
 
+In the fills, `--uktdd-body-min-height` marks a side as too cramped to
+bother with: a fill whose side is shorter than it is rejected so the
+roomier opposite side is tried. That floor is capped at the worst-case side
+— half the viewport minus the trigger, the most a vertically centered
+trigger can guarantee — so a min-height above half the viewport (honored in
+full by the named placements) can’t reject both fills: the body fills the
+roomier side and scrolls rather than overflowing.
+
 Keep `--uktdd-body-position-try-fallbacks` to at most three options. The
 limit at which browsers stop evaluating `position-try` options can be as
 low as five (e.g. in Chromium) and the component appends the two fill

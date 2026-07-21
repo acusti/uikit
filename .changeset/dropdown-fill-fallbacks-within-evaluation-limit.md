@@ -22,11 +22,14 @@ exactly five. Each fill pairs a single-side `position-area`
 rejected for horizontal overflow) with `justify-self: anchor-center`, which
 centers the body over the trigger and shifts it inward as needed to stay
 on-screen (the explicitness matters: `span-all`’s default alignment centers
-without that shift, so near a corner it would overflow and be rejected).
-Because a fill can only be rejected when its side is shorter than
-`--uktdd-body-min-height` and the two sides sum to the viewport, at least
-one of the pair always fits — for every trigger position, including
-corners, with no height cap needed. The pair is appended via the new
+without that shift, so near a corner it would overflow and be rejected). A
+fill is only rejected when its side is shorter than the body’s
+min-block-size floor — what sends a cramped side’s fill to the roomier
+opposite side — and each fill caps that floor at the worst-case larger side
+(half the viewport minus the trigger, the most a block-centered trigger can
+guarantee), so at least one of the pair always fits — for every trigger
+position, including corners and a `--uktdd-body-min-height` above half the
+viewport, with no height cap needed. The pair is appended via the new
 `--uktdd-body-fill-fallbacks` custom property, so upward-opening dropdowns
 can flip its order to keep the last-resort fill on their preferred side.
 
