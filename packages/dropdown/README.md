@@ -652,6 +652,36 @@ engine whose limit bites; an engine at the exact floor would drop the
 second fill. Keep your list to two options if you want both fills within
 the guaranteed floor.
 
+### Trading Trigger Coverage for a Full-Height Menu
+
+The block-side fills never cover the trigger, which bounds their height by
+where the trigger sits. When the body already fits horizontally, the opt-in
+`--uktdd-fill-cover` placement (in no default list) can trade that
+guarantee away: it keeps the strict start-aligned inline edge (compose
+`--uktdd-fill-cover flip-inline` for end alignment) and loosens the block
+axis instead, sizing the body to the viewport’s full block size — covering
+the trigger — so a too-tall menu gets the whole viewport to scroll in
+rather than one side of it.
+
+```css
+.tall-menu {
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-top-start, --uktdd-bottom-end;
+    --uktdd-body-fill-fallbacks:
+        --uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top;
+}
+```
+
+The cover fill is rejected whenever the body is too wide for the region
+between the trigger’s inline-start edge and the viewport edge, so the
+guaranteed pair still rescues corner triggers — but the pair must stay
+within the evaluation budget: at most two author fallbacks alongside the
+three fills (a single author fallback keeps the whole list within the
+spec’s guaranteed floor). Two caveats: don’t use it on searchable
+dropdowns, since the body overlays the trigger’s input while open; and
+while the body covers the trigger, clicking the trigger’s position hits the
+body instead — dismiss with Escape or a click elsewhere outside.
+
 Use `--uktdd-body-gap` for the space between the trigger and the body. It
 is applied as a symmetric `margin-block`, so the gap lands on whichever
 side the body attaches to and auto-reverses when `position-try` flips the
