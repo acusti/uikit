@@ -879,6 +879,32 @@ export const CoverFillRecipe: Story = {
     },
 };
 
+export const SubmenuFillsBesideParent: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'A parent item pinned near the block-end (bottom) edge with a submenu taller than the space beside it. Its natural placement (open to the inline-end, top-aligned) has too little room below, so the last-resort `--uktdd-submenu-fill-fallbacks` take over: `--uktdd-submenu-fill` fills the full viewport height beside the parent and anchor-centers to stay on-screen, then scrolls — staying next to the parent item rather than covering the parent menu (the macOS behavior). Contrast the body’s block-side fills, which cover the trigger; a submenu never covers its parent.',
+            },
+            story: { height: '420px', inline: false },
+        },
+    },
+    render() {
+        return (
+            <div className="submenu-beside-demo">
+                <Dropdown onSubmitItem={fn()}>
+                    Bottom-pinned menu
+                    <ul>
+                        <li data-ukt-item>An item</li>
+                        <Dropdown label="Tall submenu">
+                            <ul>{renderTallMenuItems()}</ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>
+            </div>
+        );
+    },
+};
+
 export const SubmenuDropdown: Story = {
     args: {
         children: [
