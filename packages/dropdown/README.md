@@ -626,9 +626,10 @@ opens upward should flip the pair
 the last-resort fill also prefers the upward side. In these fill placements
 the body spans the trigger (centered over it, shifted inward as needed to
 stay on-screen) rather than keeping the primary placement’s edge alignment.
-Submenus reuse the pair as their own final rescue, so flipping it for the
-body also flips its submenus’ fill order — nested menus share their menu’s
-directional preference.
+Submenus have their own last-resort fills
+([`--uktdd-submenu-fill-fallbacks`](#submenu-placement-and-styling)) that
+keep them beside the parent rather than covering it, so this pair applies
+to the body alone.
 
 In the fills, `--uktdd-body-min-height` marks a side as too cramped to
 bother with: a fill whose side is shorter than it is rejected so the
@@ -854,12 +855,25 @@ it flush to the parent item’s edge across browsers. Placement custom
 properties follow the established naming scheme:
 
 - `--uktdd-submenu-position-area` (default: `inline-end span-block-end`)
-- `--uktdd-submenu-position-try-fallbacks` (keep it to a single option: the
-  component appends four last-resort placements after it, and Chromium
-  evaluates at most five fallbacks — the spec floor guarantees only four —
-  so a second author fallback pushes the final rescue placement out of
-  reach, and the submenu list already relies on engines evaluating one
-  fallback past the floor)
+- `--uktdd-submenu-position-try-fallbacks` (default:
+  `--uktdd-submenu-inline-start`; keep it to a single option — the
+  component appends two last-resort fills after it, and the spec guarantees
+  only four evaluated fallbacks, so a second author fallback would push a
+  fill out of reach)
+- `--uktdd-submenu-fill-fallbacks` (the last-resort fills for a submenu too
+  tall to open beside its parent at natural size; default
+  `--uktdd-submenu-fill, --uktdd-submenu-fill flip-inline` — a full-height
+  fill on each inline side that anchor-centers on the block axis, so the
+  submenu fills the viewport height beside the parent and scrolls rather
+  than covering the parent menu, the way macOS never covers a parent with
+  its submenu. Flip the pair for a submenu that opens `inline-start` by
+  default. A submenu wider than the space on either side of its parent —
+  out of scope for a macOS-style menu’s narrow columns — is the one case
+  this gives up versus covering the parent; append
+  `--uktdd-fill-bottom, --uktdd-fill-top` here to restore the
+  parent-covering rescue if you need it, keeping
+  `--uktdd-submenu-position-try-fallbacks` empty to stay within the
+  evaluation limit)
 - `--uktdd-submenu-gap` (space between the parent item and the submenu;
   applied as a symmetric `margin-inline`, the inline-axis counterpart to
   `--uktdd-body-gap`, so it auto-reverses when the submenu flips to the

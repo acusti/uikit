@@ -36,6 +36,17 @@
     --uktdd-label-pad-right: 0.625em;
     --uktdd-submenu-position-area: inline-end span-block-end;
     --uktdd-submenu-position-try-fallbacks: --uktdd-submenu-inline-start;
+    /* the last-resort fills for a submenu too tall to open beside its parent
+       at natural size (see the [data-ukt-submenu] rule). Unlike the body’s
+       block-side fills, these keep the submenu beside the parent — macOS
+       never covers a parent menu with its submenu — filling the block axis
+       and scrolling: --uktdd-submenu-fill on the same side, its flip-inline
+       mirror on the other. Each anchor-centers on the block axis, so a
+       parent anywhere (including near the block-end edge, where the space
+       below it is too short) still gets the full viewport height beside it.
+       Overridable to flip the pair for a submenu that opens inline-start */
+    --uktdd-submenu-fill-fallbacks:
+        --uktdd-submenu-fill, --uktdd-submenu-fill flip-inline;
     /* like --uktdd-body-gap but on the inline axis, since submenus open to
        the side; auto-reverses when they flip to the opposite inline edge */
     --uktdd-submenu-gap: 0px;
@@ -222,23 +233,24 @@
         position-anchor: --uktdd-submenu-anchor;
         position-area: var(--uktdd-submenu-position-area);
         /* same strict-fit + fill-last-resort model as the body (see the
-           .uktdropdown-body rule): a too-tall submenu sizes to its block-axis
-           space and scrolls instead of clipping past the viewport edge. The
-           list is budgeted to Chromium’s five evaluated fallbacks like the
-           body’s: the author fallback, a same-side fill, its opposite-side
-           mirror (submenus open sideways, so the mirror flips inline), then
-           the two block-side fills as the final rescue when neither side of
-           the parent item can hold the submenu column. Unlike the body’s
-           list, this one can’t drop below five fallbacks without losing
-           side coverage, so submenu rescue inherently relies on engines
-           evaluating one past the spec floor of four. Reusing
-           --uktdd-body-fill-fallbacks is deliberate: flipping the pair for
-           an upward-opening body flips its submenus’ final rescue too */
+           .uktdropdown-body rule): a too-tall submenu sizes to fit and
+           scrolls instead of clipping past the viewport edge. But where the
+           body’s block-side fills cover the trigger as a last resort, a
+           submenu stays beside its parent — macOS never covers a parent
+           menu with its submenu. The list: the author fallback (the natural
+           opposite-side placement), then --uktdd-submenu-fill-fallbacks —
+           the full-height anchor-centered fills, one per inline side. Three
+           fallbacks past the base, within the spec’s five-option floor (the
+           block-cover pair is gone, so no engine reliance), and decoupled
+           from --uktdd-body-fill-fallbacks so a body’s upward flip no longer
+           reorders its submenus. The one case this drops versus covering the
+           parent — a submenu wider than the space on either side of its
+           parent — is out of scope for the narrow columns of a macOS-style
+           menu; a consumer who needs it can append the block-cover fills to
+           --uktdd-submenu-fill-fallbacks */
         position-try-fallbacks:
             var(--uktdd-submenu-position-try-fallbacks),
-            --uktdd-fill,
-            --uktdd-fill flip-inline,
-            var(--uktdd-body-fill-fallbacks);
+            var(--uktdd-submenu-fill-fallbacks);
         z-index: 2;
         margin-block: 0;
         margin-inline: var(--uktdd-submenu-gap);
@@ -386,6 +398,22 @@ div.uktdropdown-body {
    sizes the element to that placement’s block-axis space */
 @position-try --uktdd-fill {
     block-size: calc(100% - var(--uktdd-body-gap) * 2);
+}
+
+/* The submenu full-height fill (see --uktdd-submenu-fill-fallbacks): the
+   block-axis mirror of --uktdd-fill-bottom. A bare inline keyword spans all
+   block tiles, so the containing block is viewport-tall and the submenu
+   fills the full block axis on the inline-end side (beside the parent, never
+   over it), and align-self: anchor-center shifts it on the block axis to
+   stay on-screen — the rescue for a parent near the block-end edge, where
+   the top-aligned --uktdd-fill has too little room below it. Rejected only
+   on the inline axis (no room for the submenu’s width on that side), so the
+   flip-inline pair covers both sides. Compose `--uktdd-submenu-fill
+   flip-inline` for the opposite side */
+@position-try --uktdd-submenu-fill {
+    position-area: inline-end;
+    block-size: calc(100% - var(--uktdd-body-gap) * 2);
+    align-self: anchor-center;
 }
 
 /* The opt-in cover fill (in no default list): where the block-side fills

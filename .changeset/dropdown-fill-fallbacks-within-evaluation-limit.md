@@ -40,19 +40,15 @@ fits — for every trigger position, including corners and a
 `--uktdd-body-min-height` above half the viewport, with no height cap
 needed. The pair is appended via the new `--uktdd-body-fill-fallbacks`
 custom property, so upward-opening dropdowns can flip its order to keep the
-last-resort fill on their preferred side; submenus reuse the pair as their
-own final rescue, so the flip carries into a body’s submenus as well.
+last-resort fill on their preferred side. (Submenus have their own
+last-resort fills, `--uktdd-submenu-fill-fallbacks`, rather than reusing
+this pair — see the separate submenu changeset.)
 
 In the fill placements the body now spans the trigger (anchor-centered,
 shifted to fit) instead of keeping the primary placement’s edge alignment.
 Consumer fallback lists must stay within the budget: at most two options in
 `--uktdd-body-position-try-fallbacks` (matching the new floor-safe
-default), and a single option in `--uktdd-submenu-position-try-fallbacks`
-(the submenu list is now its author fallback, `--uktdd-fill`,
-`--uktdd-fill flip-inline`, then the two block-side fills — also exactly
-five fallbacks; unlike the body’s list it can’t shrink below five without
-losing side coverage, so submenu rescue inherently relies on engines
-evaluating past the spec floor).
+default), and a single option in `--uktdd-submenu-position-try-fallbacks`.
 
 Also fixes the submenu rule’s `--uktdd-body-gap: 0` override: the unitless
 zero made the fill options’ `calc(100% - var(--uktdd-body-gap) * 2)`
