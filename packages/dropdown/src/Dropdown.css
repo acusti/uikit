@@ -20,6 +20,11 @@
     --uktdd-body-position-area: block-end span-inline-end;
     --uktdd-body-position-try-fallbacks:
         --uktdd-top-start, --uktdd-bottom-end, --uktdd-top-end;
+    /* the last-resort fill placements appended after the fallbacks above
+       (see the .uktdropdown-body rule). Overridable so a dropdown that
+       prefers opening upward can flip the pair’s order to keep the fill
+       on its preferred side: --uktdd-fill-top, --uktdd-fill-bottom */
+    --uktdd-body-fill-fallbacks: --uktdd-fill-bottom, --uktdd-fill-top;
     /* gap between the trigger and the body, applied as a symmetric
        margin-block so it lands on whichever side the body attaches to and
        auto-reverses when position-try flips it above/below the trigger. A
@@ -77,26 +82,24 @@
     position-anchor: --uktdd-anchor;
     position-area: var(--uktdd-body-position-area);
     /* the primary placement wins whenever the body fits there, then the
-       author’s fallbacks are tried in order (no position-try-order:
-       most-height, which would override a fitting primary with whichever
-       side of the viewport happens to be taller). The trailing --uktdd-fill
-       options are the last resort when the body fits at its natural size in
-       none of the author’s placements: --uktdd-fill sizes the body to the
-       block-axis space it has and lets the content region scroll, so a body
-       taller than the space never overflows or covers the trigger. The four
-       ordered variants keep the body as close to the primary placement as
-       possible — same side first, flipping inline alignment only to escape a
-       horizontal-overflow rejection, and flipping to the opposite block side
-       only when the preferred side is under --uktdd-body-min-height. Since
-       --uktdd-fill clamps the block size, it can only be rejected for
-       horizontal overflow (→ flip-inline) or a too-short side (→ flip-block),
-       and these four cover every combination */
+       fallbacks are tried in order (no position-try-order: most-height,
+       which would move the body to the viewport’s taller side even when
+       the primary placement fits). The trailing fill options are the last
+       resort when the body fits in none of the placements: each sizes the
+       body to the block-axis space on one side of the trigger so the
+       content region scrolls. The limit at which engines may stop
+       evaluating position options can be as low as five (Chromium
+       evaluates five and silently ignores the rest). The default budget is
+       the three named author fallbacks plus these two fills: one per block
+       side, each unrejectable on the inline axis (span-all can’t overflow
+       horizontally, and anchor-center shifts the body as needed to keep it
+       inside the viewport). A fill can only be rejected when its side is
+       shorter than --uktdd-body-min-height, and the sides sum to the
+       viewport, so at least one of the pair always fits. Authors
+       overriding --uktdd-body-position-try-fallbacks must keep it to three
+       options so these fills stay within the limit */
     position-try-fallbacks:
-        var(--uktdd-body-position-try-fallbacks),
-        --uktdd-fill,
-        --uktdd-fill flip-inline,
-        --uktdd-fill flip-block,
-        --uktdd-fill flip-block flip-inline;
+        var(--uktdd-body-position-try-fallbacks), var(--uktdd-body-fill-fallbacks);
     min-block-size: min(var(--uktdd-body-min-height), var(--uktdd-body-max-height));
     /* no 100% clamp: a placement is only accepted when the body’s natural
        size fits it, so squeezing is reserved for the --uktdd-fill options */
@@ -213,23 +216,29 @@
         position-area: var(--uktdd-submenu-position-area);
         /* same strict-fit + fill-last-resort model as the body (see the
            .uktdropdown-body rule): a too-tall submenu sizes to its block-axis
-           space and scrolls instead of clipping past the viewport edge, and
-           the four --uktdd-fill variants keep it as near the primary
-           placement as possible before flipping inline or block */
+           space and scrolls instead of clipping past the viewport edge. The
+           list is budgeted to the five-option evaluation limit like the
+           body’s: the author fallback, a same-side fill, its opposite-side
+           mirror (submenus open sideways, so the mirror flips inline), then
+           the two block-side fills as the final rescue when neither side of
+           the parent item can hold the submenu column */
         position-try-fallbacks:
             var(--uktdd-submenu-position-try-fallbacks),
             --uktdd-fill,
             --uktdd-fill flip-inline,
-            --uktdd-fill flip-block,
-            --uktdd-fill flip-block flip-inline;
+            var(--uktdd-body-fill-fallbacks);
         z-index: 2;
         margin-block: 0;
         margin-inline: var(--uktdd-submenu-gap);
-        /* the shared --uktdd-fill subtracts --uktdd-body-gap to keep the body’s
+        /* the fill options subtract --uktdd-body-gap to keep the body’s
            block-axis margins inside the fill region; a submenu’s block margins
            are 0 (its gap is inline), so zero it here to avoid shortening a
-           filled submenu when a consumer sets a body gap */
-        --uktdd-body-gap: 0;
+           filled submenu when a consumer sets a body gap. The unit is load-
+           bearing: a bare 0 is a <number>, making the fills’
+           calc(100% - <number>) invalid so the whole block-size declaration
+           drops and every fill option is evaluated at natural size — and
+           rejected */
+        --uktdd-body-gap: 0px;
         padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right)
             var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
         inline-size: max-content;
@@ -311,27 +320,44 @@ div.uktdropdown-body {
     position-area: inline-start span-block-end;
 }
 
-/* The last-resort option appended after the author’s fallback list (for
-   both the body and submenus). It sets no position-area, so it inherits
-   the element’s primary placement — or its block-flipped mirror when
-   applied as `--uktdd-fill flip-block` — and sizes the element to that
-   side’s available space so the content scrolls. block-size must be a
-   definite length here, not a max-block-size clamp on the auto size:
-   position-try only accepts an option when the box it lays out fits, and
-   an auto-sized box is evaluated at its natural (unclamped) size, so a
-   clamp that would make it fit still reads as overflowing and the option
-   is never selected. 100% is the space on the attached side; subtracting
-   the symmetric --uktdd-body-gap margins keeps the margin box inside it.
-   The base max-block-size also still applies, capping the fill at
-   --uktdd-body-max-height, as does min-block-size, so a side shorter than
-   --uktdd-body-min-height is rejected as unusable and the flipped side is
-   tried instead. (No max-content clamp against stretching past the natural
-   size: intrinsic keywords hit the same natural-size evaluation quirk when
-   set inside @position-try, which would reject the option outright. The
-   stretch can only surface when the author’s fallbacks skip the flipped
-   block placement entirely and the preferred side is under
-   --uktdd-body-min-height — vanishingly rare with the recipes this
-   package documents.) */
+/* The last-resort fill options appended after the fallback list. Each
+   sizes the element to one side’s block-axis space so the content scrolls.
+   block-size must be a definite length, not a max-block-size clamp on the
+   auto size: position-try evaluates an auto-sized box at its natural
+   (unclamped) size, so a clamp that would make it fit still reads as
+   overflowing and the option is never selected (the same quirk rejects
+   intrinsic keywords like max-content set inside @position-try). 100% is
+   the space on the attached side; subtracting the symmetric
+   --uktdd-body-gap margins keeps the margin box inside it. The base
+   min-block-size still applies, so a side shorter than
+   --uktdd-body-min-height is rejected and the other side’s fill is tried.
+
+   --uktdd-fill-bottom/-top must be unrejectable on the inline axis so
+   whichever block side can hold the element is always accepted — what
+   makes the pair a complete rescue within the five-option limit (see the
+   .uktdropdown-body rule). A bare block keyword spans all inline tiles, so
+   the containing block is viewport-wide and the element can’t overflow it
+   horizontally, and the explicit justify-self: anchor-center shifts the
+   trigger-centered element inward as needed to stay inside the viewport
+   (span-all’s default alignment centers without that shift, so near a
+   corner the option would overflow and be rejected) */
+@position-try --uktdd-fill-bottom {
+    position-area: block-end;
+    block-size: calc(100% - var(--uktdd-body-gap) * 2);
+    justify-self: anchor-center;
+}
+
+@position-try --uktdd-fill-top {
+    position-area: block-start;
+    block-size: calc(100% - var(--uktdd-body-gap) * 2);
+    justify-self: anchor-center;
+}
+
+/* The same-side fill (used by submenus, and available to authors composing
+   their own fallback lists, including tactic-flipped: `--uktdd-fill
+   flip-inline`). It sets no position-area, so it inherits the element’s
+   primary placement — or a tactic-transformed mirror of it — and only
+   sizes the element to that placement’s block-axis space */
 @position-try --uktdd-fill {
     block-size: calc(100% - var(--uktdd-body-gap) * 2);
 }
