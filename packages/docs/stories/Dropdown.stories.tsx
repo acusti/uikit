@@ -789,7 +789,7 @@ export const FillsWhenTooTall: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'A menu taller than the viewport whose trigger sits at the bottom edge (the shape from issue #399), with no `--uktdd-body-max-height` cap. The body fits at natural size in none of the authored placements, so the last-resort `--uktdd-body-fill-fallbacks` placements take over: the below side is under `--uktdd-body-min-height`, so `--uktdd-fill-bottom` is rejected and `--uktdd-fill-top` flips the body above the trigger, sizes it to that side, and lets the content scroll. Fill placements center the body over the trigger and shift it inward as needed to stay on-screen — that shift is what keeps the corner menus inside the viewport. The center menu nests a tall submenu, which likewise fills and scrolls beside its parent item instead of running past the viewport edge.',
+                story: 'A menu taller than the viewport whose trigger sits at the bottom edge (the shape from issue #399), with no `--uktdd-body-max-height` cap. The body fits at natural size in none of the authored placements, so the last-resort `--uktdd-body-fill-fallbacks` placements take over: the below side is under `--uktdd-body-min-height`, so `--uktdd-fill-bottom` is rejected and `--uktdd-fill-top` flips the body above the trigger, sizes it to that side, and lets the content scroll. Fill placements center the body over the trigger and shift it inward as needed to stay on-screen — that shift is what keeps the corner menus inside the viewport. The center menu nests a tall submenu, which likewise fills and scrolls beside its parent item instead of running past the viewport edge. The mid-viewport trigger sets `--uktdd-body-min-height: 300px` — taller than either ~195px side of this 420px-tall canvas. The fills cap that floor at the worst-case side (half the viewport minus the trigger), so instead of both fills being rejected and the body reverting to the overflowing primary placement, it fills below the trigger and scrolls.',
             },
             story: { height: '420px', inline: false },
         },
@@ -817,6 +817,14 @@ export const FillsWhenTooTall: Story = {
                 </Dropdown>
                 <Dropdown className="too-tall" onSubmitItem={fn()}>
                     Near right corner
+                    <ul>{items}</ul>
+                </Dropdown>
+                <Dropdown
+                    className="too-tall too-tall-center-min"
+                    onSubmitItem={fn()}
+                    style={{ '--uktdd-body-min-height': '300px' }}
+                >
+                    Centered, 300px min-height
                     <ul>{items}</ul>
                 </Dropdown>
             </div>
