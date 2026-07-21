@@ -9,12 +9,14 @@ limit so a too-tall body flips and scrolls instead of opening off-screen
 The CSS anchor positioning spec lets engines cap the position options list
 at an implementation-defined length with a floor of five — and the list
 includes the element’s base position, so only four fallbacks past it are
-guaranteed. Chromium evaluates five fallbacks past the base, silently
-ignoring the rest. The body’s previous list was three author fallbacks plus
-four `--uktdd-fill` tactic variants (seven fallbacks), so the block-flipped
-fills that rescue a near-viewport-height body at a block-axis viewport edge
-were never evaluated: the body opened toward the edge and ran off-screen,
-and consumers had to cap `--uktdd-body-max-height` to work around it.
+guaranteed. In practice Chromium is the tightest, evaluating six options
+(five fallbacks past the base) and silently ignoring the rest, while Safari
+and Firefox evaluate many more. The body’s previous list was three author
+fallbacks plus four `--uktdd-fill` tactic variants (seven fallbacks), so
+the block-flipped fills that rescue a near-viewport-height body at a
+block-axis viewport edge were never evaluated: the body opened toward the
+edge and ran off-screen, and consumers had to cap `--uktdd-body-max-height`
+to work around it.
 
 The four appended tactic fills are replaced by two new named options —
 `--uktdd-fill-bottom` and `--uktdd-fill-top` — and the default author

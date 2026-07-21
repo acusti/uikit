@@ -837,8 +837,8 @@ export const FillsWhenTooTall: Story = {
 
 // the recipe inline on the style prop (like DIRECTION_RECIPE_ROWS) so the
 // docs “Show code” panel displays it: the cover fill listed before the
-// guaranteed pair, with two authored fallbacks — the budget headroom the
-// three-fill list needs
+// guaranteed pair, with two authored fallbacks — the most a three-fill list
+// has room for (six options, the limit every current engine clears)
 const COVER_FILL_STYLE = {
     '--uktdd-body-fill-fallbacks':
         '--uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top',
@@ -849,7 +849,7 @@ export const CoverFillRecipe: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'The opt-in `--uktdd-fill-cover` recipe: `--uktdd-body-fill-fallbacks: --uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top`, with at most two authored fallbacks for the budget headroom the three-fill list needs. Where the default fills keep the body beside the trigger — bounding their height by where the trigger sits — the cover fill keeps the strict start-aligned inline edge and loosens the block axis instead, sizing the body to the full viewport height, covering the trigger. It is rejected when the body overflows the region between the trigger’s inline-start edge and the viewport edge: the first menu fits horizontally, so its body covers the mid-height trigger and scrolls the whole canvas height; the right-corner menu’s 180px body does not fit, so the cover is rejected and the guaranteed block-side fills take over as usual.',
+                story: 'The opt-in `--uktdd-fill-cover` recipe: `--uktdd-body-fill-fallbacks: --uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top`, with at most two authored fallbacks — the most a three-fill list has room for (six options, within the limit every current engine evaluates). Where the default fills keep the body beside the trigger — bounding their height by where the trigger sits — the cover fill keeps the strict start-aligned inline edge and loosens the block axis instead, sizing the body to the full viewport height, covering the trigger. It is rejected when the body overflows the region between the trigger’s inline-start edge and the viewport edge: the first menu fits horizontally, so its body covers the mid-height trigger and scrolls the whole canvas height; the right-corner menu’s 180px body does not fit, so the cover is rejected and the guaranteed block-side fills take over as usual.',
             },
             story: { height: '420px', inline: false },
         },

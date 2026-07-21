@@ -427,9 +427,11 @@ div.uktdropdown-body {
    inline region rejects it, so it applies only when the body fits
    horizontally as aligned: list it before the guaranteed pair
    (--uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top) with at
-   most two author fallbacks so the pair stays within Chromium’s budget
-   (one for the spec floor — see the .uktdropdown-body rule). Avoid it on
-   searchable dropdowns: the body overlays the trigger’s input */
+   most two author fallbacks, for six options total — the ceiling every
+   current engine clears (Chromium evaluates six; Safari and Firefox go
+   further). One author fallback keeps it within the spec floor of five
+   (see the .uktdropdown-body rule). Avoid it on searchable dropdowns: the
+   body overlays the trigger’s input */
 @position-try --uktdd-fill-cover {
     position-area: span-all span-inline-end;
     block-size: calc(100% - var(--uktdd-body-gap) * 2);
