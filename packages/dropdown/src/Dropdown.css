@@ -386,3 +386,23 @@ div.uktdropdown-body {
 @position-try --uktdd-fill {
     block-size: calc(100% - var(--uktdd-body-gap) * 2);
 }
+
+/* The opt-in cover fill (in no default list): where the block-side fills
+   loosen the inline axis and keep the body beside the trigger, this keeps
+   the strict start-aligned inline edge (span-inline-end, like the -start
+   placements; compose `--uktdd-fill-cover flip-inline` for end alignment)
+   and loosens the block axis instead — span-all sizes the body to the
+   viewport’s full block axis, covering the trigger, and anchor-center
+   keeps a shorter body (an authored max-block-size) centered over the
+   trigger and shifted on-screen. Overflowing the trigger-to-viewport-edge
+   inline region rejects it, so it applies only when the body fits
+   horizontally as aligned: list it before the guaranteed pair
+   (--uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top) with at
+   most two author fallbacks so the pair stays within Chromium’s budget
+   (one for the spec floor — see the .uktdropdown-body rule). Avoid it on
+   searchable dropdowns: the body overlays the trigger’s input */
+@position-try --uktdd-fill-cover {
+    position-area: span-all span-inline-end;
+    block-size: calc(100% - var(--uktdd-body-gap) * 2);
+    align-self: anchor-center;
+}
