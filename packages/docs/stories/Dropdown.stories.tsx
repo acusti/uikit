@@ -785,6 +785,13 @@ export const DirectionRecipes: Story = {
     },
 };
 
+const renderTallMenuItems = () =>
+    Array.from({ length: 30 }, (_, index) => (
+        <li data-ukt-value={`item-${index + 1}`} key={index}>
+            Menu item {index + 1}
+        </li>
+    ));
+
 export const FillsWhenTooTall: Story = {
     parameters: {
         docs: {
@@ -795,11 +802,7 @@ export const FillsWhenTooTall: Story = {
         },
     },
     render() {
-        const items = Array.from({ length: 30 }, (_, index) => (
-            <li data-ukt-value={`item-${index + 1}`} key={index}>
-                Menu item {index + 1}
-            </li>
-        ));
+        const items = renderTallMenuItems();
         return (
             <div className="too-tall-demo">
                 <Dropdown className="too-tall" onSubmitItem={fn()}>
@@ -825,6 +828,50 @@ export const FillsWhenTooTall: Story = {
                     style={{ '--uktdd-body-min-height': '300px' }}
                 >
                     Centered, 300px min-height
+                    <ul>{items}</ul>
+                </Dropdown>
+            </div>
+        );
+    },
+};
+
+// the recipe inline on the style prop (like DIRECTION_RECIPE_ROWS) so the
+// docs “Show code” panel displays it: the cover fill listed before the
+// guaranteed pair, with two authored fallbacks — the budget headroom the
+// three-fill list needs
+const COVER_FILL_STYLE = {
+    '--uktdd-body-fill-fallbacks':
+        '--uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top',
+    '--uktdd-body-position-try-fallbacks': '--uktdd-top-start, --uktdd-bottom-end',
+} as const;
+
+export const CoverFillRecipe: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'The opt-in `--uktdd-fill-cover` recipe: `--uktdd-body-fill-fallbacks: --uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top`, with at most two authored fallbacks for the budget headroom the three-fill list needs. Where the default fills keep the body beside the trigger — bounding their height by where the trigger sits — the cover fill keeps the strict start-aligned inline edge and loosens the block axis instead, sizing the body to the full viewport height, covering the trigger. It is rejected when the body overflows the region between the trigger’s inline-start edge and the viewport edge: the first menu fits horizontally, so its body covers the mid-height trigger and scrolls the whole canvas height; the right-corner menu’s 180px body does not fit, so the cover is rejected and the guaranteed block-side fills take over as usual.',
+            },
+            story: { height: '420px', inline: false },
+        },
+    },
+    render() {
+        const items = renderTallMenuItems();
+        return (
+            <div className="cover-fill-demo">
+                <Dropdown
+                    className="cover-fill"
+                    onSubmitItem={fn()}
+                    style={COVER_FILL_STYLE}
+                >
+                    Mid-height, start edge
+                    <ul>{items}</ul>
+                </Dropdown>
+                <Dropdown
+                    className="cover-fill"
+                    onSubmitItem={fn()}
+                    style={COVER_FILL_STYLE}
+                >
+                    Near right corner
                     <ul>{items}</ul>
                 </Dropdown>
             </div>

@@ -294,6 +294,27 @@
         --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
 }
 
+/* CoverFillRecipe: the cover fill trades trigger coverage for full
+   viewport height when the body fits horizontally (the recipe lives on
+   each Dropdown’s style prop so “Show code” displays it). The mid-height
+   start-edge trigger fits the cover’s inline region, so its body covers
+   the trigger and fills the whole canvas height; the right-corner
+   trigger’s 180px body overflows its trigger-to-edge region, so the
+   cover is rejected and the guaranteed pair fills one side instead */
+.cover-fill-demo {
+    position: fixed;
+    /* mid-viewport without a translate, which would shift the triggers
+       away from where their bodies attach — see .too-tall-center-min */
+    inset-block-start: calc(50% - 30px);
+    inset-inline: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.cover-fill .uktdropdown-body {
+    inline-size: 180px;
+}
+
 /* the mid-viewport trigger whose --uktdd-body-min-height: 300px (set on
    its style prop, so “Show code” displays it) exceeds either ~195px side
    of the 420px canvas — the fills cap the floor at the worst-case side,
