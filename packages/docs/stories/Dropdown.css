@@ -289,16 +289,39 @@
         --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
 }
 
+/* the top-opening recipes also flip the last-resort fill pair so a body too
+   tall to fit anywhere fills and scrolls on the upward side first */
 .direction-top-start {
     --uktdd-body-position-area: block-start span-inline-end;
     --uktdd-body-position-try-fallbacks:
         --uktdd-bottom-start, --uktdd-top-end, --uktdd-bottom-end;
+    --uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom;
 }
 
 .direction-top-end {
     --uktdd-body-position-area: block-start span-inline-start;
     --uktdd-body-position-try-fallbacks:
         --uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start;
+    --uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom;
+}
+
+/* FillsWhenTooTall: the issue-#399 shape — a menu taller than the viewport,
+   triggers pinned to the bottom edge and corners, no max-height cap. Nothing
+   fits at natural size, the below side is under --uktdd-body-min-height, so
+   --uktdd-fill-top lands the body above, filled and scrolling (centered over
+   the trigger, shifted inward at the corners) */
+.too-tall-demo {
+    position: fixed;
+    inset-block-end: 2px;
+    inset-inline: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.too-tall {
+    --uktdd-body-position-area: block-end span-inline-start;
+    --uktdd-body-position-try-fallbacks:
+        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
 }
 
 /* ---- Fixed Header Styles ---- */
