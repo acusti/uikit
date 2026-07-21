@@ -294,6 +294,20 @@
         --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
 }
 
+/* the mid-viewport trigger whose --uktdd-body-min-height: 300px (set on
+   its style prop, so “Show code” displays it) exceeds either ~195px side
+   of the 420px canvas — the fills cap the floor at the worst-case side,
+   so the body fills below the trigger and scrolls instead of reverting to
+   the overflowing primary placement */
+.too-tall-center-min {
+    position: fixed;
+    inset-block-start: 50%;
+    inset-inline: 0;
+    margin-inline: auto;
+    inline-size: max-content;
+    translate: 0 -50%;
+}
+
 /* ---- Fixed Header Styles ---- */
 :root {
     --ui-clr-1000: #ffffff;
