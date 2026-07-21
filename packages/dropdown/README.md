@@ -525,6 +525,8 @@ CSS custom properties for the most common low-level placement controls:
 
 - `--uktdd-body-position-area`
 - `--uktdd-body-position-try-fallbacks`
+- `--uktdd-body-fill-fallbacks` (the last-resort fill placements, tried
+  when the body fits nowhere at its natural size)
 - `--uktdd-body-gap` (space between the trigger and the body)
 - `--uktdd-body-min-height`
 - `--uktdd-body-min-width`
@@ -584,6 +586,9 @@ pair:
 | Top, start-aligned                  | `block-start span-inline-end`   | `--uktdd-bottom-start, --uktdd-top-end, --uktdd-bottom-end`   |
 | Top, end-aligned                    | `block-start span-inline-start` | `--uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start` |
 
+The two Top rows should also flip the last-resort fill pair to match:
+`--uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom`.
+
 For example, to make a dropdown open upward and end-aligned (useful for a
 trigger pinned to the bottom of the viewport, near the inline-end edge):
 
@@ -592,8 +597,14 @@ trigger pinned to the bottom of the viewport, near the inline-end edge):
     --uktdd-body-position-area: block-start span-inline-start;
     --uktdd-body-position-try-fallbacks:
         --uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start;
+    --uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom;
 }
 ```
+
+The last line flips the last-resort fill pair to match the recipe’s
+direction: when the body is too tall to fit anywhere at its natural size,
+it fills and scrolls on the upward side first (more on the fill pair
+below).
 
 See the [`DirectionRecipes` story][] for a live demo of all four.
 
@@ -604,9 +615,24 @@ The primary placement wins whenever the body fits there at its natural
 size, then the fallbacks are tried in order — the body opens in the
 direction you asked for as long as that side can hold it, and never flips
 to the opposite side just because the viewport happens to have more empty
-space there. Only when the body fits in none of those placements does it
-size itself to the block-axis space its preferred side has and let the
-content scroll, so it never overflows the viewport or covers the trigger.
+space there. Only when the body fits in none of those placements do the
+`--uktdd-body-fill-fallbacks` placements
+(`--uktdd-fill-bottom, --uktdd-fill-top` by default) take over: the body
+sizes itself to the block-axis space below the trigger — or above it,
+whichever the pair lists first that has room — and lets the content scroll,
+so it never overflows the viewport or covers the trigger. A dropdown that
+opens upward should flip the pair
+(`--uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom`) so
+the last-resort fill also prefers the upward side. In these fill placements
+the body spans the trigger (centered over it, shifted inward as needed to
+stay on-screen) rather than keeping the primary placement’s edge alignment.
+
+Keep `--uktdd-body-position-try-fallbacks` to at most three options. The
+limit at which browsers stop evaluating `position-try` options can be as
+low as five (e.g. in Chromium) and the component appends the two fill
+placements after your list. A fourth author fallback pushes a fill past
+that limit, and a trigger near a viewport edge can then open off-screen
+instead of flipping and scrolling.
 
 Use `--uktdd-body-gap` for the space between the trigger and the body. It
 is applied as a symmetric `margin-block`, so the gap lands on whichever
@@ -778,7 +804,10 @@ it flush to the parent item’s edge across browsers. Placement custom
 properties follow the established naming scheme:
 
 - `--uktdd-submenu-position-area` (default: `inline-end span-block-end`)
-- `--uktdd-submenu-position-try-fallbacks`
+- `--uktdd-submenu-position-try-fallbacks` (keep it to a single option: the
+  component appends four last-resort placements after it, and browsers may
+  evaluate as few as five `position-try` options, e.g. Chromium, so a
+  second author fallback pushes the final rescue placement out of reach)
 - `--uktdd-submenu-gap` (space between the parent item and the submenu;
   applied as a symmetric `margin-inline`, the inline-axis counterpart to
   `--uktdd-body-gap`, so it auto-reverses when the submenu flips to the
