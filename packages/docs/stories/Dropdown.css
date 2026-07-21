@@ -312,6 +312,18 @@
     inline-size: 180px;
 }
 
+/* SubmenuFillsBesideParent: the trigger is pinned near the block-end edge
+   so its (short) menu — and the parent item within it — sit low in the
+   viewport. The parent item’s tall submenu has too little room below to
+   open top-aligned, so --uktdd-submenu-fill fills the full viewport height
+   beside the parent and scrolls, staying next to it rather than covering
+   the parent menu */
+.submenu-beside-demo {
+    position: fixed;
+    inset-block-end: 8px;
+    inset-inline-start: 8px;
+}
+
 /* the mid-viewport trigger whose --uktdd-body-min-height: 300px (set on
    its style prop, so “Show code” displays it) exceeds either ~195px side
    of the 420px canvas — the fills cap the floor at the worst-case side,
