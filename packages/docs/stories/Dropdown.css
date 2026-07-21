@@ -15,10 +15,6 @@
         height: calc(200vh - 110px);
         width: calc(200vw - 270px);
     }
-
-    &:has(.direction-recipes) {
-        height: 480px;
-    }
 }
 
 .sb-story {
@@ -253,17 +249,19 @@
     --uktdd-submenu-gap: 8px;
 }
 
-/* the four --uktdd-body-position-area / --uktdd-body-position-try-fallbacks
-   recipes from the README’s direction cheatsheet. Each recipe opens in its
-   named direction wherever the trigger sits, so this layout is purely
-   cosmetic: the rows sit near the canvas’s top and bottom edges — the
-   bottom-opening pair up top, the top-opening pair down low — only so each
-   menu opens into empty space instead of overlapping the other row */
+/* the recipe variables live on each Dropdown’s style prop in the story (so
+   the docs “Show code” panel displays them); this layout is purely
+   cosmetic. The fixed block-size (rather than 100% of a sized canvas)
+   holds in the docs page’s inline rendering too, keeping the rows near the
+   top and bottom edges — the bottom-opening pair up top, the top-opening
+   pair down low — so each menu opens into empty space instead of
+   overlapping the other row */
 .direction-recipes {
+    box-sizing: border-box;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    block-size: 100%;
+    block-size: 420px;
     padding-block: 1.5rem;
 }
 
@@ -275,34 +273,6 @@
 
 .direction-recipes .uktdropdown-body {
     inline-size: 140px;
-}
-
-.direction-bottom-start {
-    --uktdd-body-position-area: block-end span-inline-end;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-start, --uktdd-bottom-end, --uktdd-top-end;
-}
-
-.direction-bottom-end {
-    --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
-}
-
-/* the top-opening recipes also flip the last-resort fill pair so a body too
-   tall to fit anywhere fills and scrolls on the upward side first */
-.direction-top-start {
-    --uktdd-body-position-area: block-start span-inline-end;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-bottom-start, --uktdd-top-end, --uktdd-bottom-end;
-    --uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom;
-}
-
-.direction-top-end {
-    --uktdd-body-position-area: block-start span-inline-start;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start;
-    --uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom;
 }
 
 /* FillsWhenTooTall: the issue-#399 shape — a menu taller than the viewport,

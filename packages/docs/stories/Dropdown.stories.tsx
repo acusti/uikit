@@ -701,14 +701,52 @@ export const CenteredMenu: Story = {
     },
 };
 
+// each recipe inline on the style prop (which accepts --uktdd-* custom
+// properties) so the docs “Show code” panel displays the actual variable
+// pairs; the top-opening pair also flips --uktdd-body-fill-fallbacks so
+// the last-resort fill prefers the upward side
 const DIRECTION_RECIPE_ROWS = [
     [
-        { className: 'direction-bottom-start', label: 'Bottom Start (default)' },
-        { className: 'direction-bottom-end', label: 'Bottom End' },
+        {
+            className: 'direction-bottom-start',
+            label: 'Bottom Start (default)',
+            style: {
+                '--uktdd-body-position-area': 'block-end span-inline-end',
+                '--uktdd-body-position-try-fallbacks':
+                    '--uktdd-top-start, --uktdd-bottom-end, --uktdd-top-end',
+            },
+        },
+        {
+            className: 'direction-bottom-end',
+            label: 'Bottom End',
+            style: {
+                '--uktdd-body-position-area': 'block-end span-inline-start',
+                '--uktdd-body-position-try-fallbacks':
+                    '--uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start',
+            },
+        },
     ],
     [
-        { className: 'direction-top-start', label: 'Top Start' },
-        { className: 'direction-top-end', label: 'Top End' },
+        {
+            className: 'direction-top-start',
+            label: 'Top Start',
+            style: {
+                '--uktdd-body-fill-fallbacks': '--uktdd-fill-top, --uktdd-fill-bottom',
+                '--uktdd-body-position-area': 'block-start span-inline-end',
+                '--uktdd-body-position-try-fallbacks':
+                    '--uktdd-bottom-start, --uktdd-top-end, --uktdd-bottom-end',
+            },
+        },
+        {
+            className: 'direction-top-end',
+            label: 'Top End',
+            style: {
+                '--uktdd-body-fill-fallbacks': '--uktdd-fill-top, --uktdd-fill-bottom',
+                '--uktdd-body-position-area': 'block-start span-inline-start',
+                '--uktdd-body-position-try-fallbacks':
+                    '--uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start',
+            },
+        },
     ],
 ] as const;
 
@@ -716,7 +754,7 @@ export const DirectionRecipes: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallbacks` (see the README’s “Changing the Default Direction” section for the full cheatsheet). Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. The top-opening pair also flips `--uktdd-body-fill-fallbacks` so the last-resort fill prefers the upward side. Each recipe opens in its named direction whenever that side has room, independent of where the trigger sits; the bottom pair is placed near the top of the canvas and the top pair near the bottom only so each menu opens into empty space instead of overlapping the other row.',
+                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallbacks` (see the README’s “Changing the Default Direction” section for the full cheatsheet). Each dropdown carries its recipe on its `style` prop, so “Show code” below displays the exact variable pairs. Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. The top-opening pair also flips `--uktdd-body-fill-fallbacks` so the last-resort fill prefers the upward side. Each recipe opens in its named direction whenever that side has room, independent of where the trigger sits; the bottom pair is placed near the top of the canvas and the top pair near the bottom only so each menu opens into empty space instead of overlapping the other row.',
             },
         },
     },
@@ -725,11 +763,12 @@ export const DirectionRecipes: Story = {
             <div className="direction-recipes">
                 {DIRECTION_RECIPE_ROWS.map((row) => (
                     <div className="direction-recipes-row" key={row[0].className}>
-                        {row.map(({ className, label }) => (
+                        {row.map(({ className, label, style }) => (
                             <Dropdown
                                 className={className}
                                 key={className}
                                 onSubmitItem={fn()}
+                                style={style}
                             >
                                 {label}
                                 <ul>
