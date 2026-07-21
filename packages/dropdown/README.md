@@ -626,6 +626,9 @@ opens upward should flip the pair
 the last-resort fill also prefers the upward side. In these fill placements
 the body spans the trigger (centered over it, shifted inward as needed to
 stay on-screen) rather than keeping the primary placement’s edge alignment.
+Submenus reuse the pair as their own final rescue, so flipping it for the
+body also flips its submenus’ fill order — nested menus share their menu’s
+directional preference.
 
 In the fills, `--uktdd-body-min-height` marks a side as too cramped to
 bother with: a fill whose side is shorter than it is rejected so the
@@ -636,11 +639,18 @@ full by the named placements) can’t reject both fills: the body fills the
 roomier side and scrolls rather than overflowing.
 
 Keep `--uktdd-body-position-try-fallbacks` to at most three options. The
-limit at which browsers stop evaluating `position-try` options can be as
-low as five (e.g. in Chromium) and the component appends the two fill
-placements after your list. A fourth author fallback pushes a fill past
-that limit, and a trigger near a viewport edge can then open off-screen
-instead of flipping and scrolling.
+spec lets engines cap the position options list at an
+implementation-defined length with a floor of five — but that list includes
+the element’s base position, so only four fallbacks past it are guaranteed.
+Chromium evaluates five fallbacks and silently ignores the rest, and the
+component appends the two fill placements after your list: three author
+fallbacks exactly fill Chromium’s budget, and a fourth pushes a fill past
+it, so a trigger near a viewport edge can open off-screen instead of
+flipping and scrolling. Note that even the default list relies on engines
+evaluating one fallback past the spec’s floor — validated in Chromium, the
+engine whose limit bites; an engine at the exact floor would drop the
+second fill. Keep your list to two options if you want both fills within
+the guaranteed floor.
 
 Use `--uktdd-body-gap` for the space between the trigger and the body. It
 is applied as a symmetric `margin-block`, so the gap lands on whichever
@@ -813,9 +823,11 @@ properties follow the established naming scheme:
 
 - `--uktdd-submenu-position-area` (default: `inline-end span-block-end`)
 - `--uktdd-submenu-position-try-fallbacks` (keep it to a single option: the
-  component appends four last-resort placements after it, and browsers may
-  evaluate as few as five `position-try` options, e.g. Chromium, so a
-  second author fallback pushes the final rescue placement out of reach)
+  component appends four last-resort placements after it, and Chromium
+  evaluates at most five fallbacks — the spec floor guarantees only four —
+  so a second author fallback pushes the final rescue placement out of
+  reach, and the submenu list already relies on engines evaluating one
+  fallback past the floor)
 - `--uktdd-submenu-gap` (space between the parent item and the submenu;
   applied as a symmetric `margin-inline`, the inline-axis counterpart to
   `--uktdd-body-gap`, so it auto-reverses when the submenu flips to the
