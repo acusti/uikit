@@ -645,15 +645,16 @@ length with a floor of five — and that list includes the element’s base
 position, so only four fallbacks past it are guaranteed. The component
 appends the two fill placements after your list, so two author fallbacks
 plus the two fills is exactly four — within the floor on every conformant
-engine. A third author fallback pushes a fill past the floor into
-Chromium-only territory, and a fourth pushes it past even Chromium, so a
-trigger near a viewport edge can open off-screen instead of flipping and
-scrolling. The default’s two fallbacks are the single-axis flips of the
-primary (a block flip and an inline flip); it drops the both-axes diagonal
-to stay within the floor, so a trigger crammed into the corner diagonal to
-the primary opening direction lands in a fill rather than a natural
-placement — re-tune the primary (per the recipes above) for triggers pinned
-to a viewport corner.
+engine. A third author fallback (six options) still works on every current
+engine but leans past the spec floor onto their real limits (Chromium
+evaluates exactly six; Safari and Firefox more); a fourth pushes a fill
+past even Chromium, so a trigger near a viewport edge can open off-screen
+instead of flipping and scrolling. The default’s two fallbacks are the
+single-axis flips of the primary (a block flip and an inline flip); it
+drops the both-axes diagonal to stay within the floor, so a trigger crammed
+into the corner diagonal to the primary opening direction lands in a fill
+rather than a natural placement — re-tune the primary (per the recipes
+above) for triggers pinned to a viewport corner.
 
 ### Trading Trigger Coverage for a Full-Height Menu
 
@@ -678,12 +679,15 @@ rather than one side of it.
 The cover fill is rejected whenever the body is too wide for the region
 between the trigger’s inline-start edge and the viewport edge, so the
 guaranteed pair still rescues corner triggers — but the pair must stay
-within the evaluation budget: at most two author fallbacks alongside the
-three fills (a single author fallback keeps the whole list within the
-spec’s guaranteed floor). Two caveats: don’t use it on searchable
-dropdowns, since the body overlays the trigger’s input while open; and
-while the body covers the trigger, clicking the trigger’s position hits the
-body instead — dismiss with Escape or a click elsewhere outside.
+within the evaluation budget: with three fills you get at most two author
+fallback slots, for six position options total. That’s the ceiling every
+current engine clears (Chromium evaluates exactly six; Safari and Firefox
+go well beyond), though only five are spec-guaranteed — drop to one author
+fallback if you want the whole list within that floor. Two caveats: don’t
+use it on searchable dropdowns, since the body overlays the trigger’s input
+while open; and while the body covers the trigger, clicking the trigger’s
+position hits the body instead — dismiss with Escape or a click elsewhere
+outside.
 
 Use `--uktdd-body-gap` for the space between the trigger and the body. It
 is applied as a symmetric `margin-block`, so the gap lands on whichever
