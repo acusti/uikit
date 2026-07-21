@@ -94,8 +94,9 @@
        side, each unrejectable on the inline axis (span-all can’t overflow
        horizontally, and anchor-center shifts the body as needed to keep it
        inside the viewport). A fill can only be rejected when its side is
-       shorter than --uktdd-body-min-height, and the sides sum to the
-       viewport, so at least one of the pair always fits. Authors
+       shorter than its min-block-size floor, and the fills cap that floor
+       at the worst-case larger side (see their @position-try rules), so at
+       least one of the pair always fits. Authors
        overriding --uktdd-body-position-try-fallbacks must keep it to three
        options so these fills stay within the limit */
     position-try-fallbacks:
@@ -328,9 +329,13 @@ div.uktdropdown-body {
    overflowing and the option is never selected (the same quirk rejects
    intrinsic keywords like max-content set inside @position-try). 100% is
    the space on the attached side; subtracting the symmetric
-   --uktdd-body-gap margins keeps the margin box inside it. The base
-   min-block-size still applies, so a side shorter than
-   --uktdd-body-min-height is rejected and the other side’s fill is tried.
+   --uktdd-body-gap margins keeps the margin box inside it. min-block-size
+   still applies, so a side shorter than --uktdd-body-min-height is
+   rejected and the other side’s fill is tried — but capped at the
+   worst-case larger side, (100dvb - anchor)/2 (an anchor centered on the
+   block axis splits the rest of the viewport evenly), so a min above
+   ~half the viewport can no longer reject both sides and strand the body
+   at the overflowing primary placement.
 
    --uktdd-fill-bottom/-top must be unrejectable on the inline axis so
    whichever block side can hold the element is always accepted — what
@@ -344,12 +349,22 @@ div.uktdropdown-body {
 @position-try --uktdd-fill-bottom {
     position-area: block-end;
     block-size: calc(100% - var(--uktdd-body-gap) * 2);
+    min-block-size: min(
+        var(--uktdd-body-min-height),
+        var(--uktdd-body-max-height),
+        calc((100dvb - anchor-size(block)) / 2 - var(--uktdd-body-gap) * 2)
+    );
     justify-self: anchor-center;
 }
 
 @position-try --uktdd-fill-top {
     position-area: block-start;
     block-size: calc(100% - var(--uktdd-body-gap) * 2);
+    min-block-size: min(
+        var(--uktdd-body-min-height),
+        var(--uktdd-body-max-height),
+        calc((100dvb - anchor-size(block)) / 2 - var(--uktdd-body-gap) * 2)
+    );
     justify-self: anchor-center;
 }
 
