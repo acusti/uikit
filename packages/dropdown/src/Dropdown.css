@@ -18,8 +18,7 @@
     --uktdd-body-pad-top: 0.5em;
     --uktdd-body-min-width: min(50px, 100%);
     --uktdd-body-position-area: block-end span-inline-end;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-start, --uktdd-bottom-end, --uktdd-top-end;
+    --uktdd-body-position-try-fallbacks: --uktdd-top-start, --uktdd-bottom-end;
     /* the last-resort fill placements appended after the fallbacks above
        (see the .uktdropdown-body rule). Overridable so a dropdown that
        prefers opening upward can flip the pair’s order to keep the fill
@@ -89,21 +88,23 @@
        body to the block-axis space on one side of the trigger so the
        content region scrolls. Engines may cap the position options list
        at an implementation-defined length with a spec floor of five, and
-       the list includes the base position — only four fallbacks are
-       guaranteed. Chromium evaluates five fallbacks past the base and
-       silently ignores the rest; this default budget — the three named
-       author fallbacks plus these two fills — fills Chromium’s five, one
-       past the spec floor (an engine at the exact floor would not reach
-       --uktdd-fill-top; validated in Chromium only). Each fill pins one
-       block side, unrejectable on the inline axis (span-all can’t
-       overflow horizontally, and anchor-center shifts the body as needed
-       to keep it inside the viewport). A fill can only be rejected when
-       its side is shorter than its min-block-size floor, and the fills
-       cap that floor at the worst-case larger side (see their
-       @position-try rules), so at least one of the pair always fits.
-       Authors overriding --uktdd-body-position-try-fallbacks must keep it
-       to three options so the fills stay within Chromium’s budget — or
-       two to stay within the spec’s guaranteed floor */
+       that list includes the base position — so four fallbacks past it
+       are guaranteed on every conformant engine. This default budget —
+       two named author fallbacks plus these two fills — is exactly four,
+       within that floor with no reliance on any engine exceeding it. The
+       two author fallbacks are the single-axis flips of the primary (a
+       block flip and an inline flip); the both-axes diagonal is dropped
+       so the fills stay within the floor, so a trigger crammed into the
+       corner diagonal to the primary lands in a fill rather than a fourth
+       natural placement (re-tune the primary for edge-pinned triggers).
+       Each fill pins one block side, unrejectable on the inline axis
+       (span-all can’t overflow horizontally, and anchor-center shifts the
+       body as needed to keep it inside the viewport). A fill can only be
+       rejected when its side is shorter than its min-block-size floor,
+       and the fills cap that floor at the worst-case larger side (see
+       their @position-try rules), so at least one of the pair always
+       fits. Authors overriding --uktdd-body-position-try-fallbacks must
+       keep it to two options so the fills stay within the floor */
     position-try-fallbacks:
         var(--uktdd-body-position-try-fallbacks), var(--uktdd-body-fill-fallbacks);
     min-block-size: min(var(--uktdd-body-min-height), var(--uktdd-body-max-height));

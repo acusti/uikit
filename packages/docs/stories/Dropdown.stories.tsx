@@ -713,7 +713,7 @@ const DIRECTION_RECIPE_ROWS = [
             style: {
                 '--uktdd-body-position-area': 'block-end span-inline-end',
                 '--uktdd-body-position-try-fallbacks':
-                    '--uktdd-top-start, --uktdd-bottom-end, --uktdd-top-end',
+                    '--uktdd-top-start, --uktdd-bottom-end',
             },
         },
         {
@@ -722,7 +722,7 @@ const DIRECTION_RECIPE_ROWS = [
             style: {
                 '--uktdd-body-position-area': 'block-end span-inline-start',
                 '--uktdd-body-position-try-fallbacks':
-                    '--uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start',
+                    '--uktdd-top-end, --uktdd-bottom-start',
             },
         },
     ],
@@ -734,7 +734,7 @@ const DIRECTION_RECIPE_ROWS = [
                 '--uktdd-body-fill-fallbacks': '--uktdd-fill-top, --uktdd-fill-bottom',
                 '--uktdd-body-position-area': 'block-start span-inline-end',
                 '--uktdd-body-position-try-fallbacks':
-                    '--uktdd-bottom-start, --uktdd-top-end, --uktdd-bottom-end',
+                    '--uktdd-bottom-start, --uktdd-top-end',
             },
         },
         {
@@ -744,7 +744,7 @@ const DIRECTION_RECIPE_ROWS = [
                 '--uktdd-body-fill-fallbacks': '--uktdd-fill-top, --uktdd-fill-bottom',
                 '--uktdd-body-position-area': 'block-start span-inline-start',
                 '--uktdd-body-position-try-fallbacks':
-                    '--uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start',
+                    '--uktdd-bottom-end, --uktdd-top-start',
             },
         },
     ],

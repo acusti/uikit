@@ -539,7 +539,7 @@ Example:
 .settings-dropdown {
     --uktdd-body-position-area: block-end span-inline-start;
     --uktdd-body-position-try-fallbacks:
-        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
+        --uktdd-top-end, --uktdd-bottom-start;
     --uktdd-body-gap: 8px;
 }
 
@@ -579,12 +579,12 @@ horizontal-tb writing mode.
 Pick the row matching the direction you want, and set both variables to its
 pair:
 
-| Direction                           | `--uktdd-body-position-area`    | `--uktdd-body-position-try-fallbacks`                         |
-| ----------------------------------- | ------------------------------- | ------------------------------------------------------------- |
-| Bottom, start-aligned (the default) | `block-end span-inline-end`     | `--uktdd-top-start, --uktdd-bottom-end, --uktdd-top-end`      |
-| Bottom, end-aligned                 | `block-end span-inline-start`   | `--uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start`    |
-| Top, start-aligned                  | `block-start span-inline-end`   | `--uktdd-bottom-start, --uktdd-top-end, --uktdd-bottom-end`   |
-| Top, end-aligned                    | `block-start span-inline-start` | `--uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start` |
+| Direction                           | `--uktdd-body-position-area`    | `--uktdd-body-position-try-fallbacks`   |
+| ----------------------------------- | ------------------------------- | --------------------------------------- |
+| Bottom, start-aligned (the default) | `block-end span-inline-end`     | `--uktdd-top-start, --uktdd-bottom-end` |
+| Bottom, end-aligned                 | `block-end span-inline-start`   | `--uktdd-top-end, --uktdd-bottom-start` |
+| Top, start-aligned                  | `block-start span-inline-end`   | `--uktdd-bottom-start, --uktdd-top-end` |
+| Top, end-aligned                    | `block-start span-inline-start` | `--uktdd-bottom-end, --uktdd-top-start` |
 
 The two Top rows should also flip the last-resort fill pair to match:
 `--uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom`.
@@ -596,7 +596,7 @@ trigger pinned to the bottom of the viewport, near the inline-end edge):
 .bottom-toolbar-dropdown {
     --uktdd-body-position-area: block-start span-inline-start;
     --uktdd-body-position-try-fallbacks:
-        --uktdd-bottom-end, --uktdd-top-start, --uktdd-bottom-start;
+        --uktdd-bottom-end, --uktdd-top-start;
     --uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom;
 }
 ```
@@ -638,19 +638,21 @@ trigger can guarantee — so a min-height above half the viewport (honored in
 full by the named placements) can’t reject both fills: the body fills the
 roomier side and scrolls rather than overflowing.
 
-Keep `--uktdd-body-position-try-fallbacks` to at most three options. The
-spec lets engines cap the position options list at an
-implementation-defined length with a floor of five — but that list includes
-the element’s base position, so only four fallbacks past it are guaranteed.
-Chromium evaluates five fallbacks and silently ignores the rest, and the
-component appends the two fill placements after your list: three author
-fallbacks exactly fill Chromium’s budget, and a fourth pushes a fill past
-it, so a trigger near a viewport edge can open off-screen instead of
-flipping and scrolling. Note that even the default list relies on engines
-evaluating one fallback past the spec’s floor — validated in Chromium, the
-engine whose limit bites; an engine at the exact floor would drop the
-second fill. Keep your list to two options if you want both fills within
-the guaranteed floor.
+Keep `--uktdd-body-position-try-fallbacks` to at most two options. The spec
+lets engines cap the position options list at an implementation-defined
+length with a floor of five — and that list includes the element’s base
+position, so only four fallbacks past it are guaranteed. The component
+appends the two fill placements after your list, so two author fallbacks
+plus the two fills is exactly four — within the floor on every conformant
+engine. A third author fallback pushes a fill past the floor into
+Chromium-only territory, and a fourth pushes it past even Chromium, so a
+trigger near a viewport edge can open off-screen instead of flipping and
+scrolling. The default’s two fallbacks are the single-axis flips of the
+primary (a block flip and an inline flip); it drops the both-axes diagonal
+to stay within the floor, so a trigger crammed into the corner diagonal to
+the primary opening direction lands in a fill rather than a natural
+placement — re-tune the primary (per the recipes above) for triggers pinned
+to a viewport corner.
 
 ### Trading Trigger Coverage for a Full-Height Menu
 
@@ -704,7 +706,7 @@ the menu size itself from its contents.
 .avatar-menu {
     --uktdd-body-position-area: block-end span-inline-start;
     --uktdd-body-position-try-fallbacks:
-        --uktdd-top-end, --uktdd-top-start, --uktdd-bottom-end;
+        --uktdd-top-end, --uktdd-top-start;
 }
 ```
 

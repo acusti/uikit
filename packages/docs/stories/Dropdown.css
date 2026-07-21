@@ -120,8 +120,7 @@
 .searchable-with-label,
 .searchable-and-allow-create {
     --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
+    --uktdd-body-position-try-fallbacks: --uktdd-top-end, --uktdd-bottom-start;
 
     input,
     .uktdropdown-body {
@@ -131,8 +130,7 @@
 
 .css-value-input-trigger {
     --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
+    --uktdd-body-position-try-fallbacks: --uktdd-top-end, --uktdd-bottom-start;
 
     .uktdropdown-body {
         /* a horizontal alignment nudge, not a trigger↔body gap; set as a raw
@@ -290,8 +288,7 @@
 
 .too-tall {
     --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
+    --uktdd-body-position-try-fallbacks: --uktdd-top-end, --uktdd-bottom-start;
 }
 
 /* CoverFillRecipe: the cover fill trades trigger coverage for full
