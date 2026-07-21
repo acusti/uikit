@@ -301,11 +301,18 @@
    the overflowing primary placement */
 .too-tall-center-min {
     position: fixed;
-    inset-block-start: 50%;
+    /* mid-viewport without a translate: anchor positioning tracks the
+       trigger's layout box, and a transform moves only its painted box, so
+       a `translate: 0 -50%` centering shifts the trigger away from where
+       the body attaches (and here flipped which fill was accepted). Sitting
+       just above center also keeps the below side clearly the larger one,
+       so the accepted fill is deterministically the below one the story
+       description narrates, rather than a rounding-order tie at dead
+       center */
+    inset-block-start: calc(50% - 30px);
     inset-inline: 0;
     margin-inline: auto;
     inline-size: max-content;
-    translate: 0 -50%;
 }
 
 /* ---- Fixed Header Styles ---- */
