@@ -87,18 +87,23 @@
        the primary placement fits). The trailing fill options are the last
        resort when the body fits in none of the placements: each sizes the
        body to the block-axis space on one side of the trigger so the
-       content region scrolls. The limit at which engines may stop
-       evaluating position options can be as low as five (Chromium
-       evaluates five and silently ignores the rest). The default budget is
-       the three named author fallbacks plus these two fills: one per block
-       side, each unrejectable on the inline axis (span-all can’t overflow
-       horizontally, and anchor-center shifts the body as needed to keep it
-       inside the viewport). A fill can only be rejected when its side is
-       shorter than its min-block-size floor, and the fills cap that floor
-       at the worst-case larger side (see their @position-try rules), so at
-       least one of the pair always fits. Authors
-       overriding --uktdd-body-position-try-fallbacks must keep it to three
-       options so these fills stay within the limit */
+       content region scrolls. Engines may cap the position options list
+       at an implementation-defined length with a spec floor of five, and
+       the list includes the base position — only four fallbacks are
+       guaranteed. Chromium evaluates five fallbacks past the base and
+       silently ignores the rest; this default budget — the three named
+       author fallbacks plus these two fills — fills Chromium’s five, one
+       past the spec floor (an engine at the exact floor would not reach
+       --uktdd-fill-top; validated in Chromium only). Each fill pins one
+       block side, unrejectable on the inline axis (span-all can’t
+       overflow horizontally, and anchor-center shifts the body as needed
+       to keep it inside the viewport). A fill can only be rejected when
+       its side is shorter than its min-block-size floor, and the fills
+       cap that floor at the worst-case larger side (see their
+       @position-try rules), so at least one of the pair always fits.
+       Authors overriding --uktdd-body-position-try-fallbacks must keep it
+       to three options so the fills stay within Chromium’s budget — or
+       two to stay within the spec’s guaranteed floor */
     position-try-fallbacks:
         var(--uktdd-body-position-try-fallbacks), var(--uktdd-body-fill-fallbacks);
     min-block-size: min(var(--uktdd-body-min-height), var(--uktdd-body-max-height));
@@ -218,11 +223,16 @@
         /* same strict-fit + fill-last-resort model as the body (see the
            .uktdropdown-body rule): a too-tall submenu sizes to its block-axis
            space and scrolls instead of clipping past the viewport edge. The
-           list is budgeted to the five-option evaluation limit like the
+           list is budgeted to Chromium’s five evaluated fallbacks like the
            body’s: the author fallback, a same-side fill, its opposite-side
            mirror (submenus open sideways, so the mirror flips inline), then
            the two block-side fills as the final rescue when neither side of
-           the parent item can hold the submenu column */
+           the parent item can hold the submenu column. Unlike the body’s
+           list, this one can’t drop below five fallbacks without losing
+           side coverage, so submenu rescue inherently relies on engines
+           evaluating one past the spec floor of four. Reusing
+           --uktdd-body-fill-fallbacks is deliberate: flipping the pair for
+           an upward-opening body flips its submenus’ final rescue too */
         position-try-fallbacks:
             var(--uktdd-submenu-position-try-fallbacks),
             --uktdd-fill,
