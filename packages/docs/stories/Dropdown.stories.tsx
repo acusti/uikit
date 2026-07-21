@@ -716,7 +716,7 @@ export const DirectionRecipes: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallbacks` (see the README’s “Changing the Default Direction” section for the full cheatsheet). Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. Each recipe opens in its named direction whenever that side has room, independent of where the trigger sits; the bottom pair is placed near the top of the canvas and the top pair near the bottom only so each menu opens into empty space instead of overlapping the other row.',
+                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallbacks` (see the README’s “Changing the Default Direction” section for the full cheatsheet). Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. The top-opening pair also flips `--uktdd-body-fill-fallbacks` so the last-resort fill prefers the upward side. Each recipe opens in its named direction whenever that side has room, independent of where the trigger sits; the bottom pair is placed near the top of the canvas and the top pair near the bottom only so each menu opens into empty space instead of overlapping the other row.',
             },
         },
     },
@@ -741,6 +741,45 @@ export const DirectionRecipes: Story = {
                         ))}
                     </div>
                 ))}
+            </div>
+        );
+    },
+};
+
+export const FillsWhenTooTall: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'A menu taller than the viewport whose trigger sits at the bottom edge (the shape from issue #399), with no `--uktdd-body-max-height` cap. The body fits at natural size in none of the authored placements, so the last-resort `--uktdd-body-fill-fallbacks` placements take over: the below side is under `--uktdd-body-min-height`, so `--uktdd-fill-bottom` is rejected and `--uktdd-fill-top` flips the body above the trigger, sizes it to that side, and lets the content scroll. Fill placements center the body over the trigger and shift it inward as needed to stay on-screen — that shift is what keeps the corner menus inside the viewport. The center menu nests a tall submenu, which likewise fills and scrolls beside its parent item instead of running past the viewport edge.',
+            },
+            story: { height: '420px', inline: false },
+        },
+    },
+    render() {
+        const items = Array.from({ length: 30 }, (_, index) => (
+            <li data-ukt-value={`item-${index + 1}`} key={index}>
+                Menu item {index + 1}
+            </li>
+        ));
+        return (
+            <div className="too-tall-demo">
+                <Dropdown className="too-tall" onSubmitItem={fn()}>
+                    Near left corner
+                    <ul>{items}</ul>
+                </Dropdown>
+                <Dropdown className="too-tall" onSubmitItem={fn()}>
+                    Center (with submenu)
+                    <ul>
+                        <Dropdown label="Jump to">
+                            <ul>{items}</ul>
+                        </Dropdown>
+                        {items}
+                    </ul>
+                </Dropdown>
+                <Dropdown className="too-tall" onSubmitItem={fn()}>
+                    Near right corner
+                    <ul>{items}</ul>
+                </Dropdown>
             </div>
         );
     },
