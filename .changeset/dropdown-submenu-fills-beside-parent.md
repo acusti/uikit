@@ -30,5 +30,5 @@ The one case this gives up versus covering the parent — a submenu wider
 than the space on either side of its parent — is out of scope for the
 narrow columns of a macOS-style menu; a consumer who needs it can append
 `--uktdd-fill-bottom, --uktdd-fill-top` to `--uktdd-submenu-fill-fallbacks`
-(keeping `--uktdd-submenu-position-try-fallbacks` to a single option to
-stay within the evaluation limit).
+(the single `--uktdd-submenu-position-try-fallback` slot leaves room for
+those two extra fills within the evaluation limit).

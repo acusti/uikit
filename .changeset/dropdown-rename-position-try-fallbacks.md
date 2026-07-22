@@ -28,7 +28,7 @@ physical keyword on one axis with a logical one on the other — and read as
 `top`/`bottom` in the near-universal horizontal-tb writing mode.
 
 **Migration:** if you referenced any of the renamed `@position-try` block
-names in `--uktdd-body-position-try-fallbacks`, or set
+names in `--uktdd-body-position-try-fallback-1`/`-2`, or set
 `--uktdd-body-position-area`/`--uktdd-submenu-position-area` directly with
 `top`/`bottom`/`span-left`/`span-right`, update them:
 
@@ -37,14 +37,14 @@ names in `--uktdd-body-position-try-fallbacks`, or set
 .my-dropdown {
     --uktdd-body-position-area: bottom span-left;
     --uktdd-body-position-try-fallbacks:
-        --uktdd-top-right, --uktdd-bottom-left, --uktdd-top-left;
+        --uktdd-top-right, --uktdd-bottom-left;
 }
 
-/* after */
+/* after (the fallback list is now two fixed slots) */
 .my-dropdown {
     --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-end, --uktdd-bottom-start, --uktdd-top-start;
+    --uktdd-body-position-try-fallback-1: --uktdd-top-end;
+    --uktdd-body-position-try-fallback-2: --uktdd-bottom-start;
 }
 ```
 

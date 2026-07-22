@@ -25,7 +25,7 @@ named export combines sibling dropdowns into a macOS-style menu bar.
   properties); parent-item open state is carried by `aria-expanded`
 - Submenus reuse the anchor-positioning layout model (the expanded parent
   item is the anchor) with new `--uktdd-submenu-position-area`,
-  `--uktdd-submenu-position-try-fallbacks`, and `--uktdd-submenu-translate`
+  `--uktdd-submenu-position-try-fallback`, and `--uktdd-submenu-translate`
   custom properties; parent items render a macOS-style disclosure chevron
   (drawn in CSS, restylable via `[aria-haspopup='menu']::after`), and
   submenu bodies get an explicit text color via the new
