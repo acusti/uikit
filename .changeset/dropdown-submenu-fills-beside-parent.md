@@ -4,7 +4,7 @@
 
 Keep a too-tall submenu beside its parent instead of covering the parent
 menu, and give submenus their own last-resort fills decoupled from the
-body’s
+body’s fills
 
 Previously a submenu that fit nowhere beside its parent fell back to the
 body’s block-side fills (`--uktdd-body-fill-fallbacks`), which cover the
