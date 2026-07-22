@@ -120,7 +120,8 @@
 .searchable-with-label,
 .searchable-and-allow-create {
     --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks: --uktdd-top-end, --uktdd-bottom-start;
+    --uktdd-body-position-try-fallback-1: --uktdd-top-end;
+    --uktdd-body-position-try-fallback-2: --uktdd-bottom-start;
 
     input,
     .uktdropdown-body {
@@ -130,7 +131,8 @@
 
 .css-value-input-trigger {
     --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks: --uktdd-top-end, --uktdd-bottom-start;
+    --uktdd-body-position-try-fallback-1: --uktdd-top-end;
+    --uktdd-body-position-try-fallback-2: --uktdd-bottom-start;
 
     .uktdropdown-body {
         /* a horizontal alignment nudge, not a trigger↔body gap; set as a raw
@@ -231,7 +233,10 @@
        trigger rather than clamping against the viewport’s left edge */
     align-self: center;
     --uktdd-body-position-area: bottom span-all;
-    --uktdd-body-position-try-fallbacks: --centered-menu-top;
+    /* one meaningful fallback (the flipped centered placement); slot 2 is
+       the no-op so it doesn’t inherit the default corner flip */
+    --uktdd-body-position-try-fallback-1: --centered-menu-top;
+    --uktdd-body-position-try-fallback-2: --uktdd-noop;
 
     .uktdropdown-body {
         inline-size: 200px;
@@ -288,7 +293,8 @@
 
 .too-tall {
     --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks: --uktdd-top-end, --uktdd-bottom-start;
+    --uktdd-body-position-try-fallback-1: --uktdd-top-end;
+    --uktdd-body-position-try-fallback-2: --uktdd-bottom-start;
 }
 
 /* CoverFillRecipe: the cover fill trades trigger coverage for full
@@ -490,8 +496,8 @@
 
     .avatar-menu {
         --uktdd-body-position-area: block-end span-inline-start;
-        --uktdd-body-position-try-fallbacks:
-            --uktdd-top-end, --uktdd-top-start, --uktdd-bottom-end;
+        --uktdd-body-position-try-fallback-1: --uktdd-top-end;
+        --uktdd-body-position-try-fallback-2: --uktdd-top-start;
 
         .avatar-profile,
         .avatar-edit {
