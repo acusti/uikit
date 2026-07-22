@@ -712,8 +712,8 @@ const DIRECTION_RECIPE_ROWS = [
             label: 'Bottom Start (default)',
             style: {
                 '--uktdd-body-position-area': 'block-end span-inline-end',
-                '--uktdd-body-position-try-fallbacks':
-                    '--uktdd-top-start, --uktdd-bottom-end',
+                '--uktdd-body-position-try-fallback-1': '--uktdd-top-start',
+                '--uktdd-body-position-try-fallback-2': '--uktdd-bottom-end',
             },
         },
         {
@@ -721,8 +721,8 @@ const DIRECTION_RECIPE_ROWS = [
             label: 'Bottom End',
             style: {
                 '--uktdd-body-position-area': 'block-end span-inline-start',
-                '--uktdd-body-position-try-fallbacks':
-                    '--uktdd-top-end, --uktdd-bottom-start',
+                '--uktdd-body-position-try-fallback-1': '--uktdd-top-end',
+                '--uktdd-body-position-try-fallback-2': '--uktdd-bottom-start',
             },
         },
     ],
@@ -733,8 +733,8 @@ const DIRECTION_RECIPE_ROWS = [
             style: {
                 '--uktdd-body-fill-fallbacks': '--uktdd-fill-top, --uktdd-fill-bottom',
                 '--uktdd-body-position-area': 'block-start span-inline-end',
-                '--uktdd-body-position-try-fallbacks':
-                    '--uktdd-bottom-start, --uktdd-top-end',
+                '--uktdd-body-position-try-fallback-1': '--uktdd-bottom-start',
+                '--uktdd-body-position-try-fallback-2': '--uktdd-top-end',
             },
         },
         {
@@ -743,8 +743,8 @@ const DIRECTION_RECIPE_ROWS = [
             style: {
                 '--uktdd-body-fill-fallbacks': '--uktdd-fill-top, --uktdd-fill-bottom',
                 '--uktdd-body-position-area': 'block-start span-inline-start',
-                '--uktdd-body-position-try-fallbacks':
-                    '--uktdd-bottom-end, --uktdd-top-start',
+                '--uktdd-body-position-try-fallback-1': '--uktdd-bottom-end',
+                '--uktdd-body-position-try-fallback-2': '--uktdd-top-start',
             },
         },
     ],
@@ -754,7 +754,7 @@ export const DirectionRecipes: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallbacks` (see the README’s “Changing the Default Direction” section for the full cheatsheet). Each dropdown carries its recipe on its `style` prop, so “Show code” below displays the exact variable pairs. Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. The top-opening pair also flips `--uktdd-body-fill-fallbacks` so the last-resort fill prefers the upward side. Each recipe opens in its named direction whenever that side has room, independent of where the trigger sits; the bottom pair is placed near the top of the canvas and the top pair near the bottom only so each menu opens into empty space instead of overlapping the other row.',
+                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallback-1` and `-2` (see the README’s [“Changing the Default Direction”](https://github.com/acusti/uikit/tree/main/packages/dropdown#changing-the-default-direction) section for the full cheatsheet). Each dropdown carries its recipe on its `style` prop, so “Show code” below displays the exact variables. Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. The top-opening pair also flips `--uktdd-body-fill-fallbacks` so the last-resort fill prefers the upward side. Each recipe opens in its named direction whenever that side has room, independent of where the trigger sits; the bottom pair is placed near the top of the canvas and the top pair near the bottom only so each menu opens into empty space instead of overlapping the other row.',
             },
         },
     },
@@ -842,7 +842,8 @@ export const FillsWhenTooTall: Story = {
 const COVER_FILL_STYLE = {
     '--uktdd-body-fill-fallbacks':
         '--uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top',
-    '--uktdd-body-position-try-fallbacks': '--uktdd-top-start, --uktdd-bottom-end',
+    '--uktdd-body-position-try-fallback-1': '--uktdd-top-start',
+    '--uktdd-body-position-try-fallback-2': '--uktdd-bottom-end',
 } as const;
 
 export const CoverFillRecipe: Story = {

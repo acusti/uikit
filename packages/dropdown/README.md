@@ -524,7 +524,9 @@ Placement is best customized in CSS instead of props. The component exposes
 CSS custom properties for the most common low-level placement controls:
 
 - `--uktdd-body-position-area`
-- `--uktdd-body-position-try-fallbacks`
+- `--uktdd-body-position-try-fallback-1` and
+  `--uktdd-body-position-try-fallback-2` (the two author fallbacks, tried
+  in order after the primary placement)
 - `--uktdd-body-fill-fallbacks` (the last-resort fill placements, tried
   when the body fits nowhere at its natural size)
 - `--uktdd-body-gap` (space between the trigger and the body)
@@ -538,8 +540,8 @@ Example:
 ```css
 .settings-dropdown {
     --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-end, --uktdd-bottom-start;
+    --uktdd-body-position-try-fallback-1: --uktdd-top-end;
+    --uktdd-body-position-try-fallback-2: --uktdd-bottom-start;
     --uktdd-body-gap: 8px;
 }
 
@@ -553,15 +555,17 @@ placement and sizing control when a product surface needs it.
 
 ### Changing the Default Direction
 
-`--uktdd-body-position-area` and `--uktdd-body-position-try-fallbacks`
-always change together. `--uktdd-body-position-area` is the primary
-placement, used whenever it fits in the viewport — that’s what actually
-determines the direction a dropdown opens by default. The fallbacks list is
-only consulted when the primary placement doesn’t fit, so overriding it
-alone changes nothing in the common case where the primary already fits.
-Overriding the primary alone works, but leaves behind a fallback cascade
-tuned for the old primary — in a cramped viewport, the dropdown can fall
-back toward the direction you just moved away from.
+`--uktdd-body-position-area` and its two fallback slots
+(`--uktdd-body-position-try-fallback-1`,
+`--uktdd-body-position-try-fallback-2`) always change together.
+`--uktdd-body-position-area` is the primary placement, used whenever it
+fits in the viewport — that’s what actually determines the direction a
+dropdown opens by default. The fallback slots are tried in order only when
+the primary placement doesn’t fit. Set all three together to ensure the
+menu behaves the way you want it to in all possible contexts. If the new
+direction has only one meaningful fallback (a centered menu, say), put it
+in slot 1 and set slot 2 to the shipped no-op `--uktdd-noop` so it doesn’t
+inherit that flip.
 
 The four `@position-try` blocks the component ships (`--uktdd-top-start`,
 `--uktdd-top-end`, `--uktdd-bottom-start`, `--uktdd-bottom-end`) are named
@@ -576,15 +580,18 @@ physical keyword on one axis with a logical one on the other — though
 `block-start`/`block-end` read as `top`/`bottom` in the near-universal
 horizontal-tb writing mode.
 
-Pick the row matching the direction you want, and set both variables to its
-pair:
+Pick the row matching the direction you want, and set the three CSS custom
+properties to the corresponding values:
 
-| Direction                           | `--uktdd-body-position-area`    | `--uktdd-body-position-try-fallbacks`   |
-| ----------------------------------- | ------------------------------- | --------------------------------------- |
-| Bottom, start-aligned (the default) | `block-end span-inline-end`     | `--uktdd-top-start, --uktdd-bottom-end` |
-| Bottom, end-aligned                 | `block-end span-inline-start`   | `--uktdd-top-end, --uktdd-bottom-start` |
-| Top, start-aligned                  | `block-start span-inline-end`   | `--uktdd-bottom-start, --uktdd-top-end` |
-| Top, end-aligned                    | `block-start span-inline-start` | `--uktdd-bottom-end, --uktdd-top-start` |
+| Direction                           | `--uktdd-body-position-area`    | `…try-fallback-1`      | `…try-fallback-2`      |
+| ----------------------------------- | ------------------------------- | ---------------------- | ---------------------- |
+| Bottom, start-aligned (the default) | `block-end span-inline-end`     | `--uktdd-top-start`    | `--uktdd-bottom-end`   |
+| Bottom, end-aligned                 | `block-end span-inline-start`   | `--uktdd-top-end`      | `--uktdd-bottom-start` |
+| Top, start-aligned                  | `block-start span-inline-end`   | `--uktdd-bottom-start` | `--uktdd-top-end`      |
+| Top, end-aligned                    | `block-start span-inline-start` | `--uktdd-bottom-end`   | `--uktdd-top-start`    |
+
+(The `…try-fallback-N` columns are `--uktdd-body-position-try-fallback-1`
+and `-2`.)
 
 The two Top rows should also flip the last-resort fill pair to match:
 `--uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom`.
@@ -595,8 +602,8 @@ trigger pinned to the bottom of the viewport, near the inline-end edge):
 ```css
 .bottom-toolbar-dropdown {
     --uktdd-body-position-area: block-start span-inline-start;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-bottom-end, --uktdd-top-start;
+    --uktdd-body-position-try-fallback-1: --uktdd-bottom-end;
+    --uktdd-body-position-try-fallback-2: --uktdd-top-start;
     --uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom;
 }
 ```
@@ -639,22 +646,20 @@ trigger can guarantee — so a min-height above half the viewport (honored in
 full by the named placements) can’t reject both fills: the body fills the
 roomier side and scrolls rather than overflowing.
 
-Keep `--uktdd-body-position-try-fallbacks` to at most two options. The spec
-lets engines cap the position options list at an implementation-defined
-length with a floor of five — and that list includes the element’s base
-position, so only four fallbacks past it are guaranteed. The component
-appends the two fill placements after your list, so two author fallbacks
-plus the two fills is exactly four — within the floor on every conformant
-engine. A third author fallback (six options) still works on every current
-engine but leans past the spec floor onto their real limits (Chromium
-evaluates exactly six; Safari and Firefox more); a fourth pushes a fill
-past even Chromium, so a trigger near a viewport edge can open off-screen
-instead of flipping and scrolling. The default’s two fallbacks are the
-single-axis flips of the primary (a block flip and an inline flip); it
-drops the both-axes diagonal to stay within the floor, so a trigger crammed
-into the corner diagonal to the primary opening direction lands in a fill
-rather than a natural placement — re-tune the primary (per the recipes
-above) for triggers pinned to a viewport corner.
+There are exactly two author fallback slots by design. The
+[CSS spec](https://drafts.csswg.org/css-anchor-position-1/#fallback-apply)
+requires implementations to support at least five position options,
+including the element’s base position, and `@acusti/dropdown` appends two
+last-resort placements to the end, so that leaves two fallbacks that you
+can specify, hence why they are exposed as two separate custom properties.
+The two default slots are the single-axis flips of the primary (a block
+flip and an inline flip); the mirror opposite diagonal is intentionally not
+a slot, so that a trigger crammed into the corner diagonal to the primary
+opening direction lands in a fill rather than a natural placement. See the
+[recipes above](#changing-the-default-direction) for different common
+placement scenarios. For a recipe with a single meaningful fallback (a
+centered menu, say), set slot 1 and leave slot 2 as the shipped no-op
+`--uktdd-noop`, so it doesn’t inherit the default’s flip.
 
 ### Trading Trigger Coverage for a Full-Height Menu
 
@@ -669,8 +674,8 @@ rather than one side of it.
 
 ```css
 .tall-menu {
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-start, --uktdd-bottom-end;
+    --uktdd-body-position-try-fallback-1: --uktdd-top-start;
+    --uktdd-body-position-try-fallback-2: --uktdd-bottom-end;
     --uktdd-body-fill-fallbacks:
         --uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top;
 }
@@ -710,8 +715,8 @@ the menu size itself from its contents.
 ```css
 .avatar-menu {
     --uktdd-body-position-area: block-end span-inline-start;
-    --uktdd-body-position-try-fallbacks:
-        --uktdd-top-end, --uktdd-top-start;
+    --uktdd-body-position-try-fallback-1: --uktdd-top-end;
+    --uktdd-body-position-try-fallback-2: --uktdd-top-start;
 }
 ```
 
@@ -732,13 +737,17 @@ the trigger always overflows it — and `position-try` refuses to select a
 fallback that overflows, so a `bottom center` → `top center` setup never
 flips. `span-all` centers over the trigger identically but spans the full
 width, so it flips cleanly and clamps to the viewport near an edge. The
-menu opens below by default and flips above only when it doesn’t fit below;
-list the flipped fallback so that flip is available:
+menu opens below by default and flips above only when it doesn’t fit below.
+It has one meaningful fallback (the flipped centered placement), so set it
+in slot 1 and leave slot 2 as the no-op — otherwise slot 2 keeps the
+default’s corner flip and the menu can land off-center in a cramped
+viewport:
 
 ```css
 .centered-menu {
     --uktdd-body-position-area: bottom span-all;
-    --uktdd-body-position-try-fallbacks: --centered-menu-top;
+    --uktdd-body-position-try-fallback-1: --centered-menu-top;
+    --uktdd-body-position-try-fallback-2: --uktdd-noop;
 }
 
 /* define the flipped fallback in your own CSS */
@@ -859,11 +868,8 @@ it flush to the parent item’s edge across browsers. Placement custom
 properties follow the established naming scheme:
 
 - `--uktdd-submenu-position-area` (default: `inline-end span-block-end`)
-- `--uktdd-submenu-position-try-fallbacks` (default:
-  `--uktdd-submenu-inline-start`; keep it to a single option — the
-  component appends two last-resort fills after it, and the spec guarantees
-  only four evaluated fallbacks, so a second author fallback would push a
-  fill out of reach)
+- `--uktdd-submenu-position-try-fallback` (default:
+  `--uktdd-submenu-inline-start`; a single slot, not a list)
 - `--uktdd-submenu-fill-fallbacks` (the last-resort fills for a submenu too
   tall to open beside its parent at natural size; default
   `--uktdd-submenu-fill, --uktdd-submenu-fill flip-inline` — a full-height
@@ -871,13 +877,10 @@ properties follow the established naming scheme:
   submenu fills the viewport height beside the parent and scrolls rather
   than covering the parent menu, the way macOS never covers a parent with
   its submenu. Flip the pair for a submenu that opens `inline-start` by
-  default. A submenu wider than the space on either side of its parent —
-  out of scope for a macOS-style menu’s narrow columns — is the one case
-  this gives up versus covering the parent; append
+  default. A submenu wider than the space on either side of its parent is
+  the one case this default doesn’t handle; append
   `--uktdd-fill-bottom, --uktdd-fill-top` here to restore the
-  parent-covering rescue if you need it, keeping
-  `--uktdd-submenu-position-try-fallbacks` empty to stay within the
-  evaluation limit)
+  parent-covering rescue if you need it)
 - `--uktdd-submenu-gap` (space between the parent item and the submenu;
   applied as a symmetric `margin-inline`, the inline-axis counterpart to
   `--uktdd-body-gap`, so it auto-reverses when the submenu flips to the
