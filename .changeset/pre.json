@@ -23,6 +23,8 @@
     },
     "changesets": [
         "dropdown-derive-label-from-children",
+        "dropdown-fill-cover-option",
+        "dropdown-fill-fallbacks-within-evaluation-limit",
         "dropdown-listbox-roles",
         "dropdown-nested-independent-menu",
         "dropdown-open-on-hover",
@@ -30,6 +32,8 @@
         "dropdown-remove-min-body-props",
         "dropdown-rename-position-try-fallbacks",
         "dropdown-reveal-value-on-open",
+        "dropdown-split-fallback-slots",
+        "dropdown-submenu-fills-beside-parent",
         "dropdown-submenu-top-layer",
         "dropdown-top-layer-popover",
         "dropdown-unmatched-value-placeholder",

@@ -1,5 +1,142 @@
 # @acusti/dropdown
 
+## 1.0.0-alpha.7
+
+### Major Changes
+
+- 06ab6fa: Replace the `--uktdd-body-position-try-fallbacks` list with two
+  fixed slots, `--uktdd-body-position-try-fallback-1` and
+  `--uktdd-body-position-try-fallback-2`, and rename the submenu’s list to
+  the singular `--uktdd-submenu-position-try-fallback`
+
+    The author fallbacks sit between the primary placement and the appended
+    fills, and the component’s budget is exactly two of them (two author
+    fallbacks + two fills = four, plus the base = the spec’s guaranteed
+    five-option floor). As a comma-separated list, that limit was only
+    documented, and a third entry silently pushed a fill past the floor,
+    letting a trigger near a viewport edge open off-screen. Splitting the
+    list into two named slots makes the two-option budget structural: there
+    is no third slot to overflow into. The submenu, which affords a single
+    author fallback, likewise becomes a single named slot.
+
+    Migration: set `--uktdd-body-position-try-fallback-1` and `-2` where
+    you previously set the two entries of
+    `--uktdd-body-position-try-fallbacks` (the direction-recipe table in
+    the README lists the per-direction values), and
+    `--uktdd-submenu-position-try-fallback` (singular) where you set the
+    submenu list.
+
+    Also adds a shipped no-op placement, `--uktdd-noop`, for a recipe with
+    a single meaningful fallback (a centered menu, say): set slot 1 and
+    leave slot 2 as `--uktdd-noop` so it doesn’t inherit the default’s
+    flip. It applies no overrides, so it evaluates as the primary placement
+    and is skipped.
+
+### Minor Changes
+
+- 07cc5b5: Add the opt-in `--uktdd-fill-cover` last-resort placement (in no
+  default list): where the block-side fills loosen the inline axis and keep
+  the body beside the trigger, the cover fill keeps the strict
+  start-aligned inline edge (compose `--uktdd-fill-cover flip-inline` for
+  end alignment) and loosens the block axis instead, sizing the body to the
+  viewport’s full block size — covering the trigger — so a too-tall menu
+  gets the whole viewport to scroll in rather than one side of it. It is
+  rejected whenever the body is too wide for the trigger-to-viewport-edge
+  inline region, so listing it before the guaranteed pair
+  (`--uktdd-body-fill-fallbacks: --uktdd-fill-cover, --uktdd-fill-bottom, --uktdd-fill-top`)
+  applies it only when the body already fits horizontally, with the pair
+  still rescuing corner triggers. Three fills leaves room for at most two
+  author fallback slots — six position options total, within the limit
+  every current engine evaluates (Chromium caps at six; Safari and Firefox
+  go well beyond). Drop to one author fallback to keep the whole list
+  within the spec’s guaranteed floor of five. Avoid it on searchable
+  dropdowns — the body overlays the trigger’s input while open.
+- 7396d2f: Budget the last-resort fill placements to the `position-try`
+  evaluation limit so a too-tall body flips and scrolls instead of opening
+  off-screen (fixes #399)
+
+    A too-tall body falls back to last-resort fill placements, which have
+    to fit within the `position-try` evaluation limit, or an engine
+    silently drops one and the body opens toward a viewport edge instead of
+    flipping and scrolling. The CSS anchor positioning spec lets engines
+    cap the position options list at an implementation-defined length with
+    a floor of five, including the element’s base position, so only four
+    fallbacks past it are guaranteed. In practice Chromium is the tightest,
+    evaluating six options (five fallbacks past the base) and silently
+    ignoring the rest, while Safari and Firefox evaluate many more.
+
+    The default budget is two author fallbacks plus two named fill options,
+    `--uktdd-fill-bottom` and `--uktdd-fill-top`, so no engine can silently
+    drop a fill. The two author fallbacks are the single-axis flips of the
+    primary (a block flip and an inline flip); the opposite diagonal flip
+    is dropped to stay within the floor. The cost of dropping the diagonal
+    is that a trigger crammed into the corner diagonal to the primary
+    opening direction lands in a fill rather than a fourth natural
+    placement. Each fill pairs a single-side `position-area`
+    (`block-end`/`block-start`, spanning all inline tiles so it can never
+    be rejected for horizontal overflow) with
+    `justify-self: anchor-center`, which centers the body over the trigger
+    and shifts it inward as needed to stay on-screen (the explicitness
+    matters: `span-all`’s default alignment centers without that shift, so
+    near a corner it would overflow and be rejected). A fill is only
+    rejected when its side is shorter than the body’s `min-block-size`
+    floor, and each fill caps that floor at the larger side (roughly half
+    the viewport, the most a block-centered trigger can guarantee), so at
+    least one of the pair always fits, no additional height cap needed. The
+    pair is appended via the new `--uktdd-body-fill-fallbacks` custom
+    property, so upward-opening dropdowns can flip its order to keep the
+    last-resort fill on their preferred side. (Submenus have their own
+    last-resort fills, `--uktdd-submenu-fill-fallbacks`, rather than
+    reusing this pair — see the separate submenu changeset.)
+
+    In the fill placements the body spans the trigger instead of keeping
+    the primary placement’s edge alignment. Consumer overrides stay within
+    the budget: the two `--uktdd-body-position-try-fallback-1`/`-2` slots
+    plus the two fills, and the single
+    `--uktdd-submenu-position-try-fallback`.
+
+    Also fixes the submenu rule’s `--uktdd-body-gap: 0` override: the
+    unitless zero made the fill options’
+    `calc(100% - var(--uktdd-body-gap) * 2)` block-size invalid
+    (`<percentage> - <number>`), so every fill option was evaluated at
+    natural size and rejected — submenu fill fallbacks never applied, and a
+    submenu taller than the space beside its parent item overflowed the
+    viewport instead of filling and scrolling. The zero now carries a unit
+    (`0px`).
+
+- d0a147b: Keep a too-tall submenu beside its parent instead of covering
+  the parent menu, and give submenus their own last-resort fills decoupled
+  from the body’s fills
+
+    Previously a submenu that fit nowhere beside its parent fell back to
+    the body’s block-side fills (`--uktdd-body-fill-fallbacks`), which
+    cover the anchor — wrong for a submenu, since macOS never covers a
+    parent menu with its submenu, and it coupled the two: flipping the
+    body’s fill pair for an upward-opening dropdown silently reordered its
+    submenus’ rescue too. That list was also five fallbacks, one past the
+    spec’s guaranteed floor.
+
+    Submenus now use a new `--uktdd-submenu-fill-fallbacks` (default
+    `--uktdd-submenu-fill, --uktdd-submenu-fill flip-inline`) and a new
+    `--uktdd-submenu-fill` placement: a full-height fill on each inline
+    side that spans the viewport’s block axis (a bare `inline-end` keyword,
+    the block-axis mirror of `--uktdd-fill-bottom`) and anchor-centers on
+    the block axis, so a submenu taller than the room beside its parent
+    fills the viewport height next to the parent item and scrolls —
+    shifting on-screen even when the parent sits near the block-end edge —
+    rather than covering the parent menu. The submenu list is now one
+    author fallback plus these two fills, three past the base and within
+    the spec’s five-option floor (no reliance on an engine evaluating past
+    it), and independent of `--uktdd-body-fill-fallbacks`.
+
+    The one case this gives up versus covering the parent — a submenu wider
+    than the space on either side of its parent — is out of scope for the
+    narrow columns of a macOS-style menu; a consumer who needs it can
+    append `--uktdd-fill-bottom, --uktdd-fill-top` to
+    `--uktdd-submenu-fill-fallbacks` (the single
+    `--uktdd-submenu-position-try-fallback` slot leaves room for those two
+    extra fills within the evaluation limit).
+
 ## 1.0.0-alpha.6
 
 ### Patch Changes
