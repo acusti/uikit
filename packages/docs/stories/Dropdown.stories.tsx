@@ -59,22 +59,90 @@ export default meta;
 type Story = StoryObj<typeof Dropdown>;
 
 export const CSSLengthsDropdown: Story = {
-    args: {
-        children: (
-            <ul>
-                <li>0px</li>
-                <li>4px</li>
-                <li>9px</li>
-                <li>18px</li>
-                <li>36px</li>
-                <li>54px</li>
-                <li>72px</li>
-                <li>144px</li>
-                <li>167px</li>
-                <li>198px</li>
-            </ul>
-        ),
-        className: 'css-lengths no-trigger-text',
+    parameters: {
+        docs: {
+            description: {
+                story: 'The dark/light toggle sets `color-scheme` on the document root, standing in for a host page that has (or hasn’t) opted into dark mode — the dropdown’s default colors follow it via inheritance rather than the OS/browser preference directly. Every other Dropdown story on this page inherits from that same document root, so toggling it moves them all together (stories that render in their own iframe are a separate document and always follow your real OS/browser preference instead). See [Color Scheme](#color-scheme) in the README. Disabled when your OS/browser already prefers dark mode, since from there the only direction left to demonstrate is toggling away from your actual preference, which wouldn’t show anything a real host page would do.',
+            },
+        },
+    },
+    render() {
+        const [colorScheme, setColorScheme] = React.useState<'dark' | 'light'>(() =>
+            window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light',
+        );
+        const [prefersDark, setPrefersDark] = React.useState(
+            () => window.matchMedia('(prefers-color-scheme: dark)').matches,
+        );
+
+        React.useEffect(() => {
+            const media = window.matchMedia('(prefers-color-scheme: dark)');
+            const onChange = () => {
+                // keep colorScheme in sync with ambient too, not just the
+                // disabled state: otherwise a mid-visit OS switch to dark
+                // disables the toggle but leaves a stale 'light' applied,
+                // which the disabled button can no longer correct
+                setPrefersDark(media.matches);
+                setColorScheme(media.matches ? 'dark' : 'light');
+            };
+            media.addEventListener('change', onChange);
+            return () => media.removeEventListener('change', onChange);
+        }, []);
+
+        React.useEffect(() => {
+            document.documentElement.style.colorScheme = colorScheme;
+            return () => {
+                document.documentElement.style.colorScheme = '';
+            };
+        }, [colorScheme]);
+
+        return (
+            <div style={{ position: 'relative' }}>
+                <button
+                    disabled={prefersDark}
+                    onClick={() =>
+                        setColorScheme(colorScheme === 'light' ? 'dark' : 'light')
+                    }
+                    style={{ position: 'absolute', right: 0, top: 0 }}
+                    title={
+                        prefersDark
+                            ? 'Switch your OS/browser to light mode to try this toggle'
+                            : undefined
+                    }
+                    type="button"
+                >
+                    {colorScheme === 'light'
+                        ? '🌙 Enable dark mode'
+                        : '☀️ Enable light mode'}
+                </button>
+                {prefersDark ? (
+                    <p
+                        style={{
+                            fontSize: '0.8em',
+                            margin: '0 0 0.5rem',
+                            paddingRight: '12em',
+                        }}
+                    >
+                        Your OS/browser already prefers dark mode, so this toggle is
+                        disabled — every other story on this page is already rendering
+                        from that same preference. Switch to light mode to try it live.
+                    </p>
+                ) : null}
+                <Dropdown className="css-lengths no-trigger-text">
+                    <ul>
+                        <li>0px</li>
+                        <li>4px</li>
+                        <li>9px</li>
+                        <li>18px</li>
+                        <li>36px</li>
+                        <li>54px</li>
+                        <li>72px</li>
+                        <li>144px</li>
+                        <li>167px</li>
+                        <li>198px</li>
+                    </ul>
+                </Dropdown>
+            </div>
+        );
     },
 };
 
