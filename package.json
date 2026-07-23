@@ -57,7 +57,7 @@
         "babel-plugin-react-compiler": "^1",
         "eslint-plugin-perfectionist": "^5.9.1",
         "happy-dom": "^20.10.6",
-        "oxfmt": "^0.57.0",
+        "oxfmt": "^0.60.0",
         "oxlint": "^1.72.0",
         "oxlint-tsgolint": "^0.24.0",
         "react": "^19.2.7",
