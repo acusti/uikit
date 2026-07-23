@@ -4,6 +4,47 @@
     flex-direction: column;
 }
 
+/* Canvas/CanvasText so the demo canvas follows whatever color-scheme ends
+   up in effect — either the real ambient OS/browser preference (see the
+   media query below) or the CSSLengthsDropdown toggle. Native form
+   controls (inputs, buttons) already auto-dark from the OS preference
+   regardless of any page-level opt-in, so without this, a visitor with a
+   dark OS ends up with a native-dark input stranded on a hardcoded-light
+   page. :has(.uktdropdown) scopes this to Dropdown stories rather than
+   every Storybook page sharing these container id/class names */
+#storybook-root:has(.uktdropdown),
+.docs-story:has(.uktdropdown) {
+    background-color: Canvas;
+    color: CanvasText;
+}
+
+/* a story with parameters.docs.story.inline: false (FillsWhenTooTall,
+   CoverFillRecipe, SubmenuFillsBesideParent) renders in its own isolated
+   iframe on the docs page rather than inline in the shared document —
+   #storybook-root there is a normal Canvas-view root, sized to its (short)
+   content by default, leaving the rest of the iframe’s allocated height
+   as unstyled white. Stretching it to the full viewport means the
+   Canvas background actually covers that iframe instead of leaving a gap
+   below the dropdown. Isolated stories have no CSSLengthsDropdown-toggle
+   awareness at all — they’re a separate document — so they always render
+   from the real ambient preference regardless of the toggle, same as this
+   rule’s scope implies */
+#storybook-root:has(.uktdropdown) {
+    min-height: 100dvh;
+}
+
+/* No color-scheme override here for the rest of the (inline) Dropdown
+   stories: they deliberately inherit it from the document root, same as
+   any consumer page’s content would. CSSLengthsDropdown’s toggle sets it
+   there directly (see the story), so every other inline story on the docs
+   page visibly follows along too — the point of the demo is showing that
+   an unstyled dropdown picks up whatever color-scheme is in effect via
+   inheritance, and letting that inheritance actually reach the rest of
+   the page makes that concrete instead of demonstrating it in a single
+   isolated box. The toggle only runs when the visitor’s real OS/browser
+   prefers light (see the story), so this never fights the ambient
+   preference — it only ever moves everything the same direction, together */
+
 #storybook-root {
     &:has(.mk-header) {
         height: 1000px;
@@ -41,6 +82,14 @@
 .uktdropdown input {
     box-sizing: border-box;
     width: 110px;
+}
+
+/* the UA default placeholder opacity reads as low-contrast in either
+   scheme; GrayText is the system color for de-emphasized text and already
+   tracks light/dark on its own */
+.uktdropdown-trigger::placeholder {
+    color: GrayText;
+    opacity: 1;
 }
 
 .uktdropdown-body {
@@ -88,7 +137,7 @@
             top: 10px;
             left: 4px;
             border-radius: 2px 0 0 3px;
-            background-color: #666;
+            background-color: currentColor;
             transform: rotateZ(38deg);
         }
 
@@ -101,7 +150,7 @@
             top: 10px;
             right: 4px;
             border-radius: 0 2px 2px 0;
-            background-color: #666;
+            background-color: currentColor;
             transform: rotateZ(-38deg);
         }
     }
