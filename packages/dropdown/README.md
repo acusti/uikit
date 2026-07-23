@@ -187,6 +187,28 @@ below. If your trigger sits near the right edge of the viewport, the
 [End-Aligned, Content-Sized Menu](#end-aligned-content-sized-menu) example
 is the one you want.
 
+## Color Scheme
+
+The default colors are drawn from CSS system colors (`Canvas`,
+`CanvasText`, `Highlight`, `HighlightText`) and `color-mix()` blends
+against `CanvasText`, rather than fixed light-mode values, so the dropdown
+looks native in whichever color scheme is in effect.
+`--uktdd-body-box-shadow` is the exception — a fixed `rgba(0, 0, 0, 0.25)`
+rather than a scheme-aware mix, since mixing in `CanvasText` turns it into
+a diffuse white glow in dark mode instead of a shadow. `color-scheme` (set
+via `--uktdd-color-scheme`, default `inherit`) is left to inherit from the
+host page rather than forced to `light dark`: the popover is page content,
+not OS chrome, so it matches whatever scheme the page itself has opted into
+— light, if the page hasn’t adopted dark mode — rather than following the
+OS/browser preference regardless of the page. Set `--uktdd-color-scheme` to
+`light dark` (or `light`/`dark`) to follow the user’s preference
+irrespective of the host page instead. Override any of the
+`--uktdd-body-bg-color*` / `--uktdd-body-color*` /
+`--uktdd-body-box-shadow` custom properties to theme it further.
+`--uktdd-menubar-trigger-bg-color-active` blends against `currentColor`
+instead, so it stays visible against a menubar trigger that the consumer
+has styled with its own background, independent of the page’s color scheme.
+
 ## Browser Support
 
 `Dropdown` relies on two web-platform features, both now
@@ -891,7 +913,7 @@ item’s `::after` pseudo-element and colored with `currentColor` so it
 follows the item’s highlight color. Restyle or remove it by overriding
 `[aria-haspopup='menu']::after`.
 
-Submenu bodies set `color: var(--uktdd-body-color)` (default: `canvastext`)
+Submenu bodies set `color: var(--uktdd-body-color)` (default: `CanvasText`)
 explicitly — without it, an active parent item’s highlight text color would
 inherit into its submenu’s items, because the submenu is the parent item’s
 DOM child. Set `--uktdd-body-color` alongside `--uktdd-body-bg-color` when

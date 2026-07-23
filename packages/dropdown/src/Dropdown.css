@@ -2,12 +2,37 @@
     --uktdd-font-family:
         system-ui, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue,
         Helvetica, Arial, sans-serif;
-    --uktdd-body-bg-color: #fff;
-    --uktdd-body-bg-color-hover: rgb(105, 162, 249);
-    --uktdd-body-color-hover: #fff;
+    /* the popover is page content, not OS chrome — a native OS context menu
+       always renders in the OS’s own scheme regardless of the host page,
+       but this component should match whatever color-scheme the host page
+       itself declares (light, if the page hasn’t opted into dark mode),
+       so it inherits rather than forcing one. Override to `light dark` (or
+       `light`/`dark`) to follow the user’s OS/browser preference instead,
+       irrespective of the host page */
+    --uktdd-color-scheme: inherit;
+    /* Canvas(Text)/Highlight(Text) are UA system colors, so the color defaults
+       below need no prefers-color-scheme query of their own to work in both
+       schemes. The UA default is light-only regardless of OS/browser preference
+       until something opts in, which is what --uktdd-color-scheme above is for */
+    --uktdd-body-bg-color: Canvas;
+    --uktdd-body-bg-color-hover: Highlight;
+    --uktdd-body-color-hover: HighlightText;
     /* the persistent tint on the item matching props.value (the current
        selection), shown even after the active/hover highlight moves off it */
-    --uktdd-body-bg-color-selected: rgba(0, 0, 0, 0.06);
+    --uktdd-body-bg-color-selected: color-mix(in oklab, CanvasText 6%, transparent);
+    /* shared by the body & submenu (see their box-shadow declarations below).
+       A fixed black rather than a CanvasText-based mix: CanvasText is
+       near-white in dark mode, so mixing it in turns this into a diffuse
+       glow around the body instead of a shadow. Black stays a
+       conventional cast shadow in light mode and fades to barely-there in
+       dark mode — safe in both, rather than wrong in one */
+    --uktdd-body-box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+    /* a hairline edge, shared by the body & submenu, that does the job the
+       shadow can’t on a dark Canvas (a shadow alone is nearly invisible
+       against a dark background, unlike on a light one). Unlike the
+       shadow, a crisp 1px line has no blur radius to turn into a glow, so
+       color-mix against CanvasText is safe here in both schemes */
+    --uktdd-body-border-color: color-mix(in oklab, CanvasText 15%, transparent);
     --uktdd-body-buffer: 10px;
     --uktdd-body-max-height: calc(100dvh - var(--uktdd-body-buffer));
     --uktdd-body-max-width: calc(100dvw - var(--uktdd-body-buffer));
@@ -37,8 +62,12 @@
        margin establishes no containing block, so it’s safe on dropdowns with
        submenus */
     --uktdd-body-gap: 0px;
-    --uktdd-body-color: canvastext;
-    --uktdd-body-bg-color-path: #dcdcdc;
+    --uktdd-body-color: CanvasText;
+    /* the muted highlight for an ancestor item on the active path (see the
+       [data-ukt-active] rules below); mixed against Canvas instead of a
+       fixed light gray so it reads as a gray step off the body background
+       in both a light and a dark Canvas */
+    --uktdd-body-bg-color-path: color-mix(in oklab, CanvasText 12%, Canvas);
     --uktdd-body-color-path: currentColor;
     --uktdd-label-pad-right: 0.625em;
     --uktdd-submenu-position-area: inline-end span-block-end;
@@ -58,7 +87,18 @@
     /* like --uktdd-body-gap but on the inline axis, since submenus open to
        the side; auto-reverses when they flip to the opposite inline edge */
     --uktdd-submenu-gap: 0px;
-    --uktdd-menubar-trigger-bg-color-active: rgba(0, 0, 0, 0.12);
+    /* tints over whatever background the trigger already has, so a fixed
+       black wouldn’t register against a trigger the consumer’s already
+       styled dark; color-mix against currentColor (not CanvasText, which
+       tracks the ambient color-scheme rather than the trigger’s own
+       background) follows whatever foreground the trigger already uses for
+       contrast against its own background, so the tint stays visible
+       whether or not that matches the page’s color scheme */
+    --uktdd-menubar-trigger-bg-color-active: color-mix(
+        in oklab,
+        currentColor 12%,
+        transparent
+    );
 }
 
 .uktdropdown,
@@ -139,9 +179,13 @@
        top layer handles stacking (no z-index). The UA-popover box resets that
        must beat a consumer’s global [popover] styles live in the
        div.uktdropdown-body rule below; these cosmetics stay overridable */
-    color: inherit;
+    color: var(--uktdd-body-color);
+    /* inherited by [data-ukt-submenu] too, since it’s a DOM descendant of
+       the body (inheritance follows the DOM tree, not top-layer paint
+       order) */
+    color-scheme: var(--uktdd-color-scheme);
     background-color: var(--uktdd-body-bg-color);
-    box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+    box-shadow: var(--uktdd-body-box-shadow);
 
     &.has-items {
         user-select: none;
@@ -232,7 +276,7 @@
     [data-ukt-submenu] {
         box-sizing: border-box;
         inset: auto;
-        border: 0;
+        border: 1px solid var(--uktdd-body-border-color);
         block-size: auto;
         /* an explicit color so items don’t inherit the white highlight color
            from their active parent item (the submenu is its DOM child) */
@@ -277,7 +321,7 @@
         overscroll-behavior: contain;
         list-style: none;
         background-color: var(--uktdd-body-bg-color);
-        box-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+        box-shadow: var(--uktdd-body-box-shadow);
     }
 }
 
@@ -292,7 +336,7 @@ div.uktdropdown-body {
     block-size: auto;
     margin-block: var(--uktdd-body-gap);
     margin-inline: 0;
-    border: 0;
+    border: 1px solid var(--uktdd-body-border-color);
     padding: 0;
 }
 
