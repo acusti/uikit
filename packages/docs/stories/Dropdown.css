@@ -35,30 +35,6 @@
     &:has(.mk-header) {
         height: 1000px;
     }
-
-    &:has(.position-right.uktdropdown) {
-        align-items: center;
-        justify-content: center;
-        height: calc(200vh - 110px);
-        width: calc(200vw - 270px);
-    }
-}
-
-.sb-story {
-    &:has(.position-right.uktdropdown) {
-        height: 350px;
-        width: 100%;
-        overflow: auto;
-    }
-
-    > div {
-        &:has(.position-right.uktdropdown) {
-            align-items: center;
-            justify-content: center;
-            height: 670px;
-            width: calc(200% - 190px);
-        }
-    }
 }
 
 .sb-story {
@@ -224,14 +200,6 @@
     /* deliberately pulls the body back over the trigger — a gap only adds
        distance, so this overlap uses a raw translate (no submenus to clip) */
     translate: -10px -22px;
-}
-
-.out-of-bounds-example input {
-    width: 150px;
-}
-
-.out-of-bounds-example .uktdropdown-body {
-    inline-size: 250px;
 }
 
 /* A transformed ancestor would become the containing block for a normal
