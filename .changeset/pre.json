@@ -1,14 +1,14 @@
 {
     "mode": "pre",
-    "tag": "alpha",
+    "tag": "beta",
     "initialVersions": {
         "@acusti/appsync-fetch": "0.18.0",
         "@acusti/aws-signature-v4": "2.0.0",
         "@acusti/css-value-input": "2.4.0",
         "@acusti/css-values": "1.2.0",
         "@acusti/date-picker": "0.16.1",
-        "@acusti/uikit-docs": "0.6.3",
-        "@acusti/dropdown": "0.57.0",
+        "@acusti/uikit-docs": "0.6.4-alpha.0",
+        "@acusti/dropdown": "1.0.0-alpha.7",
         "@acusti/input-text": "2.4.3",
         "@acusti/matchmaking": "0.10.0",
         "@acusti/parsing": "0.20.2",
