@@ -132,7 +132,7 @@ this is a no-op: bun skips the lockfile write when only workspace `version`
 fields changed (publishing doesn’t read them — versions come from each
 `package.json` — and they sync on the next real lockfile write).
 
-### Prereleases (alpha)
+### Prereleases (for alpha, can substitute for beta or rc)
 
 To ship a prerelease instead of a stable version, enter changesets’
 prerelease (`pre`) mode first — from `main`, once every changeset file
