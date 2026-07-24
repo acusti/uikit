@@ -22,6 +22,7 @@
         "@acusti/vite-plugin-svg-react": "0.1.0"
     },
     "changesets": [
+        "dropdown-dark-mode-colors",
         "dropdown-derive-label-from-children",
         "dropdown-fill-cover-option",
         "dropdown-fill-fallbacks-within-evaluation-limit",
