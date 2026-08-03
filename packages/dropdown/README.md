@@ -190,20 +190,33 @@ is the one you want.
 ## Color Scheme
 
 The default colors are drawn from CSS system colors (`Canvas`,
-`CanvasText`, `Highlight`, `HighlightText`) and `color-mix()` blends
-against `CanvasText`, rather than fixed light-mode values, so the dropdown
-looks native in whichever color scheme is in effect.
-`--uktdd-body-box-shadow` is the exception — a fixed `rgba(0, 0, 0, 0.25)`
-rather than a scheme-aware mix, since mixing in `CanvasText` turns it into
-a diffuse white glow in dark mode instead of a shadow. `color-scheme` (set
-via `--uktdd-color-scheme`, default `inherit`) is left to inherit from the
-host page rather than forced to `light dark`: the popover is page content,
-not OS chrome, so it matches whatever scheme the page itself has opted into
-— light, if the page hasn’t adopted dark mode — rather than following the
-OS/browser preference regardless of the page. Set `--uktdd-color-scheme` to
-`light dark` (or `light`/`dark`) to follow the user’s preference
-irrespective of the host page instead. Override any of the
-`--uktdd-body-bg-color*` / `--uktdd-body-color*` /
+`CanvasText`, `Highlight`, `HighlightText`) rather than fixed light-mode
+values, so the dropdown looks native in whichever color scheme is in
+effect.
+
+The tints layered over the body — `--uktdd-body-bg-color-selected`,
+`--uktdd-body-border-color`, and `--uktdd-body-bg-color-path` — are
+`color-mix()` blends that derive from the body’s own foreground and
+background rather than from `CanvasText`/`Canvas` directly, so theming the
+surface carries them with it: set `--uktdd-body-color` and
+`--uktdd-body-bg-color` and the selected tint, hairline border, and
+active-path step all re-derive from the pair you set. That matters because
+a `var()` inside a custom property is substituted where that property is
+declared, so a `:root` default blended against `CanvasText` would freeze to
+the ambient color scheme before a consumer’s override could reach it — a
+dark menu on a light page would keep a black hairline it can’t show. Each
+one is still a plain custom property, so setting it directly overrides the
+derived default outright. `--uktdd-body-box-shadow` is the exception — a
+fixed `rgba(0, 0, 0, 0.25)` rather than a scheme-aware mix, since mixing in
+`CanvasText` turns it into a diffuse white glow in dark mode instead of a
+shadow. `color-scheme` (set via `--uktdd-color-scheme`, default `inherit`)
+is left to inherit from the host page rather than forced to `light dark`:
+the popover is page content, not OS chrome, so it matches whatever scheme
+the page itself has opted into — light, if the page hasn’t adopted dark
+mode — rather than following the OS/browser preference regardless of the
+page. Set `--uktdd-color-scheme` to `light dark` (or `light`/`dark`) to
+follow the user’s preference irrespective of the host page instead.
+Override any of the `--uktdd-body-bg-color*` / `--uktdd-body-color*` /
 `--uktdd-body-box-shadow` custom properties to theme it further.
 `--uktdd-menubar-trigger-bg-color-active` blends against `currentColor`
 instead, so it stays visible against a menubar trigger that the consumer
