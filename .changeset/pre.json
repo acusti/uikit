@@ -24,6 +24,7 @@
     "changesets": [
         "dropdown-dark-mode-colors",
         "dropdown-derive-label-from-children",
+        "dropdown-derive-tints-from-themed-colors",
         "dropdown-fill-cover-option",
         "dropdown-fill-fallbacks-within-evaluation-limit",
         "dropdown-listbox-roles",
