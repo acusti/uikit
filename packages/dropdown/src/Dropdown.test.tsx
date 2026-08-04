@@ -391,6 +391,214 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('aria-activedescendant', () => {
+        const renderMenu = (props: Partial<Props> = {}) =>
+            render(
+                <Dropdown {...props}>
+                    Menu
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                        <li data-ukt-value="two">Two</li>
+                        <li data-ukt-value="three">Three</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+        it('points the trigger at the active item as the highlight moves', async () => {
+            const user = userEvent.setup();
+            renderMenu();
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.click(trigger);
+            expect(trigger.hasAttribute('aria-activedescendant')).toBe(false);
+
+            await user.keyboard('{ArrowDown}');
+            const one = screen.getByText('One');
+            expect(one.id).toBeTruthy();
+            expect(trigger.getAttribute('aria-activedescendant')).toBe(one.id);
+
+            await user.keyboard('{ArrowDown}');
+            expect(trigger.getAttribute('aria-activedescendant')).toBe(
+                screen.getByText('Two').id,
+            );
+        });
+
+        it('derives item ids from the body id plus an index path', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        <li data-ukt-item>Italic</li>
+                        <Dropdown label={<span>Align</span>}>
+                            <ul>
+                                <li data-ukt-value="left">Left</li>
+                                <li data-ukt-value="center">Center</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            // the submenu is a role=menu too, so target the body directly
+            const body = document.querySelector('.uktdropdown-body')!;
+
+            await user.keyboard('{ArrowDown}');
+            expect(screen.getByText('Bold').id).toBe(`${body.id}-0`);
+
+            // dive into the third top-level item’s submenu, second item
+            await user.keyboard('{ArrowDown}{ArrowDown}{ArrowRight}{ArrowDown}');
+            expect(screen.getByText('Center').id).toBe(`${body.id}-2-1`);
+        });
+
+        it('follows the highlight back out when a submenu collapses', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        <Dropdown label={<span>Align</span>}>
+                            <ul>
+                                <li data-ukt-value="left">Left</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Format' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}{ArrowDown}{ArrowRight}');
+            expect(trigger.getAttribute('aria-activedescendant')).toBe(
+                screen.getByText('Left').id,
+            );
+
+            await user.keyboard('{ArrowLeft}');
+
+            // the parent item keeps the highlight after collapsing
+            const parentItem = screen.getByText('Align').closest('li')!;
+            expect(trigger.getAttribute('aria-activedescendant')).toBe(parentItem.id);
+        });
+
+        it('clears the reference when the dropdown closes', async () => {
+            const user = userEvent.setup();
+            renderMenu();
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}');
+            expect(trigger.getAttribute('aria-activedescendant')).toBeTruthy();
+
+            await user.keyboard('{Escape}');
+
+            // the body unmounts on close, so a stale id would dangle
+            await waitFor(() =>
+                expect(trigger.hasAttribute('aria-activedescendant')).toBe(false),
+            );
+        });
+
+        it('clears the reference when typeahead matches nothing', async () => {
+            const user = userEvent.setup();
+            renderMenu({ allowCreate: true });
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}');
+            expect(trigger.getAttribute('aria-activedescendant')).toBeTruthy();
+
+            // allowCreate requires an exact prefix match, and zzz matches none
+            await user.keyboard('zzz');
+
+            expect(trigger.hasAttribute('aria-activedescendant')).toBe(false);
+        });
+
+        it('points a searchable dropdown’s input at the active option', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable label="State">
+                    <ul>
+                        <li data-ukt-value="az">Arizona</li>
+                        <li data-ukt-value="ca">California</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('textbox');
+            await user.click(input);
+            await user.keyboard('{ArrowDown}');
+
+            expect(input.getAttribute('aria-activedescendant')).toBe(
+                screen.getByText('Arizona').id,
+            );
+        });
+
+        it('points at the revealed value when the body opens', async () => {
+            const user = userEvent.setup();
+            renderMenu({ value: 'two' });
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.click(trigger);
+
+            expect(trigger.getAttribute('aria-activedescendant')).toBe(
+                screen.getByText('Two').id,
+            );
+        });
+
+        it('honors a consumer-set item id', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Menu
+                    <ul>
+                        <li data-ukt-value="one" id="my-item">
+                            One
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}');
+
+            expect(trigger.getAttribute('aria-activedescendant')).toBe('my-item');
+        });
+
+        it('gives an item added to an already-open body an id when it activates', async () => {
+            const user = userEvent.setup();
+            const { rerender } = render(
+                <Dropdown isOpenOnMount>
+                    Menu
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // items rendered into an open body miss the once-per-open
+            // annotation pass, so their ids have to come from activation
+            rerender(
+                <Dropdown isOpenOnMount>
+                    Menu
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                        <li data-ukt-value="two">Two</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.keyboard('{ArrowDown}{ArrowDown}');
+
+            const two = screen.getByText('Two');
+            expect(two.id).toBeTruthy();
+            expect(trigger.getAttribute('aria-activedescendant')).toBe(two.id);
+        });
+    });
+
     describe('props.disabled', () => {
         it('marks the generated button trigger disabled', () => {
             render(

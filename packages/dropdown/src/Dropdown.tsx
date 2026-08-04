@@ -44,10 +44,12 @@ import {
     getLevelRoot,
     getParentItem,
     getSubmenuOfItem,
+    getTriggerElement,
     isItemExpanded,
     isPointInTriangle,
     type Point,
     setActiveItem,
+    syncActiveDescendant,
 } from './helpers.js';
 
 export type Item = {
@@ -173,7 +175,6 @@ type TimeoutID = ReturnType<typeof setTimeout>;
 const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 const CLICKABLE_SELECTOR = 'button, a[href], input[type="button"], input[type="submit"]';
-const FOCUSABLE_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]';
 // Any input that isn’t one of the non-text types, plus textarea. Derived from
 // the same list that drives use-keyboard-events’ isEventTargetUsingKeyEvent, so
 // the two can’t disagree about what counts as a text input.
@@ -577,6 +578,9 @@ function RootDropdown({
     useEffect(() => clearHoverCloseTimer, []);
 
     const closeDropdown = (options?: { keepMenubarEngaged?: boolean }) => {
+        // The body (and its items) unmount on close, so the trigger would
+        // otherwise keep pointing at an id that no longer exists
+        getTriggerElement(dropdownElement)?.removeAttribute('aria-activedescendant');
         setIsOpen(false);
         setIsOpening(false);
         mouseDownPositionRef.current = null;
@@ -621,12 +625,7 @@ function RootDropdown({
     };
 
     const focusTrigger = () => {
-        const firstChild = dropdownElement?.firstElementChild as MaybeHTMLElement;
-        if (!firstChild) return;
-        const focusable = firstChild.matches(FOCUSABLE_SELECTOR)
-            ? firstChild
-            : (firstChild.querySelector(FOCUSABLE_SELECTOR) as MaybeHTMLElement);
-        focusable?.focus();
+        getTriggerElement(dropdownElement)?.focus();
     };
 
     // Register with an enclosing Menubar (one open menu at a time, ←/→
@@ -860,6 +859,7 @@ function RootDropdown({
         }
         // If user moused out of activeItem (not into a descendant), it’s no longer active
         delete activeItem.dataset.uktActive;
+        syncActiveDescendant(dropdownElement);
         syncSubmenuDisclosure();
     };
 
