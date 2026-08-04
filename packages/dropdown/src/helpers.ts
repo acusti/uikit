@@ -235,7 +235,13 @@ export const ensureItemId = (
     dropdownElement: MaybeHTMLElement,
     item: HTMLElement,
 ): string => {
-    if (item.id) return item.id;
+    // A consumer-set id is theirs to keep. Only ids minted here carry the
+    // marker, and only those are recomputed — an index path is a snapshot of a
+    // position, so filtering or reordering an open body invalidates it, and a
+    // reused id would otherwise resolve to whichever element holds it first.
+    const generatedId = item.dataset.uktGeneratedId;
+    if (item.id && item.id !== generatedId) return item.id;
+
     const indexes: Array<number> = [];
     let current: MaybeHTMLElement = item;
     while (current) {
@@ -245,8 +251,23 @@ export const ensureItemId = (
         if (!levelRoot) break;
         current = getParentItem(levelRoot);
     }
-    item.id = `${getBodyElement(dropdownElement)?.id ?? 'uktdd'}-${indexes.join('-')}`;
-    return item.id;
+    const id = `${getBodyElement(dropdownElement)?.id ?? 'uktdd'}-${indexes.join('-')}`;
+
+    // Another item may still be holding this id from before it moved. Two
+    // elements sharing an id make aria-activedescendant resolve to whichever
+    // comes first in the document, which is how a stale id announces the wrong
+    // item; strip it from the impostor, which will re-derive its own when it
+    // next becomes active. Only ever strips a generated id, never a
+    // consumer-set one.
+    const existing = item.ownerDocument.getElementById(id);
+    if (existing && existing !== item && existing.dataset.uktGeneratedId === id) {
+        existing.removeAttribute('id');
+        delete existing.dataset.uktGeneratedId;
+    }
+
+    item.id = id;
+    item.dataset.uktGeneratedId = id;
+    return id;
 };
 
 // Point the trigger’s aria-activedescendant at the deepest active item, or

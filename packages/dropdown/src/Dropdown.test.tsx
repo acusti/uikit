@@ -567,6 +567,60 @@ describe('@acusti/dropdown', () => {
             expect(trigger.getAttribute('aria-activedescendant')).toBe('my-item');
         });
 
+        it('re-derives a generated id when the list is filtered under it', async () => {
+            const user = userEvent.setup();
+            const Filterable = ({ hideFirst }: { hideFirst: boolean }) => (
+                <Dropdown isOpenOnMount>
+                    Menu
+                    <ul>
+                        {hideFirst ? null : <li data-ukt-value="one">One</li>}
+                        <li data-ukt-value="two">Two</li>
+                    </ul>
+                </Dropdown>
+            );
+            const { rerender } = render(<Filterable hideFirst={false} />);
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.keyboard('{ArrowDown}{ArrowDown}');
+            const body = document.querySelector('.uktdropdown-body')!;
+            expect(screen.getByText('Two').id).toBe(`${body.id}-1`);
+
+            // dropping One shifts Two to index 0; a stale index-path id would
+            // later collide with whatever lands at index 1
+            rerender(<Filterable hideFirst />);
+            await user.keyboard('{ArrowUp}');
+
+            const two = screen.getByText('Two');
+            expect(two.id).toBe(`${body.id}-0`);
+            expect(trigger.getAttribute('aria-activedescendant')).toBe(two.id);
+            expect(document.querySelectorAll(`[id="${two.id}"]`)).toHaveLength(1);
+        });
+
+        it('clears the reference when the active item is filtered out of an open body', async () => {
+            const user = userEvent.setup();
+            const Filterable = ({ hideTwo }: { hideTwo: boolean }) => (
+                <Dropdown isOpenOnMount>
+                    Menu
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                        {hideTwo ? null : <li data-ukt-value="two">Two</li>}
+                    </ul>
+                </Dropdown>
+            );
+            const { rerender } = render(<Filterable hideTwo={false} />);
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.keyboard('{ArrowDown}{ArrowDown}');
+            expect(trigger.getAttribute('aria-activedescendant')).toBe(
+                screen.getByText('Two').id,
+            );
+
+            rerender(<Filterable hideTwo />);
+
+            // the highlighted item left the DOM, so the reference would dangle
+            expect(trigger.hasAttribute('aria-activedescendant')).toBe(false);
+        });
+
         it('gives an item added to an already-open body an id when it activates', async () => {
             const user = userEvent.setup();
             const { rerender } = render(

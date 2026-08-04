@@ -1181,10 +1181,19 @@ as-is.
 Ids are minted when an item becomes active rather than in the open-time
 annotation pass, which means items rendered into an already-open body —
 async-loaded, or filtered by your own search — get one too, even though
-that pass doesn’t reach them. The indices come from the navigable items, so
-a disabled item shifts the ids after it; they’re minted and consumed within
-a single open and rewritten on every move, so nothing depends on them being
-stable.
+that pass doesn’t reach them.
+
+Because an index path is a snapshot of a position, a generated id is
+**re-derived every time its item becomes active**, so filtering or
+reordering an open body doesn’t leave items holding ids that describe where
+they used to be. Treat generated ids as internal: they’re minted and
+consumed within a single open, and they move as your list moves. Ids you
+set yourself are never touched or recomputed.
+
+The indices come from the navigable items, so a disabled item shifts the
+ids after it. If the highlighted item leaves the DOM entirely — filtered
+away while the body is open — the reference is cleared rather than left
+dangling.
 
 Submenus and menubars extend the same pattern automatically:
 

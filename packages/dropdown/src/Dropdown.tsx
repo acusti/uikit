@@ -1316,6 +1316,13 @@ function RootDropdown({
     // open. Known limitation until it’s needed.
     const handleBodyRef = (ref: HTMLDivElement | null) => {
         if (!ref) return;
+        // Re-running on every render while the body is open is exactly what
+        // this needs: a consumer filtering or async-loading the body can drop
+        // the highlighted item, and nothing else would notice — the trigger
+        // would be left pointing at an id that has left the DOM. Re-deriving
+        // here clears it (or moves it, if the item merely shifted position).
+        // Above the once-per-open latch below, which would skip it.
+        syncActiveDescendant(dropdownElement);
         // An inline ref callback re-attaches (and re-runs) on every re-render
         // while the body is open, but everything below must run exactly once
         // per open: showPopover() throws on an already-shown popover, and the
