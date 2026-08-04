@@ -1088,6 +1088,22 @@ function RootDropdown({
                 syncSubmenuDisclosure();
                 return;
             }
+            // Home/End jump to the ends of the current level, the same targets
+            // as ⌥/⌘ + ↑/↓ above. Like ←/→ they stand down when a text input
+            // has focus (a searchable dropdown’s own input, or one inside a
+            // custom trigger), where they’re caret movement instead
+            if (!isTargetUsingKeyEvents && (key === 'Home' || key === 'End')) {
+                onEventHandled();
+                setActiveItem({
+                    dropdownElement,
+                    event,
+                    // Using a negative index counts back from the end
+                    index: key === 'Home' ? 0 : -1,
+                    onActiveItem: handleActiveItem,
+                });
+                syncSubmenuDisclosure();
+                return;
+            }
             // ←/→ dive into and surface out of submenus (and move between
             // menus in a menubar); leave them alone when a text input has focus
             if (!isTargetUsingKeyEvents) {
