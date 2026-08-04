@@ -192,6 +192,31 @@ describe('@acusti/dropdown', () => {
             expect(screen.getByRole('textbox', { name: 'state' })).toBeTruthy();
         });
 
+        it('does not declare a textarea trigger a combobox', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable>
+                    <textarea aria-label="notes" />
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // combobox is a single-line input; a textarea is multi-line, so
+            // the role would misdescribe it
+            expect(screen.queryByRole('combobox')).toBeNull();
+            const trigger = screen.getByRole('textbox', { name: 'notes' });
+            expect(trigger.hasAttribute('aria-autocomplete')).toBe(false);
+
+            await user.click(trigger);
+
+            // still a text input for naming, so it can’t name the listbox
+            expect(screen.getByRole('listbox').hasAttribute('aria-labelledby')).toBe(
+                false,
+            );
+        });
+
         it('does not override a consumer-set role or aria-autocomplete', () => {
             render(
                 <Dropdown isSearchable>
