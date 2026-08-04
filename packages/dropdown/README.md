@@ -1160,6 +1160,32 @@ which case the component leaves selection ARIA entirely to you, as with any
 ARIA you set. The persistent tint on the selected item is themeable via the
 `--uktdd-body-bg-color-selected` custom property.
 
+### The active item and `aria-activedescendant`
+
+DOM focus stays on the trigger for as long as the dropdown is open — the
+highlight moves via a `data-ukt-active` attribute rather than by moving
+focus. On its own that would make navigation silent to a screen reader, so
+the trigger carries `aria-activedescendant` pointing at the highlighted
+item, and it is kept in sync however the highlight moves: arrow keys,
+Home/End, typeahead, hover, diving into and out of submenus, and the
+reveal-on-open above. It’s removed when nothing is highlighted and when the
+dropdown closes, so it never dangles at an item that has unmounted.
+
+Pointing at an item means items need ids, and the component mints them from
+the same `useId` behind the trigger and body ids, suffixed with the item’s
+**index path** — its index at each level from the root level down. So
+`<bodyId>-2-1` is the second item of the submenu belonging to the third
+top-level item. An item with an `id` of your own keeps it and is pointed at
+as-is.
+
+Ids are minted when an item becomes active rather than in the open-time
+annotation pass, which means items rendered into an already-open body —
+async-loaded, or filtered by your own search — get one too, even though
+that pass doesn’t reach them. The indices come from the navigable items, so
+a disabled item shifts the ids after it; they’re minted and consumed within
+a single open and rewritten on every move, so nothing depends on them being
+stable.
+
 Submenus and menubars extend the same pattern automatically:
 
 - parent items receive `aria-haspopup="menu"` and `aria-expanded`, and

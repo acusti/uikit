@@ -7,6 +7,7 @@ export const ITEM_SELECTOR = '[data-ukt-item], [data-ukt-value]';
 export const SUBMENU_SELECTOR = '[data-ukt-submenu]';
 
 const DISABLED_ITEM_SELECTOR = '[aria-disabled="true"]';
+export const FOCUSABLE_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]';
 
 export type OnToggleSubmenu = (item: HTMLElement, isExpanded: boolean) => void;
 
@@ -201,6 +202,78 @@ export const getDeepestExpandedItem = (
 export const isItemExpanded = (item: HTMLElement) =>
     item.getAttribute('aria-expanded') === 'true';
 
+// The dropdown’s focusable trigger: the root’s first child if it’s focusable
+// itself, else the first focusable element within it. This is where DOM focus
+// stays while the menu is open, so it’s what carries aria-activedescendant.
+export const getTriggerElement = (
+    dropdownElement: MaybeHTMLElement,
+): MaybeHTMLElement => {
+    const firstChild = dropdownElement?.firstElementChild as MaybeHTMLElement;
+    if (!firstChild) return null;
+    return firstChild.matches(FOCUSABLE_SELECTOR)
+        ? firstChild
+        : (firstChild.querySelector(FOCUSABLE_SELECTOR) as MaybeHTMLElement);
+};
+
+// An id for an item, derived from its position: the body’s own id (from the
+// component’s useId) plus the item’s index path — its index at each level from
+// the root level down, so `<bodyId>-2-1` is the second item of the submenu
+// belonging to the third top-level item. Deterministic and collision-free
+// without a module-level counter, and idempotent, so re-deriving it is a no-op.
+//
+// Minted on demand rather than in the open-time annotation pass: the only
+// consumer is aria-activedescendant, which needs an id for the active item
+// alone, and doing it at activation time covers items rendered into an
+// already-open body (async-loaded or consumer-filtered), which that pass
+// doesn’t reach. A consumer-set id is left alone and used as-is.
+//
+// The indices come from getItemElements, i.e. the navigable items — exactly
+// the set that can become active — so a disabled item shifts the ids after it.
+// Ids are minted and consumed within a single open and are rewritten on every
+// activation, so nothing depends on them being stable across renders.
+export const ensureItemId = (
+    dropdownElement: MaybeHTMLElement,
+    item: HTMLElement,
+): string => {
+    if (item.id) return item.id;
+    const indexes: Array<number> = [];
+    let current: MaybeHTMLElement = item;
+    while (current) {
+        const levelRoot = getLevelRoot(current);
+        const itemElements = getItemElements(dropdownElement, levelRoot) ?? [];
+        indexes.unshift(itemElements.indexOf(current));
+        if (!levelRoot) break;
+        current = getParentItem(levelRoot);
+    }
+    item.id = `${getBodyElement(dropdownElement)?.id ?? 'uktdd'}-${indexes.join('-')}`;
+    return item.id;
+};
+
+// Point the trigger’s aria-activedescendant at the deepest active item, or
+// remove it when nothing is active. DOM focus never leaves the trigger while
+// the menu is open — the highlight is a data attribute, not focus — so without
+// this every arrow key, typeahead jump, and hover is silent to a screen reader.
+// Derived from the DOM rather than passed a target, so it stays correct
+// wherever active state is mutated.
+export const syncActiveDescendant = (dropdownElement: MaybeHTMLElement) => {
+    const trigger = getTriggerElement(dropdownElement);
+    if (!trigger) return;
+    const activeItem = getActiveItemElement(dropdownElement);
+    if (!activeItem) {
+        trigger.removeAttribute('aria-activedescendant');
+        return;
+    }
+    trigger.setAttribute(
+        'aria-activedescendant',
+        ensureItemId(dropdownElement, activeItem),
+    );
+};
+
+// The dropdown root owning an element, for the helpers that mutate active
+// state without a dropdownElement in hand
+const getDropdownRoot = (element: HTMLElement) =>
+    element.closest('.uktdropdown') as MaybeHTMLElement;
+
 let submenuIdCounter = 0;
 
 const ensureSubmenuARIA = (item: HTMLElement, submenu: HTMLElement) => {
@@ -293,6 +366,9 @@ export const collapseItem = (item: HTMLElement, onToggleSubmenu?: OnToggleSubmen
         for (const active of Array.from(submenu.querySelectorAll('[data-ukt-active]'))) {
             delete (active as HTMLElement).dataset.uktActive;
         }
+        // Collapsing surrenders the highlight to whatever is still active
+        // above (usually the parent item), so the trigger has to follow
+        syncActiveDescendant(getDropdownRoot(item));
     }
     item.setAttribute('aria-expanded', 'false');
     onToggleSubmenu?.(item, false);
@@ -330,6 +406,8 @@ const clearItemElementsState = (itemElements: Array<HTMLElement>) => {
             delete (active as HTMLElement).dataset.uktActive;
         }
     });
+    const [firstItem] = itemElements;
+    if (firstItem != null) syncActiveDescendant(getDropdownRoot(firstItem));
 };
 
 // Make the active set exactly the chain of element + its ancestor parent items
@@ -348,6 +426,7 @@ const setActiveChain = (dropdownElement: HTMLElement, element: HTMLElement) => {
     for (const item of chain) {
         item.setAttribute('data-ukt-active', '');
     }
+    syncActiveDescendant(dropdownElement);
 };
 
 type BaseSetActiveItemPayload = {
