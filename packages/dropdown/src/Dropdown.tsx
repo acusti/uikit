@@ -90,6 +90,13 @@ export type Props = {
      */
     children: ChildrenTuple | ReactElement;
     className?: string;
+    /**
+     * Prevents the dropdown from opening by any means: pointer, Enter/Space,
+     * and hover (props.openOnHover) alike. The generated trigger carries the
+     * native disabled attribute; a custom trigger can be any element, so it
+     * receives aria-disabled instead. A dropdown disabled while already open
+     * still closes normally.
+     */
     disabled?: boolean;
     hasItems?: boolean;
     isOpenOnMount?: boolean;
@@ -570,7 +577,7 @@ function RootDropdown({
     // pending close and, if props.openOnHover and not already open, open now
     const handleDropdownMouseEnter = () => {
         clearHoverCloseTimer();
-        if (!openOnHover || isOpenRef.current) return;
+        if (disabled || !openOnHover || isOpenRef.current) return;
         setIsOpen(true);
         setIsOpening(false);
     };
@@ -826,7 +833,7 @@ function RootDropdown({
 
     const handleMouseDown = (event: ReactMouseEvent<HTMLElement>) => {
         if (onMouseDown) onMouseDown(event);
-        if (isOpenRef.current) return;
+        if (disabled || isOpenRef.current) return;
 
         setIsOpen(true);
         setIsOpening(true);
@@ -939,6 +946,12 @@ function RootDropdown({
         if (!isOpenRef.current) {
             // If dropdown is closed, don’t handle key events if event target isn’t within dropdown
             if (!isEventTargetingDropdown) return;
+            // A disabled dropdown never opens. The generated trigger carries the
+            // native disabled attribute, but a custom trigger can be any element
+            // (and .uktdropdown.disabled’s pointer-events only stops the mouse),
+            // so the key path has to enforce it too. Only opening is gated —
+            // a dropdown disabled while already open still closes on Escape.
+            if (disabled) return;
             // Open the dropdown on spacebar, enter, or if isSearchable and user hits the ↑/↓ arrows
             if (
                 key === ' ' ||
@@ -1319,6 +1332,7 @@ function RootDropdown({
                     aria-expanded={isOpen}
                     aria-haspopup={popupRole}
                     className="uktdropdown-trigger"
+                    disabled={disabled}
                     tabIndex={0}
                     type="button"
                 >
@@ -1328,10 +1342,13 @@ function RootDropdown({
         }
     } else {
         // For a consumer-provided trigger, add ARIA props (letting the consumer
-        // override by specifying their own).
+        // override by specifying their own). A custom trigger can be any
+        // element, so props.disabled is conveyed as aria-disabled rather than
+        // the native attribute — the open paths enforce it either way.
         const triggerProps = trigger.props as Record<string, unknown>;
         trigger = cloneElement(trigger as ReactElement<Record<string, unknown>>, {
             'aria-controls': triggerProps['aria-controls'] ?? bodyId,
+            'aria-disabled': triggerProps['aria-disabled'] ?? (disabled || undefined),
             'aria-expanded': triggerProps['aria-expanded'] ?? isOpen,
             'aria-haspopup': triggerProps['aria-haspopup'] ?? popupRole,
         });

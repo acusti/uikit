@@ -215,6 +215,139 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('props.disabled', () => {
+        it('marks the generated button trigger disabled', () => {
+            render(
+                <Dropdown disabled>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            expect((trigger as HTMLButtonElement).disabled).toBe(true);
+        });
+
+        it('does not open on Enter when disabled', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown disabled>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            trigger.focus();
+            await user.keyboard('{Enter}');
+
+            expect(screen.queryByRole('menu')).toBeNull();
+            expect(trigger.getAttribute('aria-expanded')).toBe('false');
+        });
+
+        it('does not open on mousedown when disabled', () => {
+            render(
+                <Dropdown disabled>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // pointer-events: none makes the trigger itself an invalid pointer
+            // target, so drive the root, which is what the handler listens on
+            fireEvent.mouseDown(document.querySelector('.uktdropdown')!);
+
+            expect(screen.queryByRole('menu')).toBeNull();
+        });
+
+        it('conveys disabled to a custom trigger as aria-disabled and blocks opening', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown disabled>
+                    <span tabIndex={0}>Custom</span>
+                    <ul>
+                        <li>Custom Item</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByText('Custom');
+            expect(trigger.getAttribute('aria-disabled')).toBe('true');
+
+            trigger.focus();
+            await user.keyboard('{Enter}');
+
+            expect(screen.queryByRole('menu')).toBeNull();
+        });
+
+        it('does not open a disabled openOnHover dropdown on hover', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown disabled openOnHover>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.hover(document.querySelector('.uktdropdown')!);
+
+            expect(screen.queryByRole('menu')).toBeNull();
+        });
+
+        it('still closes on Escape when disabled while already open', async () => {
+            const { rerender } = render(
+                <Dropdown isOpenOnMount>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect(screen.getByRole('menu')).toBeTruthy();
+
+            rerender(
+                <Dropdown disabled isOpenOnMount>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            fireEvent.keyDown(document, { key: 'Escape' });
+
+            await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+        });
+
+        it('leaves an enabled dropdown opening normally', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            expect((trigger as HTMLButtonElement).disabled).toBe(false);
+            trigger.focus();
+            await user.keyboard('{Enter}');
+
+            expect(screen.getByRole('menu')).toBeTruthy();
+        });
+    });
+
     it('triggers props.onClose and props.onOpen at the appropriate times', async () => {
         let closedCount = 0;
         const handleClose = () => closedCount++;
