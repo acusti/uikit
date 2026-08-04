@@ -270,6 +270,11 @@ function RootDropdown({
     const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [dropdownElement, setDropdownElement] = useState<MaybeHTMLElement>(null);
     const bodyId = useId();
+    // Everything this component needs an id for hangs off the one useId, with
+    // a suffix naming its role. useId is unique per Dropdown instance, so the
+    // suffixed ids are collision-free without a module-level counter.
+    const triggerId = `${bodyId}-trigger`;
+    const labelId = `${bodyId}-label`;
     const popupRole = isSearchable ? 'listbox' : hasItems ? 'menu' : 'dialog';
     const menubar = useContext(MenubarContext);
     const inputElementRef = useRef<HTMLInputElement | null>(null);
@@ -1337,6 +1342,18 @@ function RootDropdown({
         }
     };
 
+    // The popup body is named by whatever names the trigger. props.label is
+    // the best source when it’s there — it’s always text, and it’s the same
+    // name the trigger itself takes — so it wins; otherwise the body points at
+    // the trigger element and inherits its accessible name.
+    //
+    // A generated searchable input is the one trigger that names nothing:
+    // aria-labelledby resolves a text input to its *value*, so pointing at it
+    // would name the listbox after whatever the user has typed. Such a
+    // dropdown has no accessible name for its trigger either, so the fix for
+    // both is the same — pass props.label.
+    let bodyLabelledBy: string | undefined;
+
     if (!isValidElement(trigger)) {
         if (isSearchable) {
             trigger = (
@@ -1348,6 +1365,7 @@ function RootDropdown({
                     className="uktdropdown-trigger"
                     defaultValue={valueLabel ?? ''}
                     disabled={disabled}
+                    id={triggerId}
                     name={name}
                     onFocus={() => setIsOpen(true)}
                     placeholder={placeholder}
@@ -1357,6 +1375,7 @@ function RootDropdown({
                 />
             );
         } else {
+            bodyLabelledBy = triggerId;
             trigger = (
                 <button
                     aria-controls={bodyId}
@@ -1364,6 +1383,7 @@ function RootDropdown({
                     aria-haspopup={popupRole}
                     className="uktdropdown-trigger"
                     disabled={disabled}
+                    id={triggerId}
                     tabIndex={0}
                     type="button"
                 >
@@ -1377,18 +1397,26 @@ function RootDropdown({
         // element, so props.disabled is conveyed as aria-disabled rather than
         // the native attribute — the open paths enforce it either way.
         const triggerProps = trigger.props as Record<string, unknown>;
+        // Point the body at whatever id the trigger ends up with, so a
+        // consumer-set one is honored rather than overwritten
+        const resolvedTriggerId = (triggerProps.id as string | undefined) ?? triggerId;
+        bodyLabelledBy = resolvedTriggerId;
         trigger = cloneElement(trigger as ReactElement<Record<string, unknown>>, {
             'aria-controls': triggerProps['aria-controls'] ?? bodyId,
             'aria-disabled': triggerProps['aria-disabled'] ?? (disabled || undefined),
             'aria-expanded': triggerProps['aria-expanded'] ?? isOpen,
             'aria-haspopup': triggerProps['aria-haspopup'] ?? popupRole,
+            id: resolvedTriggerId,
         });
     }
 
     if (label != null) {
+        bodyLabelledBy = labelId;
         trigger = (
             <label className="uktdropdown-label">
-                <div className="uktdropdown-label-text">{label}</div>
+                <div className="uktdropdown-label-text" id={labelId}>
+                    {label}
+                </div>
                 {trigger}
             </label>
         );
@@ -1420,6 +1448,7 @@ function RootDropdown({
                 {/* TODO next version of Dropdown should use <Activity> for body https://react.dev/reference/react/Activity */}
                 {isOpen ? (
                     <div
+                        aria-labelledby={bodyLabelledBy}
                         className={clsx('uktdropdown-body', {
                             'has-items': hasItems,
                         })}

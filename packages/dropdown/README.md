@@ -1115,6 +1115,21 @@ readers can associate the trigger with its popup. If your custom trigger
 already specifies any of these ARIA props, your values win — the component
 only fills in what you haven’t set.
 
+The body is also named, via `aria-labelledby`, by whatever names the
+trigger — required for the `dialog` role and worth having on the others, so
+the popup is announced as “Alignment menu” rather than a bare “menu”. The
+name comes from `props.label` when you pass one (always text, and the same
+name the trigger takes), and otherwise from the trigger element itself. The
+component fills in the trigger’s `id` for this; a custom trigger with an
+`id` of its own keeps it, and the body points at that instead.
+
+The one case with no name is a searchable dropdown with no `props.label`:
+`aria-labelledby` resolves a text input to its _value_, so pointing the
+listbox at the generated input would name it after whatever the user has
+typed. That dropdown has no accessible name for its trigger either, and
+`props.label` (or a custom trigger carrying its own `aria-label`) is the
+fix for both.
+
 Item roles are filled in the same way when the body opens: items receive
 `role="option"` in a searchable (listbox) dropdown or `role="menuitem"` in
 a menu (always `menuitem` inside a submenu), and the `<ul>`/`<ol>` wrappers
