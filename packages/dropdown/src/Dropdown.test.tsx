@@ -129,7 +129,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            const trigger = screen.getByRole('textbox');
+            const trigger = screen.getByRole('combobox');
             expect(trigger.getAttribute('aria-expanded')).toBe('false');
             expect(trigger.getAttribute('aria-haspopup')).toBe('listbox');
 
@@ -138,6 +138,86 @@ describe('@acusti/dropdown', () => {
             const popup = screen.getByRole('listbox');
             expect(trigger.getAttribute('aria-expanded')).toBe('true');
             expect(trigger.getAttribute('aria-controls')).toBe(popup.id);
+        });
+
+        it('declares the searchable trigger a combobox', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable label="State">
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('combobox', { name: 'State' });
+            // aria-expanded isn’t supported on textbox in ARIA 1.2, so the
+            // role is what makes the disclosure state legal here
+            expect(trigger.getAttribute('aria-expanded')).toBe('false');
+            expect(trigger.getAttribute('aria-autocomplete')).toBe('list');
+
+            await user.click(trigger);
+            expect(trigger.getAttribute('aria-expanded')).toBe('true');
+        });
+
+        it('declares a custom text input trigger a combobox when searchable', async () => {
+            render(
+                <Dropdown isSearchable>
+                    <input aria-label="state" />
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('combobox', { name: 'state' });
+            expect(trigger.getAttribute('aria-autocomplete')).toBe('list');
+        });
+
+        it('does not put combobox on a custom trigger that merely wraps an input', () => {
+            render(
+                <Dropdown isSearchable>
+                    <div>
+                        <input aria-label="state" />
+                    </div>
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // role=combobox belongs on the input itself; putting it on a
+            // wrapper is the deprecated ARIA 1.1 shape
+            expect(screen.queryByRole('combobox')).toBeNull();
+            expect(screen.getByRole('textbox', { name: 'state' })).toBeTruthy();
+        });
+
+        it('does not override a consumer-set role or aria-autocomplete', () => {
+            render(
+                <Dropdown isSearchable>
+                    <input aria-autocomplete="both" aria-label="state" role="searchbox" />
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('searchbox', { name: 'state' });
+            expect(trigger.getAttribute('aria-autocomplete')).toBe('both');
+        });
+
+        it('leaves a non-searchable trigger as a plain button', () => {
+            render(
+                <Dropdown>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect(screen.queryByRole('combobox')).toBeNull();
+            expect(screen.getByRole('button', { name: 'Menu' })).toBeTruthy();
         });
 
         it('uses dialog semantics when the dropdown has no selectable items', async () => {
@@ -276,7 +356,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            await user.click(screen.getByRole('textbox'));
+            await user.click(screen.getByRole('combobox'));
 
             expect(screen.getByRole('listbox', { name: 'State' })).toBeTruthy();
         });
@@ -291,7 +371,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            await user.click(screen.getByRole('textbox'));
+            await user.click(screen.getByRole('combobox'));
 
             // aria-labelledby resolves a text input to its value, so pointing
             // the listbox at the generated input would name it after whatever
@@ -313,7 +393,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('combobox');
             await user.click(input);
             fireEvent.input(input, { target: { value: 'Ariz' } });
 
@@ -333,6 +413,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
+            // not searchable, so the trigger stays a plain textbox
             await user.click(screen.getByRole('textbox'));
 
             expect(screen.getByRole('menu').hasAttribute('aria-labelledby')).toBe(false);
@@ -349,7 +430,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            await user.click(screen.getByRole('textbox'));
+            await user.click(screen.getByRole('combobox'));
 
             expect(screen.getByRole('listbox', { name: 'State' })).toBeTruthy();
         });
@@ -526,7 +607,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('combobox');
             await user.click(input);
             await user.keyboard('{ArrowDown}');
 
@@ -913,7 +994,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            await user.click(screen.getByRole('textbox'));
+            await user.click(screen.getByRole('combobox'));
             await user.keyboard('{ArrowDown}');
             expect(screen.getByText('One').hasAttribute('data-ukt-active')).toBe(true);
 
@@ -1454,7 +1535,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe(
                 'Warm & Welcoming',
             );
         });
@@ -1468,7 +1549,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe(
                 'Regular',
             );
         });
@@ -1523,7 +1604,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe(
                 'Warm & Welcoming',
             );
         });
@@ -1540,7 +1621,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe(
                 'Font Weight - 400',
             );
         });
@@ -1560,7 +1641,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe(
                 'Fruits',
             );
         });
@@ -1577,7 +1658,7 @@ describe('@acusti/dropdown', () => {
             // A value is an identity, not display text: with no matching item
             // there’s no known label, so the input stays empty and shows its
             // placeholder rather than the raw identifier.
-            const input = screen.getByRole('textbox') as HTMLInputElement;
+            const input = screen.getByRole('combobox') as HTMLInputElement;
             expect(input.value).toBe('');
             expect(input.placeholder).toBe('Pick one');
         });
@@ -1596,7 +1677,7 @@ describe('@acusti/dropdown', () => {
             // entry (a value the user typed that isn’t among the items), so it
             // must still display as typed rather than fall back to the
             // placeholder.
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('650');
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe('650');
         });
 
         it('matches a numeric data-ukt-value against a bare string value', () => {
@@ -1609,7 +1690,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe(
                 'Regular',
             );
         });
@@ -1626,7 +1707,7 @@ describe('@acusti/dropdown', () => {
 
             // The cleared state is a selection of the empty-valued item, so
             // the input shows that item’s label rather than the placeholder.
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe('None');
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe('None');
         });
 
         it('shows the placeholder for an undefined value, even with an empty-valued item', () => {
@@ -1645,7 +1726,7 @@ describe('@acusti/dropdown', () => {
             // label. This is the “Mixed” state a font-weight select uses when
             // several weights are selected at once, separate from an explicit
             // empty-valued “Inherit” option (value: '').
-            const input = screen.getByRole('textbox') as HTMLInputElement;
+            const input = screen.getByRole('combobox') as HTMLInputElement;
             expect(input.value).toBe('');
             expect(input.placeholder).toBe('Mixed');
         });
@@ -1667,7 +1748,7 @@ describe('@acusti/dropdown', () => {
             // The pair states the label explicitly, so an empty-valued
             // selection (the “Inherit” state) shows the pair’s label — not the
             // matching item’s text, and not the placeholder.
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe(
                 'Inherit',
             );
         });
@@ -1681,7 +1762,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            expect((screen.getByRole('textbox') as HTMLInputElement).value).toBe(
+            expect((screen.getByRole('combobox') as HTMLInputElement).value).toBe(
                 'Toasty',
             );
         });
@@ -1747,7 +1828,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            await user.click(screen.getByRole('textbox'));
+            await user.click(screen.getByRole('combobox'));
 
             expect(screen.getByTestId('list').getAttribute('role')).toBe('presentation');
             expect(screen.getByTestId('warm').getAttribute('role')).toBe('option');
@@ -1799,7 +1880,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            await user.click(screen.getByRole('textbox'));
+            await user.click(screen.getByRole('combobox'));
 
             expect(screen.getByTestId('plain').getAttribute('role')).toBe('option');
             // A parent item’s aria-haspopup/aria-expanded are invalid on an
@@ -1826,7 +1907,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            await user.click(screen.getByRole('textbox'));
+            await user.click(screen.getByRole('combobox'));
 
             // The consumer marked warm selected, so the reveal must not add a
             // second selected option for the item matching props.value
@@ -1881,7 +1962,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            await user.click(screen.getByRole('textbox'));
+            await user.click(screen.getByRole('combobox'));
             expect(screen.getByTestId('bold').getAttribute('aria-selected')).toBe('true');
 
             await user.click(screen.getByTestId('warm'));
@@ -1902,7 +1983,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            await user.click(screen.getByRole('textbox'));
+            await user.click(screen.getByRole('combobox'));
 
             expect(screen.getByTestId('item').getAttribute('role')).toBe('menuitemradio');
         });
@@ -2048,7 +2129,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('combobox');
             await user.click(input);
             // Empty input + allowEmpty (default) → an explicit clear submit.
             await user.keyboard('{Enter}');
@@ -2106,7 +2187,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('combobox');
             await user.click(input);
             // Cleared input + no active item: an empty “creation” is a clear,
             // so allowEmpty must gate it even though allowCreate is set.
@@ -2129,7 +2210,7 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            const input = screen.getByRole('textbox');
+            const input = screen.getByRole('combobox');
             await user.click(input);
             await user.keyboard('{Enter}');
 
@@ -2713,7 +2794,7 @@ describe('@acusti/dropdown', () => {
             </Dropdown>,
         );
 
-        const input = screen.getByRole('textbox');
+        const input = screen.getByRole('combobox');
         await user.click(input);
         expect(screen.getByRole('listbox')).toBeTruthy();
 

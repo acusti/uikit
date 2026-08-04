@@ -1383,6 +1383,7 @@ function RootDropdown({
         if (isSearchable) {
             trigger = (
                 <input
+                    aria-autocomplete="list"
                     aria-controls={bodyId}
                     aria-expanded={isOpen}
                     aria-haspopup={popupRole}
@@ -1395,6 +1396,7 @@ function RootDropdown({
                     onFocus={() => setIsOpen(true)}
                     placeholder={placeholder}
                     ref={inputElementRef}
+                    role="combobox"
                     tabIndex={tabIndex}
                     type="text"
                 />
@@ -1425,15 +1427,24 @@ function RootDropdown({
         // point the body at whatever id the trigger ends up with, so a
         // consumer-set one is honored rather than overwritten
         const resolvedTriggerId = (triggerProps.id as string | undefined) ?? triggerId;
-        if (!isSearchable && !isTextInputElement(trigger)) {
+        const isTextInputTrigger = isTextInputElement(trigger);
+        if (!isSearchable && !isTextInputTrigger) {
             bodyLabelledBy = resolvedTriggerId;
         }
+        // role="combobox" belongs on the text input itself, so it’s filled in
+        // only when the custom trigger is one. A trigger that merely wraps an
+        // input is left alone: the role on the wrapper is the deprecated ARIA
+        // 1.1 shape, and putting it there would misdescribe the wrapper.
+        const isCombobox = isSearchable && isTextInputTrigger;
         trigger = cloneElement(trigger as ReactElement<Record<string, unknown>>, {
+            'aria-autocomplete':
+                triggerProps['aria-autocomplete'] ?? (isCombobox ? 'list' : undefined),
             'aria-controls': triggerProps['aria-controls'] ?? bodyId,
             'aria-disabled': triggerProps['aria-disabled'] ?? (disabled || undefined),
             'aria-expanded': triggerProps['aria-expanded'] ?? isOpen,
             'aria-haspopup': triggerProps['aria-haspopup'] ?? popupRole,
             id: resolvedTriggerId,
+            role: triggerProps.role ?? (isCombobox ? 'combobox' : undefined),
         });
     }
 
