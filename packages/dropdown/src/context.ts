@@ -23,6 +23,10 @@ export type MenubarContextValue = {
     notifyClosed: (element: HTMLElement) => void;
     notifyOpened: (element: HTMLElement) => void;
     registerMember: (member: MenubarMember) => () => void;
+    // The member that holds the bar’s single tab stop (APG roving tabindex):
+    // its trigger is tabbable, every other member’s is reachable only with
+    // ←/→. Null before any member has registered.
+    tabbableElement: HTMLElement | null;
 };
 
 export type MenubarMember = {

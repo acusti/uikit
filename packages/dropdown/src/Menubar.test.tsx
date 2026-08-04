@@ -38,19 +38,148 @@ describe('@acusti/dropdown Menubar', () => {
         renderMenubar();
         const menubar = screen.getByRole('menubar');
         expect(menubar.classList.contains('uktmenubar')).toBe(true);
-        expect(screen.getByRole('button', { name: 'File' })).toBeTruthy();
-        expect(screen.getByRole('button', { name: 'Edit' })).toBeTruthy();
+        expect(screen.getByRole('menuitem', { name: 'File' })).toBeTruthy();
+        expect(screen.getByRole('menuitem', { name: 'Edit' })).toBeTruthy();
+    });
+
+    describe('menubar semantics', () => {
+        it('owns its triggers as menuitems with nothing generic in between', () => {
+            renderMenubar();
+
+            const menubar = screen.getByRole('menubar');
+            // aria-required-children: a menubar owns menuitems, so every
+            // element between it and a trigger has to be neutralized
+            for (const trigger of screen.getAllByRole('menuitem')) {
+                let ancestor = trigger.parentElement;
+                while (ancestor && ancestor !== menubar) {
+                    expect(ancestor.getAttribute('role')).toBe('none');
+                    ancestor = ancestor.parentElement;
+                }
+                expect(ancestor).toBe(menubar);
+            }
+        });
+
+        it('keeps a single tab stop, moving it to the focused trigger', () => {
+            renderMenubar();
+
+            const [file, edit, view] = screen.getAllByRole('menuitem');
+            expect(file.getAttribute('tabindex')).toBe('0');
+            expect(edit.getAttribute('tabindex')).toBe('-1');
+            expect(view.getAttribute('tabindex')).toBe('-1');
+
+            act(() => edit.focus());
+
+            expect(file.getAttribute('tabindex')).toBe('-1');
+            expect(edit.getAttribute('tabindex')).toBe('0');
+        });
+
+        it('gives the tab stop to the first enabled member', () => {
+            render(
+                <Menubar>
+                    <Dropdown disabled>
+                        File
+                        <ul>
+                            <li data-ukt-item>New</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown>
+                        Edit
+                        <ul>
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+            const [file, edit] = screen.getAllByRole('menuitem');
+            expect(file.getAttribute('tabindex')).toBe('-1');
+            expect(edit.getAttribute('tabindex')).toBe('0');
+        });
+
+        it('hands the tab stop on when the holder unmounts', () => {
+            const { rerender } = render(
+                <Menubar>
+                    <Dropdown>
+                        File
+                        <ul>
+                            <li data-ukt-item>New</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown>
+                        Edit
+                        <ul>
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+            expect(screen.getByRole('menuitem', { name: 'File' })).toBeTruthy();
+
+            rerender(
+                <Menubar>
+                    <Dropdown>
+                        Edit
+                        <ul>
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+            // the bar would otherwise be left with no tab stop at all
+            expect(
+                screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('tabindex'),
+            ).toBe('0');
+        });
+
+        it('leaves a standalone dropdown’s trigger a plain tabbable button', () => {
+            render(
+                <Dropdown>
+                    Standalone
+                    <ul>
+                        <li data-ukt-item>New</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Standalone' });
+            expect(trigger.getAttribute('tabindex')).toBe('0');
+        });
+
+        it('leaves a searchable member as a combobox rather than a menuitem', () => {
+            render(
+                <Menubar>
+                    <Dropdown isSearchable label="Search">
+                        <ul>
+                            <li data-ukt-value="one">One</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown>
+                        Edit
+                        <ul>
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+            // a combobox isn’t a valid menubar child, so it keeps its own
+            // semantics rather than being forced into menuitem
+            expect(screen.getByRole('combobox', { name: 'Search' })).toBeTruthy();
+            expect(screen.getAllByRole('menuitem')).toHaveLength(1);
+        });
     });
 
     it('keeps at most one menu open at a time', async () => {
         const user = userEvent.setup();
         renderMenubar();
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         expect(screen.getByTestId('file-menu')).toBeTruthy();
 
         // focusing + opening another member closes the open one
-        const viewTrigger = screen.getByRole('button', { name: 'View' });
+        const viewTrigger = screen.getByRole('menuitem', { name: 'View' });
         act(() => viewTrigger.focus());
         await user.keyboard('{Enter}');
         expect(screen.getByTestId('view-menu')).toBeTruthy();
@@ -61,13 +190,13 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubar();
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         expect(screen.getByTestId('file-menu')).toBeTruthy();
 
         // Clicking another trigger hovers it first, which switches the open
         // menu to it (macOS behavior); the click then toggles it closed like
         // any click on an open menu’s trigger
-        await user.click(screen.getByRole('button', { name: 'Edit' }));
+        await user.click(screen.getByRole('menuitem', { name: 'Edit' }));
         expect(screen.queryByTestId('file-menu')).toBe(null);
         expect(screen.queryByTestId('edit-menu')).toBe(null);
     });
@@ -76,17 +205,17 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubar();
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         expect(screen.getByTestId('file-menu')).toBeTruthy();
 
-        fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+        fireEvent.mouseOver(screen.getByRole('menuitem', { name: 'Edit' }));
         expect(screen.getByTestId('edit-menu')).toBeTruthy();
         expect(screen.queryByTestId('file-menu')).toBe(null);
     });
 
     it('does not open a menu on hover when no menu is open', () => {
         renderMenubar();
-        fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+        fireEvent.mouseOver(screen.getByRole('menuitem', { name: 'Edit' }));
         expect(screen.queryByTestId('edit-menu')).toBe(null);
     });
 
@@ -113,7 +242,7 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubarWithButton();
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         expect(screen.getByTestId('file-menu')).toBeTruthy();
 
         // Hovering the plain button closes the open menu…
@@ -122,7 +251,7 @@ describe('@acusti/dropdown Menubar', () => {
 
         // …but the bar stays engaged, so hovering a trigger reopens a menu
         // without another click
-        fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+        fireEvent.mouseOver(screen.getByRole('menuitem', { name: 'Edit' }));
         expect(screen.getByTestId('edit-menu')).toBeTruthy();
     });
 
@@ -130,7 +259,7 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubarWithButton();
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         expect(screen.getByTestId('file-menu')).toBeTruthy();
 
         // The gaps between triggers aren’t interactive controls, so sliding
@@ -143,13 +272,13 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubarWithButton();
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         await user.keyboard('{Escape}');
         expect(screen.queryByTestId('file-menu')).toBe(null);
 
         // Escape is a deliberate dismissal, so it leaves menu-mode: hovering a
         // trigger no longer opens a menu until a click re-engages the bar
-        fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+        fireEvent.mouseOver(screen.getByRole('menuitem', { name: 'Edit' }));
         expect(screen.queryByTestId('edit-menu')).toBe(null);
     });
 
@@ -175,14 +304,14 @@ describe('@acusti/dropdown Menubar', () => {
         );
         const { rerender } = render(<Bar showFile />);
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         expect(screen.getByTestId('file-menu')).toBeTruthy();
 
         // Remove the engaged dropdown without dismissing it. With the engaging
         // member gone, the bar is no longer engaged, so hovering another
         // trigger doesn’t reopen a menu.
         rerender(<Bar showFile={false} />);
-        fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+        fireEvent.mouseOver(screen.getByRole('menuitem', { name: 'Edit' }));
         expect(screen.queryByTestId('edit-menu')).toBe(null);
     });
 
@@ -190,10 +319,10 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubar();
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         expect(screen.getByTestId('file-menu')).toBeTruthy();
 
-        act(() => screen.getByRole('button', { name: 'Edit' }).focus());
+        act(() => screen.getByRole('menuitem', { name: 'Edit' }).focus());
         expect(screen.getByTestId('edit-menu')).toBeTruthy();
         expect(screen.queryByTestId('file-menu')).toBe(null);
     });
@@ -202,9 +331,9 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubar();
 
-        const fileTrigger = screen.getByRole('button', { name: 'File' });
-        const editTrigger = screen.getByRole('button', { name: 'Edit' });
-        const viewTrigger = screen.getByRole('button', { name: 'View' });
+        const fileTrigger = screen.getByRole('menuitem', { name: 'File' });
+        const editTrigger = screen.getByRole('menuitem', { name: 'Edit' });
+        const viewTrigger = screen.getByRole('menuitem', { name: 'View' });
 
         fileTrigger.focus();
         await user.keyboard('{ArrowRight}');
@@ -226,13 +355,15 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubar();
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         expect(screen.getByTestId('file-menu')).toBeTruthy();
 
         await user.keyboard('{ArrowRight}');
         expect(screen.queryByTestId('file-menu')).toBe(null);
         expect(screen.getByTestId('edit-menu')).toBeTruthy();
-        expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Edit' }));
+        expect(document.activeElement).toBe(
+            screen.getByRole('menuitem', { name: 'Edit' }),
+        );
 
         await user.keyboard('{ArrowLeft}');
         expect(screen.queryByTestId('edit-menu')).toBe(null);
@@ -243,7 +374,7 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubar();
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         await user.keyboard('{ArrowLeft}');
 
         expect(screen.queryByTestId('file-menu')).toBe(null);
@@ -255,7 +386,7 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubar({ onSubmitItem: handleSubmitItem });
 
-        await user.click(screen.getByRole('button', { name: 'File' }));
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
         await user.keyboard('{ArrowDown}{ArrowDown}');
         await user.keyboard('{Enter}');
 
@@ -269,7 +400,7 @@ describe('@acusti/dropdown Menubar', () => {
         const user = userEvent.setup();
         renderMenubar();
 
-        const fileTrigger = screen.getByRole('button', { name: 'File' });
+        const fileTrigger = screen.getByRole('menuitem', { name: 'File' });
         await user.click(fileTrigger);
         expect(screen.getByTestId('file-menu')).toBeTruthy();
 
@@ -307,7 +438,7 @@ describe('@acusti/dropdown Menubar', () => {
             const user = userEvent.setup();
             renderWithDisabledMiddle();
 
-            await user.click(screen.getByRole('button', { name: 'File' }));
+            await user.click(screen.getByRole('menuitem', { name: 'File' }));
             expect(screen.getByTestId('file-menu')).toBeTruthy();
 
             await user.keyboard('{ArrowRight}');
@@ -321,7 +452,7 @@ describe('@acusti/dropdown Menubar', () => {
             const user = userEvent.setup();
             renderWithDisabledMiddle();
 
-            await user.click(screen.getByRole('button', { name: 'View' }));
+            await user.click(screen.getByRole('menuitem', { name: 'View' }));
             await user.keyboard('{ArrowLeft}');
 
             expect(screen.queryByTestId('edit-menu')).toBe(null);
@@ -333,12 +464,12 @@ describe('@acusti/dropdown Menubar', () => {
 
             // the roving path is a separate branch from sliding an open menu:
             // it only runs while nothing is open
-            const file = screen.getByRole('button', { name: 'File' });
+            const file = screen.getByRole('menuitem', { name: 'File' });
             act(() => file.focus());
             fireEvent.keyDown(file, { key: 'ArrowRight' });
 
             expect(document.activeElement).toBe(
-                screen.getByRole('button', { name: 'View' }),
+                screen.getByRole('menuitem', { name: 'View' }),
             );
             expect(screen.queryByTestId('edit-menu')).toBe(null);
         });
@@ -361,7 +492,7 @@ describe('@acusti/dropdown Menubar', () => {
                 </Menubar>,
             );
 
-            const file = screen.getByRole('button', { name: 'File' });
+            const file = screen.getByRole('menuitem', { name: 'File' });
             act(() => file.focus());
             // deciding to stay put is still handling the key — letting it
             // through would scroll the page under the focused menubar
@@ -375,10 +506,10 @@ describe('@acusti/dropdown Menubar', () => {
             const user = userEvent.setup();
             renderWithDisabledMiddle();
 
-            await user.click(screen.getByRole('button', { name: 'File' }));
+            await user.click(screen.getByRole('menuitem', { name: 'File' }));
             // hovering the disabled member’s root leaves File open rather than
             // switching to (or clearing for) Edit
-            fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+            fireEvent.mouseOver(screen.getByRole('menuitem', { name: 'Edit' }));
 
             expect(screen.queryByTestId('edit-menu')).toBe(null);
             expect(screen.getByTestId('file-menu')).toBeTruthy();
@@ -403,7 +534,7 @@ describe('@acusti/dropdown Menubar', () => {
                 </Menubar>,
             );
 
-            await user.click(screen.getByRole('button', { name: 'File' }));
+            await user.click(screen.getByRole('menuitem', { name: 'File' }));
             await user.keyboard('{ArrowRight}');
 
             // nothing enabled to move to, so File stays open rather than

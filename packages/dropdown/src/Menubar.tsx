@@ -5,8 +5,10 @@ import {
     type KeyboardEvent as ReactKeyboardEvent,
     type MouseEvent as ReactMouseEvent,
     type ReactNode,
+    useEffect,
     useMemo,
     useRef,
+    useState,
 } from 'react';
 
 import {
@@ -59,6 +61,10 @@ const findNextEnabledMember = (
 // once any menu is open, hovering or focusing another trigger switches to it.
 export default function Menubar({ children, className, style }: MenubarProps) {
     const membersRef = useRef<Set<MenubarMember>>(new Set());
+    // APG gives a menubar a single tab stop: one trigger is tabbable and the
+    // rest are reached with ←/→. This holds whichever member currently owns
+    // it, moving to whichever trigger the user last focused.
+    const [tabbableElement, setTabbableElement] = useState<HTMLElement | null>(null);
     // The member that engaged the bar (menu-mode). It keeps pointing at that
     // member even if that member’s menu was closed by hovering a non-menu
     // control, which allows the bar to stay engaged even with nothing open.
@@ -68,6 +74,26 @@ export default function Menubar({ children, className, style }: MenubarProps) {
         Array.from(membersRef.current).sort(compareDocumentOrder),
     );
     const getOrderedMembers = getOrderedMembersRef.current;
+
+    // Keep the tab stop on a member that still exists and can take focus: on
+    // first render, and whenever the owner unmounts or becomes disabled, it
+    // falls to the first enabled member in document order. Without this an
+    // unmounted or disabled owner would leave the bar with no tab stop at all.
+    //
+    // Deliberately runs on every render rather than on a dependency list. An
+    // unmounting member changes no state here — it only removes itself from
+    // membersRef during its own cleanup — so there is nothing to depend on
+    // that would catch it. The setState the lint rule warns about can't chain:
+    // it only fires when the current holder is missing or disabled, and the
+    // value it sets makes the guard above return on the next run.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    useEffect(() => {
+        const members = getOrderedMembersRef.current();
+        const owner = members.find((member) => member.element === tabbableElement);
+        if (owner && !owner.isDisabled()) return;
+        const nextOwner = members.find((member) => !member.isDisabled());
+        setTabbableElement(nextOwner?.element ?? null);
+    });
 
     const contextValue: MenubarContextValue = useMemo(
         () => ({
@@ -104,12 +130,28 @@ export default function Menubar({ children, className, style }: MenubarProps) {
             },
             registerMember(member: MenubarMember) {
                 membersRef.current.add(member);
+                // Members register from their own effects, which don’t
+                // re-render this component, so the reconciliation effect below
+                // would never see them arrive — claim the tab stop here
+                // instead when it’s going spare. Members register in document
+                // order, so the first enabled one gets it.
+                setTabbableElement((current) =>
+                    current == null && !member.isDisabled() ? member.element : current,
+                );
                 return () => {
                     membersRef.current.delete(member);
+                    // Deliberately not released here. Members re-register on
+                    // every render, and React runs every cleanup before any
+                    // setup — so releasing would hand the tab stop to whichever
+                    // member re-registers first (always the first in the bar)
+                    // rather than back to the one that held it. A genuinely
+                    // unmounted holder is picked up by the effect below, which
+                    // no longer finds it among the members.
                 };
             },
+            tabbableElement,
         }),
-        [],
+        [tabbableElement],
     );
 
     // Rove focus between triggers with ←/→ while no menu is open (the open
@@ -164,8 +206,13 @@ export default function Menubar({ children, className, style }: MenubarProps) {
         }
     };
 
+    // Focusing a trigger hands it the bar's tab stop, so tabbing away and back
+    // returns to the trigger the user was last on rather than to the first
     const handleFocus = (event: ReactFocusEvent<HTMLDivElement>) => {
-        switchToMemberAt(event.target as HTMLElement);
+        const eventTarget = event.target as HTMLElement;
+        const member = getOrderedMembers().find((m) => m.element.contains(eventTarget));
+        if (member && !member.isDisabled()) setTabbableElement(member.element);
+        switchToMemberAt(eventTarget);
     };
 
     const handleMouseOver = (event: ReactMouseEvent<HTMLDivElement>) => {

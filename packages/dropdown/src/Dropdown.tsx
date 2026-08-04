@@ -297,6 +297,19 @@ function RootDropdown({
     const labelId = `${bodyId}-label`;
     const popupRole = isSearchable ? 'listbox' : hasItems ? 'menu' : 'dialog';
     const menubar = useContext(MenubarContext);
+    // A menubar owns menuitems, so a member's trigger takes role="menuitem"
+    // and the elements between the bar and it are neutralized — a generic div
+    // (or label) in between leaves the menubar owning no menuitems at all.
+    // Only a menu trigger qualifies: a searchable member is a combobox, which
+    // isn't a valid menubar child, so it keeps its own semantics.
+    const isMenubarItem = menubar != null && popupRole === 'menu';
+    // The bar keeps a single tab stop (APG roving tabindex); the members that
+    // don't hold it stay reachable with ←/→
+    const menubarTabIndex = !isMenubarItem
+        ? undefined
+        : menubar.tabbableElement === dropdownElement
+          ? 0
+          : -1;
     const inputElementRef = useRef<HTMLInputElement | null>(null);
     // Whether the consumer authors aria-selected in the body themselves, in
     // which case this component’s aria-selected fill-ins stand down (set per
@@ -1411,7 +1424,8 @@ function RootDropdown({
                     className="uktdropdown-trigger"
                     disabled={disabled}
                     id={triggerId}
-                    tabIndex={0}
+                    role={isMenubarItem ? 'menuitem' : undefined}
+                    tabIndex={menubarTabIndex ?? 0}
                     type="button"
                 >
                     {trigger}
@@ -1436,7 +1450,9 @@ function RootDropdown({
         // textareas or non-input wrappers)
         const isCombobox =
             isSearchable && isTextInputTrigger && trigger.type !== 'textarea';
-        const triggerRole = triggerProps.role ?? (isCombobox ? 'combobox' : undefined);
+        const triggerRole =
+            triggerProps.role ??
+            (isCombobox ? 'combobox' : isMenubarItem ? 'menuitem' : undefined);
         // aria-expanded isn’t supported on textbox either, so a text input
         // only gets one once a role makes it something else
         const canExpand = !isTextInputTrigger || triggerRole != null;
@@ -1450,13 +1466,17 @@ function RootDropdown({
             'aria-haspopup': triggerProps['aria-haspopup'] ?? popupRole,
             id: resolvedTriggerId,
             role: triggerRole,
+            tabIndex: triggerProps.tabIndex ?? menubarTabIndex,
         });
     }
 
     if (label != null) {
         bodyLabelledBy = labelId;
         trigger = (
-            <label className="uktdropdown-label">
+            <label
+                className="uktdropdown-label"
+                role={isMenubarItem ? 'none' : undefined}
+            >
                 <div className="uktdropdown-label-text" id={labelId}>
                     {label}
                 </div>
@@ -1477,6 +1497,7 @@ function RootDropdown({
                     'is-searchable': isSearchable,
                 })}
                 onClick={onClick}
+                role={isMenubarItem ? 'none' : undefined}
                 onMouseDown={handleMouseDown}
                 onMouseEnter={handleDropdownMouseEnter}
                 onMouseLeave={handleDropdownMouseLeave}
