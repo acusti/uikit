@@ -277,4 +277,96 @@ describe('@acusti/dropdown Menubar', () => {
         expect(screen.queryByTestId('file-menu')).toBe(null);
         expect(document.activeElement).toBe(fileTrigger);
     });
+
+    describe('disabled members', () => {
+        const renderWithDisabledMiddle = () =>
+            render(
+                <Menubar>
+                    <Dropdown>
+                        File
+                        <ul data-testid="file-menu">
+                            <li data-ukt-item>New</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown disabled>
+                        Edit
+                        <ul data-testid="edit-menu">
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown>
+                        View
+                        <ul data-testid="view-menu">
+                            <li data-ukt-item>Zoom In</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+        it('skips a disabled member when → slides the open menu', async () => {
+            const user = userEvent.setup();
+            renderWithDisabledMiddle();
+
+            await user.click(screen.getByRole('button', { name: 'File' }));
+            expect(screen.getByTestId('file-menu')).toBeTruthy();
+
+            await user.keyboard('{ArrowRight}');
+
+            // Edit is disabled, so → passes over it and lands on View
+            expect(screen.queryByTestId('edit-menu')).toBe(null);
+            expect(screen.getByTestId('view-menu')).toBeTruthy();
+        });
+
+        it('skips a disabled member when ← slides the open menu', async () => {
+            const user = userEvent.setup();
+            renderWithDisabledMiddle();
+
+            await user.click(screen.getByRole('button', { name: 'View' }));
+            await user.keyboard('{ArrowLeft}');
+
+            expect(screen.queryByTestId('edit-menu')).toBe(null);
+            expect(screen.getByTestId('file-menu')).toBeTruthy();
+        });
+
+        it('does not open a disabled member on hover once the bar is engaged', async () => {
+            const user = userEvent.setup();
+            renderWithDisabledMiddle();
+
+            await user.click(screen.getByRole('button', { name: 'File' }));
+            // hovering the disabled member’s root leaves File open rather than
+            // switching to (or clearing for) Edit
+            fireEvent.mouseOver(screen.getByRole('button', { name: 'Edit' }));
+
+            expect(screen.queryByTestId('edit-menu')).toBe(null);
+            expect(screen.getByTestId('file-menu')).toBeTruthy();
+        });
+
+        it('keeps the open menu when every other member is disabled', async () => {
+            const user = userEvent.setup();
+            render(
+                <Menubar>
+                    <Dropdown>
+                        File
+                        <ul data-testid="file-menu">
+                            <li data-ukt-item>New</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown disabled>
+                        Edit
+                        <ul data-testid="edit-menu">
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'File' }));
+            await user.keyboard('{ArrowRight}');
+
+            // nothing enabled to move to, so File stays open rather than
+            // closing and opening nothing
+            expect(screen.getByTestId('file-menu')).toBeTruthy();
+            expect(screen.queryByTestId('edit-menu')).toBe(null);
+        });
+    });
 });
