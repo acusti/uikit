@@ -267,6 +267,13 @@ type Props = {
      */
     children: ReactNode | [ReactNode, ReactNode];
     className?: string;
+    /**
+     * Prevents the dropdown from opening by any means: pointer, Enter/Space,
+     * and hover (props.openOnHover) alike. The generated trigger carries the
+     * native disabled attribute; a custom trigger can be any element, so it
+     * receives aria-disabled instead. A dropdown disabled while already open
+     * still closes normally.
+     */
     disabled?: boolean;
     /**
      * Whether the dropdown contains items that can be selected.
