@@ -302,6 +302,74 @@ describe('@acusti/dropdown', () => {
             );
         });
 
+        it('does not name the listbox after a custom text input trigger’s value', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable>
+                    <input aria-label="state" />
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('textbox');
+            await user.click(input);
+            fireEvent.input(input, { target: { value: 'Ariz' } });
+
+            expect(screen.getByRole('listbox').hasAttribute('aria-labelledby')).toBe(
+                false,
+            );
+        });
+
+        it('does not name the menu after a non-searchable custom text input trigger’s value', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    <input aria-label="amount" />
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+
+            expect(screen.getByRole('menu').hasAttribute('aria-labelledby')).toBe(false);
+        });
+
+        it('still names a listbox from props.label when the trigger is a custom text input', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable label="State">
+                    <input />
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+
+            expect(screen.getByRole('listbox', { name: 'State' })).toBeTruthy();
+        });
+
+        it('still names the body after a custom trigger that is a non-text input', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    <input type="button" value="Pick one" />
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Pick one' }));
+
+            expect(screen.getByRole('menu', { name: 'Pick one' })).toBeTruthy();
+        });
+
         it('honors a custom trigger’s own id instead of overwriting it', async () => {
             const user = userEvent.setup();
             render(
