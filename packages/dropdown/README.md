@@ -1081,7 +1081,8 @@ highlight into it.
 - **Escape**: Close the dropdown entirely — including any open submenus —
   and return focus to the trigger (macOS-style; use ← to back out one level
   at a time)
-- **Arrow Up/Down**: Navigate between items in the current level
+- **Arrow Up/Down**: Navigate between items in the current level; with ⌥ or
+  ⌘ held, jump to the first/last item of that level
 - **Arrow Right**: Open the highlighted parent item’s submenu (if not
   already disclosed) and highlight its first item; in a
   [`Menubar`](#menubar), if the highlighted item is a leaf, slide to the
@@ -1089,7 +1090,9 @@ highlight into it.
 - **Arrow Left**: Close the highlighted item’s level and return to its
   parent item; in a `Menubar` with the highlight at the top level of a
   menu, slide to the previous menu
-- **Home/End**: Jump to first/last item in the current level
+- **Home/End**: Jump to first/last item in the current level. Like ←/→,
+  they stand down while a text input has focus (a searchable dropdown’s own
+  input, or one inside a custom trigger), where they move the caret instead
 - **Type characters**: Jump to the best-matching item in the current level
 
 For accessibility, the component focuses on semantic HTML structure and

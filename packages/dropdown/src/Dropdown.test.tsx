@@ -386,6 +386,107 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('Home/End keys', () => {
+        const renderMenu = (props: Partial<Props> = {}) =>
+            render(
+                <Dropdown {...props}>
+                    Menu
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                        <li data-ukt-value="two">Two</li>
+                        <li data-ukt-value="three">Three</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+        it('jumps to the last item on End and the first on Home', async () => {
+            const user = userEvent.setup();
+            renderMenu();
+
+            await user.click(screen.getByRole('button', { name: 'Menu' }));
+            await user.keyboard('{ArrowDown}');
+            expect(screen.getByText('One').hasAttribute('data-ukt-active')).toBe(true);
+
+            await user.keyboard('{End}');
+            expect(screen.getByText('Three').hasAttribute('data-ukt-active')).toBe(true);
+            expect(screen.getByText('One').hasAttribute('data-ukt-active')).toBe(false);
+
+            await user.keyboard('{Home}');
+            expect(screen.getByText('One').hasAttribute('data-ukt-active')).toBe(true);
+            expect(screen.getByText('Three').hasAttribute('data-ukt-active')).toBe(false);
+        });
+
+        it('reports the jumped-to item to props.onActiveItem', async () => {
+            const handleActiveItem = vi.fn();
+            const user = userEvent.setup();
+            renderMenu({ onActiveItem: handleActiveItem });
+
+            await user.click(screen.getByRole('button', { name: 'Menu' }));
+            await user.keyboard('{End}');
+
+            expect(handleActiveItem).toHaveBeenCalledTimes(1);
+            expect(handleActiveItem.mock.calls[0][0]).toMatchObject({
+                label: 'Three',
+                value: 'three',
+            });
+        });
+
+        it('operates on the current level, not the top level', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        <Dropdown label={<span>Align</span>}>
+                            <ul>
+                                <li data-ukt-value="left">Left</li>
+                                <li data-ukt-value="center">Center</li>
+                                <li data-ukt-value="right">Right</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            // dive into the submenu, then jump to its end
+            await user.keyboard('{ArrowDown}{ArrowDown}{ArrowRight}');
+            expect(screen.getByText('Left').hasAttribute('data-ukt-active')).toBe(true);
+
+            await user.keyboard('{End}');
+            expect(screen.getByText('Right').hasAttribute('data-ukt-active')).toBe(true);
+            // the top level is untouched — Bold never becomes active
+            expect(screen.getByText('Bold').hasAttribute('data-ukt-active')).toBe(false);
+
+            await user.keyboard('{Home}');
+            expect(screen.getByText('Left').hasAttribute('data-ukt-active')).toBe(true);
+        });
+
+        it('leaves Home/End to the caret when a text input has focus', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable>
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                        <li data-ukt-value="two">Two</li>
+                        <li data-ukt-value="three">Three</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+            await user.keyboard('{ArrowDown}');
+            expect(screen.getByText('One').hasAttribute('data-ukt-active')).toBe(true);
+
+            await user.keyboard('{End}');
+
+            // still on One: End moved the caret, it didn’t jump to Three
+            expect(screen.getByText('One').hasAttribute('data-ukt-active')).toBe(true);
+            expect(screen.getByText('Three').hasAttribute('data-ukt-active')).toBe(false);
+        });
+    });
+
     it('triggers props.onClose and props.onOpen at the appropriate times', async () => {
         let closedCount = 0;
         const handleClose = () => closedCount++;
