@@ -29,6 +29,11 @@ export type MenubarMember = {
     close: () => void;
     element: HTMLElement;
     focusTrigger: () => void;
+    // A disabled member is skipped by every menubar-driven move: the bar
+    // navigates and switches by calling open()/focusTrigger() directly, so
+    // without this the Dropdown’s own pointer and key guards never see those
+    // opens and props.disabled wouldn’t hold inside a Menubar.
+    isDisabled: () => boolean;
     isOpen: () => boolean;
     open: () => void;
 };

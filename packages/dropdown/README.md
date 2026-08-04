@@ -269,10 +269,12 @@ type Props = {
     className?: string;
     /**
      * Prevents the dropdown from opening by any means: pointer, Enter/Space,
-     * and hover (props.openOnHover) alike. The generated trigger carries the
+     * hover (props.openOnHover), typing in a custom trigger’s text input, and
+     * Menubar navigation onto it alike. The generated trigger carries the
      * native disabled attribute; a custom trigger can be any element, so it
-     * receives aria-disabled instead. A dropdown disabled while already open
-     * still closes normally.
+     * receives aria-disabled instead. Inside a Menubar the member is skipped
+     * rather than landed on, the way macOS passes over a disabled menu. A
+     * dropdown disabled while already open still closes normally.
      */
     disabled?: boolean;
     /**
@@ -1035,6 +1037,10 @@ Menubar behaviors:
 - a deliberate dismissal — **Escape**, a click outside the bar, or
   selecting an item — leaves menu-mode, after which hovering a trigger no
   longer opens its menu until a menu is opened again to re-engage the bar
+- a `disabled` member is passed over rather than landed on, the way macOS
+  skips a disabled menu: ←/→ move to the next enabled trigger, hovering it
+  leaves the open menu alone, and if no other member is enabled the open
+  menu simply stays put
 - **←/→** move between menus, wrapping at the ends: with the bar focused
   they move focus between triggers, and while a menu is open they slide the
   open menu to the adjacent trigger — unless the active item is a parent

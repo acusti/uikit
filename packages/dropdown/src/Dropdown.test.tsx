@@ -328,6 +328,25 @@ describe('@acusti/dropdown', () => {
             await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
         });
 
+        it('does not open when a custom trigger’s text input is typed in', async () => {
+            render(
+                <Dropdown disabled>
+                    <input aria-label="amount" />
+                    <ul>
+                        <li>Custom Item</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('textbox');
+            // aria-disabled doesn’t make an input inert the way the native
+            // attribute does, so it still accepts typing
+            fireEvent.input(input, { target: { value: 'abc' } });
+            await waitFor(() => expect(input).toHaveProperty('value', 'abc'));
+
+            expect(screen.queryByRole('menu')).toBeNull();
+        });
+
         it('leaves an enabled dropdown opening normally', async () => {
             const user = userEvent.setup();
             render(

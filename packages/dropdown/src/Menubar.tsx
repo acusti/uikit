@@ -34,6 +34,26 @@ const compareDocumentOrder = (a: MenubarMember, b: MenubarMember) => {
 // disengaging the menubar.
 const NON_MENU_CONTROL_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]';
 
+// The next member in `direction` that isn’t disabled, wrapping around and
+// skipping disabled ones — like macOS, where a disabled menu is passed over
+// rather than landed on. Returns null when no enabled member other than the
+// starting one exists, so an all-disabled bar (or a lone enabled menu) simply
+// stays put instead of closing what’s open and opening nothing.
+const findNextEnabledMember = (
+    members: Array<MenubarMember>,
+    fromIndex: number,
+    direction: -1 | 1,
+) => {
+    const { length } = members;
+    for (let step = 1; step < length; step++) {
+        // + length keeps the operand positive so % is a true modulo
+        const member =
+            members[(((fromIndex + direction * step) % length) + length) % length];
+        if (!member.isDisabled()) return member;
+    }
+    return null;
+};
+
 // Combines sibling Dropdowns into a single menu, like the system menu in the
 // top toolbar of macOS: one menu open at a time, ←/→ move between menus, and
 // once any menu is open, hovering or focusing another trigger switches to it.
@@ -58,10 +78,13 @@ export default function Menubar({ children, className, style }: MenubarProps) {
                     (member) => member.element === fromElement,
                 );
                 if (index === -1) return;
-                const nextIndex = (index + direction + members.length) % members.length;
+                const next = findNextEnabledMember(members, index, direction);
+                // Nothing enabled to move to: keep the current menu open
+                // rather than closing it and opening nothing
+                if (!next) return;
                 members[index].close();
-                members[nextIndex].open();
-                members[nextIndex].focusTrigger();
+                next.open();
+                next.focusTrigger();
             },
             notifyClosed(element: HTMLElement) {
                 // Only a dismissal of the member that engaged the bar ends
@@ -100,10 +123,12 @@ export default function Menubar({ children, className, style }: MenubarProps) {
         const eventTarget = event.target as HTMLElement;
         const index = members.findIndex((member) => member.element.contains(eventTarget));
         if (index === -1) return;
+        const direction = key === 'ArrowRight' ? 1 : -1;
+        const next = findNextEnabledMember(members, index, direction);
+        if (!next) return;
         event.preventDefault();
         event.stopPropagation();
-        const direction = key === 'ArrowRight' ? 1 : -1;
-        members[(index + direction + members.length) % members.length].focusTrigger();
+        next.focusTrigger();
     };
 
     // Once the bar is engaged, moving hover or focus onto another member’s
@@ -121,6 +146,9 @@ export default function Menubar({ children, className, style }: MenubarProps) {
         }
         const member = members.find((m) => m.element.contains(eventTarget));
         if (member) {
+            // A disabled member never opens, and hovering it leaves whatever
+            // is open alone rather than clearing it
+            if (member.isDisabled()) return;
             if (!member.isOpen()) member.open();
             return;
         }

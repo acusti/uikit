@@ -92,10 +92,12 @@ export type Props = {
     className?: string;
     /**
      * Prevents the dropdown from opening by any means: pointer, Enter/Space,
-     * and hover (props.openOnHover) alike. The generated trigger carries the
+     * hover (props.openOnHover), typing in a custom trigger’s text input, and
+     * Menubar navigation onto it alike. The generated trigger carries the
      * native disabled attribute; a custom trigger can be any element, so it
-     * receives aria-disabled instead. A dropdown disabled while already open
-     * still closes normally.
+     * receives aria-disabled instead. Inside a Menubar the member is skipped
+     * rather than landed on, the way macOS passes over a disabled menu. A
+     * dropdown disabled while already open still closes normally.
      */
     disabled?: boolean;
     hasItems?: boolean;
@@ -294,6 +296,7 @@ function RootDropdown({
 
     const allowCreateRef = useRef(allowCreate);
     const allowEmptyRef = useRef(allowEmpty);
+    const disabledRef = useRef(disabled);
     const hasItemsRef = useRef(hasItems);
     const isOpenRef = useRef(isOpen);
     const isOpeningRef = useRef(isOpening);
@@ -306,6 +309,7 @@ function RootDropdown({
     useEffect(() => {
         allowCreateRef.current = allowCreate;
         allowEmptyRef.current = allowEmpty;
+        disabledRef.current = disabled;
         hasItemsRef.current = hasItems;
         isOpenRef.current = isOpen;
         isOpeningRef.current = isOpening;
@@ -317,6 +321,7 @@ function RootDropdown({
     }, [
         allowCreate,
         allowEmpty,
+        disabled,
         hasItems,
         isOpen,
         isOpening,
@@ -614,8 +619,15 @@ function RootDropdown({
             close: () => closeDropdown({ keepMenubarEngaged: true }),
             element: dropdownElement,
             focusTrigger,
+            isDisabled: () => Boolean(disabled),
             isOpen: () => isOpenRef.current,
-            open: () => setIsOpen(true),
+            // Gated as well as skipped by the menubar: open() is the one
+            // opening path that doesn’t go through this component’s own
+            // pointer/key handlers, so it enforces props.disabled itself
+            open: () => {
+                if (disabled) return;
+                setIsOpen(true);
+            },
         });
     });
 
@@ -1207,6 +1219,11 @@ function RootDropdown({
         }
 
         const handleInput = (event: Event) => {
+            // A custom trigger’s text input stays editable when disabled —
+            // aria-disabled doesn’t make an input inert the way the native
+            // attribute on the generated trigger does — so typing in one must
+            // not open the dropdown either
+            if (disabledRef.current) return;
             if (!isOpenRef.current) setIsOpen(true);
 
             const input = event.target as HTMLInputElement;
