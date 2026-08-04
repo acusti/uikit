@@ -38,6 +38,10 @@ export type MenubarMember = {
     // without this the Dropdown’s own pointer and key guards never see those
     // opens and props.disabled wouldn’t hold inside a Menubar.
     isDisabled: () => boolean;
+    // Whether this member renders as a menuitem. A searchable member is a
+    // combobox instead, which is neither a valid menubar child nor part of the
+    // bar's roving tabindex — it keeps its own native tab stop.
+    isMenuItem: () => boolean;
     isOpen: () => boolean;
     open: () => void;
 };

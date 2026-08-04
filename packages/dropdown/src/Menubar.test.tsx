@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Dropdown, { Menubar } from './Dropdown.js';
@@ -43,19 +44,71 @@ describe('@acusti/dropdown Menubar', () => {
     });
 
     describe('menubar semantics', () => {
-        it('owns its triggers as menuitems with nothing generic in between', () => {
-            renderMenubar();
-
+        // aria-required-children: a menubar owns menuitems and nothing else.
+        // Checking ancestors alone isn’t enough — a presentational wrapper
+        // promotes *all* its children to the bar, so an un-roled sibling of
+        // the trigger (props.label’s text div) is owned by the menubar too.
+        // This walks everything the bar ends up owning: an element whose
+        // ancestors are all role="none" is owned directly, and must carry a
+        // role of its own rather than being a bare generic.
+        const expectNoGenericsOwnedByMenubar = () => {
             const menubar = screen.getByRole('menubar');
-            // aria-required-children: a menubar owns menuitems, so every
-            // element between it and a trigger has to be neutralized
-            for (const trigger of screen.getAllByRole('menuitem')) {
-                let ancestor = trigger.parentElement;
+            const menuitems = screen.getAllByRole('menuitem');
+            expect(menuitems.length).toBeGreaterThan(0);
+
+            for (const element of Array.from(menubar.querySelectorAll('*'))) {
+                // anything inside a menuitem is that item's own content
+                if (
+                    menuitems.some((item) => item !== element && item.contains(element))
+                ) {
+                    continue;
+                }
+                let ancestor = element.parentElement;
+                let isOwnedByMenubar = true;
                 while (ancestor && ancestor !== menubar) {
-                    expect(ancestor.getAttribute('role')).toBe('none');
+                    if (ancestor.getAttribute('role') !== 'none') {
+                        isOwnedByMenubar = false;
+                        break;
+                    }
                     ancestor = ancestor.parentElement;
                 }
-                expect(ancestor).toBe(menubar);
+                if (!isOwnedByMenubar) continue;
+                expect({
+                    html: element.outerHTML.slice(0, 120),
+                    role: element.getAttribute('role'),
+                }).toMatchObject({ role: expect.any(String) });
+            }
+        };
+
+        it('owns its triggers as menuitems with nothing generic in between', () => {
+            renderMenubar();
+            expectNoGenericsOwnedByMenubar();
+        });
+
+        it('neutralizes the label wrapper and its text for a labelled member', () => {
+            render(
+                <Menubar>
+                    <Dropdown label="File">
+                        <ul>
+                            <li data-ukt-item>New</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown label="Edit">
+                        <ul>
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+            // props.label is the documented way to build a Menubar, and it
+            // puts a text div beside the trigger inside a presentational
+            // label — which the bar would otherwise own as a generic
+            expectNoGenericsOwnedByMenubar();
+            for (const labelText of Array.from(
+                document.querySelectorAll('.uktdropdown-label-text'),
+            )) {
+                expect(labelText.getAttribute('role')).toBe('none');
             }
         });
 
@@ -168,6 +221,88 @@ describe('@acusti/dropdown Menubar', () => {
             // semantics rather than being forced into menuitem
             expect(screen.getByRole('combobox', { name: 'Search' })).toBeTruthy();
             expect(screen.getAllByRole('menuitem')).toHaveLength(1);
+        });
+
+        it('does not let a searchable member take the bar’s tab stop', () => {
+            render(
+                <Menubar>
+                    <Dropdown isSearchable label="Search">
+                        <ul>
+                            <li data-ukt-value="one">One</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown>
+                        Edit
+                        <ul>
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+            // the combobox comes first in document order, but it has its own
+            // native tab stop and never reads the roving value — if it held
+            // the bar's stop, every menuitem would be left at -1
+            expect(
+                screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('tabindex'),
+            ).toBe('0');
+
+            act(() => screen.getByRole('combobox', { name: 'Search' }).focus());
+
+            expect(
+                screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('tabindex'),
+            ).toBe('0');
+        });
+
+        it('hands the tab stop on when an intermediate component unmounts the holder', async () => {
+            const user = userEvent.setup();
+            // The removal is driven by this component's own state, so Menubar
+            // never re-renders — its children prop keeps the same identity.
+            // Without the removal scheduling its own reconciliation, the tab
+            // stop stays stranded on the unmounted holder and the bar is left
+            // with no entry point at all.
+            const Members = () => {
+                const [showFile, setShowFile] = useState(true);
+                return (
+                    <>
+                        <button onClick={() => setShowFile(false)} type="button">
+                            hide File
+                        </button>
+                        {showFile ? (
+                            <Dropdown>
+                                File
+                                <ul>
+                                    <li data-ukt-item>New</li>
+                                </ul>
+                            </Dropdown>
+                        ) : null}
+                        <Dropdown>
+                            Edit
+                            <ul>
+                                <li data-ukt-item>Undo</li>
+                            </ul>
+                        </Dropdown>
+                    </>
+                );
+            };
+            render(
+                <Menubar>
+                    <Members />
+                </Menubar>,
+            );
+
+            expect(
+                screen.getByRole('menuitem', { name: 'File' }).getAttribute('tabindex'),
+            ).toBe('0');
+            expect(
+                screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('tabindex'),
+            ).toBe('-1');
+
+            await user.click(screen.getByRole('button', { name: 'hide File' }));
+
+            expect(
+                screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('tabindex'),
+            ).toBe('0');
         });
     });
 

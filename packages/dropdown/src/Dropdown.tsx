@@ -304,7 +304,17 @@ function RootDropdown({
     // isn't a valid menubar child, so it keeps its own semantics.
     const isMenubarItem = menubar != null && popupRole === 'menu';
     // The bar keeps a single tab stop (APG roving tabindex); the members that
-    // don't hold it stay reachable with ←/→
+    // don't hold it stay reachable with ←/→.
+    //
+    // Before registration both sides are null, so every member renders
+    // tabbable on the first render. That's deliberate: the first render is
+    // also the SSR render, and the roving tabindex is only navigable because
+    // JS is running (←/→ is the Menubar's own key handler). Without JS, all
+    // triggers tabbable degrades to plain buttons — every menu still
+    // reachable — whereas defaulting them to -1 would leave the bar with no
+    // keyboard entry point and no arrow navigation to compensate. On the
+    // client the window is a single render: members register in their effects
+    // during the mount commit, so the first paint already has one stop.
     const menubarTabIndex = !isMenubarItem
         ? undefined
         : menubar.tabbableElement === dropdownElement
@@ -664,6 +674,11 @@ function RootDropdown({
             element: dropdownElement,
             focusTrigger,
             isDisabled: () => Boolean(disabled),
+            // Only a member rendered as a menuitem takes part in the bar's
+            // roving tabindex; a searchable member is a combobox with its own
+            // native tab stop, and letting it hold the bar's would leave every
+            // menuitem at -1
+            isMenuItem: () => isMenubarItem,
             isOpen: () => isOpenRef.current,
             // Gated as well as skipped by the menubar: open() is the one
             // opening path that doesn’t go through this component’s own
@@ -1477,7 +1492,11 @@ function RootDropdown({
                 className="uktdropdown-label"
                 role={isMenubarItem ? 'none' : undefined}
             >
-                <div className="uktdropdown-label-text" id={labelId}>
+                <div
+                    className="uktdropdown-label-text"
+                    id={labelId}
+                    role={isMenubarItem ? 'none' : undefined}
+                >
                     {label}
                 </div>
                 {trigger}
