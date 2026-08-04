@@ -1123,12 +1123,25 @@ name the trigger takes), and otherwise from the trigger element itself. The
 component fills in the trigger’s `id` for this; a custom trigger with an
 `id` of its own keeps it, and the body points at that instead.
 
-The one case with no name is a searchable dropdown with no `props.label`:
-`aria-labelledby` resolves a text input to its _value_, so pointing the
-listbox at the generated input would name it after whatever the user has
-typed. That dropdown has no accessible name for its trigger either, and
-`props.label` (or a custom trigger carrying its own `aria-label`) is the
-fix for both.
+Two shapes end up with no name, both because the trigger has none to give:
+
+- **A text input trigger.** `aria-labelledby` resolves a text input to its
+  _value_, so pointing the popup at one would name it after whatever the
+  user has typed. The component leaves the popup unnamed instead — for a
+  searchable dropdown’s trigger (a text input by definition, generated or
+  custom) and for a custom trigger that is itself an `<input>` or
+  `<textarea>`. A text input _nested_ inside a custom trigger leaks its
+  value the same way but isn’t detectable from the element alone, so it’s
+  on you to pass `props.label` there.
+- **An empty generated trigger**: single-child syntax with no `props.label`
+  renders a `<button>` with nothing in it, which has no accessible name of
+  its own to lend. This matters most for `hasItems={false}`, where the
+  popup is a `dialog` and an unnamed dialog is an ARIA violation.
+
+In both cases the trigger is unnamed too, and `props.label` fixes both at
+once. (A custom trigger’s own `aria-label` names the trigger, but the popup
+can’t inherit it — `aria-labelledby` would resolve the input to its value —
+so pass `props.label` when you want the popup named as well.)
 
 Item roles are filled in the same way when the body opens: items receive
 `role="option"` in a searchable (listbox) dropdown or `role="menuitem"` in

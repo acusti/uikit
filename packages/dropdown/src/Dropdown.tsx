@@ -191,6 +191,33 @@ const SAFE_AREA_TIMEOUT = 300;
 // somewhere the pointer briefly leaves) doesn’t flicker-close it
 const HOVER_CLOSE_DELAY = 150;
 
+// Input types that hold no user-entered text, so aria-labelledby resolves them
+// by their label/content rather than their value (mirrors TEXT_INPUT_SELECTOR)
+const NON_TEXT_INPUT_TYPES = new Set([
+    'button',
+    'checkbox',
+    'color',
+    'file',
+    'hidden',
+    'image',
+    'radio',
+    'range',
+    'reset',
+    'submit',
+]);
+
+// Whether a custom trigger element is itself a text input — one aria-labelledby
+// would resolve to its value rather than to a name (see bodyLabelledBy). Only
+// the element itself is checked: a text input nested inside a custom trigger
+// leaks its value the same way, but that isn’t knowable from the element alone,
+// and props.label is the documented answer for both.
+const isTextInputElement = (element: ReactElement) => {
+    if (element.type === 'textarea') return true;
+    if (element.type !== 'input') return false;
+    const { type } = element.props as { type?: string };
+    return type == null || !NON_TEXT_INPUT_TYPES.has(type);
+};
+
 export default function Dropdown(props: Props) {
     const parentDropdown = useContext(DropdownContext);
     // A Dropdown nested inside a menu dropdown’s body renders as a submenu
@@ -1347,11 +1374,13 @@ function RootDropdown({
     // name the trigger itself takes — so it wins; otherwise the body points at
     // the trigger element and inherits its accessible name.
     //
-    // A generated searchable input is the one trigger that names nothing:
-    // aria-labelledby resolves a text input to its *value*, so pointing at it
-    // would name the listbox after whatever the user has typed. Such a
-    // dropdown has no accessible name for its trigger either, so the fix for
-    // both is the same — pass props.label.
+    // A text input can’t serve as that source: aria-labelledby resolves one to
+    // its *value*, so pointing at it would name the popup after whatever the
+    // user has typed. That rules out the trigger of a searchable dropdown —
+    // a text input by definition, generated or custom — and a custom trigger
+    // that is itself an input or textarea. Such a dropdown has no accessible
+    // name for its trigger either, so the fix for both is the same: pass
+    // props.label (or, for the trigger alone, a custom trigger’s aria-label).
     let bodyLabelledBy: string | undefined;
 
     if (!isValidElement(trigger)) {
@@ -1400,7 +1429,9 @@ function RootDropdown({
         // Point the body at whatever id the trigger ends up with, so a
         // consumer-set one is honored rather than overwritten
         const resolvedTriggerId = (triggerProps.id as string | undefined) ?? triggerId;
-        bodyLabelledBy = resolvedTriggerId;
+        if (!isSearchable && !isTextInputElement(trigger)) {
+            bodyLabelledBy = resolvedTriggerId;
+        }
         trigger = cloneElement(trigger as ReactElement<Record<string, unknown>>, {
             'aria-controls': triggerProps['aria-controls'] ?? bodyId,
             'aria-disabled': triggerProps['aria-disabled'] ?? (disabled || undefined),
