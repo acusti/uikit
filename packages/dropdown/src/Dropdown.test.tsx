@@ -215,6 +215,114 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('popup accessible name', () => {
+        it('names the dialog body after its trigger', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    Settings
+                    <form>
+                        <label>
+                            Full name
+                            <input name="name" />
+                        </label>
+                    </form>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+
+            expect(screen.getByRole('dialog', { name: 'Settings' })).toBeTruthy();
+        });
+
+        it('names the menu body after its trigger', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Menu
+                    <ul>
+                        <li>New Window</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Menu' }));
+
+            expect(screen.getByRole('menu', { name: 'Menu' })).toBeTruthy();
+        });
+
+        it('prefers props.label over the trigger as the name source', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown label="Alignment">
+                    <ul>
+                        <li>Left</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button'));
+
+            expect(screen.getByRole('menu', { name: 'Alignment' })).toBeTruthy();
+        });
+
+        it('names a searchable listbox from props.label', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable label="State">
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+
+            expect(screen.getByRole('listbox', { name: 'State' })).toBeTruthy();
+        });
+
+        it('leaves a label-less searchable listbox unnamed rather than naming it after the input’s value', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable>
+                    <ul>
+                        <li>Arizona</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox'));
+
+            // aria-labelledby resolves a text input to its value, so pointing
+            // the listbox at the generated input would name it after whatever
+            // has been typed. Such a dropdown has no name for its trigger
+            // either — props.label is the fix for both.
+            expect(screen.getByRole('listbox').hasAttribute('aria-labelledby')).toBe(
+                false,
+            );
+        });
+
+        it('honors a custom trigger’s own id instead of overwriting it', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    <button id="my-trigger">Custom</button>
+                    <ul>
+                        <li>Custom Item</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Custom' });
+            expect(trigger.id).toBe('my-trigger');
+
+            await user.click(trigger);
+
+            const popup = screen.getByRole('menu', { name: 'Custom' });
+            expect(popup.getAttribute('aria-labelledby')).toBe('my-trigger');
+        });
+    });
+
     describe('props.disabled', () => {
         it('marks the generated button trigger disabled', () => {
             render(
