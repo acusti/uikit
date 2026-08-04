@@ -1173,10 +1173,12 @@ suggestions appear in the popup, and nothing is completed inline in the
 input.
 
 For a custom trigger, the role is filled in only when the trigger element
-**is** the text input. A trigger that merely wraps an input is left alone —
-`role="combobox"` on a wrapper is the deprecated ARIA 1.1 shape, and it
-would misdescribe the wrapper. As always, a `role` or `aria-autocomplete`
-you set yourself wins.
+**is** a single-line text input. A trigger that merely wraps an input is
+left alone — `role="combobox"` on a wrapper is the deprecated ARIA 1.1
+shape, and it would misdescribe the wrapper — and a `<textarea>` is
+excluded for the same reason, since a combobox is single-line. (A textarea
+trigger still counts as a text input for naming, so it can’t name the popup
+either.) As always, a `role` or `aria-autocomplete` you set yourself wins.
 
 Note that this changes the trigger’s exposed role, so anything selecting it
 by role — `getByRole('textbox')` in tests, or a `[role]` selector — needs

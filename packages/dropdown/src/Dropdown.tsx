@@ -1431,11 +1431,11 @@ function RootDropdown({
         if (!isSearchable && !isTextInputTrigger) {
             bodyLabelledBy = resolvedTriggerId;
         }
-        // role="combobox" belongs on the text input itself, so it’s filled in
-        // only when the custom trigger is one. A trigger that merely wraps an
-        // input is left alone: the role on the wrapper is the deprecated ARIA
-        // 1.1 shape, and putting it there would misdescribe the wrapper.
-        const isCombobox = isSearchable && isTextInputTrigger;
+        // role="combobox" & aria-autocomplete="list" belong on the text input,
+        // but only when the trigger is an actual text input (not valid on
+        // textareas or non-input wrappers)
+        const isCombobox =
+            isSearchable && isTextInputTrigger && trigger.type !== 'textarea';
         trigger = cloneElement(trigger as ReactElement<Record<string, unknown>>, {
             'aria-autocomplete':
                 triggerProps['aria-autocomplete'] ?? (isCombobox ? 'list' : undefined),
