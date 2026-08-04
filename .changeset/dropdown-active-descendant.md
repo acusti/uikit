@@ -27,7 +27,16 @@ carrying an `id` of its own keeps it.
 Ids are minted when an item becomes active rather than during the open-time
 annotation pass, which means items rendered into an already-open body
 (async-loaded, or filtered by a consumer’s own search) get one too, even
-though that pass doesn’t reach them. Indices come from the navigable items,
-so a disabled item shifts the ids after it; they’re minted and consumed
-within a single open and rewritten on every move, so nothing depends on
-them being stable.
+though that pass doesn’t reach them.
+
+An index path is a snapshot of a position, so a generated id is re-derived
+every time its item becomes active: filtering or reordering an open body
+can’t leave an item holding an id that describes where it used to be, which
+would otherwise collide with whatever moved into that position and resolve
+to the wrong element. Generated ids are internal — minted and consumed
+within a single open, and moving as the list moves. Ids a consumer sets are
+never touched or recomputed.
+
+Indices come from the navigable items, so a disabled item shifts the ids
+after it. If the highlighted item leaves the DOM while the body is open,
+the reference is cleared rather than left dangling.
