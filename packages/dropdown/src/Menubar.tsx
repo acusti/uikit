@@ -7,6 +7,7 @@ import {
     type ReactNode,
     useEffect,
     useMemo,
+    useReducer,
     useRef,
     useState,
 } from 'react';
@@ -56,6 +57,13 @@ const findNextEnabledMember = (
     return null;
 };
 
+// Only an enabled member that actually renders as a menuitem can hold the bar's
+// tab stop. A searchable member is a combobox with its own native tab stop and
+// never reads the roving value, so letting it take ownership would leave every
+// menuitem at -1 and the bar without a menu entry point.
+const canHoldTabStop = (member: MenubarMember) =>
+    !member.isDisabled() && member.isMenuItem();
+
 // Combines sibling Dropdowns into a single menu, like the system menu in the
 // top toolbar of macOS: one menu open at a time, ←/→ move between menus, and
 // once any menu is open, hovering or focusing another trigger switches to it.
@@ -65,6 +73,7 @@ export default function Menubar({ children, className, style }: MenubarProps) {
     // rest are reached with ←/→. This holds whichever member currently owns
     // it, moving to whichever trigger the user last focused.
     const [tabbableElement, setTabbableElement] = useState<HTMLElement | null>(null);
+    const [, reconcile] = useReducer((count: number) => count + 1, 0);
     // The member that engaged the bar (menu-mode). It keeps pointing at that
     // member even if that member’s menu was closed by hovering a non-menu
     // control, which allows the bar to stay engaged even with nothing open.
@@ -90,8 +99,8 @@ export default function Menubar({ children, className, style }: MenubarProps) {
     useEffect(() => {
         const members = getOrderedMembersRef.current();
         const owner = members.find((member) => member.element === tabbableElement);
-        if (owner && !owner.isDisabled()) return;
-        const nextOwner = members.find((member) => !member.isDisabled());
+        if (owner && canHoldTabStop(owner)) return;
+        const nextOwner = members.find(canHoldTabStop);
         setTabbableElement(nextOwner?.element ?? null);
     });
 
@@ -136,10 +145,19 @@ export default function Menubar({ children, className, style }: MenubarProps) {
                 // instead when it’s going spare. Members register in document
                 // order, so the first enabled one gets it.
                 setTabbableElement((current) =>
-                    current == null && !member.isDisabled() ? member.element : current,
+                    current == null && canHoldTabStop(member) ? member.element : current,
                 );
                 return () => {
                     membersRef.current.delete(member);
+                    // Membership changes in a member's own effect, which
+                    // doesn't re-render this component — and an intermediate
+                    // component can unmount a member without Menubar
+                    // re-rendering at all, which would strand the tab stop on
+                    // an element that's gone. Force the render so the effect
+                    // above reconciles; it reads the settled member set,
+                    // since React runs every cleanup and setup before the
+                    // batched re-render.
+                    reconcile();
                     // Deliberately not released here. Members re-register on
                     // every render, and React runs every cleanup before any
                     // setup — so releasing would hand the tab stop to whichever
@@ -211,7 +229,7 @@ export default function Menubar({ children, className, style }: MenubarProps) {
     const handleFocus = (event: ReactFocusEvent<HTMLDivElement>) => {
         const eventTarget = event.target as HTMLElement;
         const member = getOrderedMembers().find((m) => m.element.contains(eventTarget));
-        if (member && !member.isDisabled()) setTabbableElement(member.element);
+        if (member && canHoldTabStop(member)) setTabbableElement(member.element);
         switchToMemberAt(eventTarget);
     };
 

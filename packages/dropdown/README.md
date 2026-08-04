@@ -1032,11 +1032,13 @@ Menubar behaviors:
   in between would leave the menubar owning no menu items at all. A
   searchable member is exempt: its trigger is a `combobox`, which isn’t a
   valid menubar child, so it keeps its own semantics
-- the bar is a **single tab stop**, as the APG menubar pattern expects: one
-  trigger is tabbable and the rest are reached with ←/→. The tab stop
-  follows the trigger you last focused, so tabbing away and back returns
-  you where you were; it starts on (and falls back to) the first enabled
-  member
+- the bar’s **menu items share a single tab stop**, as the APG menubar
+  pattern expects: one `menuitem` trigger is tabbable and the rest are
+  reached with ←/→. The tab stop follows the trigger you last focused, so
+  tabbing away and back returns you where you were; it starts on (and falls
+  back to) the first enabled member. A searchable member sits outside this
+  — it’s a `combobox`, not a menu item, so it keeps its own native tab stop
+  and never takes the bar’s
 - at most one menu in the bar is open at a time
 - opening a trigger’s menu (by click or keyboard) engages the bar
   (menu-mode). While engaged, hovering or focusing another trigger switches
