@@ -1030,8 +1030,12 @@ Menubar behaviors:
   `role="menuitem"` that the bar owns directly — the wrapper elements
   between them are neutralized with `role="none"`, since a generic element
   in between would leave the menubar owning no menu items at all. A
-  searchable member is exempt: its trigger is a `combobox`, which isn’t a
-  valid menubar child, so it keeps its own semantics
+  searchable member is exempt from the `menuitem` role: its trigger is a
+  `combobox`, so it keeps its own semantics rather than being mislabelled.
+  Its wrappers are still neutralized, but note that a `combobox` isn’t
+  valid menubar content in the first place — no markup arrangement fixes
+  that, so a search field belongs **outside** the `<Menubar>` (a container
+  mixing menus and other controls is a `toolbar`, not a menubar)
 - the bar’s **menu items share a single tab stop**, as the APG menubar
   pattern expects: one `menuitem` trigger is tabbable and the rest are
   reached with ←/→. The tab stop follows the trigger you last focused, so

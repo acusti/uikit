@@ -57,12 +57,9 @@ const findNextEnabledMember = (
     return null;
 };
 
-// Only an enabled member that actually renders as a menuitem can hold the bar's
-// tab stop. A searchable member is a combobox with its own native tab stop and
-// never reads the roving value, so letting it take ownership would leave every
-// menuitem at -1 and the bar without a menu entry point.
+// Only an enabled member whose popup is a menu can hold the bar’s tab stop
 const canHoldTabStop = (member: MenubarMember) =>
-    !member.isDisabled() && member.isMenuItem();
+    !member.isDisabled() && member.isMenuPopup();
 
 // Combines sibling Dropdowns into a single menu, like the system menu in the
 // top toolbar of macOS: one menu open at a time, ←/→ move between menus, and
@@ -73,7 +70,7 @@ export default function Menubar({ children, className, style }: MenubarProps) {
     // rest are reached with ←/→. This holds whichever member currently owns
     // it, moving to whichever trigger the user last focused.
     const [tabbableElement, setTabbableElement] = useState<HTMLElement | null>(null);
-    const [, reconcile] = useReducer((count: number) => count + 1, 0);
+    const [reconcileCount, reconcile] = useReducer((count: number) => count + 1, 0);
     // The member that engaged the bar (menu-mode). It keeps pointing at that
     // member even if that member’s menu was closed by hovering a non-menu
     // control, which allows the bar to stay engaged even with nothing open.
@@ -89,20 +86,16 @@ export default function Menubar({ children, className, style }: MenubarProps) {
     // falls to the first enabled member in document order. Without this an
     // unmounted or disabled owner would leave the bar with no tab stop at all.
     //
-    // Deliberately runs on every render rather than on a dependency list. An
-    // unmounting member changes no state here — it only removes itself from
-    // membersRef during its own cleanup — so there is nothing to depend on
-    // that would catch it. The setState the lint rule warns about can't chain:
-    // it only fires when the current holder is missing or disabled, and the
-    // value it sets makes the guard above return on the next run.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // reconcileCount is the dependency that catches a member leaving: membership
+    // changes in the member’s own effect, which re-renders nothing here, so its
+    // cleanup bumps the reducer to say the set has settled.
     useEffect(() => {
         const members = getOrderedMembersRef.current();
         const owner = members.find((member) => member.element === tabbableElement);
         if (owner && canHoldTabStop(owner)) return;
         const nextOwner = members.find(canHoldTabStop);
         setTabbableElement(nextOwner?.element ?? null);
-    });
+    }, [reconcileCount, tabbableElement]);
 
     const contextValue: MenubarContextValue = useMemo(
         () => ({
@@ -139,32 +132,20 @@ export default function Menubar({ children, className, style }: MenubarProps) {
             },
             registerMember(member: MenubarMember) {
                 membersRef.current.add(member);
-                // Members register from their own effects, which don’t
-                // re-render this component, so the reconciliation effect below
-                // would never see them arrive — claim the tab stop here
-                // instead when it’s going spare. Members register in document
-                // order, so the first enabled one gets it.
+                // Claim the tab stop when it’s going spare; members register
+                // in document order, so the first enabled one gets it
                 setTabbableElement((current) =>
                     current == null && canHoldTabStop(member) ? member.element : current,
                 );
                 return () => {
                     membersRef.current.delete(member);
-                    // Membership changes in a member's own effect, which
-                    // doesn't re-render this component — and an intermediate
-                    // component can unmount a member without Menubar
-                    // re-rendering at all, which would strand the tab stop on
-                    // an element that's gone. Force the render so the effect
-                    // above reconciles; it reads the settled member set,
-                    // since React runs every cleanup and setup before the
-                    // batched re-render.
+                    // say the set has settled, so the effect above can pick
+                    // up a tab stop stranded on an unmounted member
                     reconcile();
-                    // Deliberately not released here. Members re-register on
-                    // every render, and React runs every cleanup before any
-                    // setup — so releasing would hand the tab stop to whichever
-                    // member re-registers first (always the first in the bar)
-                    // rather than back to the one that held it. A genuinely
-                    // unmounted holder is picked up by the effect below, which
-                    // no longer finds it among the members.
+                    // the tab stop is deliberately not released here: members
+                    // re-register on every render, and React runs every cleanup
+                    // before any setup, so releasing would hand it to whichever
+                    // member re-registers first rather than back to the holder
                 };
             },
             tabbableElement,
@@ -224,7 +205,7 @@ export default function Menubar({ children, className, style }: MenubarProps) {
         }
     };
 
-    // Focusing a trigger hands it the bar's tab stop, so tabbing away and back
+    // focusing a trigger hands it the bar’s tab stop, so tabbing away and back
     // returns to the trigger the user was last on rather than to the first
     const handleFocus = (event: ReactFocusEvent<HTMLDivElement>) => {
         const eventTarget = event.target as HTMLElement;

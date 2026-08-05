@@ -297,24 +297,23 @@ function RootDropdown({
     const labelId = `${bodyId}-label`;
     const popupRole = isSearchable ? 'listbox' : hasItems ? 'menu' : 'dialog';
     const menubar = useContext(MenubarContext);
-    // A menubar owns menuitems, so a member's trigger takes role="menuitem"
-    // and the elements between the bar and it are neutralized — a generic div
-    // (or label) in between leaves the menubar owning no menuitems at all.
-    // Only a menu trigger qualifies: a searchable member is a combobox, which
-    // isn't a valid menubar child, so it keeps its own semantics.
-    const isMenubarItem = menubar != null && popupRole === 'menu';
+    // Every member’s wrapper elements are neutralized, so the bar owns the
+    // controls themselves rather than the generic divs (and label) around
+    // them — a generic in between leaves the menubar owning no menu items at
+    // all. This applies to any member, including a searchable one.
+    const isMenubarMember = menubar != null;
+    // Only a member whose popup is a menu joins the roving tabindex, and takes
+    // role=menuitem unless the trigger declares its own. A searchable member is
+    // a combobox, which is neither a valid menubar child nor part of the bar’s
+    // tab stop, so it keeps its own semantics.
+    const isMenubarItem = isMenubarMember && popupRole === 'menu';
     // The bar keeps a single tab stop (APG roving tabindex); the members that
-    // don't hold it stay reachable with ←/→.
+    // don’t hold it stay reachable with ←/→.
     //
     // Before registration both sides are null, so every member renders
-    // tabbable on the first render. That's deliberate: the first render is
-    // also the SSR render, and the roving tabindex is only navigable because
-    // JS is running (←/→ is the Menubar's own key handler). Without JS, all
-    // triggers tabbable degrades to plain buttons — every menu still
-    // reachable — whereas defaulting them to -1 would leave the bar with no
-    // keyboard entry point and no arrow navigation to compensate. On the
-    // client the window is a single render: members register in their effects
-    // during the mount commit, so the first paint already has one stop.
+    // tabbable on the first render to ensure the UI works without JS. Members
+    // proceed to register in their effects, so the bar settles to one stop as
+    // soon as those run.
     const menubarTabIndex = !isMenubarItem
         ? undefined
         : menubar.tabbableElement === dropdownElement
@@ -674,11 +673,9 @@ function RootDropdown({
             element: dropdownElement,
             focusTrigger,
             isDisabled: () => Boolean(disabled),
-            // Only a member rendered as a menuitem takes part in the bar's
-            // roving tabindex; a searchable member is a combobox with its own
-            // native tab stop, and letting it hold the bar's would leave every
-            // menuitem at -1
-            isMenuItem: () => isMenubarItem,
+            // Only a member whose popup is a menu takes part in the bar’s
+            // roving tabindex
+            isMenuPopup: () => isMenubarItem,
             isOpen: () => isOpenRef.current,
             // Gated as well as skipped by the menubar: open() is the one
             // opening path that doesn’t go through this component’s own
@@ -1490,12 +1487,12 @@ function RootDropdown({
         trigger = (
             <label
                 className="uktdropdown-label"
-                role={isMenubarItem ? 'none' : undefined}
+                role={isMenubarMember ? 'none' : undefined}
             >
                 <div
                     className="uktdropdown-label-text"
                     id={labelId}
-                    role={isMenubarItem ? 'none' : undefined}
+                    role={isMenubarMember ? 'none' : undefined}
                 >
                     {label}
                 </div>
@@ -1516,7 +1513,7 @@ function RootDropdown({
                     'is-searchable': isSearchable,
                 })}
                 onClick={onClick}
-                role={isMenubarItem ? 'none' : undefined}
+                role={isMenubarMember ? 'none' : undefined}
                 onMouseDown={handleMouseDown}
                 onMouseEnter={handleDropdownMouseEnter}
                 onMouseLeave={handleDropdownMouseLeave}

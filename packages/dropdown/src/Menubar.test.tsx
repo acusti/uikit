@@ -44,45 +44,55 @@ describe('@acusti/dropdown Menubar', () => {
     });
 
     describe('menubar semantics', () => {
-        // aria-required-children: a menubar owns menuitems and nothing else.
+        // aria-required-children: a menubar owns its menu items, the menu an
+        // open member discloses (the canonical APG shape puts a menuitem and
+        // its menu inside the same presentational wrapper), and the
+        // neutralized wrappers, which are transparent. Nothing else.
+        //
         // Checking ancestors alone isn’t enough — a presentational wrapper
         // promotes *all* its children to the bar, so an un-roled sibling of
         // the trigger (props.label’s text div) is owned by the menubar too.
-        // This walks everything the bar ends up owning: an element whose
-        // ancestors are all role="none" is owned directly, and must carry a
-        // role of its own rather than being a bare generic.
-        const expectNoGenericsOwnedByMenubar = () => {
+        const ALLOWED_OWNED_ROLES = ['menu', 'menuitem', 'none'];
+
+        const expectMenubarOwnsOnlyAllowedRoles = () => {
             const menubar = screen.getByRole('menubar');
-            const menuitems = screen.getAllByRole('menuitem');
-            expect(menuitems.length).toBeGreaterThan(0);
+            expect(screen.getAllByRole('menuitem').length).toBeGreaterThan(0);
 
             for (const element of Array.from(menubar.querySelectorAll('*'))) {
-                // anything inside a menuitem is that item's own content
-                if (
-                    menuitems.some((item) => item !== element && item.contains(element))
-                ) {
+                // an element is owned by the bar when the nearest roled
+                // ancestor is the bar itself or a transparent wrapper;
+                // anything deeper belongs to that menuitem or open menu
+                const owner = element.parentElement?.closest('[role]');
+                if (owner && owner !== menubar && owner.getAttribute('role') !== 'none') {
                     continue;
                 }
-                let ancestor = element.parentElement;
-                let isOwnedByMenubar = true;
-                while (ancestor && ancestor !== menubar) {
-                    if (ancestor.getAttribute('role') !== 'none') {
-                        isOwnedByMenubar = false;
-                        break;
-                    }
-                    ancestor = ancestor.parentElement;
-                }
-                if (!isOwnedByMenubar) continue;
                 expect({
-                    html: element.outerHTML.slice(0, 120),
+                    html: element.outerHTML.slice(0, 100),
                     role: element.getAttribute('role'),
-                }).toMatchObject({ role: expect.any(String) });
+                }).toMatchObject({
+                    role: expect.stringMatching(
+                        new RegExp(`^(${ALLOWED_OWNED_ROLES.join('|')})$`),
+                    ),
+                });
             }
         };
 
         it('owns its triggers as menuitems with nothing generic in between', () => {
             renderMenubar();
-            expectNoGenericsOwnedByMenubar();
+            expectMenubarOwnsOnlyAllowedRoles();
+        });
+
+        it('still owns only allowed roles once a menu is open', async () => {
+            const user = userEvent.setup();
+            renderMenubar();
+
+            // the open body mounts inside the member’s neutralized wrapper, so
+            // the bar owns it directly — the state this is really about, and
+            // the one a closed-bar assertion never reaches
+            await user.click(screen.getByRole('menuitem', { name: 'File' }));
+            expect(screen.getByTestId('file-menu')).toBeTruthy();
+
+            expectMenubarOwnsOnlyAllowedRoles();
         });
 
         it('neutralizes the label wrapper and its text for a labelled member', () => {
@@ -104,7 +114,7 @@ describe('@acusti/dropdown Menubar', () => {
             // props.label is the documented way to build a Menubar, and it
             // puts a text div beside the trigger inside a presentational
             // label — which the bar would otherwise own as a generic
-            expectNoGenericsOwnedByMenubar();
+            expectMenubarOwnsOnlyAllowedRoles();
             for (const labelText of Array.from(
                 document.querySelectorAll('.uktdropdown-label-text'),
             )) {
@@ -219,8 +229,21 @@ describe('@acusti/dropdown Menubar', () => {
 
             // a combobox isn’t a valid menubar child, so it keeps its own
             // semantics rather than being forced into menuitem
-            expect(screen.getByRole('combobox', { name: 'Search' })).toBeTruthy();
+            const combobox = screen.getByRole('combobox', { name: 'Search' });
+            expect(combobox).toBeTruthy();
             expect(screen.getAllByRole('menuitem')).toHaveLength(1);
+
+            // Its wrappers are still neutralized, so the bar doesn’t own a
+            // bare generic on top of the combobox. The combobox itself remains
+            // invalid menubar content — no arrangement fixes that, which is
+            // why the README says a search field belongs outside the bar.
+            let ancestor = combobox.parentElement;
+            const menubar = screen.getByRole('menubar');
+            while (ancestor && ancestor !== menubar) {
+                expect(ancestor.getAttribute('role')).toBe('none');
+                ancestor = ancestor.parentElement;
+            }
+            expect(ancestor).toBe(menubar);
         });
 
         it('does not let a searchable member take the bar’s tab stop', () => {
@@ -242,7 +265,7 @@ describe('@acusti/dropdown Menubar', () => {
 
             // the combobox comes first in document order, but it has its own
             // native tab stop and never reads the roving value — if it held
-            // the bar's stop, every menuitem would be left at -1
+            // the bar’s stop, every menuitem would be left at -1
             expect(
                 screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('tabindex'),
             ).toBe('0');
@@ -256,7 +279,7 @@ describe('@acusti/dropdown Menubar', () => {
 
         it('hands the tab stop on when an intermediate component unmounts the holder', async () => {
             const user = userEvent.setup();
-            // The removal is driven by this component's own state, so Menubar
+            // The removal is driven by this component’s own state, so Menubar
             // never re-renders — its children prop keeps the same identity.
             // Without the removal scheduling its own reconciliation, the tab
             // stop stays stranded on the unmounted holder and the bar is left
