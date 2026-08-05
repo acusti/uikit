@@ -1249,11 +1249,6 @@ function RootDropdown({
             ownerDocument.addEventListener('mouseup', handleGlobalMouseUp);
         }
 
-        // If dropdown should be open on mount, focus it
-        if (isOpenOnMount) {
-            ref.focus();
-        }
-
         const handleInput = (event: Event) => {
             // A custom trigger’s text input stays editable when disabled —
             // aria-disabled doesn’t make an input inert the way the native
