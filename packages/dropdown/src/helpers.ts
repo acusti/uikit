@@ -270,6 +270,12 @@ export const ensureItemId = (
     return id;
 };
 
+// The highlight is one piece of state kept in two places: data-ukt-active,
+// which this engine and consumer CSS read, and the trigger’s
+// aria-activedescendant, which assistive technology reads. Everything that
+// writes the first is below and re-derives the second, so a call site can move
+// the highlight without having to remember to move the reference too.
+
 // Point the trigger’s aria-activedescendant at the deepest active item, or
 // remove it when nothing is active. DOM focus never leaves the trigger while
 // the menu is open — the highlight is a data attribute, not focus — so without
@@ -288,6 +294,24 @@ export const syncActiveDescendant = (dropdownElement: MaybeHTMLElement) => {
         'aria-activedescendant',
         ensureItemId(dropdownElement, activeItem),
     );
+};
+
+// Clear the highlight on each scope element and on anything inside it. The
+// only place data-ukt-active is removed; setActiveChain below is the only
+// place it’s added.
+export const clearActiveItems = (
+    dropdownElement: MaybeHTMLElement,
+    scopes: Array<HTMLElement> | HTMLElement,
+) => {
+    for (const scope of Array.isArray(scopes) ? scopes : [scopes]) {
+        delete scope.dataset.uktActive;
+        for (const active of Array.from(
+            scope.querySelectorAll('[data-ukt-active]'),
+        ) as Array<HTMLElement>) {
+            delete active.dataset.uktActive;
+        }
+    }
+    syncActiveDescendant(dropdownElement);
 };
 
 // the dropdown root owning an element, for the helpers that mutate active
@@ -384,12 +408,9 @@ export const collapseItem = (item: HTMLElement, onToggleSubmenu?: OnToggleSubmen
         for (const descendant of expandedDescendants) {
             collapseItem(descendant, onToggleSubmenu);
         }
-        for (const active of Array.from(submenu.querySelectorAll('[data-ukt-active]'))) {
-            delete (active as HTMLElement).dataset.uktActive;
-        }
         // collapsing surrenders the highlight to whatever is still active
-        // above (usually the parent item), so the trigger has to follow
-        syncActiveDescendant(getDropdownRoot(item));
+        // above, usually the parent item
+        clearActiveItems(getDropdownRoot(item), submenu);
     }
     item.setAttribute('aria-expanded', 'false');
     onToggleSubmenu?.(item, false);
@@ -415,23 +436,9 @@ export const collapseItemsOutsidePath = (
     }
 };
 
-const clearItemElementsState = (itemElements: Array<HTMLElement>) => {
-    itemElements.forEach((itemElement) => {
-        if (itemElement.hasAttribute('data-ukt-active')) {
-            delete itemElement.dataset.uktActive;
-        }
-        // Also clear active state in any deeper levels within this item
-        for (const active of Array.from(
-            itemElement.querySelectorAll('[data-ukt-active]'),
-        )) {
-            delete (active as HTMLElement).dataset.uktActive;
-        }
-    });
-    const [firstItem] = itemElements;
-    if (firstItem != null) syncActiveDescendant(getDropdownRoot(firstItem));
-};
-
-// Make the active set exactly the chain of element + its ancestor parent items
+// Make the active set exactly the chain of element + its ancestor parent items.
+// The only place data-ukt-active is added; clearActiveItems above is the only
+// place it’s removed.
 const setActiveChain = (dropdownElement: HTMLElement, element: HTMLElement) => {
     const chain = new Set<HTMLElement>([element]);
     let levelRoot = getLevelRoot(element);
@@ -527,7 +534,7 @@ export const setActiveItem = ({
     } else if (typeof text === 'string') {
         // If text is empty, clear existing active items and early return
         if (!text) {
-            clearItemElementsState(itemElements);
+            clearActiveItems(dropdownElement, itemElements);
             return null;
         }
 
@@ -539,7 +546,7 @@ export const setActiveItem = ({
             );
             // If isExactMatch is required and no exact match was found, clear active items
             if (nextActiveIndex === -1) {
-                clearItemElementsState(itemElements);
+                clearActiveItems(dropdownElement, itemElements);
             }
         } else {
             const bestMatch = getBestMatch({ items: itemTexts, text });
