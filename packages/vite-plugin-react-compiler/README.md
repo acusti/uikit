@@ -127,10 +127,11 @@ against the Babel plugin before trusting it (the `__COMPILER_RUNTIME.c`
 memo cache calls in output are easy to diff). Alongside the plugin’s own
 tests, this repo runs an upstream-tracking suite against the pinned
 bindings version: it pins the ways the Rust port already exceeds
-babel-plugin-react-compiler@1.0.0 (try/catch value blocks, computed object
-keys) and watches known upstream gaps (e.g. react-hooks lint suppressions
-not yet opting functions out), re-verified on every bindings bump before it
-ships in a plugin release.
+babel-plugin-react-compiler@1.0.0 (e.g. computed object keys) and watches
+known upstream divergences (react-hooks lint suppressions not yet opting
+functions out; try/catch value blocks compiling while upstream restores the
+Babel-matching bailout), re-verified on every bindings bump before it ships
+in a plugin release.
 
 Verified results from the production Vite 8 + React Router app this plugin
 was extracted from, compared against babel-plugin-react-compiler@1.0.0
