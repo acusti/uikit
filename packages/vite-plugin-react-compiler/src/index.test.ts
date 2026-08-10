@@ -47,6 +47,18 @@ describe('vite-plugin-react-compiler', () => {
         expect(result?.code).not.toContain('name: string');
     });
 
+    it('normalizes query-suffixed ids to the underlying file', async () => {
+        const { transformCode } = createTransformer();
+        // a query suffix doesn’t defeat the extension-based include filter
+        const result = await transformCode(COMPONENT, '/src/Greeting.tsx?v=abc123');
+        expect(result?.code).toContain('react/compiler-runtime');
+        // the query is stripped from the filename used in the sourcemap
+        expect(result?.map?.sources).toEqual(['/src/Greeting.tsx']);
+        // query variants share the underlying file’s cache entry
+        const clean = await transformCode(COMPONENT, '/src/Greeting.tsx');
+        expect(clean).toBe(result);
+    });
+
     it('respects the include and exclude filters', async () => {
         const { transformCode } = createTransformer();
         expect(await transformCode(COMPONENT, '/node_modules/pkg/Greeting.tsx')).toBe(
