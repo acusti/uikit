@@ -44,6 +44,10 @@ matches how the Babel path uses @babel/preset-typescript.)
 npm install --save-dev @acusti/vite-plugin-react-compiler oxc-transform-react
 # or
 yarn add --dev @acusti/vite-plugin-react-compiler oxc-transform-react
+# or
+pnpm add --save-dev @acusti/vite-plugin-react-compiler oxc-transform-react
+# or
+bun add --dev @acusti/vite-plugin-react-compiler oxc-transform-react
 ```
 
 Note that [oxc-transform-react][] is a peer dependency, not a dependency:
