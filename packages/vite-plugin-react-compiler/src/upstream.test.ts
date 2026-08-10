@@ -30,9 +30,13 @@ const context = {
 const transformCode = (code: string, id: string) => transform.call(context, code, id);
 
 describe('oxc-transform-react upstream behavior', () => {
-    // babel-plugin-react-compiler@1.0.0 bails on try/catch used as a value
-    // block; the Rust port tracks compiler main, which supports it
-    it('compiles try/catch value blocks the Babel plugin bails on', async () => {
+    // the Rust port currently compiles try/catch used as a value block,
+    // which babel-plugin-react-compiler@1.0.0 bails on — but that missing
+    // bailout is a bug, not an improvement: upstream is restoring the
+    // Babel-matching bailout
+    // (https://github.com/oxc-project/oxc/issues/25343, fixed by
+    // https://github.com/oxc-project/oxc/pull/25409)
+    it.fails('bails on try/catch value blocks like the Babel plugin', async () => {
         const result = await transformCode(
             `
 export function SafeParse({ json }: { json: string }) {
@@ -47,7 +51,7 @@ export function SafeParse({ json }: { json: string }) {
 `,
             '/src/SafeParse.tsx',
         );
-        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).not.toContain('react/compiler-runtime');
     });
 
     // babel-plugin-react-compiler@1.0.0 bails on computed object keys
