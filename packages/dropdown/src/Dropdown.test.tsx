@@ -347,6 +347,25 @@ describe('@acusti/dropdown', () => {
             expect(screen.queryByRole('menu')).toBeNull();
         });
 
+        it('does not open when disabled is turned on after mount', () => {
+            const Wrapper = ({ disabled }: { disabled: boolean }) => (
+                <Dropdown disabled={disabled}>
+                    <input aria-label="amount" />
+                    <ul>
+                        <li>Custom Item</li>
+                    </ul>
+                </Dropdown>
+            );
+            const { rerender } = render(<Wrapper disabled={false} />);
+            rerender(<Wrapper disabled />);
+
+            fireEvent.input(screen.getByRole('textbox'), {
+                target: { value: 'abc' },
+            });
+
+            expect(screen.queryByRole('menu')).toBeNull();
+        });
+
         it('leaves an enabled dropdown opening normally', async () => {
             const user = userEvent.setup();
             render(
