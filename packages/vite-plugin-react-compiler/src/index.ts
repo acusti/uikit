@@ -1,3 +1,4 @@
+import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 
 import {
@@ -80,6 +81,9 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
                 // would, forwarding the first error’s position so vite can
                 // report the location alongside oxc’s own code frames
                 if (transformed.fatal) {
+                    // oxc label offsets are utf-8 byte offsets, but rollup’s
+                    // pos argument indexes the (utf-16) code string
+                    const byteStart = transformed.errors[0]?.labels[0]?.start;
                     this.error(
                         transformed.errors
                             .map((error) =>
@@ -88,7 +92,11 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
                                     : error.message,
                             )
                             .join('\n'),
-                        transformed.errors[0]?.labels[0]?.start,
+                        byteStart == null
+                            ? undefined
+                            : Buffer.from(code, 'utf8')
+                                  .subarray(0, byteStart)
+                                  .toString('utf8').length,
                     );
                 }
 

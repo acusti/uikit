@@ -103,17 +103,21 @@ describe('vite-plugin-react-compiler', () => {
 
     it('errors on fatal input (parse errors) with the error’s location', async () => {
         const { errorCalls, transformCode } = createTransformer();
-        await expect(transformCode('const = ;', '/src/broken.tsx')).rejects.toThrow();
+        // the multi-byte chars before the error ensure the forwarded
+        // position is an index into the code string (what rollup expects),
+        // not oxc’s utf-8 byte offset, which is 3 higher here
+        const broken = "const s = 'héllo💜';\nconst = ;";
+        await expect(transformCode(broken, '/src/broken.tsx')).rejects.toThrow();
 
         expect(errorCalls).toHaveLength(1);
         expect(errorCalls[0].message).toContain('Unexpected token');
         // oxc’s code frame includes the file:line:column of the error …
-        expect(errorCalls[0].message).toContain('/src/broken.tsx:1:');
+        expect(errorCalls[0].message).toContain('/src/broken.tsx:2:');
         // … and the first error’s position is forwarded for vite to report
-        expect(errorCalls[0].pos).toBe('const '.length);
+        expect(errorCalls[0].pos).toBe(broken.indexOf('= ;'));
 
         // failed transforms aren’t cached: an identical retry runs again
-        await expect(transformCode('const = ;', '/src/broken.tsx')).rejects.toThrow();
+        await expect(transformCode(broken, '/src/broken.tsx')).rejects.toThrow();
         expect(errorCalls).toHaveLength(2);
     });
 
