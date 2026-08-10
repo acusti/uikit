@@ -355,20 +355,12 @@ function RootDropdown({
         valueIdentity,
     ]);
 
-    // A consumer filtering or async-loading the body can drop the highlighted
-    // item, or shift it to a new index path, and nothing else would notice —
-    // the trigger would be left pointing at an id that has left the DOM or
-    // moved to another item. Deliberately dep-less: every render while open is
-    // a render that may have rearranged the items. It can’t hang off the body
-    // ref callback instead, because React Compiler memoizes that callback, so
-    // a re-render doesn’t re-attach the ref (see Dropdown.test.tsx).
-    //
-    // Layout rather than passive so the id and the reference to it are always
-    // committed together: a passive effect would leave a window, however
-    // brief, where the accessibility tree has the trigger pointing at an item
-    // that is no longer in the document. It can’t move into render either —
-    // render runs before the commit, so it would read the previous render’s
-    // items and derive index paths from a body that no longer exists.
+    // A consumer filtering or async-loading the body can drop or shift the
+    // highlighted item without us seeing the change. Deliberately dep-less:
+    // every render while open may have rearranged the items. useLayoutEffect
+    // over useEffect so the id and reference to it are always committed
+    // together: a passive effect would leave a window where the a11y tree has
+    // the trigger pointing at an item that is no longer in the document.
     useLayoutEffect(() => {
         if (isOpen) syncActiveDescendant(dropdownElement);
     });
