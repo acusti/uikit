@@ -176,9 +176,7 @@ const CLICKABLE_SELECTOR = 'button, a[href], input[type="button"], input[type="s
 const FOCUSABLE_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]';
 // Any input that isn’t one of the non-text types, plus textarea. Derived from
 // the same list that drives use-keyboard-events’ isEventTargetUsingKeyEvent, so
-// the two can’t disagree about what counts as a text input — the hand-written
-// version of this listed only radio, checkbox, and range, which meant a submit
-// or button input in a custom trigger was adopted as its value source.
+// the two can’t disagree about what counts as a text input.
 const TEXT_INPUT_SELECTOR = `input${NON_TEXT_INPUT_TYPES.map(
     (type) => `:not([type=${type}])`,
 ).join('')},textarea`;
