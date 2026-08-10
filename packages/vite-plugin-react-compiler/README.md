@@ -41,24 +41,26 @@ matches how the Babel path uses @babel/preset-typescript.)
 ## Usage
 
 ```
-npm install --save-dev @acusti/vite-plugin-react-compiler oxc-transform-react
+npm install --save-dev @acusti/vite-plugin-react-compiler
 # or
-yarn add --dev @acusti/vite-plugin-react-compiler oxc-transform-react
+yarn add --dev @acusti/vite-plugin-react-compiler
 # or
-pnpm add --save-dev @acusti/vite-plugin-react-compiler oxc-transform-react
+pnpm add --save-dev @acusti/vite-plugin-react-compiler
 # or
-bun add --dev @acusti/vite-plugin-react-compiler oxc-transform-react
+bun add --dev @acusti/vite-plugin-react-compiler
 ```
 
-Note that [oxc-transform-react][] is a peer dependency, not a dependency:
-it is on a fast-moving 0.x release train tracking React Compiler main, so
-you should pin your own exact version of it to make compiler behavior
-changes arrive deliberately, on your schedule.
+The plugin depends on an exact, tested version of [oxc-transform-react][]:
+the bindings are on a fast-moving 0.x release train tracking React Compiler
+main, and new bindings releases are close to 100% bug fixes (the Rust port
+chases parity with the existing widely-used Babel plugin), so the plugin
+pins the newest version that passes this repo’s test suite and ships it in
+regular plugin releases. If you need a different version, use your package
+manager’s `overrides` (npm, pnpm, bun) or `resolutions` (yarn) to force it.
 
 Like [@acusti/vite-plugin-svg-react][], this plugin requires Vite ≥ 8, on
 purpose: its reason for existing is completing the all-native oxc/rolldown
-pipeline that Vite 8 introduced. On Vite < 8, the Babel-based
-`reactCompilerPreset` path is no slower than the rest of the pipeline.
+pipeline that Vite 8 introduced.
 
 [@acusti/vite-plugin-svg-react]:
     https://www.npmjs.com/package/@acusti/vite-plugin-svg-react

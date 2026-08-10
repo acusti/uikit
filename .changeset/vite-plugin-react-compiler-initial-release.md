@@ -11,5 +11,7 @@ oxc pipeline stays in charge of JSX/refresh/TypeScript handling downstream,
 and memoizes transform results by module id + content hash so
 multi-environment builds only compile each file once. Fatal compiler errors
 (parse failures, rejected options) fail the build like a Babel syntax error
-would. oxc-transform-react is a peer dependency so consumers pin their own
-exact version of its fast-moving 0.x release train.
+would. The plugin depends on an exact, tested version of
+oxc-transform-react — the bindings track React Compiler main on a
+fast-moving 0.x release train, so updates ship as regular plugin releases
+after passing this repo’s test suite.
