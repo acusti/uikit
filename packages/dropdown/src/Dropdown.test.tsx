@@ -2068,6 +2068,56 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('typeahead and disabled items', () => {
+        const renderFormatMenu = (disabledItem?: string) =>
+            render(
+                <Dropdown>
+                    Format
+                    <ul>
+                        {['Bold', 'Bullets', 'Numbered'].map((label) => (
+                            <li
+                                aria-disabled={
+                                    label === disabledItem ? 'true' : undefined
+                                }
+                                data-ukt-item
+                                key={label}
+                            >
+                                {label}
+                            </li>
+                        ))}
+                    </ul>
+                </Dropdown>,
+            );
+
+        it('activates the best-matching item as characters are typed', async () => {
+            const user = userEvent.setup();
+            renderFormatMenu();
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            await user.keyboard('bu');
+
+            expect(screen.getByText('Bullets').hasAttribute('data-ukt-active')).toBe(
+                true,
+            );
+        });
+
+        it('matches against enabled items only, landing elsewhere when the best match is disabled', async () => {
+            const user = userEvent.setup();
+            renderFormatMenu('Bullets');
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            await user.keyboard('bu');
+
+            // the same keystrokes that reach Bullets above now reach Bold:
+            // a disabled item is not a candidate, so the best remaining match
+            // wins rather than typeahead landing on something unselectable
+            expect(screen.getByText('Bullets').hasAttribute('data-ukt-active')).toBe(
+                false,
+            );
+            expect(screen.getByText('Bold').hasAttribute('data-ukt-active')).toBe(true);
+        });
+    });
+
     it('skips aria-disabled items during keyboard navigation in flat (heuristic) bodies', async () => {
         const user = userEvent.setup();
         render(
