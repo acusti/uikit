@@ -1324,10 +1324,12 @@ function RootDropdown({
         if (!ref) return;
         // Everything below must run exactly once per open: showPopover() throws
         // on an already-shown popover, and the ownership check would read the
-        // reveal’s own aria-selected annotation back as consumer-authored. A
-        // ref callback can re-attach on a re-render, and each open mounts a
-        // fresh body element, so latch per element (a WeakSet, to hold no
-        // unmounted bodies alive).
+        // reveal’s own aria-selected annotation back as consumer-authored.
+        // React re-attaches this ref to the same body element every time it
+        // re-renders with a new callback identity — three runs for a mount plus
+        // one prop change — so the latch is what makes “once per open” true.
+        // Keyed on the element, since each open mounts a fresh one, in a
+        // WeakSet so it holds no unmounted bodies alive.
         if (annotatedBodiesRef.current.has(ref)) return;
         annotatedBodiesRef.current.add(ref);
         // A consumer-authored aria-selected anywhere in the just-mounted body
@@ -1340,8 +1342,8 @@ function RootDropdown({
         annotateParentItems(ref);
         if (popupRole !== 'dialog') annotateItemRoles(ref, popupRole);
         // The Popover API is Baseline 2024, so showPopover() needs no feature
-        // detection; the body is mounted only while open, so this runs once
-        // per open and won’t throw on an already-open body.
+        // detection; the latch above is what keeps it off an already-shown
+        // popover, which would throw.
         ref.showPopover();
         // Reveal the current value on open: mark the matching option
         // aria-selected (listbox only — aria-selected isn’t valid on a
