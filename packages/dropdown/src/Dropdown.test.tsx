@@ -208,6 +208,10 @@ describe('@acusti/dropdown', () => {
             expect(screen.queryByRole('combobox')).toBeNull();
             const trigger = screen.getByRole('textbox', { name: 'notes' });
             expect(trigger.hasAttribute('aria-autocomplete')).toBe(false);
+            // aria-expanded isn’t supported on textbox either
+            expect(trigger.hasAttribute('aria-expanded')).toBe(false);
+            // aria-haspopup is, so it stays
+            expect(trigger.getAttribute('aria-haspopup')).toBe('listbox');
 
             await user.click(trigger);
 
@@ -442,6 +446,50 @@ describe('@acusti/dropdown', () => {
             await user.click(screen.getByRole('textbox'));
 
             expect(screen.getByRole('menu').hasAttribute('aria-labelledby')).toBe(false);
+        });
+
+        it('leaves aria-expanded off a trigger whose role can’t take it', () => {
+            const { rerender } = render(
+                <Dropdown>
+                    <input aria-label="amount" />
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // not searchable, so this stays a textbox rather than a combobox
+            expect(screen.getByRole('textbox').hasAttribute('aria-expanded')).toBe(false);
+
+            rerender(
+                <Dropdown>
+                    <button type="button">Pick</button>
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect(screen.getByRole('button').getAttribute('aria-expanded')).toBe(
+                'false',
+            );
+        });
+
+        it('still expands a text input trigger the consumer gave a role', () => {
+            render(
+                <Dropdown>
+                    <input aria-label="amount" role="combobox" />
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            // combobox does support aria-expanded, so declaring the role gets
+            // the disclosure state back without hand-setting it
+            expect(screen.getByRole('combobox').getAttribute('aria-expanded')).toBe(
+                'false',
+            );
         });
 
         it('still names a listbox from props.label when the trigger is a custom text input', async () => {
