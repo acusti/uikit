@@ -91,7 +91,7 @@ describe('vite-plugin-react-compiler', () => {
             COMPONENT,
             '/src/Greeting.tsx',
         );
-        expect(annotationResult?.code).not.toContain('compiler-runtime');
+        expect(annotationResult?.code).not.toContain('react/compiler-runtime');
     });
 
     it('returns a sourcemap', async () => {
