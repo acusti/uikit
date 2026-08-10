@@ -5,6 +5,7 @@ import { addHandler, addHandlers, type Handler } from './handlers.js';
 export {
     isEventTargetUsingKeyEvent,
     isPrimaryModifierPressed,
+    NON_TEXT_INPUT_TYPES,
     usesKeyEvents,
 } from './handlers.js';
 

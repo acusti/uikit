@@ -1697,6 +1697,30 @@ describe('@acusti/dropdown', () => {
             expect(handleSubmitItem).not.toHaveBeenCalled();
         });
 
+        it('does not adopt a non-text input in a custom trigger as the value source', async () => {
+            const handleSubmitItem = vi.fn();
+            const user = userEvent.setup();
+
+            // A submit input is not a text input, so there is still nothing
+            // for allowCreate to create from — the trigger's input must not be
+            // mistaken for a value source just because it is an <input>
+            render(
+                <Dropdown allowCreate onSubmitItem={handleSubmitItem}>
+                    <input type="submit" value="Go" />
+                    <ul>
+                        <li data-ukt-item data-ukt-value="one">
+                            One
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Go' }));
+            await user.keyboard('{Enter}');
+
+            expect(handleSubmitItem).not.toHaveBeenCalled();
+        });
+
         it('does not call onSubmitItem when allowCreate is set but there is no input to source a value', async () => {
             const handleSubmitItem = vi.fn();
             const user = userEvent.setup();

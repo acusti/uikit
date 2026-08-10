@@ -69,7 +69,10 @@ export function isPrimaryModifierPressed(event: KeyboardEvent) {
     return IS_APPLE_REGEXP.test(platform) ? event.metaKey : event.ctrlKey;
 }
 
-const NON_TEXT_INPUT_TYPES = new Set([
+// The input types that hold no user-entered text. Exported because consumers
+// need the same notion of "is this a text input" that isEventTargetUsingKeyEvent
+// uses — keeping a second copy in sync by hand is how they drift apart.
+export const NON_TEXT_INPUT_TYPES = new Set([
     'button',
     'checkbox',
     'color',
