@@ -51,6 +51,14 @@ it is on a fast-moving 0.x release train tracking React Compiler main, so
 you should pin your own exact version of it to make compiler behavior
 changes arrive deliberately, on your schedule.
 
+Like [@acusti/vite-plugin-svg-react][], this plugin requires Vite ≥ 8, on
+purpose: its reason for existing is completing the all-native oxc/rolldown
+pipeline that Vite 8 introduced. On Vite < 8, the Babel-based
+`reactCompilerPreset` path is no slower than the rest of the pipeline.
+
+[@acusti/vite-plugin-svg-react]:
+    https://www.npmjs.com/package/@acusti/vite-plugin-svg-react
+
 Add the plugin to your vite config (and remove any Babel-based React
 Compiler wiring, e.g. `reactCompilerPreset` + @rolldown/plugin-babel):
 
