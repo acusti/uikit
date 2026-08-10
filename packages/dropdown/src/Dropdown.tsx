@@ -17,6 +17,7 @@ import {
     useContext,
     useEffect,
     useId,
+    useLayoutEffect,
     useMemo,
     useRef,
     useState,
@@ -360,7 +361,14 @@ function RootDropdown({
     // a render that may have rearranged the items. It can’t hang off the body
     // ref callback instead, because React Compiler memoizes that callback, so
     // a re-render doesn’t re-attach the ref (see Dropdown.test.tsx).
-    useEffect(() => {
+    //
+    // Layout rather than passive so the id and the reference to it are always
+    // committed together: a passive effect would leave a window, however
+    // brief, where the accessibility tree has the trigger pointing at an item
+    // that is no longer in the document. It can’t move into render either —
+    // render runs before the commit, so it would read the previous render’s
+    // items and derive index paths from a body that no longer exists.
+    useLayoutEffect(() => {
         if (isOpen) syncActiveDescendant(dropdownElement);
     });
 
