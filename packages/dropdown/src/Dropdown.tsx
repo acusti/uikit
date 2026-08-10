@@ -342,40 +342,22 @@ function RootDropdown({
     const wasInSafeAreaRef = useRef<boolean>(false);
     const hoverCloseTimerRef = useRef<null | TimeoutID>(null);
 
-    const allowCreateRef = useRef(allowCreate);
-    const allowEmptyRef = useRef(allowEmpty);
-    const hasItemsRef = useRef(hasItems);
+    // The four values that still need mirroring, for two distinct reasons:
+    // 1. isOpen/isOpening are read by the document-level listeners attached in
+    //    handleRef
+    // 2. onOpen/onClose are called from an effect keyed on [isOpen] alone, which
+    //    is what makes it fire only on open/close transitions
     const isOpenRef = useRef(isOpen);
     const isOpeningRef = useRef(isOpening);
-    const keepOpenOnSubmitRef = useRef(keepOpenOnSubmit);
     const onCloseRef = useRef(onClose);
     const onOpenRef = useRef(onOpen);
-    const onSubmitItemRef = useRef(onSubmitItem);
-    const valueRef = useRef(valueIdentity);
 
     useEffect(() => {
-        allowCreateRef.current = allowCreate;
-        allowEmptyRef.current = allowEmpty;
-        hasItemsRef.current = hasItems;
         isOpenRef.current = isOpen;
         isOpeningRef.current = isOpening;
-        keepOpenOnSubmitRef.current = keepOpenOnSubmit;
         onCloseRef.current = onClose;
         onOpenRef.current = onOpen;
-        onSubmitItemRef.current = onSubmitItem;
-        valueRef.current = valueIdentity;
-    }, [
-        allowCreate,
-        allowEmpty,
-        hasItems,
-        isOpen,
-        isOpening,
-        keepOpenOnSubmit,
-        onClose,
-        onOpen,
-        onSubmitItem,
-        valueIdentity,
-    ]);
+    }, [isOpen, isOpening, onClose, onOpen]);
 
     // A consumer filtering or async-loading the body can drop or shift the
     // highlighted item without us seeing the change. Deliberately dep-less:
@@ -563,7 +545,7 @@ function RootDropdown({
     const trackSafeArea = (event: ReactMouseEvent<HTMLElement>) => {
         // Safe-area intent only applies to an open menu with items; skip the
         // per-move DOM query otherwise (mousemove is a hot path)
-        if (!dropdownElement || !isOpenRef.current || !hasItemsRef.current) return;
+        if (!dropdownElement || !isOpenRef.current || !hasItems) return;
         const pointer = { x: event.clientX, y: event.clientY };
         pointerRef.current = pointer;
         lastMouseEventRef.current = event.nativeEvent;
@@ -694,9 +676,7 @@ function RootDropdown({
     }, [dropdownElement, isOpen, menubar]);
 
     const handleSubmitItem = (event: Event | React.SyntheticEvent<HTMLElement>) => {
-        const element = hasItemsRef.current
-            ? getActiveItemElement(dropdownElement)
-            : null;
+        const element = hasItems ? getActiveItemElement(dropdownElement) : null;
 
         const submenuOfActive = element ? getSubmenuOfItem(element) : null;
         if (element && submenuOfActive) {
@@ -717,13 +697,13 @@ function RootDropdown({
             return;
         }
 
-        if (isOpenRef.current && !keepOpenOnSubmitRef.current) {
+        if (isOpenRef.current && !keepOpenOnSubmit) {
             // A short timeout before closing is better UX when user selects an item so dropdown
             // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
             closingTimerRef.current = setTimeout(closeDropdown, 90);
         }
 
-        if (!hasItemsRef.current) return;
+        if (!hasItems) return;
 
         if (!element) {
             // With nothing selected, the only possible value comes from a text
@@ -736,8 +716,8 @@ function RootDropdown({
             if (!inputElementRef.current) return;
             if (inputElementRef.current.value) {
                 // Non-empty text matching no item is a created value
-                if (!allowCreateRef.current) return;
-            } else if (!allowEmptyRef.current) {
+                if (!allowCreate) return;
+            } else if (!allowEmpty) {
                 // A cleared input is an empty (clearing) submit, which
                 // allowEmpty gates even when allowCreate is set — “creating”
                 // an empty value is clearing, not creating
@@ -763,7 +743,7 @@ function RootDropdown({
 
         const nextValue = element?.dataset.uktValue ?? itemLabel;
         // If parent is controlling Dropdown via props.value and nextValue is the same, do nothing
-        if (valueRef.current && valueRef.current === nextValue) return;
+        if (valueIdentity && valueIdentity === nextValue) return;
 
         // When the body stays open after submit (keepOpenOnSubmit), move
         // aria-selected to the submitted option so the open-time annotation
@@ -774,7 +754,7 @@ function RootDropdown({
         // aria-selected themselves.
         if (
             element &&
-            keepOpenOnSubmitRef.current &&
+            keepOpenOnSubmit &&
             popupRole === 'listbox' &&
             !consumerOwnsARIASelectedRef.current
         ) {
@@ -819,7 +799,7 @@ function RootDropdown({
             path: getItemPath(element),
             value: nextValue,
         };
-        onSubmitItemRef.current?.(payload);
+        onSubmitItem?.(payload);
         dispatchToSubmenus('onSubmitItem', payload);
     };
 
@@ -839,7 +819,7 @@ function RootDropdown({
     };
 
     const handleMouseOver = (event: ReactMouseEvent<HTMLElement>) => {
-        if (!hasItemsRef.current) return;
+        if (!hasItems) return;
 
         // If user isn’t currently using the mouse to navigate the dropdown, do nothing
         if (currentInputMethodRef.current !== 'mouse') return;
@@ -875,7 +855,7 @@ function RootDropdown({
     };
 
     const handleMouseOut = (event: ReactMouseEvent<HTMLElement>) => {
-        if (!hasItemsRef.current) return;
+        if (!hasItems) return;
         // The pointer left the dropdown entirely: drop the safe area so its
         // give-up timer can’t later fire on a stale position, and fall through
         // to the normal collapse (mousemove has stopped, so nothing else will)
@@ -958,7 +938,7 @@ function RootDropdown({
         }
 
         // If dropdown has no items and click was within dropdown body, do nothing
-        if (!hasItemsRef.current) return;
+        if (!hasItems) return;
 
         if (dropdownElement) {
             const clickedItem = getItemForTarget(dropdownElement, eventTarget);
@@ -1024,7 +1004,7 @@ function RootDropdown({
             if (
                 key === ' ' ||
                 key === 'Enter' ||
-                (hasItemsRef.current && (key === 'ArrowUp' || key === 'ArrowDown'))
+                (hasItems && (key === 'ArrowUp' || key === 'ArrowDown'))
             ) {
                 onEventHandled();
                 setIsOpen(true);
@@ -1035,7 +1015,7 @@ function RootDropdown({
         const isTargetUsingKeyEvents = isEventTargetUsingKeyEvent(event);
 
         // If dropdown isOpen + hasItems & eventTargetNotUsingKeyEvents, handle characters
-        if (hasItemsRef.current && !isTargetUsingKeyEvents) {
+        if (hasItems && !isTargetUsingKeyEvents) {
             let isEditingCharacters = !ctrlKey && !metaKey && /^[A-Za-z0-9]$/.test(key);
             // User could also be editing characters if there are already characters entered
             // and they are hitting delete or spacebar
@@ -1059,7 +1039,7 @@ function RootDropdown({
                     event,
                     // If props.allowCreate, only override the input’s value with an
                     // exact text match so user can enter a value not in items
-                    isExactMatch: allowCreateRef.current,
+                    isExactMatch: allowCreate,
                     onActiveItem: handleActiveItem,
                     text: enteredCharactersRef.current,
                 });
@@ -1086,12 +1066,9 @@ function RootDropdown({
         }
 
         // If dropdown isOpen, handle closing it on escape or spacebar if !hasItems
-        if (
-            key === 'Escape' ||
-            (isEventTargetingDropdown && key === ' ' && !hasItemsRef.current)
-        ) {
+        if (key === 'Escape' || (isEventTargetingDropdown && key === ' ' && !hasItems)) {
             // Close dropdown if hasItems or event target not using key events
-            if (hasItemsRef.current || !isTargetUsingKeyEvents) {
+            if (hasItems || !isTargetUsingKeyEvents) {
                 // Escape closes the whole menu — submenus included — and
                 // returns focus to the element that opened it. Focus before
                 // closing: a searchable trigger input opens the dropdown on
@@ -1104,7 +1081,7 @@ function RootDropdown({
         }
 
         // Handle arrow keys
-        if (hasItemsRef.current) {
+        if (hasItems) {
             if (key === 'ArrowUp') {
                 onEventHandled();
                 if (altKey || metaKey) {
@@ -1307,7 +1284,7 @@ function RootDropdown({
                 event,
                 // If props.allowCreate, only override the input’s value with an
                 // exact text match so user can enter a value not in items
-                isExactMatch: allowCreateRef.current,
+                isExactMatch: allowCreate,
                 onActiveItem: handleActiveItem,
                 text: enteredCharactersRef.current,
             });
