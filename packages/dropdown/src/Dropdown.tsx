@@ -1,6 +1,7 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events, jsx-a11y/mouse-events-have-key-events, jsx-a11y/no-static-element-interactions */
 import useKeyboardEvents, {
     isEventTargetUsingKeyEvent,
+    NON_TEXT_INPUT_TYPES,
 } from '@acusti/use-keyboard-events';
 import clsx from 'clsx';
 import {
@@ -173,8 +174,15 @@ const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 const CLICKABLE_SELECTOR = 'button, a[href], input[type="button"], input[type="submit"]';
 const FOCUSABLE_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]';
-const TEXT_INPUT_SELECTOR =
-    'input:not([type=radio]):not([type=checkbox]):not([type=range]),textarea';
+// Any input that isn't one of the non-text types, plus textarea. Derived from
+// the same set that drives use-keyboard-events' isEventTargetUsingKeyEvent, so
+// the two can't disagree about what counts as a text input — the hand-written
+// version of this listed only radio, checkbox, and range, which meant a submit
+// or button input in a custom trigger was adopted as its value source.
+const TEXT_INPUT_SELECTOR = `input${Array.from(
+    NON_TEXT_INPUT_TYPES,
+    (type) => `:not([type=${type}])`,
+).join('')},textarea`;
 
 // Matches macOS: quick, natural arrowing past parent items never flashes
 // their submenus, but a brief pause discloses. Frame-stepping macOS menus
@@ -190,21 +198,6 @@ const SAFE_AREA_TIMEOUT = 300;
 // that crossing the trigger/body gap (or a placement fallback moving the body
 // somewhere the pointer briefly leaves) doesn’t flicker-close it
 const HOVER_CLOSE_DELAY = 150;
-
-// Input types that hold no user-entered text, so aria-labelledby resolves them
-// by their label/content rather than their value (mirrors TEXT_INPUT_SELECTOR)
-const NON_TEXT_INPUT_TYPES = new Set([
-    'button',
-    'checkbox',
-    'color',
-    'file',
-    'hidden',
-    'image',
-    'radio',
-    'range',
-    'reset',
-    'submit',
-]);
 
 // Whether a custom trigger element is itself a text input — one aria-labelledby
 // would resolve to its value rather than to a name (see bodyLabelledBy). Only
