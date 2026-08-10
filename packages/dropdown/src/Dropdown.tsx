@@ -1368,11 +1368,9 @@ function RootDropdown({
     //
     // A text input can’t serve as that source: aria-labelledby resolves one to
     // its *value*, so pointing at it would name the popup after whatever the
-    // user has typed. That rules out the trigger of a searchable dropdown —
-    // a text input by definition, generated or custom — and a custom trigger
-    // that is itself an input or textarea. Such a dropdown has no accessible
-    // name for its trigger either, so the fix for both is the same: pass
-    // props.label (or, for the trigger alone, a custom trigger’s aria-label).
+    // user has typed. That rules out triggers that are an input or textarea,
+    // which have no accessible name. The fix is to pass props.label (or, for
+    // the trigger alone, a custom trigger’s aria-label).
     let bodyLabelledBy: string | undefined;
 
     if (!isValidElement(trigger)) {
