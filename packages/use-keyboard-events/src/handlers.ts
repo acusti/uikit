@@ -71,8 +71,11 @@ export function isPrimaryModifierPressed(event: KeyboardEvent) {
 
 // The input types that hold no user-entered text. Exported because consumers
 // need the same notion of "is this a text input" that isEventTargetUsingKeyEvent
-// uses — keeping a second copy in sync by hand is how they drift apart.
-export const NON_TEXT_INPUT_TYPES = new Set([
+// uses — keeping a second copy in sync by hand is how they drift apart. Frozen,
+// and an array rather than a Set, because it's a singleton every consumer shares:
+// Object.freeze can't protect a Set (.add still mutates a frozen one), so an
+// array is the only shape that can't be edited out from under its readers.
+export const NON_TEXT_INPUT_TYPES = Object.freeze([
     'button',
     'checkbox',
     'color',
@@ -84,6 +87,9 @@ export const NON_TEXT_INPUT_TYPES = new Set([
     'reset',
     'submit',
 ]);
+
+// Membership is checked on every key event, so pay for the Set once here
+const NON_TEXT_INPUT_TYPE_SET = new Set(NON_TEXT_INPUT_TYPES);
 
 const NON_TEXT_INPUT_USES_KEYS = new Set([
     ' ',
@@ -104,7 +110,7 @@ export const isEventTargetUsingKeyEvent = (event: KeyboardEvent) => {
     if (target == null || !usesKeyEvents(target)) return false;
     // Restrict special handling to only non-text <input> elements
     if (target.tagName !== 'INPUT') return true;
-    if (!NON_TEXT_INPUT_TYPES.has((target as HTMLInputElement).type)) return true;
+    if (!NON_TEXT_INPUT_TYPE_SET.has((target as HTMLInputElement).type)) return true;
     // Non-text inputs can use arrow keys, escape, the spacebar, and return / enter
     return NON_TEXT_INPUT_USES_KEYS.has(event.key);
 };
