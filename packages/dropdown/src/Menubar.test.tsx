@@ -328,6 +328,49 @@ describe('@acusti/dropdown Menubar', () => {
             expect(screen.getByTestId('file-menu')).toBeTruthy();
         });
 
+        it('skips a disabled member when ←/→ rove focus with no menu open', () => {
+            renderWithDisabledMiddle();
+
+            // the roving path is a separate branch from sliding an open menu:
+            // it only runs while nothing is open
+            const file = screen.getByRole('button', { name: 'File' });
+            act(() => file.focus());
+            fireEvent.keyDown(file, { key: 'ArrowRight' });
+
+            expect(document.activeElement).toBe(
+                screen.getByRole('button', { name: 'View' }),
+            );
+            expect(screen.queryByTestId('edit-menu')).toBe(null);
+        });
+
+        it('still consumes ←/→ when there is no enabled member to move to', () => {
+            render(
+                <Menubar>
+                    <Dropdown>
+                        File
+                        <ul>
+                            <li data-ukt-item>New</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown disabled>
+                        Edit
+                        <ul>
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+            const file = screen.getByRole('button', { name: 'File' });
+            act(() => file.focus());
+            // deciding to stay put is still handling the key — letting it
+            // through would scroll the page under the focused menubar
+            const handled = fireEvent.keyDown(file, { key: 'ArrowRight' });
+
+            expect(handled).toBe(false);
+            expect(document.activeElement).toBe(file);
+        });
+
         it('does not open a disabled member on hover once the bar is engaged', async () => {
             const user = userEvent.setup();
             renderWithDisabledMiddle();
