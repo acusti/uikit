@@ -1436,15 +1436,20 @@ function RootDropdown({
         // textareas or non-input wrappers)
         const isCombobox =
             isSearchable && isTextInputTrigger && trigger.type !== 'textarea';
+        const triggerRole = triggerProps.role ?? (isCombobox ? 'combobox' : undefined);
+        // aria-expanded isn’t supported on textbox either, so a text input
+        // only gets one once a role makes it something else
+        const canExpand = !isTextInputTrigger || triggerRole != null;
         trigger = cloneElement(trigger as ReactElement<Record<string, unknown>>, {
             'aria-autocomplete':
                 triggerProps['aria-autocomplete'] ?? (isCombobox ? 'list' : undefined),
             'aria-controls': triggerProps['aria-controls'] ?? bodyId,
             'aria-disabled': triggerProps['aria-disabled'] ?? (disabled || undefined),
-            'aria-expanded': triggerProps['aria-expanded'] ?? isOpen,
+            'aria-expanded':
+                triggerProps['aria-expanded'] ?? (canExpand ? isOpen : undefined),
             'aria-haspopup': triggerProps['aria-haspopup'] ?? popupRole,
             id: resolvedTriggerId,
-            role: triggerProps.role ?? (isCombobox ? 'combobox' : undefined),
+            role: triggerRole,
         });
     }
 

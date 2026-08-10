@@ -1103,8 +1103,13 @@ elements for actions, etc.).
 ### ARIA attributes
 
 The trigger automatically receives `aria-haspopup`, `aria-expanded`, and
-`aria-controls` pointing to the open body. The popup role is chosen based
-on the dropdown’s mode:
+`aria-controls` pointing to the open body. The exception is a custom
+trigger that is a text input or `<textarea>` and ends up with no `role`: it
+gets no `aria-expanded`, which `textbox` doesn’t support. A single-line
+`<input>` gets one back from `isSearchable`, which makes it a `combobox`
+(see below); a `<textarea>` — never a combobox, since that role is for
+single-line inputs — needs a `role` of its own. The popup role is chosen
+based on the dropdown’s mode:
 
 - `aria-haspopup="listbox"` when `isSearchable` is true (combobox pattern —
   see below)
