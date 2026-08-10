@@ -1701,8 +1701,8 @@ describe('@acusti/dropdown', () => {
             const handleSubmitItem = vi.fn();
             const user = userEvent.setup();
 
-            // A submit input is not a text input, so there is still nothing
-            // for allowCreate to create from — the trigger's input must not be
+            // a submit input is not a text input, so there is still nothing
+            // for allowCreate to create from — the trigger’s input must not be
             // mistaken for a value source just because it is an <input>
             render(
                 <Dropdown allowCreate onSubmitItem={handleSubmitItem}>

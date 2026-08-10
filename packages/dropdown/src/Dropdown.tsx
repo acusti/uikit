@@ -174,9 +174,9 @@ const CHILDREN_ERROR =
     '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 const CLICKABLE_SELECTOR = 'button, a[href], input[type="button"], input[type="submit"]';
 const FOCUSABLE_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]';
-// Any input that isn't one of the non-text types, plus textarea. Derived from
-// the same list that drives use-keyboard-events' isEventTargetUsingKeyEvent, so
-// the two can't disagree about what counts as a text input — the hand-written
+// Any input that isn’t one of the non-text types, plus textarea. Derived from
+// the same list that drives use-keyboard-events’ isEventTargetUsingKeyEvent, so
+// the two can’t disagree about what counts as a text input — the hand-written
 // version of this listed only radio, checkbox, and range, which meant a submit
 // or button input in a custom trigger was adopted as its value source.
 const TEXT_INPUT_SELECTOR = `input${NON_TEXT_INPUT_TYPES.map(
@@ -1418,7 +1418,7 @@ function RootDropdown({
         // element, so props.disabled is conveyed as aria-disabled rather than
         // the native attribute — the open paths enforce it either way.
         const triggerProps = trigger.props as Record<string, unknown>;
-        // Point the body at whatever id the trigger ends up with, so a
+        // point the body at whatever id the trigger ends up with, so a
         // consumer-set one is honored rather than overwritten
         const resolvedTriggerId = (triggerProps.id as string | undefined) ?? triggerId;
         if (!isSearchable && !isTextInputElement(trigger)) {
