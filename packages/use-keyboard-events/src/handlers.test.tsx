@@ -5,7 +5,12 @@ import { userEvent } from '@testing-library/user-event';
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { addHandler, handlersData, isEventTargetUsingKeyEvent } from './handlers.js';
+import {
+    addHandler,
+    handlersData,
+    isEventTargetUsingKeyEvent,
+    NON_TEXT_INPUT_TYPES,
+} from './handlers.js';
 
 const noop = () => {}; // eslint-disable-line no-empty-function
 
@@ -198,6 +203,16 @@ describe('@acusti/use-keyboard-events', () => {
                 isUsingKeyEvent = null;
                 await user.type(input, ' ');
                 expect(isUsingKeyEvent).toBe(true);
+            });
+        });
+
+        describe('NON_TEXT_INPUT_TYPES', () => {
+            it('is frozen, because every consumer shares the one instance', () => {
+                expect(Object.isFrozen(NON_TEXT_INPUT_TYPES)).toBe(true);
+                expect(() =>
+                    (NON_TEXT_INPUT_TYPES as Array<string>).push('text'),
+                ).toThrow(TypeError);
+                expect(NON_TEXT_INPUT_TYPES).not.toContain('text');
             });
         });
     });
