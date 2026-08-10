@@ -30,12 +30,22 @@ const context = {
 const transformCode = (code: string, id: string) => transform.call(context, code, id);
 
 describe('oxc-transform-react upstream behavior', () => {
-    // the Rust port currently compiles try/catch used as a value block,
-    // which babel-plugin-react-compiler@1.0.0 bails on — but that missing
-    // bailout is a bug, not an improvement: upstream is restoring the
+    // try/catch value blocks are a two-step story. Today the Rust port
+    // compiles them, but that is a missing-bailout bug rather than real
+    // support (the compiler can’t yet handle them soundly, which is why
+    // babel-plugin-react-compiler bails): upstream is restoring the
     // Babel-matching bailout
     // (https://github.com/oxc-project/oxc/issues/25343, fixed by
-    // https://github.com/oxc-project/oxc/pull/25409)
+    // https://github.com/oxc-project/oxc/pull/25409). When a bindings
+    // bump picks that up and flips this test red, do NOT pin the
+    // bailout — invert this into
+    // it.fails('compiles try/catch value blocks') asserting
+    // .toContain('react/compiler-runtime'), so the suite starts tracking
+    // the shortcoming we actually hope gets fixed (the compiler gaining
+    // real try/catch support), and pin compilation when that lands. A
+    // single hope-test can’t be written today because “compiles” is
+    // observably true in both the buggy present and the fixed future —
+    // the suite sees output, not soundness.
     it.fails('bails on try/catch value blocks like the Babel plugin', async () => {
         const result = await transformCode(
             `
