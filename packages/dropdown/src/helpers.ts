@@ -296,9 +296,8 @@ export const syncActiveDescendant = (dropdownElement: MaybeHTMLElement) => {
     );
 };
 
-// Clear the highlight on each scope element and on anything inside it. The
-// only place data-ukt-active is removed; setActiveChain below is the only
-// place it’s added.
+// Clear the highlight on each scope element and on anything inside it. One of
+// the two writers of data-ukt-active, alongside setActiveChain below.
 export const clearActiveItems = (
     dropdownElement: MaybeHTMLElement,
     scopes: Array<HTMLElement> | HTMLElement,
@@ -436,9 +435,9 @@ export const collapseItemsOutsidePath = (
     }
 };
 
-// Make the active set exactly the chain of element + its ancestor parent items.
-// The only place data-ukt-active is added; clearActiveItems above is the only
-// place it’s removed.
+// Make the active set exactly the chain of element + its ancestor parent items,
+// clearing whatever falls outside it. The only place data-ukt-active is added,
+// and the other of the two writers, alongside clearActiveItems above.
 const setActiveChain = (dropdownElement: HTMLElement, element: HTMLElement) => {
     const chain = new Set<HTMLElement>([element]);
     let levelRoot = getLevelRoot(element);
