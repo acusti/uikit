@@ -86,7 +86,7 @@ The plugin takes an optional options object with four properties:
 - **`include`** / **`exclude`**: standard Vite
   [`createFilter`](https://vite.dev/guide/api-plugin#filtering-include-exclude-pattern)
   patterns selecting which modules get the compiler pass. Defaults:
-  `include: /\.[jt]sx?$/`, `exclude: /node_modules/`.
+  `include: /\.[jt]sx?$/`, `exclude: /[/\\]node_modules[/\\]/`.
 - **`reactCompiler`**: options passed verbatim to React Compiler, using the
   same names as [babel-plugin-react-compiler][compiler options]:
   `compilationMode`, `panicThreshold` (defaults to `'none'`), `target`

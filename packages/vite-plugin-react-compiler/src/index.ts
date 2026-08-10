@@ -12,7 +12,7 @@ export type Options = {
     /**
      * Modules to exclude from the compiler pass (takes precedence over
      * include).
-     * @default /node_modules/
+     * @default /[/\\]node_modules[/\\]/
      */
     exclude?: FilterPattern;
     /**
@@ -42,7 +42,7 @@ type CachedTransform = {
 
 type TransformOutput = { code: string; map?: SourceMap };
 
-const defaultExclude = /node_modules/;
+const defaultExclude = /[/\\]node_modules[/\\]/;
 const defaultInclude = /\.[jt]sx?$/;
 
 export default function vitePluginReactCompiler(options: Options = {}): Plugin {
