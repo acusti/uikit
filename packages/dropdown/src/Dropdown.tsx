@@ -33,6 +33,7 @@ import styles from './Dropdown.css?inline';
 import {
     annotateItemRoles,
     annotateParentItems,
+    clearActiveItems,
     collapseItem,
     collapseItemsOutsidePath,
     expandItem,
@@ -877,8 +878,7 @@ function RootDropdown({
             return;
         }
         // If user moused out of activeItem (not into a descendant), it’s no longer active
-        delete activeItem.dataset.uktActive;
-        syncActiveDescendant(dropdownElement);
+        clearActiveItems(dropdownElement, activeItem);
         syncSubmenuDisclosure();
     };
 
