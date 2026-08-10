@@ -91,12 +91,14 @@ export type Props = {
     children: ChildrenTuple | ReactElement;
     className?: string;
     /**
-     * Prevents the dropdown from opening by any means: pointer, Enter/Space,
-     * hover (props.openOnHover), typing in a custom trigger’s text input, and
-     * Menubar navigation onto it alike. The generated trigger carries the
-     * native disabled attribute; a custom trigger can be any element, so it
-     * receives aria-disabled instead. Inside a Menubar the member is skipped.
-     * A dropdown disabled while already open still closes normally.
+     * Prevents the dropdown from opening via user interaction: pointer,
+     * Enter/Space, hover (props.openOnHover), typing in a custom trigger’s
+     * text input, and Menubar navigation onto it alike. The generated trigger
+     * carries the native disabled attribute; a custom trigger can be any
+     * element, so it receives aria-disabled instead. Inside a Menubar the
+     * member is skipped. A dropdown disabled while already open still closes
+     * normally (as does one started open with props.isOpenOnMount, which
+     * disabled doesn't override).
      */
     disabled?: boolean;
     hasItems?: boolean;

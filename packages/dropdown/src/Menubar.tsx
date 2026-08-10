@@ -123,11 +123,14 @@ export default function Menubar({ children, className, style }: MenubarProps) {
         const eventTarget = event.target as HTMLElement;
         const index = members.findIndex((member) => member.element.contains(eventTarget));
         if (index === -1) return;
+        // Once focus is on a member, ←/→ belong to the bar, so the key is
+        // consumed whether or not there's an enabled member to move to —
+        // otherwise deciding to stay put would let it through to scroll the page
+        event.preventDefault();
+        event.stopPropagation();
         const direction = key === 'ArrowRight' ? 1 : -1;
         const next = findNextEnabledMember(members, index, direction);
         if (!next) return;
-        event.preventDefault();
-        event.stopPropagation();
         next.focusTrigger();
     };
 
