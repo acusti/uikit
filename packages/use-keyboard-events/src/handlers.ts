@@ -69,12 +69,8 @@ export function isPrimaryModifierPressed(event: KeyboardEvent) {
     return IS_APPLE_REGEXP.test(platform) ? event.metaKey : event.ctrlKey;
 }
 
-// The input types that hold no user-entered text. Exported because consumers
-// need the same notion of "is this a text input" that isEventTargetUsingKeyEvent
-// uses — keeping a second copy in sync by hand is how they drift apart. Frozen,
-// and an array rather than a Set, because it's a singleton every consumer shares:
-// Object.freeze can't protect a Set (.add still mutates a frozen one), so an
-// array is the only shape that can't be edited out from under its readers.
+// the input types that cannot hold user-entered text, exported so consumers can share
+// the notion of “is this a text input” (e.g. @acusti/dropdown)
 export const NON_TEXT_INPUT_TYPES = Object.freeze([
     'button',
     'checkbox',
@@ -88,7 +84,7 @@ export const NON_TEXT_INPUT_TYPES = Object.freeze([
     'submit',
 ]);
 
-// Membership is checked on every key event, so pay for the Set once here
+// membership is checked on every key event, so pay for the Set once here
 const NON_TEXT_INPUT_TYPE_SET = new Set(NON_TEXT_INPUT_TYPES);
 
 const NON_TEXT_INPUT_USES_KEYS = new Set([
