@@ -578,7 +578,7 @@ function RootDropdown({
     useEffect(() => clearHoverCloseTimer, []);
 
     const closeDropdown = (options?: { keepMenubarEngaged?: boolean }) => {
-        // The body (and its items) unmount on close, so the trigger would
+        // the body (and its items) unmount on close, so the trigger would
         // otherwise keep pointing at an id that no longer exists
         getTriggerElement(dropdownElement)?.removeAttribute('aria-activedescendant');
         setIsOpen(false);
@@ -1316,7 +1316,7 @@ function RootDropdown({
         // the highlighted item, and nothing else would notice — the trigger
         // would be left pointing at an id that has left the DOM. Re-deriving
         // here clears it (or moves it, if the item merely shifted position).
-        // Above the once-per-open latch below, which would skip it.
+        // above the once-per-open latch below, which would skip it
         syncActiveDescendant(dropdownElement);
         // An inline ref callback re-attaches (and re-runs) on every re-render
         // while the body is open, but everything below must run exactly once

@@ -290,7 +290,7 @@ export const syncActiveDescendant = (dropdownElement: MaybeHTMLElement) => {
     );
 };
 
-// The dropdown root owning an element, for the helpers that mutate active
+// the dropdown root owning an element, for the helpers that mutate active
 // state without a dropdownElement in hand
 const getDropdownRoot = (element: HTMLElement) =>
     element.closest('.uktdropdown') as MaybeHTMLElement;
@@ -387,7 +387,7 @@ export const collapseItem = (item: HTMLElement, onToggleSubmenu?: OnToggleSubmen
         for (const active of Array.from(submenu.querySelectorAll('[data-ukt-active]'))) {
             delete (active as HTMLElement).dataset.uktActive;
         }
-        // Collapsing surrenders the highlight to whatever is still active
+        // collapsing surrenders the highlight to whatever is still active
         // above (usually the parent item), so the trigger has to follow
         syncActiveDescendant(getDropdownRoot(item));
     }
