@@ -272,9 +272,8 @@ type Props = {
      * hover (props.openOnHover), typing in a custom trigger’s text input, and
      * Menubar navigation onto it alike. The generated trigger carries the
      * native disabled attribute; a custom trigger can be any element, so it
-     * receives aria-disabled instead. Inside a Menubar the member is skipped
-     * rather than landed on, the way macOS passes over a disabled menu. A
-     * dropdown disabled while already open still closes normally.
+     * receives aria-disabled instead. Inside a Menubar the member is skipped.
+     * A dropdown disabled while already open still closes normally.
      */
     disabled?: boolean;
     /**
