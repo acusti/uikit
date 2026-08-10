@@ -59,10 +59,16 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
         enforce: 'pre',
         name: 'vite-plugin-react-compiler',
         transform(code, id) {
-            if (!filter(id)) return null;
+            // vite module ids can carry a query suffix (e.g. sub-request
+            // queries from other plugins); filter, cache, and compile by
+            // the underlying file path — like @vitejs/plugin-react — so
+            // the cache stays one-entry-per-file and sourcemap sources
+            // don’t include vite queries
+            const [filepath] = id.split('?');
+            if (!filter(filepath)) return null;
 
             const run = async (): Promise<TransformOutput> => {
-                const transformed = await transform(id, code, {
+                const transformed = await transform(filepath, code, {
                     // leave JSX for vite’s own pipeline (refresh, dev runtime)
                     jsx: 'preserve',
                     reactCompiler: options.reactCompiler ?? {},
@@ -92,14 +98,14 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
             if (!isMemoizing) return run();
 
             const hash = createHash('sha1').update(code).digest('hex');
-            const cached = cache.get(id);
+            const cached = cache.get(filepath);
             if (cached?.hash === hash) return cached.result;
 
             const result = run();
-            cache.set(id, { hash, result });
+            cache.set(filepath, { hash, result });
             // drop failed transforms so the next request retries them
             result.catch(() => {
-                if (cache.get(id)?.result === result) cache.delete(id);
+                if (cache.get(filepath)?.result === result) cache.delete(filepath);
             });
             return result;
         },
