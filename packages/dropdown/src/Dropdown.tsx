@@ -353,6 +353,17 @@ function RootDropdown({
         valueIdentity,
     ]);
 
+    // A consumer filtering or async-loading the body can drop the highlighted
+    // item, or shift it to a new index path, and nothing else would notice —
+    // the trigger would be left pointing at an id that has left the DOM or
+    // moved to another item. Deliberately dep-less: every render while open is
+    // a render that may have rearranged the items. It can’t hang off the body
+    // ref callback instead, because React Compiler memoizes that callback, so
+    // a re-render doesn’t re-attach the ref (see Dropdown.test.tsx).
+    useEffect(() => {
+        if (isOpen) syncActiveDescendant(dropdownElement);
+    });
+
     const isMountedRef = useRef(false);
 
     useEffect(() => {
@@ -1311,19 +1322,12 @@ function RootDropdown({
     // open. Known limitation until it’s needed.
     const handleBodyRef = (ref: HTMLDivElement | null) => {
         if (!ref) return;
-        // Re-running on every render while the body is open is exactly what
-        // this needs: a consumer filtering or async-loading the body can drop
-        // the highlighted item, and nothing else would notice — the trigger
-        // would be left pointing at an id that has left the DOM. Re-deriving
-        // here clears it (or moves it, if the item merely shifted position).
-        // above the once-per-open latch below, which would skip it
-        syncActiveDescendant(dropdownElement);
-        // An inline ref callback re-attaches (and re-runs) on every re-render
-        // while the body is open, but everything below must run exactly once
-        // per open: showPopover() throws on an already-shown popover, and the
-        // ownership check would read the reveal’s own aria-selected annotation
-        // back as consumer-authored. Each open mounts a fresh body element, so
-        // latch per element (a WeakSet, to hold no unmounted bodies alive).
+        // Everything below must run exactly once per open: showPopover() throws
+        // on an already-shown popover, and the ownership check would read the
+        // reveal’s own aria-selected annotation back as consumer-authored. A
+        // ref callback can re-attach on a re-render, and each open mounts a
+        // fresh body element, so latch per element (a WeakSet, to hold no
+        // unmounted bodies alive).
         if (annotatedBodiesRef.current.has(ref)) return;
         annotatedBodiesRef.current.add(ref);
         // A consumer-authored aria-selected anywhere in the just-mounted body
