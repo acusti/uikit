@@ -78,10 +78,10 @@ export function Swatch({ prop, value }: { prop: string; value: string }) {
         expect(result?.code).toContain('react/compiler-runtime');
     });
 
-    // the Babel plugin opts a function out of compilation when it carries
-    // an eslint suppression of a react-hooks rule; the Rust port doesn’t
-    // respect suppressions yet: https://github.com/oxc-project/oxc/issues/25392
-    it.fails('skips functions carrying react-hooks lint suppressions', async () => {
+    // like the Babel plugin, an eslint suppression of a react-hooks rule
+    // opts a function out of compilation — fixed upstream in 0.144.0
+    // (https://github.com/oxc-project/oxc/issues/25392), pinned since
+    it('skips functions carrying react-hooks lint suppressions', async () => {
         const result = await transformCode(
             `
 import { useEffect, useRef, useState } from 'react';
