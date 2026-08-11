@@ -1100,16 +1100,19 @@ keyboard navigation. It works best when you use appropriate HTML elements
 in your dropdown content (like `<ul>` and `<li>` for lists, `<button>`
 elements for actions, etc.).
 
+The ARIA it adds is a best effort from what it can control: it annotates
+the DOM it renders and the shapes it recognizes, but never overwrites a
+value you pass. So when you provide a completely custom trigger, it is
+possible to end up with ARIA that doesn’t hold together. The safest thing
+if you go full custom is to take over the ARIA as well.
+
 ### ARIA attributes
 
 The trigger automatically receives `aria-haspopup`, `aria-expanded`, and
-`aria-controls` pointing to the open body. The exception is a custom
-trigger that is a text input or `<textarea>` and ends up with no `role`: it
-gets no `aria-expanded`, which `textbox` doesn’t support. A single-line
-`<input>` gets one back from `isSearchable`, which makes it a `combobox`
-(see below); a `<textarea>` — never a combobox, since that role is for
-single-line inputs — needs a `role` of its own. The popup role is chosen
-based on the dropdown’s mode:
+`aria-controls` pointing to the open body. The component does its best to
+also apply the correct roles and attributes with custom triggers, but if
+you are customizing in that way, consider also providing the appropriate
+ARIA. The popup role is chosen based on the dropdown’s mode:
 
 - `aria-haspopup="listbox"` when `isSearchable` is true (combobox pattern —
   see below)
@@ -1169,25 +1172,16 @@ ARIA you set. The persistent tint on the selected item is themeable via the
 ### The searchable trigger is a combobox
 
 A searchable dropdown’s trigger declares `role="combobox"` together with
-`aria-autocomplete="list"`. The role is what makes the rest of the pattern
-legal: ARIA 1.2 doesn’t include `aria-expanded` among the states a
-`textbox` supports, so a bare `<input>` carrying it — which is what this
-was before — is exposed without the disclosure state a combobox needs.
-`aria-autocomplete="list"` describes what typing actually does here:
+`aria-autocomplete="list"`, which describes what typing actually does here:
 suggestions appear in the popup, and nothing is completed inline in the
 input.
 
 For a custom trigger, the role is filled in only when the trigger element
-**is** a single-line text input. A trigger that merely wraps an input is
-left alone — `role="combobox"` on a wrapper is the deprecated ARIA 1.1
-shape, and it would misdescribe the wrapper — and a `<textarea>` is
-excluded for the same reason, since a combobox is single-line. (A textarea
-trigger still counts as a text input for naming, so it can’t name the popup
-either.) As always, a `role` or `aria-autocomplete` you set yourself wins.
-
-Note that this changes the trigger’s exposed role, so anything selecting it
-by role — `getByRole('textbox')` in tests, or a `[role]` selector — needs
-`combobox` for searchable dropdowns. Non-searchable triggers are unchanged.
+is a single-line text input. A trigger that merely wraps an input is left
+alone. Same with a `<textarea>`, since a combobox is single-line. (A
+textarea trigger still counts as a text input for naming, so it can’t name
+the popup either.) As always, a `role` or `aria-autocomplete` you set
+yourself wins.
 
 ### The active item and `aria-activedescendant`
 
