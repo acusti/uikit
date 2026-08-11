@@ -1319,7 +1319,7 @@ function RootDropdown({
     // These annotations run once per open (the body unmounts on close and is
     // annotated fresh each time); items rendered into an already-open body —
     // async-loaded or consumer-filtered — aren’t annotated until the next
-    // open. Known limitation until it’s needed.
+    // open. Custom implementations like that should set their own ARIA roles.
     const handleBodyRef = (ref: HTMLDivElement | null) => {
         if (!ref) return;
         // Everything below must run exactly once per open: showPopover() throws
