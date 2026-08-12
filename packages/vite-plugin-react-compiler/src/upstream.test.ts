@@ -30,23 +30,15 @@ const context = {
 const transformCode = (code: string, id: string) => transform.call(context, code, id);
 
 describe('oxc-transform-react upstream behavior', () => {
-    // try/catch value blocks are a two-step story. Today the Rust port
-    // compiles them, but that is a missing-bailout bug rather than real
-    // support (the compiler can’t yet handle them soundly, which is why
-    // babel-plugin-react-compiler bails): upstream is restoring the
-    // Babel-matching bailout
-    // (https://github.com/oxc-project/oxc/issues/25343, fixed by
-    // https://github.com/oxc-project/oxc/pull/25409). When a bindings
-    // bump picks that up and flips this test red, do NOT pin the
-    // bailout — invert this into
-    // it.fails('compiles try/catch value blocks') asserting
-    // .toContain('react/compiler-runtime'), so the suite starts tracking
-    // the shortcoming we actually hope gets fixed (the compiler gaining
-    // real try/catch support), and pin compilation when that lands. A
-    // single hope-test can’t be written today because “compiles” is
-    // observably true in both the buggy present and the fixed future —
-    // the suite sees output, not soundness.
-    it.fails('bails on try/catch value blocks like the Babel plugin', async () => {
+    // babel-plugin-react-compiler@1.0.0 (stable) bails on try/catch used
+    // as a value block, but React Compiler main — which the Rust port
+    // tracks — supports them: upstream confirmed the compiled output
+    // conforms to the unpublished Babel compiler and dropped the
+    // bailout-restoration attempt
+    // (https://github.com/oxc-project/oxc/issues/25343 closed as not
+    // planned; https://github.com/oxc-project/oxc/pull/25409 closed
+    // unmerged), so compiling is the supported behavior and this pins it
+    it('compiles try/catch value blocks the stable Babel plugin bails on', async () => {
         const result = await transformCode(
             `
 export function SafeParse({ json }: { json: string }) {
@@ -61,7 +53,7 @@ export function SafeParse({ json }: { json: string }) {
 `,
             '/src/SafeParse.tsx',
         );
-        expect(result?.code).not.toContain('react/compiler-runtime');
+        expect(result?.code).toContain('react/compiler-runtime');
     });
 
     // babel-plugin-react-compiler@1.0.0 bails on computed object keys
