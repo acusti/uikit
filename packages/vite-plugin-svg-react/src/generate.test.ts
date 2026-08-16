@@ -30,6 +30,19 @@ describe('generateComponentModule', () => {
         expect(code).not.toContain('comment');
     });
 
+    it('handles doctypes with quoted ">" and internal subsets', () => {
+        // ">" inside a quoted literal doesn't terminate the doctype
+        expect(
+            generate('<!DOCTYPE svg SYSTEM "weird>name.dtd"><svg><path d="M0 0"/></svg>'),
+        ).toContain('<path d="M0 0" />');
+        // Illustrator-style internal subset with entity declarations
+        expect(
+            generate(
+                '<!DOCTYPE svg [ <!ENTITY ns_a "http://a.example"> <!ENTITY gt-ish "a > b"> ]><svg/>',
+            ),
+        ).toContain('<svg {...props} />');
+    });
+
     it('converts kebab-case, class, and namespaced attributes to React prop names', () => {
         const code = generate(
             '<svg xmlns:xlink="http://www.w3.org/1999/xlink" class="icon" stroke-width="2" fill-rule="evenodd" clip-rule="evenodd"><use xlink:href="#a" xml:space="preserve"/></svg>',
@@ -68,7 +81,23 @@ describe('generateComponentModule', () => {
             '<svg><path style="fill: red; stroke-width: 2; margin-top: 4px; -webkit-transform: rotate(3deg); -ms-transform: none; --custom: 4"/></svg>',
         );
         expect(code).toContain(
-            'style={{ fill: "red", strokeWidth: 2, marginTop: 4, WebkitTransform: "rotate(3deg)", msTransform: "none", "--custom": 4 }}',
+            'style={{ fill: "red", strokeWidth: 2, marginTop: "4px", WebkitTransform: "rotate(3deg)", msTransform: "none", "--custom": 4 }}',
+        );
+    });
+
+    it('keeps px style values as strings so React-unitless properties stay correct', () => {
+        // converting "20px" to 20 would make React render line-height: 20 (a
+        // font-size multiplier) and strip the unit from custom properties
+        const code = generate('<svg><text style="line-height: 20px; --gap: 6px"/></svg>');
+        expect(code).toContain('style={{ lineHeight: "20px", "--gap": "6px" }}');
+    });
+
+    it('ignores semicolons inside parentheses and quotes in style values', () => {
+        const code = generate(
+            '<svg><rect style="background: url(data:image/png;base64,aa;bb); fill: red"/></svg>',
+        );
+        expect(code).toContain(
+            'style={{ background: "url(data:image/png;base64,aa;bb)", fill: "red" }}',
         );
     });
 
