@@ -139,6 +139,14 @@ describe('vite-plugin-svg-react', () => {
         ).toThrow(/unsupported svgrOptions: namedExport/);
     });
 
+    it('rejects unknown top-level option keys', () => {
+        // a typo one level up would otherwise silently default everything
+        expect(() =>
+            // @ts-expect-error svgOptions is a typo of svgrOptions
+            vitePluginSVGReact({ svgOptions: { exportType: 'named' } }),
+        ).toThrow(/unsupported options: svgOptions/);
+    });
+
     it('compiles against React.createElement with jsxRuntime: classic', async () => {
         const { code } = await loadSVGComponent({
             command: 'serve',
