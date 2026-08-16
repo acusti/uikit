@@ -43,13 +43,13 @@
         "build": "vite build && tsc -p tsconfig.build.json",
         "tsc": "tsc --noEmit"
     },
-    "dependencies": {
-        "@svgr/core": "^8.1",
-        "@svgr/plugin-jsx": "^8.1"
-    },
     "devDependencies": {
+        "@testing-library/react": "^16.3.2",
         "@types/node": "^26.1.0",
         "@types/react": "^19.2.17",
+        "happy-dom": "^20.4.0",
+        "react": "^19",
+        "react-dom": "^19",
         "typescript": "^7",
         "vite": "^8.0.0-0",
         "vitest": "^4"
