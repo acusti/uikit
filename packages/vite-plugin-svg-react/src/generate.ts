@@ -11,13 +11,13 @@ import { parseSVG, type XMLElement, type XMLText } from './parse.js';
 export type ComponentOptions = {
     /** Remove width/height from the root <svg> (default: keep them). */
     dimensions?: boolean;
-    /** Where to spread props onto the root <svg> (default: 'end'). */
-    expandProps?: 'end' | 'start' | false;
+    /** Where to spread props onto the root <svg> (default: 'end'; true is an alias for 'end'). */
+    expandProps?: boolean | 'end' | 'start';
     /** Emit `export default` or a named `ReactComponent` export (default: 'default'). */
     exportType?: 'default' | 'named';
     /** Set width/height to 1em (true) or the given value (default: false). */
     icon?: boolean | number | string;
-    /** With 'classic', add an `import * as React` statement (default: 'automatic'). */
+    /** With 'classic', compile against React.createElement (default: 'automatic'). */
     jsxRuntime?: 'automatic' | 'classic';
     /** Wrap the component with React.memo (default: false). */
     memo?: boolean;
@@ -29,7 +29,24 @@ export type ComponentOptions = {
     typescript?: boolean;
 };
 
+// runtime mirror of the ComponentOptions keys, used to reject svgr options
+// that this plugin no longer supports instead of silently ignoring them
+export const COMPONENT_OPTION_NAMES: ReadonlySet<string> = new Set([
+    'dimensions',
+    'expandProps',
+    'exportType',
+    'icon',
+    'jsxRuntime',
+    'memo',
+    'ref',
+    'svgProps',
+    'typescript',
+]);
+
 const IDENTIFIER_REGEX = /^[A-Za-z_$][\w$]*$/;
+// lowercase-initial (intrinsic) JSX element names, dashes allowed for
+// custom elements inside <foreignObject>
+const INTRINSIC_TAG_REGEX = /^[a-z][a-zA-Z0-9-]*$/;
 const KEBAB_REGEX = /[A-ZÀ-ÖØ-Þ]/g;
 const MS_PREFIX_REGEX = /^-ms-/;
 // tabs, newlines, and exotic line separators collapse to a single space in
@@ -152,7 +169,15 @@ type RootAttributes = {
 };
 
 const toJSXElement = (element: XMLElement, rootAttributes?: RootAttributes): string => {
+    // like the reference, tag names are looked up as written (attribute
+    // names, by contrast, are lowercased before their table lookup)
     const name = TAG_NAME_MAPPINGS[element.name] ?? element.name;
+    // JSX treats capitalized or dotted names as component references, so a
+    // name that isn’t a valid intrinsic (lowercase-initial) element must
+    // fail the build here instead of compiling into a runtime ReferenceError
+    if (!INTRINSIC_TAG_REGEX.test(name)) {
+        throw new Error(`Invalid SVG: <${element.name}> is not a valid SVG element name`);
+    }
     const attributes: Array<string> = [...(rootAttributes?.leading ?? [])];
     for (const [attributeName, value] of element.attributes) {
         attributes.push(toJSXAttribute(attributeName, value, element.name));
@@ -215,7 +240,7 @@ export function generateComponentModule(
         typescript = true,
     } = options;
 
-    const root = parseSVG(svg);
+    const root = parseSVG(svg, filePath);
 
     if (dimensions === false) {
         root.attributes.delete('width');
@@ -240,14 +265,16 @@ export function generateComponentModule(
         }
     }
     if (ref) trailing.push('ref={ref}');
-    if (expandProps === 'end') trailing.push('{...props}');
+    // svgr typed expandProps as boolean | 'start' | 'end'; true means 'end'
+    const spreadPosition = expandProps === true ? 'end' : expandProps;
+    if (spreadPosition === 'end') trailing.push('{...props}');
 
     const jsx = toJSXElement(root, {
-        leading: expandProps === 'start' ? ['{...props}'] : [],
+        leading: spreadPosition === 'start' ? ['{...props}'] : [],
         trailing,
     });
 
-    const withProps = expandProps !== false;
+    const withProps = spreadPosition !== false;
     const lines: Array<string> = [];
     if (jsxRuntime === 'classic') lines.push(`import * as React from 'react';`);
     if (typescript && (withProps || ref)) {

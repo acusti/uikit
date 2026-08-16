@@ -22,8 +22,13 @@ const NAME_CHARS = /[^\s='"/>]+/y;
 const WHITESPACE = /\s*/y;
 
 // Decode the five predefined XML entities plus decimal/hex character
-// references. Unrecognized entities are left as-is (matching the reference
-// pipeline, which used entities’ decodeXML).
+// references. Unrecognized names (e.g. HTML-only ones like &nbsp;, which XML
+// doesn’t define) pass through literally — and stay literal in the rendered
+// output, because attribute values are fully re-escaped at emission, so the
+// JSX compiler never gets a second pass at them. That’s a deliberate
+// trade-off: the reference pipeline left values raw for the JSX layer to
+// decode, which double-decoded entity-shaped text and emitted invalid JSX
+// for values containing double quotes.
 export function decodeEntities(text: string): string {
     if (!text.includes('&')) return text;
     return text.replace(
@@ -49,7 +54,7 @@ export function decodeEntities(text: string): string {
 // Parse an SVG document and return its root element. Comments, doctypes,
 // processing instructions, and anything else outside the root element are
 // discarded; CDATA sections become text nodes with their literal contents.
-export function parseSVG(svg: string): XMLElement {
+export function parseSVG(svg: string, filePath?: string): XMLElement {
     // strip a leading BOM
     const input = svg.charCodeAt(0) === 0xfeff ? svg.slice(1) : svg;
     const { length } = input;
@@ -58,7 +63,20 @@ export function parseSVG(svg: string): XMLElement {
     const stack: Array<XMLElement> = [];
 
     const fail = (message: string): never => {
-        throw new Error(`Invalid SVG: ${message} (at character ${index})`);
+        // report 1-based line:column, which editors understand better than
+        // a character offset
+        let column = 1;
+        let line = 1;
+        for (let position = 0; position < index; position += 1) {
+            if (input[position] === '\n') {
+                line += 1;
+                column = 1;
+            } else {
+                column += 1;
+            }
+        }
+        const source = filePath == null ? '' : ` in ${filePath}`;
+        throw new Error(`Invalid SVG${source}: ${message} (${line}:${column})`);
     };
 
     const skipPast = (needle: string, description: string) => {
@@ -158,7 +176,7 @@ export function parseSVG(svg: string): XMLElement {
                 parent.children.push(element);
             } else if (root == null) {
                 root = element;
-            } else if (root != null) {
+            } else {
                 fail('multiple root elements');
             }
             const isSelfClosing = input.startsWith('/>', index);
