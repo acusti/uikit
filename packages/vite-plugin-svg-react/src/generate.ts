@@ -30,18 +30,23 @@ export type ComponentOptions = {
 };
 
 // runtime mirror of the ComponentOptions keys, used to reject svgr options
-// that this plugin no longer supports instead of silently ignoring them
-export const COMPONENT_OPTION_NAMES: ReadonlySet<string> = new Set([
-    'dimensions',
-    'expandProps',
-    'exportType',
-    'icon',
-    'jsxRuntime',
-    'memo',
-    'ref',
-    'svgProps',
-    'typescript',
-]);
+// that this plugin no longer supports instead of silently ignoring them;
+// the satisfies clause makes tsc fail if the two ever drift apart
+const componentOptionNames = {
+    dimensions: true,
+    expandProps: true,
+    exportType: true,
+    icon: true,
+    jsxRuntime: true,
+    memo: true,
+    ref: true,
+    svgProps: true,
+    typescript: true,
+} satisfies Record<keyof Required<ComponentOptions>, true>;
+
+export const COMPONENT_OPTION_NAMES: ReadonlySet<string> = new Set(
+    Object.keys(componentOptionNames),
+);
 
 const IDENTIFIER_REGEX = /^[A-Za-z_$][\w$]*$/;
 // lowercase-initial (intrinsic) JSX element names: JSX resolves these as
