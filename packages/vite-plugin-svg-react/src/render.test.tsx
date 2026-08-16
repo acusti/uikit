@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-// End-to-end tests: run SVG fixtures through the plugin's load hook (module
+// End-to-end tests: run SVG fixtures through the plugin’s load hook (module
 // generation + oxc compilation), import the compiled modules, render the
 // components with @testing-library/react, and assert on the resulting DOM.
 import { cleanup, render } from '@testing-library/react';
@@ -156,7 +156,7 @@ describe('rendered SVG components', () => {
     });
 
     // The tests above hand the load hook a pre-built virtual id; this one
-    // runs a real `vite build` so the `.svg?react` import travels Vite's own
+    // runs a real `vite build` so the `.svg?react` import travels Vite’s own
     // resolution and plugin pipeline (enforce: 'pre' ordering ahead of asset
     // handling, resolveId → virtual id → load), then renders the bundle.
     it('transforms an .svg?react import end to end through a real Vite build', async () => {

@@ -49,13 +49,13 @@ describe('vite-plugin-svg-react', () => {
     // virtual modules, so any dep they alone import is discovered
     // mid-first-request on a cold optimizer cache, forcing a re-optimization
     // under the in-flight SSR render (see “Why the dev JSX runtime in dev
-    // matters” in the README). Matching the main pipeline's jsx transform
+    // matters” in the README). Matching the main pipeline’s jsx transform
     // (dev runtime outside `vite build`) keeps them off that path.
     it('emits the dev jsx runtime when serving', async () => {
         const { code } = await loadSVGComponent({ command: 'serve' });
         expect(code).toContain('react/jsx-dev-runtime');
         // Bare specifier (no quotes) so a quote-style change in the emitted
-        // import can't make this pass vacuously; it can't match
+        // import can’t make this pass vacuously; it can’t match
         // react/jsx-dev-runtime, which diverges after "react/jsx-".
         expect(code).not.toContain('react/jsx-runtime');
     });
@@ -64,7 +64,7 @@ describe('vite-plugin-svg-react', () => {
         const { code, map } = await loadSVGComponent({ command: 'build' });
         expect(code).toContain('react/jsx-runtime');
         expect(code).not.toContain('react/jsx-dev-runtime');
-        // the oxc compile's sourcemap is forwarded, never dropped to null
+        // the oxc compile’s sourcemap is forwarded, never dropped to null
         expect(map).not.toBeNull();
     });
 
@@ -90,7 +90,7 @@ describe('vite-plugin-svg-react', () => {
             {},
         );
         expect(resolved?.id).toBe('\0vite-plugin-svg-react:/project/icon.svg');
-        // the id is a virtual module, not a fake path to a file that doesn't
+        // the id is a virtual module, not a fake path to a file that doesn’t
         // exist on disk (the v1 `.tsx`-suffix hack died under workerd)
         expect(resolved?.id.endsWith('.tsx')).toBe(false);
     });
@@ -101,7 +101,7 @@ describe('vite-plugin-svg-react', () => {
         const context = {
             resolve: (source: string) => Promise.resolve({ id: source }),
         };
-        // plain .svg imports stay on Vite's asset pipeline
+        // plain .svg imports stay on Vite’s asset pipeline
         await expect(
             resolveId.call(context, '/project/icon.svg', '/project/app.tsx', {}),
         ).resolves.toBeNull();

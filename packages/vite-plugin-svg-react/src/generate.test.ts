@@ -31,7 +31,7 @@ describe('generateComponentModule', () => {
     });
 
     it('handles doctypes with quoted ">" and internal subsets', () => {
-        // ">" inside a quoted literal doesn't terminate the doctype
+        // ">" inside a quoted literal doesn’t terminate the doctype
         expect(
             generate('<!DOCTYPE svg SYSTEM "weird>name.dtd"><svg><path d="M0 0"/></svg>'),
         ).toContain('<path d="M0 0" />');
