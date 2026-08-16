@@ -41,6 +41,10 @@ describe('generateComponentModule', () => {
                 '<!DOCTYPE svg [ <!ENTITY ns_a "http://a.example"> <!ENTITY gt-ish "a > b"> ]><svg/>',
             ),
         ).toContain('<svg {...props} />');
+        // brackets and apostrophes inside subset comments don't derail the scan
+        expect(generate("<!DOCTYPE svg [ <!-- don't strip ] --> ]><svg/>")).toContain(
+            '<svg {...props} />',
+        );
     });
 
     it('converts kebab-case, class, and namespaced attributes to React prop names', () => {
@@ -99,6 +103,11 @@ describe('generateComponentModule', () => {
         expect(code).toContain(
             'style={{ background: "url(data:image/png;base64,aa;bb)", fill: "red" }}',
         );
+        // a backslash-escaped quote doesn't end the quoted run early
+        const escaped = generate(
+            `<svg><text style="font-family: 'a\\'b; c'; fill: red"/></svg>`,
+        );
+        expect(escaped).toContain(`fontFamily: "'a\\\\'b; c'", fill: "red"`);
     });
 
     it('maps lowercased camelCase tag names back to their JSX names', () => {

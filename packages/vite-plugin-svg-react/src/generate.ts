@@ -73,14 +73,20 @@ const toPropName = (name: string, elementName: string) => {
 };
 
 // Split a style string into declarations at semicolons, ignoring semicolons
-// inside quotes or parentheses (e.g. url(data:image/png;base64,…)).
+// inside quotes or parentheses (e.g. url(data:image/png;base64,…)) and
+// honoring backslash escapes inside quoted strings.
 const splitStyleDeclarations = (style: string) => {
     const declarations: Array<string> = [];
     let current = '';
     let depth = 0;
+    let escaped = false;
     let quote = '';
     for (const character of style) {
-        if (quote !== '') {
+        if (escaped) {
+            escaped = false;
+        } else if (character === '\\') {
+            escaped = true;
+        } else if (quote !== '') {
             if (character === quote) quote = '';
         } else if (character === '"' || character === "'") {
             quote = character;
