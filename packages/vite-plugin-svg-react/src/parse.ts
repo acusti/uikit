@@ -99,7 +99,9 @@ export function parseSVG(svg: string): XMLElement {
         } else if (input.startsWith('<!', index)) {
             // doctype: scan to the terminating '>', ignoring '>' characters
             // inside quoted literals and inside the bracketed internal subset
-            // (which can hold entity declarations with their own '>'s)
+            // (which can hold entity declarations with their own '>'s), and
+            // skipping comment and processing-instruction bodies so their
+            // contents can't derail the quote/bracket tracking
             let end = -1;
             let inSubset = false;
             let quote = '';
@@ -107,6 +109,16 @@ export function parseSVG(svg: string): XMLElement {
                 const character = input[scan];
                 if (quote !== '') {
                     if (character === quote) quote = '';
+                } else if (input.startsWith('<!--', scan)) {
+                    const commentEnd = input.indexOf('-->', scan + 4);
+                    if (commentEnd === -1) fail('unterminated comment');
+                    scan = commentEnd + 2;
+                } else if (input.startsWith('<?', scan)) {
+                    const instructionEnd = input.indexOf('?>', scan + 2);
+                    if (instructionEnd === -1) {
+                        fail('unterminated processing instruction');
+                    }
+                    scan = instructionEnd + 1;
                 } else if (character === '"' || character === "'") {
                     quote = character;
                 } else if (character === '[') {
