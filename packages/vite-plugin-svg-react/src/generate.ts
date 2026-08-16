@@ -257,6 +257,15 @@ export function generateComponentModule(
     const trailing: Array<string> = [];
     if (svgProps) {
         for (const [name, value] of Object.entries(svgProps)) {
+            // drop any root attribute the prop overrides: emitting both would
+            // be a duplicate JSX attribute (a TS error, and only last-wins by
+            // oxc's grace). svgr replaced the attribute in place; appending
+            // instead keeps the same rendered result with unambiguous JSX.
+            for (const attributeName of root.attributes.keys()) {
+                if (toPropName(attributeName, root.name) === name) {
+                    root.attributes.delete(attributeName);
+                }
+            }
             const isExpression = value.startsWith('{') && value.endsWith('}');
             trailing.push(
                 isExpression

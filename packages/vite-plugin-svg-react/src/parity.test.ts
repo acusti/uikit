@@ -6,8 +6,10 @@ import { type ComponentOptions, generateComponentModule } from './generate.js';
 // verified against @svgr/core@8.1 + @svgr/plugin-jsx before the dependency
 // was removed — byte-for-byte modulo quote style, except for the documented
 // deliberate divergences (CDATA preserved, px style values kept as strings,
-// semicolons inside url()/quotes not treated as declaration boundaries, and
-// attribute values fully escaped at emission). If a change to generate.ts,
+// semicolons inside url()/quotes not treated as declaration boundaries,
+// attribute values fully escaped at emission, svgProps overrides appended
+// instead of replaced in place, and namespaced element names rejected at
+// build time). If a change to generate.ts,
 // parse.ts, or mappings.ts alters a snapshot, that’s a parity break: update
 // deliberately, with the divergence documented, or not at all.
 

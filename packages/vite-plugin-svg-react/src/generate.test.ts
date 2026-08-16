@@ -190,6 +190,17 @@ describe('generateComponentModule', () => {
         });
         expect(code).toContain('role="img"');
         expect(code).toContain('height={props.width}');
+        // the overridden root attribute is dropped, not duplicated
+        expect(code).not.toContain('height={24}');
+        expect(code.match(/height/g)).toHaveLength(1);
+    });
+
+    it('drops root attributes that svgProps override via their prop names', () => {
+        const code = generate('<svg class="icon"><path d="M0 0"/></svg>', {
+            svgProps: { className: 'overridden' },
+        });
+        expect(code).toContain('className="overridden"');
+        expect(code.match(/className/g)).toHaveLength(1);
     });
 
     it('supports expandProps start, end/true, and false', () => {
