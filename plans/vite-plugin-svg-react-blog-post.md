@@ -215,20 +215,21 @@ the search query this post owns.)
 
 - ~~`load()` extracts the file path via a hardcoded `id.slice(23)`~~ —
   **done**: the shipped code uses `id.slice(VIRTUAL_PREFIX.length)`.
-- Package test suite should add (outlyne's contract test intentionally
-  stays thin and consumer-facing, not a substitute for these): the
-  virtual-id shape test (`\0` prefix, no fake on-disk `.tsx` path);
-  ~~`svgrOptions` merge behavior~~ (**done** — and post-v4 there is no
-  `plugins: [jsx]` to clobber; the merge is over a plain options bag); one
-  true integration test with a real Vite `createServer` or fixture build
-  asserting an `.svg?react` import transforms end to end (this is the tier
-  that would have caught the `id.slice(23)` issue, plus `enforce: 'pre'`
-  ordering and alias-resolution issues); sourcemap presence (non-null);
-  non-matching ids pass through undyed. The v4 branch adds the
-  load-hook-to-rendered-DOM tier (fixtures through the real load hook,
-  compiled modules rendered under happy-dom); the `createServer`
-  integration, sourcemap, virtual-id shape, and passthrough tests remain
-  open.
+- ~~Package test suite should add~~ — **done, all of it, on the v4 branch**
+  (`b5eb99e`; outlyne's contract test intentionally stays thin and
+  consumer-facing, not a substitute): the virtual-id shape test (`\0`
+  prefix, no fake on-disk `.tsx` path); `svgrOptions` merge behavior
+  (post-v4 there is no `plugins: [jsx]` to clobber; the merge is over a
+  plain options bag); the true integration test — a real `vite build()` of
+  an `.svg?react` entry, resolved and transformed by Vite's own pipeline,
+  with the bundle imported and rendered to the DOM (the tier that would
+  have caught the `id.slice(23)` issue, plus `enforce: 'pre'` ordering);
+  sourcemap presence (non-null); non-matching ids pass through undyed. The
+  v4 branch also adds the load-hook-to-rendered-DOM tier (fixtures through
+  the real load hook, compiled modules rendered under happy-dom). A
+  `createServer` dev-server variant was considered and skipped: it
+  duplicates the build-test coverage at higher cost, and the dev-runtime
+  behavior is asserted directly.
 
 ## Open TODOs before drafting
 
