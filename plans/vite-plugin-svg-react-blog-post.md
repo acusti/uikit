@@ -147,8 +147,9 @@ Raw material worth keeping:
   make sure we aren't putting ourselves on the hook for maintaining a
   mature extensive feature surface area." The plugin keeps the three
   options that shape the `<svg>` element itself (`dimensions`, `icon`,
-  `svgProps`, still under the `svgrOptions` key with svgr semantics) and
-  fixes the module wrapper: typed, default export, props spread at the end.
+  `svgProps`, now under an `svg` key — the svgrOptions name went with its
+  namesake, and the old key throws a migration message) and fixes the
+  module wrapper: typed, default export, props spread at the end.
   Everything else — `ref` (React 19 passes ref as a regular prop, so the
   spread already forwards it), `memo` (wrap at the use site), `exportType`,
   `typescript` (no observable effect once oxc compiles the module
