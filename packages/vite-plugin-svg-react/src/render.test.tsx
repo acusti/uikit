@@ -23,13 +23,13 @@ let moduleCount = 0;
 async function loadFixture({
     command = 'build',
     fixture,
-    svgrOptions,
+    svg,
 }: {
     command?: 'build' | 'serve';
     fixture: string;
-    svgrOptions?: Options['svgrOptions'];
+    svg?: Options['svg'];
 }): Promise<Record<string, SVGComponent>> {
-    const plugin = vitePluginSVGReact({ svgrOptions });
+    const plugin = vitePluginSVGReact({ svg });
     const configResolved = plugin.configResolved as (config: {
         command: 'build' | 'serve';
     }) => void;
@@ -142,7 +142,7 @@ describe('rendered SVG components', () => {
     it('applies icon and svgProps options to the root <svg>', async () => {
         const { default: Icon } = await loadFixture({
             fixture: 'cdata.svg',
-            svgrOptions: { icon: true, svgProps: { role: 'img' } },
+            svg: { icon: true, svgProps: { role: 'img' } },
         });
         const { container } = render(<Icon />);
         const svg = container.querySelector('svg')!;
