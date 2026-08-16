@@ -216,6 +216,10 @@ describe('generateComponentModule', () => {
         // reference and throw a ReferenceError at render time
         expect(() => generate('<svg><CLIPPATH/></svg>')).toThrow(/CLIPPATH/);
         expect(() => generate('<svg><a.b/></svg>')).toThrow(/a\.b/);
+        // lowercase-initial names with dashes or underscores are string tags
+        expect(generate('<svg><my-widget/><my_widget/></svg>')).toContain(
+            '<my-widget /><my_widget />',
+        );
     });
 
     it('throws on malformed SVG', () => {
