@@ -32,11 +32,21 @@ const defaultComponentOptions: ComponentOptions = {
 };
 
 export default function vitePluginSVGReact(options: Options = {}): Plugin {
-    // Reject unrecognized options (svgr options this plugin doesn’t carry
-    // over, like namedExport or titleProp) instead of silently ignoring
-    // them: a silently dropped option surfaces as broken imports or missing
-    // behavior with an error that points nowhere near the cause, and only
-    // TypeScript consumers get a compile-time diagnostic.
+    // Reject unrecognized options — a typo at the top level (svgOptions) or
+    // svgr options this plugin doesn’t carry over (namedExport, titleProp,
+    // …) — instead of silently ignoring them: a silently dropped option
+    // surfaces as broken imports or missing behavior with an error that
+    // points nowhere near the cause, and only TypeScript consumers get a
+    // compile-time diagnostic.
+    const unsupportedTopLevel = Object.keys(options).filter(
+        (name) => name !== 'svgrOptions',
+    );
+    if (unsupportedTopLevel.length > 0) {
+        throw new Error(
+            `vite-plugin-svg-react: unsupported options: ${unsupportedTopLevel.join(', ')}. ` +
+                'The only supported option is svgrOptions.',
+        );
+    }
     const unsupportedOptions = Object.keys(options.svgrOptions ?? {}).filter(
         (name) => !COMPONENT_OPTION_NAMES.has(name),
     );
