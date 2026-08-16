@@ -33,9 +33,9 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
     return {
         configResolved(config) {
             // Match the jsx transform of the main pipeline (dev runtime
-            // outside `vite build`) so dev SSR doesn't import
+            // outside `vite build`) so dev SSR doesn’t import
             // react/jsx-runtime from these virtual modules only — the dep
-            // scanner can't crawl them (.svg imports are treated as assets),
+            // scanner can’t crawl them (.svg imports are treated as assets),
             // so that lone import gets discovered mid-first-request and
             // forces a cold-cache re-optimization. See “Why the dev JSX
             // runtime in dev matters” in the README.
@@ -71,7 +71,7 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             });
             if (resolved == null) return null;
 
-            // return a virtual module ID that won't be parsed as a real file
+            // return a virtual module ID that won’t be parsed as a real file
             // the \0 prefix tells Vite/Rollup this is a virtual module
             return { id: VIRTUAL_PREFIX + resolved.id };
         },
