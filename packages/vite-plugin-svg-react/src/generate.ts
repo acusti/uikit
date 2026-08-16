@@ -173,11 +173,17 @@ const toJSXElement = (element: XMLElement, rootAttributes?: RootAttributes): str
     // like the reference, tag names are looked up as written (attribute
     // names, by contrast, are lowercased before their table lookup)
     const name = TAG_NAME_MAPPINGS[element.name] ?? element.name;
+    // namespaced names compile to string tags, but React renders them as
+    // unknown elements (an svg:rect is not a rect), so reject them with an
+    // accurate message instead of emitting markup that renders wrong
+    if (name.includes(':')) {
+        throw new Error(`namespaced element names aren’t supported (<${element.name}>)`);
+    }
     // JSX treats capitalized or dotted names as component references, so a
     // name that isn’t a valid intrinsic (lowercase-initial) element must
     // fail the build here instead of compiling into a runtime ReferenceError
     if (!INTRINSIC_TAG_REGEX.test(name)) {
-        throw new Error(`Invalid SVG: <${element.name}> is not a valid SVG element name`);
+        throw new Error(`<${element.name}> is not a valid SVG element name`);
     }
     const attributes: Array<string> = [...(rootAttributes?.leading ?? [])];
     for (const [attributeName, value] of element.attributes) {
@@ -279,10 +285,18 @@ export function generateComponentModule(
     const spreadPosition = expandProps === true ? 'end' : expandProps;
     if (spreadPosition === 'end') trailing.push('{...props}');
 
-    const jsx = toJSXElement(root, {
-        leading: spreadPosition === 'start' ? ['{...props}'] : [],
-        trailing,
-    });
+    let jsx = '';
+    try {
+        jsx = toJSXElement(root, {
+            leading: spreadPosition === 'start' ? ['{...props}'] : [],
+            trailing,
+        });
+    } catch (error) {
+        // prefix emitter errors with the source file, matching parseSVG’s
+        // own diagnostics
+        const message = error instanceof Error ? error.message : String(error);
+        throw new Error(`Invalid SVG in ${filePath}: ${message}`);
+    }
 
     const withProps = spreadPosition !== false;
     const lines: Array<string> = [];
