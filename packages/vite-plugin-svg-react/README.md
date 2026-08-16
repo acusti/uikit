@@ -4,8 +4,7 @@
 [![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/vite-plugin-svg-react?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fvite-plugin-svg-react)
 [![downloads per month](https://img.shields.io/npm/dm/@acusti/vite-plugin-svg-react?style=for-the-badge)](https://www.npmjs.com/package/@acusti/vite-plugin-svg-react)
 
-A [Vite][] plugin that turns SVG files into typed React components using
-[SVGR][]:
+A [Vite][] plugin that turns SVG files into typed React components:
 
 ```tsx
 import Icon from './icon.svg?react';
@@ -17,22 +16,54 @@ It was extracted from the build tooling of [Outlyne][], where it runs in
 production.
 
 [vite]: https://vite.dev
-[svgr]: https://react-svgr.com
 [outlyne]: https://outlyne.io
 
 ## Why Vite ≥ 8 only?
 
 This plugin requires Vite 8 and is rolldown-native, on purpose. The Vite 8
-/ [rolldown-vite][] transition left no working SVGR option:
+/ [rolldown-vite][] transition left no working [SVGR][] option:
 [vite-plugin-svgr][] runs its own esbuild transform to compile the JSX that
 SVGR emits, reintroducing esbuild into an otherwise oxc/rolldown pipeline.
-This plugin instead compiles the JSX with Vite 8’s exported
-`transformWithOxc`, so SVG-to-React conversion is oxc/rolldown end to end:
-no esbuild fallback, no version matrix, no compatibility shims for older
-Vite versions. If you are on Vite < 8, use vite-plugin-svgr.
+This plugin instead generates each component module directly and compiles
+it with Vite 8’s exported `transformWithOxc`, so SVG-to-React conversion is
+oxc/rolldown end to end: no esbuild fallback, no version matrix, no
+compatibility shims for older Vite versions. If you are on Vite < 8, use
+vite-plugin-svgr.
 
 [rolldown-vite]: https://vite.dev/guide/rolldown
+[svgr]: https://react-svgr.com
 [vite-plugin-svgr]: https://github.com/pd4d10/vite-plugin-svgr
+
+## Babel-free (and dependency-free)
+
+The plugin converts SVG to a React component module itself — parsing the
+SVG as XML and emitting the component as JSX source — instead of delegating
+to SVGR, which parses and re-prints the module through Babel. Attribute
+conversion matches what SVGR produced (kebab-case presentation attributes
+to camelCase, `class` → `className`, `xlink:*`/`xml:*` to their React prop
+names, `data-*`/`aria-*` passed through, `style` strings to style objects),
+so the rendered components are the same. What consumers get out of it:
+
+- **Zero dependencies**: no `@svgr/*` and no `@babel/*` in the dependency
+  tree, which removes dozens of packages from a typical install.
+- **Fast cold transforms**: emitting the module as a string takes
+  microseconds, and compiling it with oxc takes about a millisecond, so the
+  first `.svg?react` import costs single-digit milliseconds instead of the
+  hundreds of milliseconds it takes to load and warm up a Babel pipeline.
+
+One thing SVGR could do that this plugin doesn’t: run [SVGO][] optimization
+via `@svgr/plugin-svgo`. Optimizing SVGs is a build concern you can handle
+before they reach the bundler (e.g. `svgo --folder`).
+
+### Future work
+
+An optional pre-optimization pass built on [OXVG][] — the Rust,
+SVGO-compatible SVG toolchain — would fit the plugin’s all-native pipeline
+and could slot in ahead of component generation without reintroducing a JS
+compiler. If you want it, open an issue.
+
+[svgo]: https://github.com/svg/svgo
+[oxvg]: https://github.com/noahbald/oxvg
 
 ## Usage
 
@@ -94,10 +125,12 @@ project (e.g. `src/vite-env.d.ts`):
 ### Options
 
 The plugin takes an optional options object with a single property:
-`svgrOptions`, which is passed to [@svgr/core’s `transform`][svgr options]
-and shallow-merged over the defaults (`exportType: 'default'`,
-`jsxRuntime: 'automatic'`, `plugins: [jsx]`, `typescript: true`). Use it to
-add [svgo][], change the export type, set default props, and so on:
+`svgrOptions` (the name is carried over from the plugin’s original SVGR
+implementation, so existing configurations keep working). It is
+shallow-merged over the defaults (`exportType: 'default'`,
+`jsxRuntime: 'automatic'`, `typescript: true`) and supports the [SVGR
+options][svgr options] that affect the generated component, with the same
+semantics and defaults:
 
 ```ts
 svgReact({
@@ -108,19 +141,24 @@ svgReact({
 });
 ```
 
-Note that the merge is shallow, so if you pass `plugins`, include
-`@svgr/plugin-jsx` (and put it last) to keep JSX output working:
+- `dimensions: false` removes `width`/`height` from the root `<svg>`
+- `expandProps` controls where props are spread onto the root `<svg>`
+  (`'end'`, `'start'`, or `false`)
+- `exportType` exports the component as the default export (`'default'`) or
+  as a named `ReactComponent` export (`'named'`)
+- `icon` sets `width`/`height` to `1em` (`true`) or to the value you pass
+- `jsxRuntime: 'classic'` adds an `import * as React` statement
+- `memo` wraps the component with `React.memo`
+- `ref` forwards refs to the root `<svg>` via `React.forwardRef`
+- `svgProps` adds extra props to the root `<svg>` (string values, or
+  `{expression}` strings inserted verbatim)
+- `typescript: false` emits an untyped (plain JSX) component
 
-```ts
-import svgReact from '@acusti/vite-plugin-svg-react';
-import jsx from '@svgr/plugin-jsx';
-import svgo from '@svgr/plugin-svgo';
-
-svgReact({ svgrOptions: { plugins: [svgo, jsx] } });
-```
+SVGR options that configured SVGR’s own plugin pipeline (`plugins`,
+`template`, `svgoConfig`, and so on) are not supported, since there is no
+SVGR under the hood anymore.
 
 [svgr options]: https://react-svgr.com/docs/options/
-[svgo]: https://github.com/svg/svgo
 
 ## Why the dev JSX runtime in dev matters
 
