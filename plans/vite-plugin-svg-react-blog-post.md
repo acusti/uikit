@@ -142,12 +142,22 @@ Raw material worth keeping:
 - **One behavior improvement:** CDATA sections are preserved as text —
   svgr's svg-parser silently dropped them, so
   `<style><![CDATA[…]]></style>` came out as `<style />`.
-- **The API held still:** same `svgrOptions` key (name kept deliberately
-  for compat), same defaults, same semantics for exportType / typescript /
-  icon / dimensions / svgProps / ref / memo / expandProps / jsxRuntime.
-  Options that configured svgr's own pipeline (`plugins`, `template`,
-  `svgoConfig`) are gone; the README points at OXVG (the Rust,
-  SVGO-compatible toolchain) as the future optional optimizer.
+- **The option surface shrank on purpose** (decided during review, not
+  drift): full svgr parity was explicitly declared a non-goal — "I want to
+  make sure we aren't putting ourselves on the hook for maintaining a
+  mature extensive feature surface area." The plugin keeps the three
+  options that shape the `<svg>` element itself (`dimensions`, `icon`,
+  `svgProps`, still under the `svgrOptions` key with svgr semantics) and
+  fixes the module wrapper: typed, default export, props spread at the end.
+  Everything else — `ref` (React 19 passes ref as a regular prop, so the
+  spread already forwards it), `memo` (wrap at the use site), `exportType`,
+  `typescript` (no observable effect once oxc compiles the module
+  immediately), `jsxRuntime`, `expandProps`, and svgr's pipeline options —
+  throws at config time with the replacement named in the README. Good post
+  material: the unknown-option validation is what made shrinking safe —
+  dropped options fail loudly instead of silently changing behavior. The
+  README points at OXVG (the Rust, SVGO-compatible toolchain) as the future
+  optional optimizer.
 - **Tests now do what Lesson 2 preaches, one level deeper:** fixture SVGs
   run through the real load hook, the compiled modules are imported and
   rendered under happy-dom, and the assertions are on the DOM, not on
