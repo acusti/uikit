@@ -224,19 +224,32 @@ describe('generateComponentModule', () => {
 
     it('throws on tag names that aren’t intrinsic JSX elements', () => {
         // an uppercase-initial or dotted name would compile into a component
-        // reference and throw a ReferenceError at render time
-        expect(() => generate('<svg><CLIPPATH/></svg>')).toThrow(/CLIPPATH/);
+        // reference and throw a ReferenceError at render time; the message
+        // names the source file like the parser’s own diagnostics
+        expect(() => generate('<svg><CLIPPATH/></svg>')).toThrow(
+            /in \/x\/icon\.svg: <CLIPPATH>/,
+        );
         expect(() => generate('<svg><a.b/></svg>')).toThrow(/a\.b/);
+        // namespaced names compile to string tags but render as unknown
+        // elements, so they’re rejected with an accurate message
+        expect(() => generate('<svg><svg:rect/></svg>')).toThrow(
+            /namespaced element names aren’t supported \(<svg:rect>\)/,
+        );
         // lowercase-initial names with dashes or underscores are string tags
         expect(generate('<svg><my-widget/><my_widget/></svg>')).toContain(
             '<my-widget /><my_widget />',
         );
     });
 
-    it('throws on malformed SVG', () => {
-        expect(() => generate('<svg><path></svg>')).toThrow(/expected <\/path>/);
+    it('throws on malformed SVG, naming the file and position', () => {
+        expect(() => generate('<svg><path></svg>')).toThrow(
+            /Invalid SVG in \/x\/icon\.svg: expected <\/path>.*\(1:\d+\)/,
+        );
         expect(() => generate('just text')).toThrow(/Invalid SVG/);
         expect(() => generate('<svg>')).toThrow(/unclosed element/);
+        expect(() => generate('<!-- no root -->')).toThrow(
+            /in \/x\/icon\.svg: no root element found/,
+        );
     });
 });
 

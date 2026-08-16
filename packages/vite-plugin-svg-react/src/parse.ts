@@ -129,11 +129,16 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
                     if (character === quote) quote = '';
                 } else if (input.startsWith('<!--', scan)) {
                     const commentEnd = input.indexOf('-->', scan + 4);
-                    if (commentEnd === -1) fail('unterminated comment');
+                    if (commentEnd === -1) {
+                        // point the error at the comment, not the doctype
+                        index = scan;
+                        fail('unterminated comment');
+                    }
                     scan = commentEnd + 2;
                 } else if (input.startsWith('<?', scan)) {
                     const instructionEnd = input.indexOf('?>', scan + 2);
                     if (instructionEnd === -1) {
+                        index = scan;
                         fail('unterminated processing instruction');
                     }
                     scan = instructionEnd + 1;
@@ -192,7 +197,7 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
     }
 
     if (stack.length > 0) fail(`unclosed element <${stack[stack.length - 1].name}>`);
-    if (root == null) throw new Error('Invalid SVG: no root element found');
+    if (root == null) fail('no root element found');
     return root;
 
     function readAttributes(element: XMLElement) {
