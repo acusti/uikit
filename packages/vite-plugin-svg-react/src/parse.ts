@@ -97,14 +97,29 @@ export function parseSVG(svg: string): XMLElement {
             parent?.children.push({ type: 'text', value: input.slice(start, end) });
             index = end + ']]>'.length;
         } else if (input.startsWith('<!', index)) {
-            // doctype; its internal subset may nest a bracketed group
-            const subsetStart = index;
-            skipPast('>', 'doctype');
-            const declaration = input.slice(subsetStart, index);
-            if (declaration.includes('[') && !declaration.includes(']')) {
-                skipPast(']', 'doctype internal subset');
-                skipPast('>', 'doctype');
+            // doctype: scan to the terminating '>', ignoring '>' characters
+            // inside quoted literals and inside the bracketed internal subset
+            // (which can hold entity declarations with their own '>'s)
+            let end = -1;
+            let inSubset = false;
+            let quote = '';
+            for (let scan = index + 2; scan < length; scan += 1) {
+                const character = input[scan];
+                if (quote !== '') {
+                    if (character === quote) quote = '';
+                } else if (character === '"' || character === "'") {
+                    quote = character;
+                } else if (character === '[') {
+                    inSubset = true;
+                } else if (character === ']') {
+                    inSubset = false;
+                } else if (character === '>' && !inSubset) {
+                    end = scan;
+                    break;
+                }
             }
+            if (end === -1) fail('unterminated doctype');
+            index = end + 1;
         } else if (input.startsWith('</', index)) {
             index += 2;
             const name = readName();

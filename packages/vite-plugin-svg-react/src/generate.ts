@@ -32,7 +32,6 @@ export type ComponentOptions = {
 const IDENTIFIER_REGEX = /^[A-Za-z_$][\w$]*$/;
 const KEBAB_REGEX = /[A-ZÀ-ÖØ-Þ]/g;
 const MS_PREFIX_REGEX = /^-ms-/;
-const PX_VALUE_REGEX = /^\d+px$/;
 // tabs, newlines, and exotic line separators collapse to a single space in
 // attribute values (regular spaces are preserved as-is)
 const SPACES_REGEX = /[\t\n\r\u0085\u2028\u2029]+/g;
@@ -73,11 +72,41 @@ const toPropName = (name: string, elementName: string) => {
     return name;
 };
 
+// Split a style string into declarations at semicolons, ignoring semicolons
+// inside quotes or parentheses (e.g. url(data:image/png;base64,…)).
+const splitStyleDeclarations = (style: string) => {
+    const declarations: Array<string> = [];
+    let current = '';
+    let depth = 0;
+    let quote = '';
+    for (const character of style) {
+        if (quote !== '') {
+            if (character === quote) quote = '';
+        } else if (character === '"' || character === "'") {
+            quote = character;
+        } else if (character === '(') {
+            depth += 1;
+        } else if (character === ')') {
+            if (depth > 0) depth -= 1;
+        } else if (character === ';' && depth === 0) {
+            declarations.push(current);
+            current = '';
+            continue;
+        }
+        current += character;
+    }
+    declarations.push(current);
+    return declarations;
+};
+
 // Convert a style="…" string to a JSX style object literal, e.g.
 // style="fill: red; stroke-width: 2" → {{ fill: "red", strokeWidth: 2 }}.
+// Values with units stay strings: React only auto-appends px to properties
+// outside its unitless list, so converting "20px" to 20 would corrupt
+// unitless properties (line-height) and custom properties (--*).
 const toStyleObject = (style: string) => {
     const properties: Array<string> = [];
-    for (const declaration of style.split(';')) {
+    for (const declaration of splitStyleDeclarations(style)) {
         const trimmed = declaration.trim();
         const firstColon = trimmed.indexOf(':');
         if (firstColon <= 0) continue;
@@ -91,14 +120,9 @@ const toStyleObject = (style: string) => {
             key = hyphenToCamelCase(name.toLowerCase().replace(MS_PREFIX_REGEX, 'ms-'));
             if (!IDENTIFIER_REGEX.test(key)) key = JSON.stringify(key);
         }
-        let formattedValue = '';
-        if (isNumericValue(value)) {
-            formattedValue = String(Number(value));
-        } else if (PX_VALUE_REGEX.test(value)) {
-            formattedValue = value.slice(0, -'px'.length);
-        } else {
-            formattedValue = JSON.stringify(value);
-        }
+        const formattedValue = isNumericValue(value)
+            ? String(Number(value))
+            : JSON.stringify(value);
         properties.push(`${key}: ${formattedValue}`);
     }
     if (properties.length === 0) return '{}';
