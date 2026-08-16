@@ -60,10 +60,11 @@ before they reach the bundler (e.g. `svgo --folder`).
 An optional pre-optimization pass built on [OXVG][] — the Rust,
 SVGO-compatible SVG toolchain — would fit the plugin’s all-native pipeline
 and could slot in ahead of component generation without reintroducing a JS
-compiler. If you want it, open an issue.
+compiler. If you want it, add your 👍 to [this issue][oxvg issue].
 
 [svgo]: https://github.com/svg/svgo
 [oxvg]: https://github.com/noahbald/oxvg
+[oxvg issue]: https://github.com/acusti/uikit/issues/422
 
 ## Usage
 
