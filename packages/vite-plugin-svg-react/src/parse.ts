@@ -197,7 +197,8 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
     }
 
     if (stack.length > 0) fail(`unclosed element <${stack[stack.length - 1].name}>`);
-    if (root == null) fail('no root element found');
+    // fail never returns; the return satisfies control-flow analysis
+    if (root == null) return fail('no root element found');
     return root;
 
     function readAttributes(element: XMLElement) {
