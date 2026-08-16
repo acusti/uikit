@@ -154,34 +154,12 @@ describe('generateComponentModule', () => {
         expect(code).toContain('d="M0 0   h1v1 H0z"');
     });
 
-    it('supports exportType: named', () => {
-        const code = generate(SIMPLE_SVG, { exportType: 'named' });
-        expect(code).toContain('export { SvgIcon as ReactComponent };');
-        expect(code).not.toContain('export default');
-    });
-
-    it('supports typescript: false', () => {
-        const code = generate(SIMPLE_SVG, { typescript: false });
-        expect(code).not.toContain('SVGProps');
-        expect(code).toContain('const SvgIcon = (props) =>');
-    });
-
     it('supports icon and dimensions', () => {
         expect(generate('<svg viewBox="0 0 24 24"/>', { icon: true })).toContain(
             '<svg viewBox="0 0 24 24" width="1em" height="1em" {...props} />',
         );
         expect(generate(SIMPLE_SVG, { icon: 32 })).toContain('width={32} height={32}');
         expect(generate(SIMPLE_SVG, { dimensions: false })).not.toContain('width=');
-    });
-
-    it('supports ref forwarding and memo', () => {
-        const code = generate(SIMPLE_SVG, { memo: true, ref: true });
-        expect(code).toContain(`import { type Ref, forwardRef, memo } from 'react';`);
-        expect(code).toContain('ref: Ref<SVGSVGElement>) =>');
-        expect(code).toContain('ref={ref} {...props}');
-        expect(code).toContain('const ForwardRef = forwardRef(SvgIcon);');
-        expect(code).toContain('const Memo = memo(ForwardRef);');
-        expect(code).toContain('export default Memo;');
     });
 
     it('supports svgProps, including expression values', () => {
@@ -201,25 +179,6 @@ describe('generateComponentModule', () => {
         });
         expect(code).toContain('className="overridden"');
         expect(code.match(/className/g)).toHaveLength(1);
-    });
-
-    it('supports expandProps start, end/true, and false', () => {
-        expect(generate(SIMPLE_SVG, { expandProps: 'start' })).toContain(
-            '<svg {...props} xmlns=',
-        );
-        // svgr typed expandProps as boolean | 'start' | 'end': true is 'end'
-        expect(generate(SIMPLE_SVG, { expandProps: true })).toBe(
-            generate(SIMPLE_SVG, { expandProps: 'end' }),
-        );
-        const code = generate(SIMPLE_SVG, { expandProps: false });
-        expect(code).toContain('const SvgIcon = () =>');
-        expect(code).not.toContain('{...props}');
-    });
-
-    it('supports jsxRuntime: classic', () => {
-        expect(generate(SIMPLE_SVG, { jsxRuntime: 'classic' })).toContain(
-            `import * as React from 'react';`,
-        );
     });
 
     it('throws on tag names that aren’t intrinsic JSX elements', () => {

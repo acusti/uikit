@@ -5,43 +5,26 @@ import {
 } from './mappings.js';
 import { parseSVG, type XMLElement, type XMLText } from './parse.js';
 
-// The subset of svgr’s Config that this plugin supports natively now that it
-// generates the component module directly (no svgr, no Babel). Defaults and
-// behavior match what @svgr/core produced for the same options.
+// The options this plugin supports: a deliberately small subset of svgr’s
+// Config, limited to options that shape the generated <svg> element itself.
+// Their semantics match what @svgr/core did for the same options; the module
+// wrapper (typed, default-export, props spread at the end) is fixed.
 export type ComponentOptions = {
     /** Remove width/height from the root <svg> (default: keep them). */
     dimensions?: boolean;
-    /** Where to spread props onto the root <svg> (default: 'end'; true is an alias for 'end'). */
-    expandProps?: boolean | 'end' | 'start';
-    /** Emit `export default` or a named `ReactComponent` export (default: 'default'). */
-    exportType?: 'default' | 'named';
     /** Set width/height to 1em (true) or the given value (default: false). */
     icon?: boolean | number | string;
-    /** With 'classic', compile against React.createElement (default: 'automatic'). */
-    jsxRuntime?: 'automatic' | 'classic';
-    /** Wrap the component with React.memo (default: false). */
-    memo?: boolean;
-    /** Forward refs to the root <svg> via React.forwardRef (default: false). */
-    ref?: boolean;
     /** Extra props for the root <svg>; `{expression}` values are inserted verbatim. */
     svgProps?: Record<string, string>;
-    /** Type the component with SVGProps<SVGSVGElement> (default: true). */
-    typescript?: boolean;
 };
 
-// runtime mirror of the ComponentOptions keys, used to reject svgr options
-// that this plugin no longer supports instead of silently ignoring them;
-// the satisfies clause makes tsc fail if the two ever drift apart
+// runtime mirror of the ComponentOptions keys, used to reject options this
+// plugin doesn’t support instead of silently ignoring them; the satisfies
+// clause makes tsc fail if the two ever drift apart
 const componentOptionNames = {
     dimensions: true,
-    expandProps: true,
-    exportType: true,
     icon: true,
-    jsxRuntime: true,
-    memo: true,
-    ref: true,
     svgProps: true,
-    typescript: true,
 } satisfies Record<keyof Required<ComponentOptions>, true>;
 
 export const COMPONENT_OPTION_NAMES: ReadonlySet<string> = new Set(
@@ -167,14 +150,10 @@ const toJSXAttribute = (name: string, value: string, elementName: string) => {
     return `${propName}="${escapeAttributeValue(value)}"`;
 };
 
-type RootAttributes = {
-    /** Attribute tokens inserted before the element’s own (expandProps: 'start'). */
-    leading?: Array<string>;
-    /** Attribute tokens appended after the element’s own (svgProps, ref, spread). */
-    trailing?: Array<string>;
-};
-
-const toJSXElement = (element: XMLElement, rootAttributes?: RootAttributes): string => {
+const toJSXElement = (
+    element: XMLElement,
+    trailingAttributes?: Array<string>,
+): string => {
     // like the reference, tag names are looked up as written (attribute
     // names, by contrast, are lowercased before their table lookup)
     const name = TAG_NAME_MAPPINGS[element.name] ?? element.name;
@@ -190,11 +169,11 @@ const toJSXElement = (element: XMLElement, rootAttributes?: RootAttributes): str
     if (!INTRINSIC_TAG_REGEX.test(name)) {
         throw new Error(`<${element.name}> is not a valid SVG element name`);
     }
-    const attributes: Array<string> = [...(rootAttributes?.leading ?? [])];
+    const attributes: Array<string> = [];
     for (const [attributeName, value] of element.attributes) {
         attributes.push(toJSXAttribute(attributeName, value, element.name));
     }
-    attributes.push(...(rootAttributes?.trailing ?? []));
+    if (trailingAttributes) attributes.push(...trailingAttributes);
     const attributesText = attributes.length ? ` ${attributes.join(' ')}` : '';
     let children = '';
     for (const child of element.children) {
@@ -231,26 +210,16 @@ export const getComponentName = (filePath: string) => {
     return `Svg${pascalCased}`;
 };
 
-// Generate the component module (TSX by default) for an SVG source. The
-// output matches the shape svgr produced: a props-spreading arrow-function
-// component named after the file, exported as the default export (or as
-// ReactComponent for exportType: 'named').
+// Generate the component module (TSX) for an SVG source. The output matches
+// the shape svgr produced by default: a typed arrow-function component named
+// after the file that spreads its props onto the root <svg>, exported as the
+// default export.
 export function generateComponentModule(
     svg: string,
     filePath: string,
     options: ComponentOptions = {},
 ): string {
-    const {
-        dimensions,
-        expandProps = 'end',
-        exportType = 'default',
-        icon = false,
-        jsxRuntime = 'automatic',
-        memo = false,
-        ref = false,
-        svgProps,
-        typescript = true,
-    } = options;
+    const { dimensions, icon = false, svgProps } = options;
 
     const root = parseSVG(svg, filePath);
 
@@ -285,17 +254,11 @@ export function generateComponentModule(
             );
         }
     }
-    if (ref) trailing.push('ref={ref}');
-    // svgr typed expandProps as boolean | 'start' | 'end'; true means 'end'
-    const spreadPosition = expandProps === true ? 'end' : expandProps;
-    if (spreadPosition === 'end') trailing.push('{...props}');
+    trailing.push('{...props}');
 
     let jsx = '';
     try {
-        jsx = toJSXElement(root, {
-            leading: spreadPosition === 'start' ? ['{...props}'] : [],
-            trailing,
-        });
+        jsx = toJSXElement(root, trailing);
     } catch (error) {
         // prefix emitter errors with the source file, matching parseSVG’s
         // own diagnostics
@@ -303,47 +266,11 @@ export function generateComponentModule(
         throw new Error(`Invalid SVG in ${filePath}: ${message}`);
     }
 
-    const withProps = spreadPosition !== false;
-    const lines: Array<string> = [];
-    if (jsxRuntime === 'classic') lines.push(`import * as React from 'react';`);
-    if (typescript && (withProps || ref)) {
-        lines.push(`import type { SVGProps } from 'react';`);
-    }
-    if (ref || memo) {
-        const reactImports = [
-            ref && typescript ? 'type Ref' : null,
-            ref ? 'forwardRef' : null,
-            memo ? 'memo' : null,
-        ].filter(Boolean);
-        lines.push(`import { ${reactImports.join(', ')} } from 'react';`);
-    }
-
-    const propsType = typescript ? ': SVGProps<SVGSVGElement>' : '';
-    const parameters: Array<string> = [];
-    if (withProps) {
-        parameters.push(`props${propsType}`);
-    } else if (ref) {
-        parameters.push(`_props${propsType}`);
-    }
-    if (ref) parameters.push(`ref${typescript ? ': Ref<SVGSVGElement>' : ''}`);
-
     const componentName = getComponentName(filePath);
-    lines.push(`const ${componentName} = (${parameters.join(', ')}) => ${jsx};`);
-
-    let exportedName = componentName;
-    if (ref) {
-        lines.push(`const ForwardRef = forwardRef(${componentName});`);
-        exportedName = 'ForwardRef';
-    }
-    if (memo) {
-        lines.push(`const Memo = memo(${exportedName});`);
-        exportedName = 'Memo';
-    }
-    lines.push(
-        exportType === 'named'
-            ? `export { ${exportedName} as ReactComponent };`
-            : `export default ${exportedName};`,
-    );
-
-    return `${lines.join('\n')}\n`;
+    return [
+        `import type { SVGProps } from 'react';`,
+        `const ${componentName} = (props: SVGProps<SVGSVGElement>) => ${jsx};`,
+        `export default ${componentName};`,
+        '',
+    ].join('\n');
 }

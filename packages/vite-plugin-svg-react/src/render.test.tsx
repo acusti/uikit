@@ -130,20 +130,10 @@ describe('rendered SVG components', () => {
         expect(container.querySelector('rect')?.getAttribute('class')).toBe('cls');
     });
 
-    it('exposes a named ReactComponent export with exportType: named', async () => {
-        const { ReactComponent } = await loadFixture({
-            fixture: 'cdata.svg',
-            svgrOptions: { exportType: 'named' },
-        });
-        const { container } = render(<ReactComponent />);
-        expect(container.querySelector('svg')).not.toBeNull();
-    });
-
-    it('forwards refs to the root <svg> with ref: true', async () => {
-        const { default: Icon } = await loadFixture({
-            fixture: 'cdata.svg',
-            svgrOptions: { ref: true },
-        });
+    it('forwards refs to the root <svg> via the props spread (React 19)', async () => {
+        // React 19 passes ref as a regular prop, so the props spread carries
+        // it to the DOM node without any forwardRef wrapper
+        const { default: Icon } = await loadFixture({ fixture: 'cdata.svg' });
         const ref = createRef<SVGSVGElement>();
         render(<Icon ref={ref} />);
         expect(ref.current?.tagName.toLowerCase()).toBe('svg');
