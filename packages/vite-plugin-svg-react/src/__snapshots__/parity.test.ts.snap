@@ -1,0 +1,119 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`svgr parity corpus > CDATA, entities, and multiline attributes 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg {...props}><style>{".a > .b { fill: red; }"}</style><text fontFamily="A &amp; B &quot;C&quot;" x={5}>{"aA<b>"}</text><path d="M0 0   h1v1 H0z" /></svg>;
+export default SvgIcon;
+"
+`;
+
+exports[`svgr parity corpus > component naming from a digit-initial file name 1`] = `
+"import type { SVGProps } from 'react';
+const Svg2Fast = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
+export default Svg2Fast;
+"
+`;
+
+exports[`svgr parity corpus > defaults with the complex document 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" className="icon" strokeWidth={2} fillRule="evenodd" {...props}><title>{"My & Icon"}</title><desc>{"It's a \\"nice\\" icon {with braces}"}</desc><defs><linearGradient id="g"><stop offset="0%" stopColor="#fff" /></linearGradient></defs><style>{".cls-1{fill:red}"}</style><path d="M0 0h1v1H0z" style={{ fill: "red", strokeWidth: 2, WebkitTransform: "rotate(3deg)", "--custom": 4 }} /><use xlinkHref="#g" xmlSpace="preserve" data-foo="bar" aria-hidden="true" /><text>{"braces {here} and \\"quotes\\""}</text></svg>;
+export default SvgIcon;
+"
+`;
+
+exports[`svgr parity corpus > defaults with the simple document 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
+export default SvgIcon;
+"
+`;
+
+exports[`svgr parity corpus > dimensions false 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
+export default SvgIcon;
+"
+`;
+
+exports[`svgr parity corpus > expandProps false 1`] = `
+"const SvgIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24"><path d="M0 0h1v1H0z" /></svg>;
+export default SvgIcon;
+"
+`;
+
+exports[`svgr parity corpus > expandProps start 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24"><path d="M0 0h1v1H0z" /></svg>;
+export default SvgIcon;
+"
+`;
+
+exports[`svgr parity corpus > exportType named 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
+export { SvgIcon as ReactComponent };
+"
+`;
+
+exports[`svgr parity corpus > icon numeric 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={32} height={32} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
+export default SvgIcon;
+"
+`;
+
+exports[`svgr parity corpus > icon true without dimensions 1`] = `
+"import type { SVGProps } from 'react';
+const SvgArrowLeft = (props: SVGProps<SVGSVGElement>) => <svg viewBox="0 0 24 24" width="1em" height="1em" {...props}><path d="M0 0" /></svg>;
+export default SvgArrowLeft;
+"
+`;
+
+exports[`svgr parity corpus > jsxRuntime classic 1`] = `
+"import * as React from 'react';
+import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
+export default SvgIcon;
+"
+`;
+
+exports[`svgr parity corpus > memo 1`] = `
+"import type { SVGProps } from 'react';
+import { memo } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
+const Memo = memo(SvgIcon);
+export default Memo;
+"
+`;
+
+exports[`svgr parity corpus > ref 1`] = `
+"import type { SVGProps } from 'react';
+import { type Ref, forwardRef } from 'react';
+const SvgMyIcon = (props: SVGProps<SVGSVGElement>, ref: Ref<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" ref={ref} {...props}><path d="M0 0h1v1H0z" /></svg>;
+const ForwardRef = forwardRef(SvgMyIcon);
+export default ForwardRef;
+"
+`;
+
+exports[`svgr parity corpus > ref and memo 1`] = `
+"import type { SVGProps } from 'react';
+import { type Ref, forwardRef, memo } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>, ref: Ref<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" ref={ref} {...props}><path d="M0 0h1v1H0z" /></svg>;
+const ForwardRef = forwardRef(SvgIcon);
+const Memo = memo(ForwardRef);
+export default Memo;
+"
+`;
+
+exports[`svgr parity corpus > svgProps with an expression value 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" height={props.width} role="img" {...props}><path d="M0 0h1v1H0z" /></svg>;
+export default SvgIcon;
+"
+`;
+
+exports[`svgr parity corpus > typescript false 1`] = `
+"const SvgIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
+export default SvgIcon;
+"
+`;
