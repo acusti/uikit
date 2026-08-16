@@ -16,6 +16,10 @@
 - `@acusti/vite-plugin-svg-react` v0.1.0 published; outlyne migrated onto
   it in PR #1859 (merged). Remaining gate before tagging v1: verify in
   prod, plus the pre-v1 package-hardening checklist below.
+- **2026-08-16: v4 rework on branch `svg-react/drop-svgr-babel`** (commit
+  `3285c7f`, pending review): the plugin now generates component modules
+  directly and drops `@svgr/*` — and with it Babel — entirely. See "v4 —
+  dropping svgr" below; it changes the post's framing in a few places.
 - **This is set up as two posts.** Post 1 (outlined in full below) is the
   "four scars" origin/design story. Post 2 (not yet outlined) is the deep
   debugging story of the v3 heisenbug specifically — post 1 deliberately
@@ -110,6 +114,62 @@ Plus the sharing arc as the package's origin story in miniature: commit
 `../main/vite.config.ts` is "a package with commitment issues." Extraction
 just finished the thought.
 
+## v4 — dropping svgr (and with it, Babel) — added 2026-08-16
+
+Branch `svg-react/drop-svgr-babel` (commit `3285c7f`, pending review)
+reworks the package to emit each component module directly as a string — a
+minimal hand-rolled XML parser, the React prop-name mapping tables
+extracted from `@svgr/hast-util-to-babel-ast`, and a template-string
+emitter — with the JSX still compiled by Vite's `transformWithOxc`. No
+`@svgr/*`, no `@babel/*`, zero runtime dependencies. Unlike the four
+gotchas, this era didn't open with a failure: svgr worked. It was just
+carrying a full Babel parse-and-reprint pipeline to do what is, for
+SVG→JSX, a string-to-string conversion with a lookup table.
+
+Raw material worth keeping:
+
+- **Fidelity was verified against svgr itself before deleting it.** Probe
+  scripts captured `@svgr/core`'s output for the plugin's defaults and
+  every supported option; the new emitter matches byte-for-byte on that
+  corpus (modulo quote style). The mapping tables were extracted
+  programmatically from `@svgr/hast-util-to-babel-ast` in node_modules, not
+  transcribed by hand.
+- **Numbers** (representative 20-element fixture, node 22, load hook end to
+  end including the oxc compile): cold per-SVG transform 170–280ms → ~6ms;
+  warm 5–10ms → ~1.2ms; plugin import chain 385–420ms (`@svgr/*` + Babel +
+  vite) → ~235ms (vite alone). 29 packages left this monorepo's lockfile;
+  standalone consumers shed the whole `@babel/*` tree on top of that.
+- **One behavior improvement:** CDATA sections are preserved as text —
+  svgr's svg-parser silently dropped them, so
+  `<style><![CDATA[…]]></style>` came out as `<style />`.
+- **The API held still:** same `svgrOptions` key (name kept deliberately
+  for compat), same defaults, same semantics for exportType / typescript /
+  icon / dimensions / svgProps / ref / memo / expandProps / jsxRuntime.
+  Options that configured svgr's own pipeline (`plugins`, `template`,
+  `svgoConfig`) are gone; the README points at OXVG (the Rust,
+  SVGO-compatible toolchain) as the future optional optimizer.
+- **Tests now do what Lesson 2 preaches, one level deeper:** fixture SVGs
+  run through the real load hook, the compiled modules are imported and
+  rendered under happy-dom, and the assertions are on the DOM, not on
+  emitted strings.
+
+### What v4 does to the post plan
+
+- The subhead's "a tiny SVGR plugin" and the SVGR leg of the taxonomy need
+  retouching: it's now "SVGR-compatible, without SVGR" — arguably a
+  stronger hook for the search query the post owns. "70 lines" is stale too
+  (~600 including the mapping tables, still zero dependencies).
+- This is **not a fifth scar** — no verbatim error string, no break. It
+  slots into section 6 (the extraction / ending) as the final beat: the
+  package didn't just leave home, it stopped needing its parent. The
+  earlier note to "resist a fifth section about the future" was about
+  speculation; this is shipped, so it strengthens the ending instead of
+  diluting it.
+- Candidate closing lesson if a fifth box is wanted: **the transform was
+  never the hard part — SVG→JSX is a lookup table and an escape function,
+  not a compiler pipeline.** (Lesson 1 said the compile must be oxc; v4
+  says the conversion needs no compiler at all.)
+
 ## The full merged outline
 
 **Title:** The best way to render SVGs in React with Vite 8 + Rolldown
@@ -153,20 +213,22 @@ the search query this post owns.)
 
 ## Pre-v1 package hardening checklist (surfaced while migrating outlyne)
 
-- `load()` extracts the file path via a hardcoded `id.slice(23)` — correct
-  for the current `\0vite-plugin-svg-react:` prefix length but silently
-  breaks if the prefix ever changes. Switch to
-  `id.slice(VIRTUAL_PREFIX.length)`.
+- ~~`load()` extracts the file path via a hardcoded `id.slice(23)`~~ —
+  **done**: the shipped code uses `id.slice(VIRTUAL_PREFIX.length)`.
 - Package test suite should add (outlyne's contract test intentionally
   stays thin and consumer-facing, not a substitute for these): the
   virtual-id shape test (`\0` prefix, no fake on-disk `.tsx` path);
-  `svgrOptions` merge behavior (user options shallow-merge over defaults
-  without clobbering `plugins: [jsx]`); one true integration test with a
-  real Vite `createServer` or fixture build asserting an `.svg?react`
-  import transforms end to end (this is the tier that would have caught the
-  `id.slice(23)` issue, plus `enforce: 'pre'` ordering and alias-resolution
-  issues); sourcemap presence (non-null); non-matching ids pass through
-  undyed.
+  ~~`svgrOptions` merge behavior~~ (**done** — and post-v4 there is no
+  `plugins: [jsx]` to clobber; the merge is over a plain options bag); one
+  true integration test with a real Vite `createServer` or fixture build
+  asserting an `.svg?react` import transforms end to end (this is the tier
+  that would have caught the `id.slice(23)` issue, plus `enforce: 'pre'`
+  ordering and alias-resolution issues); sourcemap presence (non-null);
+  non-matching ids pass through undyed. The v4 branch adds the
+  load-hook-to-rendered-DOM tier (fixtures through the real load hook,
+  compiled modules rendered under happy-dom); the `createServer`
+  integration, sourcemap, virtual-id shape, and passthrough tests remain
+  open.
 
 ## Open TODOs before drafting
 
@@ -174,3 +236,7 @@ the search query this post owns.)
   ending explicitly promises it.
 - Re-verify in prod, then tag package v1 (post 1's own closing pitch
   depends on the package being real, not just outlyne-internal).
+- Once the v4 branch (`svg-react/drop-svgr-babel`) merges and ships: sweep
+  the outline for stale svgr framing (subhead, taxonomy, "70 lines"),
+  decide whether the ending gets the fifth lesson box, and fold the perf
+  numbers into section 6's pitch.
