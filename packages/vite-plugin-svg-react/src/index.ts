@@ -11,12 +11,11 @@ export type { ComponentOptions } from './generate.js';
 
 export type Options = {
     /**
-     * Options controlling the generated component modules: dimensions, icon,
-     * and svgProps — a deliberately small subset of svgr’s Config, with the
-     * same semantics. The name is carried over from the plugin’s original
-     * svgr implementation.
+     * Options shaping the generated <svg> element — dimensions, icon, and
+     * svgProps — with the same semantics as svgr’s options of the same
+     * names. Nested so the top level stays free for plugin-level options.
      */
-    svgrOptions?: ComponentOptions;
+    svg?: ComponentOptions;
 };
 
 const svgReactImportFilter = /\.svg\?react$/;
@@ -25,33 +24,35 @@ const VIRTUAL_PREFIX = '\0vite-plugin-svg-react:';
 const virtualModuleFilter = /^\0vite-plugin-svg-react:/;
 
 export default function vitePluginSVGReact(options: Options = {}): Plugin {
-    // Reject unrecognized options — a typo at the top level (svgOptions) or
-    // svgr options this plugin doesn’t carry over (namedExport, titleProp,
-    // …) — instead of silently ignoring them: a silently dropped option
-    // surfaces as broken imports or missing behavior with an error that
-    // points nowhere near the cause, and only TypeScript consumers get a
-    // compile-time diagnostic.
-    const unsupportedTopLevel = Object.keys(options).filter(
-        (name) => name !== 'svgrOptions',
-    );
+    // Reject unrecognized options — a typo at the top level, the pre-rework
+    // svgrOptions key, or svgr options this plugin doesn’t carry over
+    // (namedExport, titleProp, …) — instead of silently ignoring them: a
+    // silently dropped option surfaces as broken imports or missing behavior
+    // with an error that points nowhere near the cause, and only TypeScript
+    // consumers get a compile-time diagnostic.
+    const unsupportedTopLevel = Object.keys(options).filter((name) => name !== 'svg');
     if (unsupportedTopLevel.length > 0) {
+        // point migrations from the svgr-era API (this plugin ≤ 0.1 and
+        // vite-plugin-svgr) at the renamed, narrowed shape
+        const hint = unsupportedTopLevel.includes('svgrOptions')
+            ? 'svgrOptions was renamed to svg and narrowed to dimensions, icon, and svgProps (see the README’s Options section).'
+            : 'The only supported option is svg.';
         throw new Error(
-            `vite-plugin-svg-react: unsupported options: ${unsupportedTopLevel.join(', ')}. ` +
-                'The only supported option is svgrOptions.',
+            `vite-plugin-svg-react: unsupported options: ${unsupportedTopLevel.join(', ')}. ${hint}`,
         );
     }
-    const unsupportedOptions = Object.keys(options.svgrOptions ?? {}).filter(
+    const unsupportedOptions = Object.keys(options.svg ?? {}).filter(
         (name) => !COMPONENT_OPTION_NAMES.has(name),
     );
     if (unsupportedOptions.length > 0) {
         throw new Error(
-            `vite-plugin-svg-react: unsupported svgrOptions: ${unsupportedOptions.join(', ')}. ` +
+            `vite-plugin-svg-react: unsupported svg options: ${unsupportedOptions.join(', ')}. ` +
                 `Supported options: ${Array.from(COMPONENT_OPTION_NAMES).join(', ')} ` +
                 '(see the README’s Options section).',
         );
     }
 
-    const componentOptions: ComponentOptions = options.svgrOptions ?? {};
+    const componentOptions: ComponentOptions = options.svg ?? {};
     let development = false;
     return {
         configResolved(config) {
