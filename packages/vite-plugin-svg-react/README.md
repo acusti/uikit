@@ -44,9 +44,9 @@ to camelCase, `class` → `className`, `xlink:*`/`xml:*` to their React prop
 names, `data-*`/`aria-*` passed through, `style` strings to style objects),
 so the rendered components are the same. What consumers get out of it:
 
-- **Zero dependencies**: no `@svgr/*` and no `@babel/*` in the dependency
+- **Zero dependencies:** no `@svgr/*` and no `@babel/*` in the dependency
   tree, which removes dozens of packages from a typical install.
-- **Fast cold transforms**: emitting the module as a string takes
+- **Fast cold transforms:** emitting the module as a string takes
   microseconds, and compiling it with oxc takes about a millisecond, so the
   first `.svg?react` import costs single-digit milliseconds instead of the
   hundreds of milliseconds it takes to load and warm up a Babel pipeline.
