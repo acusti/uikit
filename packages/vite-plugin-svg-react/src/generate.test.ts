@@ -192,9 +192,13 @@ describe('generateComponentModule', () => {
         expect(code).toContain('height={props.width}');
     });
 
-    it('supports expandProps start and false', () => {
+    it('supports expandProps start, end/true, and false', () => {
         expect(generate(SIMPLE_SVG, { expandProps: 'start' })).toContain(
             '<svg {...props} xmlns=',
+        );
+        // svgr typed expandProps as boolean | 'start' | 'end': true is 'end'
+        expect(generate(SIMPLE_SVG, { expandProps: true })).toBe(
+            generate(SIMPLE_SVG, { expandProps: 'end' }),
         );
         const code = generate(SIMPLE_SVG, { expandProps: false });
         expect(code).toContain('const SvgIcon = () =>');
@@ -205,6 +209,13 @@ describe('generateComponentModule', () => {
         expect(generate(SIMPLE_SVG, { jsxRuntime: 'classic' })).toContain(
             `import * as React from 'react';`,
         );
+    });
+
+    it('throws on tag names that aren’t intrinsic JSX elements', () => {
+        // an uppercase-initial or dotted name would compile into a component
+        // reference and throw a ReferenceError at render time
+        expect(() => generate('<svg><CLIPPATH/></svg>')).toThrow(/CLIPPATH/);
+        expect(() => generate('<svg><a.b/></svg>')).toThrow(/a\.b/);
     });
 
     it('throws on malformed SVG', () => {

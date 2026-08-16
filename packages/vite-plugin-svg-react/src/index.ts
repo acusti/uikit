@@ -1,7 +1,11 @@
 import fs from 'node:fs/promises';
 import { type Plugin, transformWithOxc } from 'vite';
 
-import { type ComponentOptions, generateComponentModule } from './generate.js';
+import {
+    COMPONENT_OPTION_NAMES,
+    type ComponentOptions,
+    generateComponentModule,
+} from './generate.js';
 
 export type { ComponentOptions } from './generate.js';
 
@@ -28,7 +32,26 @@ const defaultComponentOptions: ComponentOptions = {
 };
 
 export default function vitePluginSVGReact(options: Options = {}): Plugin {
+    // Reject unrecognized options (svgr options this plugin doesn’t carry
+    // over, like namedExport or titleProp) instead of silently ignoring
+    // them: a silently dropped option surfaces as broken imports or missing
+    // behavior with an error that points nowhere near the cause, and only
+    // TypeScript consumers get a compile-time diagnostic.
+    const unsupportedOptions = Object.keys(options.svgrOptions ?? {}).filter(
+        (name) => !COMPONENT_OPTION_NAMES.has(name),
+    );
+    if (unsupportedOptions.length > 0) {
+        throw new Error(
+            `vite-plugin-svg-react: unsupported svgrOptions: ${unsupportedOptions.join(', ')}. ` +
+                `Supported options: ${Array.from(COMPONENT_OPTION_NAMES).join(', ')} ` +
+                '(see the README’s Options section).',
+        );
+    }
+
     const componentOptions = { ...defaultComponentOptions, ...options.svgrOptions };
+    // the generated modules import * as React and use React.createElement
+    // when the classic runtime is requested
+    const runtime = componentOptions.jsxRuntime === 'classic' ? 'classic' : 'automatic';
     let development = false;
     return {
         configResolved(config) {
@@ -46,12 +69,18 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             if (!virtualModuleFilter.test(id)) return;
             // extract the real file path from the virtual ID
             const filePath = id.slice(VIRTUAL_PREFIX.length);
+            // the virtual id hides the on-disk source from Rollup, so
+            // editing the SVG wouldn’t invalidate this module otherwise
+            this.addWatchFile(filePath);
             const svg = await fs.readFile(filePath, 'utf-8');
 
             const code = generateComponentModule(svg, filePath, componentOptions);
 
             const compiled = await transformWithOxc(code, filePath, {
-                jsx: { development, runtime: 'automatic' },
+                jsx: {
+                    development: development && runtime === 'automatic',
+                    runtime,
+                },
                 lang: 'tsx',
             });
 

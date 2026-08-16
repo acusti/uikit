@@ -36,8 +36,14 @@ async function loadFixture({
     configResolved({ command });
 
     const filePath = join(import.meta.dirname, 'fixtures', fixture);
-    const load = plugin.load as (id: string) => Promise<{ code: string }>;
-    const { code } = await load(`\0vite-plugin-svg-react:${filePath}`);
+    const load = plugin.load as (
+        this: { addWatchFile: (id: string) => void },
+        id: string,
+    ) => Promise<{ code: string }>;
+    const { code } = await load.call(
+        { addWatchFile: () => undefined },
+        `\0vite-plugin-svg-react:${filePath}`,
+    );
 
     moduleCount += 1;
     const modulePath = join(OUTPUT_DIRECTORY, `module-${moduleCount}.mjs`);

@@ -9,6 +9,11 @@ import vitePluginSVGReact, { type Options } from './index.js';
 
 const SVG = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v1H0z"/></svg>';
 
+type LoadHook = (
+    this: { addWatchFile: (id: string) => void },
+    id: string,
+) => Promise<undefined | { code: string; map: unknown }>;
+
 type ResolveIdHook = (
     this: { resolve: (source: string) => Promise<null | { id: string }> },
     source: string,
@@ -34,11 +39,15 @@ async function loadSVGComponent({
         const filePath = join(directory, 'icon.svg');
         await writeFile(filePath, SVG);
 
-        const load = plugin.load as (
-            id: string,
-        ) => Promise<{ code: string; map: unknown }>;
-        const result = await load(`\0vite-plugin-svg-react:${filePath}`);
-        return result;
+        const load = plugin.load as LoadHook;
+        const watchedFiles: Array<string> = [];
+        const context = {
+            addWatchFile: (file: string) => {
+                watchedFiles.push(file);
+            },
+        };
+        const result = await load.call(context, `\0vite-plugin-svg-react:${filePath}`);
+        return { ...result, filePath, watchedFiles };
     } finally {
         await rm(directory, { force: true, recursive: true });
     }
@@ -106,7 +115,37 @@ describe('vite-plugin-svg-react', () => {
             resolveId.call(context, '/project/icon.svg', '/project/app.tsx', {}),
         ).resolves.toBeNull();
 
-        const load = plugin.load as (id: string) => Promise<unknown>;
-        await expect(load('/project/icon.svg')).resolves.toBeUndefined();
+        const load = plugin.load as LoadHook;
+        await expect(
+            load.call({ addWatchFile: () => undefined }, '/project/icon.svg'),
+        ).resolves.toBeUndefined();
+    });
+
+    it('registers the source SVG as a watched file', async () => {
+        // the virtual id hides the on-disk source from Rollup, so without
+        // this, editing an SVG in dev wouldn’t invalidate its module
+        const { filePath, watchedFiles } = await loadSVGComponent({
+            command: 'serve',
+        });
+        expect(watchedFiles).toEqual([filePath]);
+    });
+
+    it('rejects svgr options that this plugin doesn’t support', () => {
+        expect(() =>
+            vitePluginSVGReact({
+                // @ts-expect-error namedExport is a dropped svgr option
+                svgrOptions: { exportType: 'named', namedExport: 'Icon' },
+            }),
+        ).toThrow(/unsupported svgrOptions: namedExport/);
+    });
+
+    it('compiles against React.createElement with jsxRuntime: classic', async () => {
+        const { code } = await loadSVGComponent({
+            command: 'serve',
+            svgrOptions: { jsxRuntime: 'classic' },
+        });
+        expect(code).toContain('React.createElement');
+        expect(code).not.toContain('react/jsx-runtime');
+        expect(code).not.toContain('react/jsx-dev-runtime');
     });
 });

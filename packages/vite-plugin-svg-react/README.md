@@ -144,20 +144,24 @@ svgReact({
 
 - `dimensions: false` removes `width`/`height` from the root `<svg>`
 - `expandProps` controls where props are spread onto the root `<svg>`
-  (`'end'`, `'start'`, or `false`)
+  (`'end'`, `'start'`, or `false`; `true` is an alias for `'end'`)
 - `exportType` exports the component as the default export (`'default'`) or
   as a named `ReactComponent` export (`'named'`)
 - `icon` sets `width`/`height` to `1em` (`true`) or to the value you pass
-- `jsxRuntime: 'classic'` adds an `import * as React` statement
+- `jsxRuntime: 'classic'` compiles against `React.createElement` instead of
+  `react/jsx-runtime`
 - `memo` wraps the component with `React.memo`
 - `ref` forwards refs to the root `<svg>` via `React.forwardRef`
 - `svgProps` adds extra props to the root `<svg>` (string values, or
   `{expression}` strings inserted verbatim)
 - `typescript: false` emits an untyped (plain JSX) component
 
-SVGR options that configured SVGR’s own plugin pipeline (`plugins`,
-`template`, `svgoConfig`, and so on) are not supported, since there is no
-SVGR under the hood anymore.
+Any other option throws at config time. That includes the SVGR options that
+configured SVGR’s own plugin pipeline (`plugins`, `template`, `svgoConfig`)
+as well as SVGR options this plugin doesn’t carry over (`namedExport`,
+`titleProp`, `descProp`, `replaceAttrValues`, and so on) — rejecting them
+loudly beats silently generating components that don’t match your
+configuration.
 
 [svgr options]: https://react-svgr.com/docs/options/
 
