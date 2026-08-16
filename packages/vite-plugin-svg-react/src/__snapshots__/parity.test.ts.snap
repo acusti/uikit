@@ -35,26 +35,6 @@ export default SvgIcon;
 "
 `;
 
-exports[`svgr parity corpus > expandProps false 1`] = `
-"const SvgIcon = () => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24"><path d="M0 0h1v1H0z" /></svg>;
-export default SvgIcon;
-"
-`;
-
-exports[`svgr parity corpus > expandProps start 1`] = `
-"import type { SVGProps } from 'react';
-const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg {...props} xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24"><path d="M0 0h1v1H0z" /></svg>;
-export default SvgIcon;
-"
-`;
-
-exports[`svgr parity corpus > exportType named 1`] = `
-"import type { SVGProps } from 'react';
-const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
-export { SvgIcon as ReactComponent };
-"
-`;
-
 exports[`svgr parity corpus > icon numeric 1`] = `
 "import type { SVGProps } from 'react';
 const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={32} height={32} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
@@ -69,51 +49,9 @@ export default SvgArrowLeft;
 "
 `;
 
-exports[`svgr parity corpus > jsxRuntime classic 1`] = `
-"import * as React from 'react';
-import type { SVGProps } from 'react';
-const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
-export default SvgIcon;
-"
-`;
-
-exports[`svgr parity corpus > memo 1`] = `
-"import type { SVGProps } from 'react';
-import { memo } from 'react';
-const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
-const Memo = memo(SvgIcon);
-export default Memo;
-"
-`;
-
-exports[`svgr parity corpus > ref 1`] = `
-"import type { SVGProps } from 'react';
-import { type Ref, forwardRef } from 'react';
-const SvgMyIcon = (props: SVGProps<SVGSVGElement>, ref: Ref<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" ref={ref} {...props}><path d="M0 0h1v1H0z" /></svg>;
-const ForwardRef = forwardRef(SvgMyIcon);
-export default ForwardRef;
-"
-`;
-
-exports[`svgr parity corpus > ref and memo 1`] = `
-"import type { SVGProps } from 'react';
-import { type Ref, forwardRef, memo } from 'react';
-const SvgIcon = (props: SVGProps<SVGSVGElement>, ref: Ref<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" ref={ref} {...props}><path d="M0 0h1v1H0z" /></svg>;
-const ForwardRef = forwardRef(SvgIcon);
-const Memo = memo(ForwardRef);
-export default Memo;
-"
-`;
-
 exports[`svgr parity corpus > svgProps with an expression value 1`] = `
 "import type { SVGProps } from 'react';
 const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} viewBox="0 0 24 24" height={props.width} role="img" {...props}><path d="M0 0h1v1H0z" /></svg>;
-export default SvgIcon;
-"
-`;
-
-exports[`svgr parity corpus > typescript false 1`] = `
-"const SvgIcon = (props) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;
 export default SvgIcon;
 "
 `;

@@ -11,11 +11,10 @@ export type { ComponentOptions } from './generate.js';
 
 export type Options = {
     /**
-     * Options controlling the generated component modules, shallow-merged
-     * over the defaults ({ exportType: 'default', jsxRuntime: 'automatic',
-     * typescript: true }). The name and the option semantics are carried
-     * over from the plugin’s original svgr implementation, so existing
-     * configurations keep working.
+     * Options controlling the generated component modules: dimensions, icon,
+     * and svgProps — a deliberately small subset of svgr’s Config, with the
+     * same semantics. The name is carried over from the plugin’s original
+     * svgr implementation.
      */
     svgrOptions?: ComponentOptions;
 };
@@ -24,12 +23,6 @@ const svgReactImportFilter = /\.svg\?react$/;
 // virtual module prefix (Rollup/Vite convention)
 const VIRTUAL_PREFIX = '\0vite-plugin-svg-react:';
 const virtualModuleFilter = /^\0vite-plugin-svg-react:/;
-
-const defaultComponentOptions: ComponentOptions = {
-    exportType: 'default',
-    jsxRuntime: 'automatic',
-    typescript: true,
-};
 
 export default function vitePluginSVGReact(options: Options = {}): Plugin {
     // Reject unrecognized options — a typo at the top level (svgOptions) or
@@ -58,10 +51,7 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
         );
     }
 
-    const componentOptions = { ...defaultComponentOptions, ...options.svgrOptions };
-    // the generated modules import * as React and use React.createElement
-    // when the classic runtime is requested
-    const runtime = componentOptions.jsxRuntime === 'classic' ? 'classic' : 'automatic';
+    const componentOptions: ComponentOptions = options.svgrOptions ?? {};
     let development = false;
     return {
         configResolved(config) {
@@ -87,10 +77,7 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             const code = generateComponentModule(svg, filePath, componentOptions);
 
             const compiled = await transformWithOxc(code, filePath, {
-                jsx: {
-                    development: development && runtime === 'automatic',
-                    runtime,
-                },
+                jsx: { development, runtime: 'automatic' },
                 lang: 'tsx',
             });
 

@@ -127,11 +127,9 @@ project (e.g. `src/vite-env.d.ts`):
 
 The plugin takes an optional options object with a single property:
 `svgrOptions` (the name is carried over from the plugin’s original SVGR
-implementation, so existing configurations keep working). It is
-shallow-merged over the defaults (`exportType: 'default'`,
-`jsxRuntime: 'automatic'`, `typescript: true`) and supports the [SVGR
-options][svgr options] that affect the generated component, with the same
-semantics and defaults:
+implementation). It supports a deliberately small subset of the [SVGR
+options][svgr options] — the ones that shape the generated `<svg>` element
+itself — with the same semantics:
 
 ```ts
 svgReact({
@@ -143,25 +141,27 @@ svgReact({
 ```
 
 - `dimensions: false` removes `width`/`height` from the root `<svg>`
-- `expandProps` controls where props are spread onto the root `<svg>`
-  (`'end'`, `'start'`, or `false`; `true` is an alias for `'end'`)
-- `exportType` exports the component as the default export (`'default'`) or
-  as a named `ReactComponent` export (`'named'`)
 - `icon` sets `width`/`height` to `1em` (`true`) or to the value you pass
-- `jsxRuntime: 'classic'` compiles against `React.createElement` instead of
-  `react/jsx-runtime`
-- `memo` wraps the component with `React.memo`
-- `ref` forwards refs to the root `<svg>` via `React.forwardRef`
 - `svgProps` adds extra props to the root `<svg>` (string values, or
   `{expression}` strings inserted verbatim)
-- `typescript: false` emits an untyped (plain JSX) component
 
-Any other option throws at config time. That includes the SVGR options that
-configured SVGR’s own plugin pipeline (`plugins`, `template`, `svgoConfig`)
-as well as SVGR options this plugin doesn’t carry over (`namedExport`,
-`titleProp`, `descProp`, `replaceAttrValues`, and so on) — rejecting them
-loudly beats silently generating components that don’t match your
-configuration.
+The module wrapper is fixed: a typed component that spreads its props onto
+the root `<svg>`, exported as the default export. Any other option throws
+at config time — rejecting unknown options loudly beats silently generating
+components that don’t match your configuration. That includes the SVGR
+options this plugin deliberately doesn’t carry, most of which have direct
+replacements:
+
+- `ref`: unnecessary on React 19, where `ref` is a regular prop — the props
+  spread already delivers it to the `<svg>` DOM node
+- `memo`: wrap at the use site (`memo(Icon)`)
+- `exportType`/`namedExport`: the default export is the only export, which
+  is also the only shape `client.d.ts` types
+- `typescript`: the emitted module is compiled immediately, so this had no
+  observable effect
+- `jsxRuntime`, `expandProps`, `titleProp`, `descProp`,
+  `replaceAttrValues`, and SVGR’s pipeline options (`plugins`, `template`,
+  `svgoConfig`): not supported
 
 [svgr options]: https://react-svgr.com/docs/options/
 

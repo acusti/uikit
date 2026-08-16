@@ -77,13 +77,12 @@ describe('vite-plugin-svg-react', () => {
         expect(map).not.toBeNull();
     });
 
-    it('shallow-merges svgrOptions over the defaults', async () => {
+    it('passes svgrOptions through to generation', async () => {
         const { code } = await loadSVGComponent({
             command: 'build',
-            svgrOptions: { exportType: 'named' },
+            svgrOptions: { icon: true },
         });
-        expect(code).toContain('ReactComponent');
-        expect(code).not.toContain('export default');
+        expect(code).toContain('1em');
     });
 
     it('mints \\0-prefixed virtual ids from the resolved SVG path', async () => {
@@ -133,27 +132,17 @@ describe('vite-plugin-svg-react', () => {
     it('rejects svgr options that this plugin doesn’t support', () => {
         expect(() =>
             vitePluginSVGReact({
-                // @ts-expect-error namedExport is a dropped svgr option
-                svgrOptions: { exportType: 'named', namedExport: 'Icon' },
+                // @ts-expect-error exportType is a dropped svgr option
+                svgrOptions: { exportType: 'named', icon: true },
             }),
-        ).toThrow(/unsupported svgrOptions: namedExport/);
+        ).toThrow(/unsupported svgrOptions: exportType/);
     });
 
     it('rejects unknown top-level option keys', () => {
         // a typo one level up would otherwise silently default everything
         expect(() =>
             // @ts-expect-error svgOptions is a typo of svgrOptions
-            vitePluginSVGReact({ svgOptions: { exportType: 'named' } }),
+            vitePluginSVGReact({ svgOptions: { icon: true } }),
         ).toThrow(/unsupported options: svgOptions/);
-    });
-
-    it('compiles against React.createElement with jsxRuntime: classic', async () => {
-        const { code } = await loadSVGComponent({
-            command: 'serve',
-            svgrOptions: { jsxRuntime: 'classic' },
-        });
-        expect(code).toContain('React.createElement');
-        expect(code).not.toContain('react/jsx-runtime');
-        expect(code).not.toContain('react/jsx-dev-runtime');
     });
 });

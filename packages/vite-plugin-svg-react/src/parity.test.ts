@@ -2,16 +2,19 @@ import { describe, expect, it } from 'vitest';
 
 import { type ComponentOptions, generateComponentModule } from './generate.js';
 
-// The differential corpus behind the PR’s parity claim: these outputs were
-// verified against @svgr/core@8.1 + @svgr/plugin-jsx before the dependency
-// was removed — byte-for-byte modulo quote style, except for the documented
-// deliberate divergences (CDATA preserved, px style values kept as strings,
-// semicolons inside url()/quotes not treated as declaration boundaries,
-// attribute values fully escaped at emission, svgProps overrides appended
-// instead of replaced in place, and namespaced element names rejected at
-// build time). If a change to generate.ts,
-// parse.ts, or mappings.ts alters a snapshot, that’s a parity break: update
-// deliberately, with the divergence documented, or not at all.
+// The differential corpus behind the conversion-fidelity claim: these
+// outputs were verified against @svgr/core@8.1 + @svgr/plugin-jsx before the
+// dependency was removed — byte-for-byte modulo quote style, except for the
+// documented deliberate divergences (CDATA preserved, px style values kept
+// as strings, semicolons inside url()/quotes not treated as declaration
+// boundaries, attribute values fully escaped at emission, svgProps overrides
+// appended instead of replaced in place, and namespaced element names
+// rejected at build time). The corpus covers the supported options
+// (dimensions, icon, svgProps) and the markup edge cases; svgr options the
+// plugin deliberately dropped are rejected at config time and aren’t
+// represented here. If a change to generate.ts, parse.ts, or mappings.ts
+// alters a snapshot, that’s a fidelity break: update deliberately, with the
+// divergence documented, or not at all.
 
 const COMPLEX_SVG = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -39,7 +42,6 @@ const CASES: Array<{
 }> = [
     { name: 'defaults with the complex document', svg: COMPLEX_SVG },
     { name: 'defaults with the simple document' },
-    { name: 'exportType named', options: { exportType: 'named' } },
     {
         filePath: '/x/arrow-left.svg',
         name: 'icon true without dimensions',
@@ -48,17 +50,10 @@ const CASES: Array<{
     },
     { name: 'icon numeric', options: { icon: 32 } },
     { name: 'dimensions false', options: { dimensions: false } },
-    { filePath: '/x/my_icon.svg', name: 'ref', options: { ref: true } },
-    { name: 'memo', options: { memo: true } },
-    { name: 'ref and memo', options: { memo: true, ref: true } },
     {
         name: 'svgProps with an expression value',
         options: { svgProps: { height: '{props.width}', role: 'img' } },
     },
-    { name: 'typescript false', options: { typescript: false } },
-    { name: 'jsxRuntime classic', options: { jsxRuntime: 'classic' } },
-    { name: 'expandProps start', options: { expandProps: 'start' } },
-    { name: 'expandProps false', options: { expandProps: false } },
     {
         name: 'CDATA, entities, and multiline attributes',
         svg: '<svg><style><![CDATA[.a > .b { fill: red; }]]></style><text font-family="A &amp; B &quot;C&quot;" x="5">a&#65;&lt;b&gt;</text><path d="M0 0\n  h1v1\tH0z"/></svg>',
