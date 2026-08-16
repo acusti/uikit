@@ -7,6 +7,7 @@ import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { type ComponentType, createRef, type SVGProps } from 'react';
+import { build } from 'vite';
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 
 import vitePluginSVGReact, { type Options } from './index.js';
@@ -152,5 +153,47 @@ describe('rendered SVG components', () => {
         expect(svg.getAttribute('width')).toBe('1em');
         expect(svg.getAttribute('height')).toBe('1em');
         expect(svg.getAttribute('role')).toBe('img');
+    });
+
+    // The tests above hand the load hook a pre-built virtual id; this one
+    // runs a real `vite build` so the `.svg?react` import travels Vite's own
+    // resolution and plugin pipeline (enforce: 'pre' ordering ahead of asset
+    // handling, resolveId → virtual id → load), then renders the bundle.
+    it('transforms an .svg?react import end to end through a real Vite build', async () => {
+        await mkdir(OUTPUT_DIRECTORY, { recursive: true });
+        const entryPath = join(OUTPUT_DIRECTORY, 'entry.ts');
+        const svgPath = join(import.meta.dirname, 'fixtures', 'cdata.svg');
+        await writeFile(entryPath, `export { default } from '${svgPath}?react';\n`);
+
+        const result = (await build({
+            build: {
+                lib: {
+                    entry: entryPath,
+                    fileName: () => 'bundle.mjs',
+                    formats: ['es'],
+                },
+                minify: false,
+                rollupOptions: {
+                    external: ['react', 'react/jsx-runtime'],
+                },
+                write: false,
+            },
+            configFile: false,
+            logLevel: 'silent',
+            plugins: [vitePluginSVGReact()],
+        })) as Array<{ output: Array<{ code: string }> }>;
+
+        const chunk = result[0].output[0];
+        // built (not served) modules compile against the production runtime
+        expect(chunk.code).toContain('react/jsx-runtime');
+
+        const bundlePath = join(OUTPUT_DIRECTORY, 'bundle.mjs');
+        await writeFile(bundlePath, chunk.code);
+        const { default: Icon } = (await import(
+            pathToFileURL(bundlePath).href
+        )) as Record<string, SVGComponent>;
+        const { container } = render(<Icon />);
+        expect(container.querySelector('svg')?.getAttribute('viewBox')).toBe('0 0 4 4');
+        expect(container.querySelector('rect')?.getAttribute('class')).toBe('cls');
     });
 });
