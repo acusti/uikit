@@ -1,15 +1,19 @@
-import { type Config, transform } from '@svgr/core';
-import jsx from '@svgr/plugin-jsx';
 import fs from 'node:fs/promises';
 import { type Plugin, transformWithOxc } from 'vite';
 
+import { type ComponentOptions, generateComponentModule } from './generate.js';
+
+export type { ComponentOptions } from './generate.js';
+
 export type Options = {
     /**
-     * Options passed to @svgr/core’s transform, shallow-merged over the
-     * defaults ({ exportType: 'default', jsxRuntime: 'automatic',
-     * plugins: [jsx], typescript: true }).
+     * Options controlling the generated component modules, shallow-merged
+     * over the defaults ({ exportType: 'default', jsxRuntime: 'automatic',
+     * typescript: true }). The name and the option semantics are carried
+     * over from the plugin’s original svgr implementation, so existing
+     * configurations keep working.
      */
-    svgrOptions?: Config;
+    svgrOptions?: ComponentOptions;
 };
 
 const svgReactImportFilter = /\.svg\?react$/;
@@ -17,15 +21,14 @@ const svgReactImportFilter = /\.svg\?react$/;
 const VIRTUAL_PREFIX = '\0vite-plugin-svg-react:';
 const virtualModuleFilter = /^\0vite-plugin-svg-react:/;
 
-const defaultSVGROptions: Config = {
+const defaultComponentOptions: ComponentOptions = {
     exportType: 'default',
     jsxRuntime: 'automatic',
-    plugins: [jsx],
     typescript: true,
 };
 
 export default function vitePluginSVGReact(options: Options = {}): Plugin {
-    const svgrOptions = { ...defaultSVGROptions, ...options.svgrOptions };
+    const componentOptions = { ...defaultComponentOptions, ...options.svgrOptions };
     let development = false;
     return {
         configResolved(config) {
@@ -45,7 +48,7 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             const filePath = id.slice(VIRTUAL_PREFIX.length);
             const svg = await fs.readFile(filePath, 'utf-8');
 
-            const code = await transform(svg, svgrOptions, { filePath });
+            const code = generateComponentModule(svg, filePath, componentOptions);
 
             const compiled = await transformWithOxc(code, filePath, {
                 jsx: { development, runtime: 'automatic' },

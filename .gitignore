@@ -15,5 +15,8 @@ yarn-error.log*
 **/dist/*
 *.tsbuildinfo
 
+# test scratch output (compiled modules imported by render tests)
+**/.test-tmp/
+
 # claude code
 .claude

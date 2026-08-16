@@ -1,0 +1,197 @@
+// A minimal XML parser for SVG sources. It handles the constructs that show
+// up in real-world SVG files — XML prologs, doctypes (including internal
+// subsets), comments, CDATA sections, character references, self-closing
+// tags, and namespaced names — and throws on malformed markup rather than
+// guessing. It is not a general-purpose XML parser: it ignores content
+// outside the root element and doesn’t validate namespaces.
+
+export type XMLElement = {
+    // insertion-ordered; a repeated attribute name updates the value in place
+    attributes: Map<string, string>;
+    children: Array<XMLNode>;
+    name: string;
+    type: 'element';
+};
+
+export type XMLNode = XMLElement | XMLText;
+
+export type XMLText = { type: 'text'; value: string };
+
+const NAME_START = /[A-Za-z_:]/;
+const NAME_CHARS = /[^\s='"/>]+/y;
+const WHITESPACE = /\s*/y;
+
+// Decode the five predefined XML entities plus decimal/hex character
+// references. Unrecognized entities are left as-is (matching the reference
+// pipeline, which used entities’ decodeXML).
+export function decodeEntities(text: string): string {
+    if (!text.includes('&')) return text;
+    return text.replace(
+        /&(?:#x([0-9A-Fa-f]+)|#([0-9]+)|(amp|apos|gt|lt|quot));/g,
+        (match, hex: string | undefined, dec: string | undefined, named?: string) => {
+            if (named) {
+                if (named === 'amp') return '&';
+                if (named === 'apos') return "'";
+                if (named === 'gt') return '>';
+                if (named === 'lt') return '<';
+                return '"';
+            }
+            const codePoint = parseInt(hex ?? dec ?? '', hex == null ? 10 : 16);
+            try {
+                return String.fromCodePoint(codePoint);
+            } catch (_error) {
+                return match;
+            }
+        },
+    );
+}
+
+// Parse an SVG document and return its root element. Comments, doctypes,
+// processing instructions, and anything else outside the root element are
+// discarded; CDATA sections become text nodes with their literal contents.
+export function parseSVG(svg: string): XMLElement {
+    // strip a leading BOM
+    const input = svg.charCodeAt(0) === 0xfeff ? svg.slice(1) : svg;
+    const { length } = input;
+    let index = 0;
+    let root: null | XMLElement = null;
+    const stack: Array<XMLElement> = [];
+
+    const fail = (message: string): never => {
+        throw new Error(`Invalid SVG: ${message} (at character ${index})`);
+    };
+
+    const skipPast = (needle: string, description: string) => {
+        const end = input.indexOf(needle, index);
+        if (end === -1) fail(`unterminated ${description}`);
+        index = end + needle.length;
+    };
+
+    while (index < length) {
+        if (input[index] !== '<') {
+            // text run
+            const end = input.indexOf('<', index);
+            const value = input.slice(index, end === -1 ? length : end);
+            const parent: undefined | XMLElement = stack[stack.length - 1];
+            if (parent != null) {
+                parent.children.push({ type: 'text', value: decodeEntities(value) });
+            } else if (value.trim() !== '') {
+                fail('text content outside of the root element');
+            }
+            if (end === -1) break;
+            index = end;
+            continue;
+        }
+
+        if (input.startsWith('<?', index)) {
+            // processing instruction (e.g. the <?xml …?> prolog)
+            skipPast('?>', 'processing instruction');
+        } else if (input.startsWith('<!--', index)) {
+            skipPast('-->', 'comment');
+        } else if (input.startsWith('<![CDATA[', index)) {
+            const start = index + '<![CDATA['.length;
+            const end = input.indexOf(']]>', start);
+            if (end === -1) fail('unterminated CDATA section');
+            const parent = stack[stack.length - 1];
+            // CDATA contents are literal text: no entity decoding
+            parent?.children.push({ type: 'text', value: input.slice(start, end) });
+            index = end + ']]>'.length;
+        } else if (input.startsWith('<!', index)) {
+            // doctype; its internal subset may nest a bracketed group
+            const subsetStart = index;
+            skipPast('>', 'doctype');
+            const declaration = input.slice(subsetStart, index);
+            if (declaration.includes('[') && !declaration.includes(']')) {
+                skipPast(']', 'doctype internal subset');
+                skipPast('>', 'doctype');
+            }
+        } else if (input.startsWith('</', index)) {
+            index += 2;
+            const name = readName();
+            skipWhitespace();
+            if (input[index] !== '>') fail(`malformed closing tag </${name}`);
+            index += 1;
+            const element = stack.pop();
+            if (!element) fail(`unexpected closing tag </${name}>`);
+            if (element && element.name !== name) {
+                fail(`expected </${element.name}> but found </${name}>`);
+            }
+        } else {
+            // opening tag
+            index += 1;
+            const element: XMLElement = {
+                attributes: new Map(),
+                children: [],
+                name: readName(),
+                type: 'element',
+            };
+            readAttributes(element);
+            const parent: undefined | XMLElement = stack[stack.length - 1];
+            if (parent != null) {
+                parent.children.push(element);
+            } else if (root == null) {
+                root = element;
+            } else if (root != null) {
+                fail('multiple root elements');
+            }
+            const isSelfClosing = input.startsWith('/>', index);
+            if (isSelfClosing) {
+                index += 2;
+            } else if (input[index] === '>') {
+                index += 1;
+                stack.push(element);
+            } else {
+                fail(`malformed tag <${element.name}`);
+            }
+        }
+    }
+
+    if (stack.length > 0) fail(`unclosed element <${stack[stack.length - 1].name}>`);
+    if (root == null) throw new Error('Invalid SVG: no root element found');
+    return root;
+
+    function readAttributes(element: XMLElement) {
+        for (;;) {
+            skipWhitespace();
+            const character = input[index];
+            if (character == null) fail(`unterminated tag <${element.name}`);
+            if (character === '>' || character === '/') return;
+            const name = readName();
+            skipWhitespace();
+            if (input[index] !== '=') {
+                // tolerate a minimized (valueless) attribute
+                element.attributes.set(name, '');
+                continue;
+            }
+            index += 1;
+            skipWhitespace();
+            const quote = input[index];
+            if (quote !== '"' && quote !== "'") {
+                fail(`attribute ${name} is missing a quoted value`);
+            }
+            index += 1;
+            const end = input.indexOf(quote, index);
+            if (end === -1) fail(`unterminated value for attribute ${name}`);
+            element.attributes.set(name, decodeEntities(input.slice(index, end)));
+            index = end + 1;
+        }
+    }
+
+    function readName(): string {
+        const character = input[index];
+        if (character == null || !NAME_START.test(character)) {
+            fail('expected a name');
+        }
+        NAME_CHARS.lastIndex = index;
+        const match = NAME_CHARS.exec(input);
+        // NAME_CHARS is a superset of NAME_START, so match is always non-null
+        index = NAME_CHARS.lastIndex;
+        return match?.[0] ?? '';
+    }
+
+    function skipWhitespace() {
+        WHITESPACE.lastIndex = index;
+        WHITESPACE.exec(input);
+        index = WHITESPACE.lastIndex;
+    }
+}
