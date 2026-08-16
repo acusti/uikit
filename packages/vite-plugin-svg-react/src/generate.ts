@@ -44,9 +44,10 @@ export const COMPONENT_OPTION_NAMES: ReadonlySet<string> = new Set([
 ]);
 
 const IDENTIFIER_REGEX = /^[A-Za-z_$][\w$]*$/;
-// lowercase-initial (intrinsic) JSX element names, dashes allowed for
-// custom elements inside <foreignObject>
-const INTRINSIC_TAG_REGEX = /^[a-z][a-zA-Z0-9-]*$/;
+// lowercase-initial (intrinsic) JSX element names: JSX resolves these as
+// string tags; dashes and underscores are allowed after the first character
+// (custom elements inside <foreignObject>, generated XML names)
+const INTRINSIC_TAG_REGEX = /^[a-z][\w-]*$/;
 const KEBAB_REGEX = /[A-ZÀ-ÖØ-Þ]/g;
 const MS_PREFIX_REGEX = /^-ms-/;
 // tabs, newlines, and exotic line separators collapse to a single space in
