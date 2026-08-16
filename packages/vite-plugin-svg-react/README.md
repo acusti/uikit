@@ -125,15 +125,14 @@ project (e.g. `src/vite-env.d.ts`):
 
 ### Options
 
-The plugin takes an optional options object with a single property:
-`svgrOptions` (the name is carried over from the plugin’s original SVGR
-implementation). It supports a deliberately small subset of the [SVGR
-options][svgr options] — the ones that shape the generated `<svg>` element
-itself — with the same semantics:
+The plugin takes an optional options object with a single property: `svg`,
+which shapes the generated `<svg>` element. It supports a deliberately
+small subset of the [SVGR options][svgr options], with the same names and
+semantics (the nesting keeps the top level free for plugin-level options):
 
 ```ts
 svgReact({
-    svgrOptions: {
+    svg: {
         icon: true,
         svgProps: { role: 'img' },
     },
@@ -162,6 +161,10 @@ replacements:
 - `jsxRuntime`, `expandProps`, `titleProp`, `descProp`,
   `replaceAttrValues`, and SVGR’s pipeline options (`plugins`, `template`,
   `svgoConfig`): not supported
+
+Migrating from vite-plugin-svgr (or from this plugin’s svgr-based 0.1
+release): the old `svgrOptions` key throws with a message pointing here —
+move `icon`, `svgProps`, and `dimensions` under `svg` and drop the rest.
 
 [svgr options]: https://react-svgr.com/docs/options/
 

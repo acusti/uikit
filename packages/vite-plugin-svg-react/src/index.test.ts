@@ -23,12 +23,12 @@ type ResolveIdHook = (
 
 async function loadSVGComponent({
     command,
-    svgrOptions,
+    svg,
 }: {
     command: 'build' | 'serve';
-    svgrOptions?: Options['svgrOptions'];
+    svg?: Options['svg'];
 }) {
-    const plugin = vitePluginSVGReact({ svgrOptions });
+    const plugin = vitePluginSVGReact({ svg });
     const configResolved = plugin.configResolved as (
         config: Pick<ResolvedConfig, 'command'>,
     ) => void;
@@ -77,10 +77,10 @@ describe('vite-plugin-svg-react', () => {
         expect(map).not.toBeNull();
     });
 
-    it('passes svgrOptions through to generation', async () => {
+    it('passes svg options through to generation', async () => {
         const { code } = await loadSVGComponent({
             command: 'build',
-            svgrOptions: { icon: true },
+            svg: { icon: true },
         });
         expect(code).toContain('1em');
     });
@@ -129,20 +129,29 @@ describe('vite-plugin-svg-react', () => {
         expect(watchedFiles).toEqual([filePath]);
     });
 
-    it('rejects svgr options that this plugin doesn’t support', () => {
+    it('rejects svg options that this plugin doesn’t support', () => {
         expect(() =>
             vitePluginSVGReact({
                 // @ts-expect-error exportType is a dropped svgr option
-                svgrOptions: { exportType: 'named', icon: true },
+                svg: { exportType: 'named', icon: true },
             }),
-        ).toThrow(/unsupported svgrOptions: exportType/);
+        ).toThrow(/unsupported svg options: exportType/);
     });
 
     it('rejects unknown top-level option keys', () => {
         // a typo one level up would otherwise silently default everything
         expect(() =>
-            // @ts-expect-error svgOptions is a typo of svgrOptions
+            // @ts-expect-error svgOptions is a typo of svg
             vitePluginSVGReact({ svgOptions: { icon: true } }),
         ).toThrow(/unsupported options: svgOptions/);
+    });
+
+    it('points svgrOptions users at the renamed key', () => {
+        // the svgr-era key (this plugin ≤ 0.1 and vite-plugin-svgr) gets a
+        // migration message instead of the generic unknown-key error
+        expect(() =>
+            // @ts-expect-error svgrOptions was renamed to svg
+            vitePluginSVGReact({ svgrOptions: { icon: true } }),
+        ).toThrow(/svgrOptions was renamed to svg/);
     });
 });
