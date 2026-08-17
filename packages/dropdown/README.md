@@ -1187,9 +1187,12 @@ ARIA you set. The persistent tint on the selected item is themeable via the
 design (a 6% mix), which `forced-colors` mode (Windows High Contrast)
 reduces further — a `color-mix()` still computes there, but with next to
 nothing left to distinguish it from the surface. The selected item also
-gets an outline in `Highlight`, the same system color the hover state uses,
-scoped to `@media (forced-colors: active)` so it adds nothing outside that
-mode.
+gets an outline in `currentColor`, scoped to
+`@media (forced-colors: active)` so it adds nothing outside that mode —
+`currentColor` rather than a fixed system color because this item can also
+be the hover/active target, whose own rule paints the same background
+`Highlight`; a fixed-color outline would vanish into its own fill, while
+`currentColor` tracks whichever color that rule leaves in effect.
 
 ### The searchable trigger is a combobox
 
