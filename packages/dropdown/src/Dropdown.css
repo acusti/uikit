@@ -196,6 +196,15 @@
 
     [aria-selected="true"] {
         background-color: var(--uktdd-body-bg-color-selected);
+        /* forced-colors mode drops the tint to a few percent of the forced
+           foreground, which is imperceptible against the forced background —
+           color-mix keeps computing, but with no reliable value left to mix
+           in. An inset outline in the same system color the hover state
+           already uses is a second, non-color-alone signal that survives */
+        @media (forced-colors: active) {
+            outline: 2px solid Highlight;
+            outline-offset: -2px;
+        }
     }
 
     [data-ukt-active] {
