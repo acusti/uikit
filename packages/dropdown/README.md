@@ -1183,7 +1183,13 @@ additionally receives `aria-selected="true"` (`aria-selected` isn’t valid
 on a `menuitem`) — unless you author `aria-selected` on items yourself, in
 which case the component leaves selection ARIA entirely to you, as with any
 ARIA you set. The persistent tint on the selected item is themeable via the
-`--uktdd-body-bg-color-selected` custom property.
+`--uktdd-body-bg-color-selected` custom property. The tint is subtle by
+design (a 6% mix), which `forced-colors` mode (Windows High Contrast)
+reduces further — a `color-mix()` still computes there, but with next to
+nothing left to distinguish it from the surface. The selected item also
+gets an outline in `Highlight`, the same system color the hover state uses,
+scoped to `@media (forced-colors: active)` so it adds nothing outside that
+mode.
 
 ### The searchable trigger is a combobox
 
