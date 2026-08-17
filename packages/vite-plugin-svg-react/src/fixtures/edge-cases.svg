@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- a header comment that must be stripped -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 24 24" width="24" height="24" class="icon-root" stroke-width="1.5" fill-rule="evenodd">
+  <title>Fancy &amp; Icon &#169;</title>
+  <desc>An icon with {braces} and "quotes"</desc>
+  <!-- an inner comment that must be stripped -->
+  <defs>
+    <linearGradient id="gradient">
+      <stop offset="0%" stop-color="#fff" stop-opacity="0.5"/>
+    </linearGradient>
+  </defs>
+  <path d="M0 0h24v24H0z" style="fill: red; -webkit-transform: rotate(3deg); --brand: #f00" data-part="path" aria-hidden="true"/>
+  <use xlink:href="#gradient" xml:lang="en"/>
+  <text x="12" y="20">Braces {and} "quotes" \ backslash</text>
+</svg>
