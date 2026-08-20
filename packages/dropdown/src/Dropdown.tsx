@@ -443,7 +443,10 @@ function RootDropdown({
     };
 
     // Clear the disclosure intent timer on unmount so it can’t fire against
-    // unmounted DOM or dispatch submenu callbacks after teardown
+    // unmounted DOM or dispatch submenu callbacks after teardown. Deliberately
+    // unmount-only: clearDisclosureTimer only touches refs, so leaving it out
+    // of deps is safe and re-running it on every render is not desired.
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
     useEffect(() => clearDisclosureTimer, []);
 
     // A parent item discloses its submenu after a short intent delay whenever
@@ -478,7 +481,8 @@ function RootDropdown({
     };
 
     // Clear the safe-area give-up timer on unmount so it can’t fire against
-    // unmounted DOM
+    // unmounted DOM. Deliberately unmount-only, see clearDisclosureTimer above.
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
     useEffect(() => clearSafeAreaTimer, []);
 
     // The safe area is the triangle from where the pointer last sat on the
@@ -590,7 +594,8 @@ function RootDropdown({
     };
 
     // Clear props.openOnHover’s close timer on unmount so it can’t fire against
-    // unmounted DOM
+    // unmounted DOM. Deliberately unmount-only, see clearDisclosureTimer above.
+    // oxlint-disable-next-line react/exhaustive-effect-dependencies
     useEffect(() => clearHoverCloseTimer, []);
 
     const closeDropdown = (options?: { keepMenubarEngaged?: boolean }) => {
@@ -1192,7 +1197,7 @@ function RootDropdown({
 
     useKeyboardEvents({ ignoreUsedKeyboardEvents: false, onKeyDown: handleKeyDown });
 
-    const handleRef = (ref: HTMLDivElement | null): (() => void) | void => {
+    const handleRef = (ref: HTMLDivElement | null): (() => void) | undefined => {
         setDropdownElement(ref);
         if (!ref) return;
 

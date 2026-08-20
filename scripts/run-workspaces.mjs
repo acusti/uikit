@@ -49,7 +49,9 @@ for (let index = 0; index < rawArgs.length; index += 1) {
     process.exit(1);
 }
 
-const rootManifest = JSON.parse(await fs.readFile(path.join(rootDir, 'package.json'), 'utf8'));
+const rootManifest = JSON.parse(
+    await fs.readFile(path.join(rootDir, 'package.json'), 'utf8'),
+);
 const workspacePatterns = Array.isArray(rootManifest.workspaces)
     ? rootManifest.workspaces
     : (rootManifest.workspaces?.packages ?? []);
@@ -96,10 +98,17 @@ for (const workspaceDir of workspaceDirs) {
     }
 }
 
-const selectedWorkspaces = workspaces.filter((workspace) => !excludes.has(workspace.name));
+const selectedWorkspaces = workspaces.filter(
+    (workspace) => !excludes.has(workspace.name),
+);
 const selectedNames = new Set(selectedWorkspaces.map((workspace) => workspace.name));
 
-const dependencySections = ['dependencies', 'devDependencies', 'peerDependencies', 'optionalDependencies'];
+const dependencySections = [
+    'dependencies',
+    'devDependencies',
+    'peerDependencies',
+    'optionalDependencies',
+];
 const adjacency = new Map(selectedWorkspaces.map((workspace) => [workspace.name, []]));
 const inDegree = new Map(selectedWorkspaces.map((workspace) => [workspace.name, 0]));
 
@@ -141,7 +150,36 @@ if (orderedNames.length !== selectedWorkspaces.length) {
     process.exit(1);
 }
 
-const workspaceByName = new Map(selectedWorkspaces.map((workspace) => [workspace.name, workspace]));
+// @acusti/vite-plugin-react-compiler is imported by every package’s shared
+// vite.config.base.js (see that file for why), including its own — nothing
+// can express “after itself” in the dependency graph the sort above reads,
+// so its build order has to be forced here instead. Move it to the front
+// unconditionally so its dist/ always exists before any other package’s
+// vite config gets loaded.
+const buildFirstNames = ['@acusti/vite-plugin-react-compiler'];
+
+for (const name of buildFirstNames) {
+    // excluding it wouldn’t skip it so much as silently break every other
+    // package’s build, since they all load it indirectly through
+    // vite.config.base.js
+    if (excludes.has(name)) {
+        console.error(
+            `Cannot --exclude ${name}: other packages depend on it being built first.`,
+        );
+        process.exit(1);
+    }
+
+    const index = orderedNames.indexOf(name);
+
+    if (index > 0) {
+        orderedNames.splice(index, 1);
+        orderedNames.unshift(name);
+    }
+}
+
+const workspaceByName = new Map(
+    selectedWorkspaces.map((workspace) => [workspace.name, workspace]),
+);
 
 for (const name of orderedNames) {
     const workspace = workspaceByName.get(name);
@@ -150,13 +188,15 @@ for (const name of orderedNames) {
         continue;
     }
 
-    const commandLabel = mode === 'exec' ? `bun x ${scriptName}` : `bun run ${scriptName}`;
+    const commandLabel =
+        mode === 'exec' ? `bun x ${scriptName}` : `bun run ${scriptName}`;
     process.stdout.write(`\n[${name}] ${commandLabel}\n`);
 
     const exitCode = await new Promise((resolve, reject) => {
-        const command = mode === 'exec'
-            ? ['x', scriptName, ...childArgs]
-            : ['run', scriptName, ...childArgs];
+        const command =
+            mode === 'exec'
+                ? ['x', scriptName, ...childArgs]
+                : ['run', scriptName, ...childArgs];
         const child = spawn('bun', command, {
             cwd: workspace.dir,
             stdio: 'inherit',

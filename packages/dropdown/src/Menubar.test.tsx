@@ -540,7 +540,7 @@ describe('@acusti/dropdown Menubar', () => {
     });
 
     it('still navigates items with ↑/↓ and submits with Enter inside the open menu', async () => {
-        const handleSubmitItem = vi.fn();
+        const handleSubmitItem = vi.fn<() => void>();
         const user = userEvent.setup();
         renderMenubar({ onSubmitItem: handleSubmitItem });
 

@@ -92,7 +92,7 @@ export default function CSSValueInput({
     // props.value should be a string; if it’s a number, convert it here
     const value =
         typeof valueFromProps === 'number' && Number.isFinite(valueFromProps)
-            ? `${valueFromProps}`
+            ? String(valueFromProps)
             : valueFromProps;
     const submittedValueRef = useRef(value ?? '');
 

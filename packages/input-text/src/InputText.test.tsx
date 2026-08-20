@@ -54,9 +54,11 @@ describe('CSSValueInput.tsx', () => {
 
     it('triggers onPaste for text inputs and multi-line inputs', () => {
         const pasteTargets: Array<EventTarget | null> = [];
-        const onPaste = vi.fn((event) => {
-            pasteTargets.push(event.currentTarget);
-        });
+        const onPaste = vi.fn<(event: { currentTarget: EventTarget | null }) => void>(
+            (event) => {
+                pasteTargets.push(event.currentTarget);
+            },
+        );
         const { rerender } = render(<InputText onPaste={onPaste} />);
         const input = screen.getByRole('textbox') as HTMLInputElement;
 
@@ -84,8 +86,8 @@ describe('CSSValueInput.tsx', () => {
 
     it('triggers onChange and onChangeValue when discarding changes via Escape with discardOnEscape', async () => {
         const user = userEvent.setup();
-        const onChange = vi.fn();
-        const onChangeValue = vi.fn();
+        const onChange = vi.fn<() => void>();
+        const onChangeValue = vi.fn<() => void>();
         render(
             <InputText
                 discardOnEscape
@@ -122,8 +124,8 @@ describe('CSSValueInput.tsx', () => {
 
     it('does not trigger onChange when discarding via Escape if value has not changed', async () => {
         const user = userEvent.setup();
-        const onChange = vi.fn();
-        const onChangeValue = vi.fn();
+        const onChange = vi.fn<() => void>();
+        const onChangeValue = vi.fn<() => void>();
         render(
             <InputText
                 discardOnEscape
@@ -154,8 +156,8 @@ describe('CSSValueInput.tsx', () => {
 
     it('blurs the input by default when pressing Enter with submitOnEnter', async () => {
         const user = userEvent.setup();
-        const onBlur = vi.fn();
-        const onSubmit = vi.fn();
+        const onBlur = vi.fn<() => void>();
+        const onSubmit = vi.fn<() => void>();
         render(
             <form
                 onSubmit={(event) => {
@@ -176,8 +178,8 @@ describe('CSSValueInput.tsx', () => {
 
     it('keeps focus when pressing Enter with submitOnEnter and keepFocusOnSubmit', async () => {
         const user = userEvent.setup();
-        const onBlur = vi.fn();
-        const onSubmit = vi.fn();
+        const onBlur = vi.fn<() => void>();
+        const onSubmit = vi.fn<() => void>();
         render(
             <form
                 onSubmit={(event) => {
@@ -203,7 +205,7 @@ describe('CSSValueInput.tsx', () => {
 
     it('allows Shift+Enter to insert a newline for multiLine submitOnEnter inputs with doubleClickToEdit', async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn<() => void>();
         render(
             <form
                 onSubmit={(event) => {
@@ -247,7 +249,7 @@ describe('CSSValueInput.tsx', () => {
 
     it('enters edit mode instead of submitting when pressing Enter on a focused readOnly multiLine input with submitOnEnter and doubleClickToEdit', async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn<() => void>();
         render(
             <form
                 onSubmit={(event) => {
@@ -277,7 +279,7 @@ describe('CSSValueInput.tsx', () => {
 
     it('submits when pressing the primary modifier plus Enter while editing a multiLine input with submitOnEnter and doubleClickToEdit', async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn<() => void>();
         render(
             <form
                 onSubmit={(event) => {
@@ -313,7 +315,7 @@ describe('CSSValueInput.tsx', () => {
 
     it('submits when pressing Enter while already editing a multiLine input with submitOnEnter and doubleClickToEdit', async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn<() => void>();
         render(
             <form
                 onSubmit={(event) => {
@@ -341,7 +343,7 @@ describe('CSSValueInput.tsx', () => {
 
     it('discards changes when pressing Escape while editing a multiLine input with submitOnEnter and doubleClickToEdit', async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn<() => void>();
         render(
             <form
                 onSubmit={(event) => {

@@ -1,7 +1,7 @@
 export type EventType = 'keydown' | 'keypress' | 'keyup';
 export type Handler = (event: KeyboardEvent) => unknown;
 type HandlerConfig = { ignoreUsedKeyboardEvents: boolean; priority: number };
-type HandlersByPriority = Array<Set<Handler>>;
+type HandlersByPriority = Array<Set<Handler> | undefined>;
 
 export const handlersData = {
     config: new Map() as Map<Handler, HandlerConfig>,
@@ -23,7 +23,7 @@ export function addHandler({
     priority: _priority,
 }: {
     eventType: EventType;
-    handler: Handler | void;
+    handler: Handler | undefined;
     ignoreUsedKeyboardEvents?: boolean;
     priority?: number;
 }) {
@@ -36,17 +36,17 @@ export function addHandler({
 
     const handlersByPriority = handlersData[eventType];
     handlersByPriority[priority] ??= new Set();
-
     handlersByPriority[priority].add(handler);
     handlersData.config.set(handler, { ignoreUsedKeyboardEvents, priority });
 
     return () => {
         handlersData.config.delete(handler);
-        if (handlersByPriority[priority] == null) return;
+        const handlersAtPriority = handlersByPriority[priority];
+        if (handlersAtPriority == null) return;
 
-        handlersByPriority[priority].delete(handler);
-        if (!handlersByPriority[priority].size) {
-            delete handlersByPriority[priority];
+        handlersAtPriority.delete(handler);
+        if (!handlersAtPriority.size) {
+            handlersByPriority[priority] = undefined;
             // if no other handlers have a higher priority, resize the array
             for (
                 let index = priority;

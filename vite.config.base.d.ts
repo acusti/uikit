@@ -14,11 +14,4 @@ export const compilerOptions: {
     environment: {
         enableTreatRefLikeIdentifiersAsRefs: boolean;
     };
-    logger: {
-        logEvent: (
-            filename: string | null,
-            event: { detail?: unknown; kind?: string },
-        ) => void;
-    };
-    reportableLevels: Set<string>;
 };

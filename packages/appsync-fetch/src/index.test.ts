@@ -28,7 +28,9 @@ const DATE_TIME_STRING = '20150830T123600Z';
 const QUERY_ONLY_SIGNATURE =
     '1a978b7ed853f34303cb9ca91f41a18263deacc0b97eda68e208fddeb4a963af';
 
-const mockPost = vi.fn(async () => RESPONSE_AS_JSON);
+const mockPost = vi.fn<() => Promise<typeof RESPONSE_AS_JSON>>(
+    async () => RESPONSE_AS_JSON,
+);
 
 vi.mock('@acusti/post', async () => {
     const actualPost = await vi.importActual('@acusti/post');
@@ -40,6 +42,7 @@ const { appsyncFetch } = await import('./index.js');
 
 describe('appsyncFetch', () => {
     const authorizationStart = `AWS4-HMAC-SHA256 Credential=${ACCESS_KEY_ID}/20150830/${REGION}/appsync/aws4_request`;
+    // eslint-disable-next-line typescript/unbound-method -- saved only for restoration in afterAll, never called detached
     const originalToISOString = Date.prototype.toISOString;
 
     beforeAll(() => {

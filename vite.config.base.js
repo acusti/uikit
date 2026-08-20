@@ -1,7 +1,7 @@
 import { fileURLToPath } from 'node:url';
 
-import babel from '@rolldown/plugin-babel';
-import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import reactCompiler from '@acusti/vite-plugin-react-compiler';
+import react from '@vitejs/plugin-react';
 import { defineConfig as defineConfigVite } from 'vite';
 import { configDefaults } from 'vitest/config';
 
@@ -41,11 +41,11 @@ export const defineConfig = (options = {}) => {
         },
         ...(css ? { css } : {}),
         plugins: [
-            ...(isReact ? [react()] : []),
             // react: 'no-compiler' opts out of the React Compiler transform
             // (for code that by design accesses refs during render)
+            ...(isReact ? [react()] : []),
             ...(isReact === true
-                ? [babel({ presets: [reactCompilerPreset(compilerOptions)] })]
+                ? [reactCompiler({ reactCompiler: compilerOptions })]
                 : []),
             ...plugins,
         ],
@@ -57,27 +57,12 @@ export const defineConfig = (options = {}) => {
 };
 
 // React Compiler https://github.com/reactwg/react-compiler/discussions/36#discussioncomment-11285011
+// (compiler bailouts are caught by oxlint's react-compiler rules instead of
+// a runtime logger: @acusti/vite-plugin-react-compiler doesn’t support
+// callback-valued options like `logger` since they can’t cross the native
+// oxc-transform-react boundary)
 export const compilerOptions = {
     environment: {
         enableTreatRefLikeIdentifiersAsRefs: true,
     },
-    logger: {
-        logEvent(filename, event) {
-            if (event.kind !== 'CompileError') return;
-            console.log(
-                'React Compiler logger',
-                filename,
-                JSON.stringify(event.detail, null, 2),
-            );
-        },
-    },
-    // https://github.com/facebook/react/blob/5c56b87/compiler/packages/babel-plugin-react-compiler/src/CompilerError.ts#L11-L39
-    reportableLevels: new Set([
-        'CannotPreserveMemoization',
-        'InvalidConfig',
-        'InvalidJS',
-        'InvalidReact',
-        'Invariant',
-        'Todo',
-    ]),
 };
