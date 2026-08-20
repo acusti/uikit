@@ -1,5 +1,106 @@
 # @acusti/dropdown
 
+## 1.0.0-beta.2
+
+### Minor Changes
+
+- c50a281: Expose the active item to screen readers with
+  aria-activedescendant
+
+    The trigger now points at the highlighted item, kept in sync as the
+    highlight moves and cleared when the dropdown closes. Focus stays on
+    the trigger while a dropdown is open, so without this, arrowing through
+    a menu was silent to assistive tech.
+
+    Items need ids to be pointed at, and get generated ones derived from
+    the body’s id plus their index path. Treat them as internal: they are
+    re-derived whenever an item becomes active, so filtering or reordering
+    an open body reassigns them. Ids you set yourself are never touched.
+
+- 41a63e6: Declare the searchable trigger a combobox
+
+    A searchable dropdown’s trigger now declares `role="combobox"` and
+    `aria-autocomplete="list"`. Without the role it was exposed as a
+    `textbox`, which doesn’t support the `aria-expanded` it was already
+    carrying, so the open/closed state never reached assistive tech. A
+    custom trigger gets the same treatment when it _is_ a single-line text
+    input; a wrapper around one is left alone. A trigger that stays a
+    `textbox` — a `<textarea>`, or a text input in a non-searchable
+    dropdown — no longer carries `aria-expanded`, which `textbox` doesn’t
+    support either; give it a `role` to get it back.
+
+    **Upgrading:** this changes the trigger’s exposed role, so anything
+    selecting it by role needs `combobox` for searchable dropdowns —
+    `getByRole('textbox')` in tests, `[role]` selectors in CSS or queries.
+    The role of a non-searchable trigger is unchanged.
+
+- 1fe2837: Implement the documented Home/End keys
+
+    The keyboard docs listed Home and End as “jump to first/last item in
+    the current level”, but the key handler had no branch for either, so
+    both were no-ops — the only way to reach a level’s ends was ⌥/⌘ + ↑/↓.
+    Home and End now jump to the same targets those modifiers do, operating
+    on the current level (the level of the deepest highlighted item) like
+    every other navigation key, and reporting the item they land on to
+    `props.onActiveItem`.
+
+    Like ←/→, they stand down while a text input has focus — a searchable
+    dropdown’s own input, or one inside a custom trigger — where Home/End
+    are caret movement rather than menu navigation. The ⌥/⌘ + ↑/↓ shortcut,
+    which was never documented, is now listed alongside them.
+
+- 18bf9c3: Give Menubar real menubar semantics
+
+    Each member’s trigger now takes `role="menuitem"`, and the wrapper
+    elements between it and the bar are neutralized with `role="none"`.
+    Previously the bar owned only generic elements, so it was reported as a
+    menubar with no menu items at all. Its menu items also share a single
+    tab stop now (a roving tabindex that follows the last-focused trigger),
+    where every trigger used to be its own tab stop.
+
+    A searchable member keeps its `combobox` semantics and stays out of the
+    roving set. Note that a combobox isn’t valid menubar content in the
+    first place — put a search field outside the `Menubar`.
+
+    **Upgrading:** this changes the triggers’ exposed role, so anything
+    selecting a menubar member’s trigger by role needs `menuitem` rather
+    than `button`. Standalone dropdowns outside a `Menubar` are unaffected.
+
+- 83acc70: Give the popup body an accessible name
+
+    The open body now takes `aria-labelledby` pointing at whatever names
+    the trigger — `props.label` if you pass one, otherwise the trigger
+    element. Previously it carried a `role` but no name, so
+    `hasItems={false}` rendered an unnamed `dialog`.
+
+    Two shapes stay unnamed, because the trigger has no name to lend: a
+    text input trigger (`aria-labelledby` resolves one to its value) and an
+    empty generated trigger (single-child syntax with no `props.label`).
+    Pass `props.label` to name either.
+
+### Patch Changes
+
+- 5ddd59c: Stop a disabled dropdown from opening
+
+    `props.disabled` was enforced only by `.uktdropdown.disabled`'s
+    `pointer-events: none`, which stops the mouse and nothing else — a
+    disabled dropdown still opened from the keyboard, from typing in a
+    custom trigger's text input, and via `Menubar` navigation. Every path
+    that opens a dropdown now checks it, and a disabled `Menubar` member is
+    skipped rather than landed on. A dropdown disabled while already open
+    still closes normally.
+
+- fb483ea: Widen the text input selector to match use-keyboard-events
+
+    The selector that finds a custom trigger’s value-source input excluded
+    only `radio`, `checkbox`, and `range`, so a `submit`, `button`, `file`,
+    or other non-text input in a trigger was adopted as the dropdown’s
+    value source. It is now derived from `NON_TEXT_INPUT_TYPES`, the same
+    list `isEventTargetUsingKeyEvent` uses, so the two agree.
+
+- Updated dependencies [fb483ea]
+    - @acusti/use-keyboard-events@0.12.0
+
 ## 1.0.0-beta.1
 
 ### Patch Changes
