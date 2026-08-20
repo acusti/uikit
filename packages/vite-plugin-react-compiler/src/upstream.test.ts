@@ -98,10 +98,7 @@ export function Counter({ step }: { step: number }) {
     // reassigning a destructured prop identifier that a nested closure also
     // captures used to bail the whole component out via two diagnostics —
     // "Todo: Support destructuring of context variables" and "Immutability:
-    // This value cannot be modified" — that eslint-plugin-react-hooks'
-    // react-hooks/todo and react-hooks/immutability report but oxlint's
-    // react/todo and react/immutability miss; fixed upstream in 0.145.0,
-    // pinned since
+    // This value cannot be modified"; fixed upstream in 0.145.0
     it('compiles reassignment of a destructured prop captured by a closure', async () => {
         const result = await transformCode(
             `
