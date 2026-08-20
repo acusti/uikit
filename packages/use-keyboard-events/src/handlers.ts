@@ -35,8 +35,8 @@ export function addHandler({
     );
 
     const handlersByPriority = handlersData[eventType];
-    const handlers = (handlersByPriority[priority] ??= new Set());
-    handlers.add(handler);
+    handlersByPriority[priority] ??= new Set();
+    handlersByPriority[priority].add(handler);
     handlersData.config.set(handler, { ignoreUsedKeyboardEvents, priority });
 
     return () => {
