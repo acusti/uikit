@@ -7,12 +7,9 @@
 '@acusti/use-keyboard-events': patch
 ---
 
-Rebuild with the native React Compiler transform
+Rebuild with a new React Compiler toolchain
 
-The published artifacts are now built with
-@acusti/vite-plugin-react-compiler, which runs React Compiler via
-oxc-transform-react (the native Node bindings for the oxc project's Rust
-port of the compiler), replacing the Babel-based pipeline
-(@rolldown/plugin-babel + `reactCompilerPreset`). Output is verified
-equivalent: React Compiler memoization is present with zero compiler
-bailouts. No API or behavior changes.
+The published build now runs through a different React Compiler toolchain
+internally. Output is verified equivalent to the previous build: React
+Compiler memoization is unchanged, with zero compiler bailouts. No API or
+behavior changes.
