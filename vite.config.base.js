@@ -15,14 +15,20 @@ export const defineConfig = async (options = {}) => {
         target,
     } = options;
 
-    // dynamic import: only packages that opt into the compiler pay for
-    // resolving @acusti/vite-plugin-react-compiler, so packages that don’t,
-    // including @acusti/vite-plugin-react-compiler itself, never need it
-    // pre-built
+    // dynamic import via a non-literal specifier: vite’s config-file bundler
+    // resolves a literal import()’s target even when the branch that runs it
+    // is unreachable (react !== true), so a literal specifier here would
+    // require every package — including @acusti/vite-plugin-react-compiler
+    // itself — to have it pre-built just to load this shared config. A
+    // computed specifier isn’t statically analyzable, so only packages that
+    // actually reach this branch at runtime need it built (and declare it as
+    // a devDependency for build ordering, since they no longer import it
+    // directly themselves)
+    const reactCompilerPluginSpecifier = '@acusti/vite-plugin-react-compiler';
     const reactCompilerPlugins =
         isReact === true
             ? [
-                  (await import('@acusti/vite-plugin-react-compiler')).default({
+                  (await import(reactCompilerPluginSpecifier)).default({
                       reactCompiler: compilerOptions,
                   }),
               ]
