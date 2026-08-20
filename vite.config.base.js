@@ -4,7 +4,7 @@ import react from '@vitejs/plugin-react';
 import { defineConfig as defineConfigVite } from 'vite';
 import { configDefaults } from 'vitest/config';
 
-export const defineConfig = (options = {}) => {
+export const defineConfig = async (options = {}) => {
     const {
         build: buildOptions,
         css,
@@ -14,6 +14,19 @@ export const defineConfig = (options = {}) => {
         react: isReact = false,
         target,
     } = options;
+
+    // dynamic import: only packages that opt into the compiler pay for
+    // resolving @acusti/vite-plugin-react-compiler, so packages that don’t,
+    // including @acusti/vite-plugin-react-compiler itself, never need it
+    // pre-built
+    const reactCompilerPlugins =
+        isReact === true
+            ? [
+                  (await import('@acusti/vite-plugin-react-compiler')).default({
+                      reactCompiler: compilerOptions,
+                  }),
+              ]
+            : [];
 
     return defineConfigVite({
         build: {
@@ -40,13 +53,10 @@ export const defineConfig = (options = {}) => {
         },
         ...(css ? { css } : {}),
         plugins: [
-            // callers that want the React Compiler transform pass their own
-            // @acusti/vite-plugin-react-compiler() instance via `plugins`
-            // (see compilerOptions below) — kept out of this shared base
-            // config so packages that don’t opt in, including
-            // @acusti/vite-plugin-react-compiler itself, never need it
-            // pre-built
+            // react: 'no-compiler' opts out of the React Compiler transform
+            // (for code that by design accesses refs during render)
             ...(isReact ? [react()] : []),
+            ...reactCompilerPlugins,
             ...plugins,
         ],
         test: {
