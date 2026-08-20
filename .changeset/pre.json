@@ -1,14 +1,14 @@
 {
     "mode": "pre",
-    "tag": "beta",
+    "tag": "rc",
     "initialVersions": {
         "@acusti/appsync-fetch": "0.18.0",
         "@acusti/aws-signature-v4": "2.0.0",
         "@acusti/css-value-input": "2.4.0",
         "@acusti/css-values": "1.2.0",
         "@acusti/date-picker": "0.16.1",
-        "@acusti/uikit-docs": "0.6.4-alpha.0",
-        "@acusti/dropdown": "1.0.0-alpha.7",
+        "@acusti/uikit-docs": "0.6.5",
+        "@acusti/dropdown": "1.0.0-beta.2",
         "@acusti/input-text": "2.4.3",
         "@acusti/matchmaking": "0.10.0",
         "@acusti/parsing": "0.20.2",
@@ -18,9 +18,9 @@
         "@acusti/uniquify": "0.8.1",
         "@acusti/use-bounding-client-rect": "2.0.2",
         "@acusti/use-is-out-of-bounds": "0.15.0",
-        "@acusti/use-keyboard-events": "0.11.1",
-        "@acusti/vite-plugin-svg-react": "0.1.0",
-        "@acusti/vite-plugin-react-compiler": "0.0.0"
+        "@acusti/use-keyboard-events": "0.12.0",
+        "@acusti/vite-plugin-react-compiler": "0.1.0",
+        "@acusti/vite-plugin-svg-react": "0.1.0"
     },
     "changesets": [
         "dropdown-active-descendant",
