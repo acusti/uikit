@@ -74,8 +74,8 @@ export const defineConfig = async (options = {}) => {
 
 // React Compiler https://github.com/reactwg/react-compiler/discussions/36#discussioncomment-11285011
 // (compiler bailouts are caught by oxlint's react-compiler rules instead of
-// a runtime logger: @acusti/vite-plugin-react-compiler doesn't support
-// callback-valued options like `logger` since they can't cross the native
+// a runtime logger: @acusti/vite-plugin-react-compiler doesn’t support
+// callback-valued options like `logger` since they can’t cross the native
 // oxc-transform-react boundary)
 export const compilerOptions = {
     environment: {
