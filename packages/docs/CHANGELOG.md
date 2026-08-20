@@ -1,5 +1,20 @@
 # @acusti/uikit-docs
 
+## 0.6.5
+
+### Patch Changes
+
+- Updated dependencies [c50a281]
+- Updated dependencies [41a63e6]
+- Updated dependencies [5ddd59c]
+- Updated dependencies [1fe2837]
+- Updated dependencies [18bf9c3]
+- Updated dependencies [83acc70]
+- Updated dependencies [fb483ea]
+- Updated dependencies [fb483ea]
+    - @acusti/dropdown@1.0.0-beta.2
+    - @acusti/use-keyboard-events@0.12.0
+
 ## 0.6.4-alpha.0
 
 ### Patch Changes
