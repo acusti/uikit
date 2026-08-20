@@ -88,13 +88,16 @@ export default function Menubar({ children, className, style }: MenubarProps) {
     //
     // reconcileCount is the dependency that catches a member leaving: membership
     // changes in the member’s own effect, which re-renders nothing here, so its
-    // cleanup bumps the reducer to say the set has settled.
+    // cleanup bumps the reducer to say the set has settled. tabbableElement is
+    // deliberately also a dependency, so the effect re-validates it whenever it
+    // changes through any other path, not just on reconcile.
     useEffect(() => {
         const members = getOrderedMembersRef.current();
         const owner = members.find((member) => member.element === tabbableElement);
         if (owner && canHoldTabStop(owner)) return;
         const nextOwner = members.find(canHoldTabStop);
         setTabbableElement(nextOwner?.element ?? null);
+        // oxlint-disable-next-line react/exhaustive-effect-dependencies
     }, [reconcileCount, tabbableElement]);
 
     const contextValue: MenubarContextValue = useMemo(
