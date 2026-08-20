@@ -159,6 +159,16 @@ if (orderedNames.length !== selectedWorkspaces.length) {
 const buildFirstNames = ['@acusti/vite-plugin-react-compiler'];
 
 for (const name of buildFirstNames) {
+    // excluding it wouldn’t skip it so much as silently break every other
+    // package’s build, since they all load it indirectly through
+    // vite.config.base.js
+    if (excludes.has(name)) {
+        console.error(
+            `Cannot --exclude ${name}: other packages depend on it being built first.`,
+        );
+        process.exit(1);
+    }
+
     const index = orderedNames.indexOf(name);
 
     if (index > 0) {
