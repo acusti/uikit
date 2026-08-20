@@ -94,4 +94,23 @@ export function Counter({ step }: { step: number }) {
         );
         expect(result?.code).not.toContain('react/compiler-runtime');
     });
+
+    // reassigning a destructured prop identifier that a nested closure also
+    // captures bails the whole component out via two diagnostics —
+    // "Todo: Support destructuring of context variables" and "Immutability:
+    // This value cannot be modified" — that eslint-plugin-react-hooks'
+    // react-hooks/todo and react-hooks/immutability report but oxlint's
+    // react/todo and react/immutability miss
+    it.fails('compiles reassignment of a destructured prop captured by a closure', async () => {
+        const result = await transformCode(
+            `
+export default function Repro({ value }: { value: string }) {
+    value = value + '!';
+    return <button onClick={() => console.log(value)}>{value}</button>;
+}
+`,
+            '/src/Repro.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
 });
