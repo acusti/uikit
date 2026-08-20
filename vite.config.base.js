@@ -1,10 +1,11 @@
 import { fileURLToPath } from 'node:url';
 
+import reactCompiler from '@acusti/vite-plugin-react-compiler';
 import react from '@vitejs/plugin-react';
 import { defineConfig as defineConfigVite } from 'vite';
 import { configDefaults } from 'vitest/config';
 
-export const defineConfig = async (options = {}) => {
+export const defineConfig = (options = {}) => {
     const {
         build: buildOptions,
         css,
@@ -14,25 +15,6 @@ export const defineConfig = async (options = {}) => {
         react: isReact = false,
         target,
     } = options;
-
-    // dynamic import via a non-literal specifier: vite’s config-file bundler
-    // resolves a literal import()’s target even when the branch that runs it
-    // is unreachable (react !== true), so a literal specifier here would
-    // require every package — including @acusti/vite-plugin-react-compiler
-    // itself — to have it pre-built just to load this shared config. A
-    // computed specifier isn’t statically analyzable, so only packages that
-    // actually reach this branch at runtime need it built (and declare it as
-    // a devDependency for build ordering, since they no longer import it
-    // directly themselves)
-    const reactCompilerPluginSpecifier = '@acusti/vite-plugin-react-compiler';
-    const reactCompilerPlugins =
-        isReact === true
-            ? [
-                  (await import(reactCompilerPluginSpecifier)).default({
-                      reactCompiler: compilerOptions,
-                  }),
-              ]
-            : [];
 
     return defineConfigVite({
         build: {
@@ -62,7 +44,9 @@ export const defineConfig = async (options = {}) => {
             // react: 'no-compiler' opts out of the React Compiler transform
             // (for code that by design accesses refs during render)
             ...(isReact ? [react()] : []),
-            ...reactCompilerPlugins,
+            ...(isReact === true
+                ? [reactCompiler({ reactCompiler: compilerOptions })]
+                : []),
             ...plugins,
         ],
         test: {
