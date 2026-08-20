@@ -6,7 +6,7 @@ export const defineConfig: (options?: {
     entry?: string[];
     formats?: string[];
     plugins?: NonNullable<UserConfig['plugins']>;
-    react?: boolean | 'no-compiler';
+    react?: boolean;
     target?: string;
 }) => UserConfig;
 
@@ -14,11 +14,4 @@ export const compilerOptions: {
     environment: {
         enableTreatRefLikeIdentifiersAsRefs: boolean;
     };
-    logger: {
-        logEvent: (
-            filename: string | null,
-            event: { detail?: unknown; kind?: string },
-        ) => void;
-    };
-    reportableLevels: Set<string>;
 };

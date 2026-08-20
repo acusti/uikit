@@ -1,7 +1,6 @@
 import { fileURLToPath } from 'node:url';
 
-import babel from '@rolldown/plugin-babel';
-import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react';
 import { defineConfig as defineConfigVite } from 'vite';
 import { configDefaults } from 'vitest/config';
 
@@ -41,12 +40,13 @@ export const defineConfig = (options = {}) => {
         },
         ...(css ? { css } : {}),
         plugins: [
+            // callers that want the React Compiler transform pass their own
+            // @acusti/vite-plugin-react-compiler() instance via `plugins`
+            // (see compilerOptions below) — kept out of this shared base
+            // config so packages that don’t opt in, including
+            // @acusti/vite-plugin-react-compiler itself, never need it
+            // pre-built
             ...(isReact ? [react()] : []),
-            // react: 'no-compiler' opts out of the React Compiler transform
-            // (for code that by design accesses refs during render)
-            ...(isReact === true
-                ? [babel({ presets: [reactCompilerPreset(compilerOptions)] })]
-                : []),
             ...plugins,
         ],
         test: {
@@ -57,27 +57,12 @@ export const defineConfig = (options = {}) => {
 };
 
 // React Compiler https://github.com/reactwg/react-compiler/discussions/36#discussioncomment-11285011
+// (compiler bailouts are caught by oxlint's react-compiler rules instead of
+// a runtime logger: @acusti/vite-plugin-react-compiler doesn't support
+// callback-valued options like `logger` since they can't cross the native
+// oxc-transform-react boundary)
 export const compilerOptions = {
     environment: {
         enableTreatRefLikeIdentifiersAsRefs: true,
     },
-    logger: {
-        logEvent(filename, event) {
-            if (event.kind !== 'CompileError') return;
-            console.log(
-                'React Compiler logger',
-                filename,
-                JSON.stringify(event.detail, null, 2),
-            );
-        },
-    },
-    // https://github.com/facebook/react/blob/5c56b87/compiler/packages/babel-plugin-react-compiler/src/CompilerError.ts#L11-L39
-    reportableLevels: new Set([
-        'CannotPreserveMemoization',
-        'InvalidConfig',
-        'InvalidJS',
-        'InvalidReact',
-        'Invariant',
-        'Todo',
-    ]),
 };

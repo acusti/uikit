@@ -12,10 +12,6 @@ updates:
           interval: cron
           cronjob: '0 6 * * 1,4'
       groups:
-          babel:
-              patterns:
-                  - '@babel/*'
-                  - '@types/babel__core'
           eslint-plugins:
               patterns:
                   - 'eslint-plugin-*'
