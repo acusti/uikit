@@ -1,3 +1,9 @@
-import { defineConfig } from '../../vite.config.base.js';
+import reactCompiler from '@acusti/vite-plugin-react-compiler';
 
-export default defineConfig({ entry: ['src/InputText.tsx'], react: true });
+import { compilerOptions, defineConfig } from '../../vite.config.base.js';
+
+export default defineConfig({
+    entry: ['src/InputText.tsx'],
+    plugins: [reactCompiler({ reactCompiler: compilerOptions })],
+    react: true,
+});
