@@ -4,7 +4,7 @@ import { userEvent } from '@testing-library/user-event';
 import { type MouseEvent } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import Dropdown, { type Props } from './Dropdown.js';
+import Dropdown, { type Item, type Props } from './Dropdown.js';
 
 afterEach(cleanup);
 
@@ -281,6 +281,7 @@ describe('@acusti/dropdown', () => {
                         aria-controls="custom-popup"
                         aria-expanded
                         aria-haspopup="tree"
+                        type="button"
                     >
                         Custom
                     </button>
@@ -305,7 +306,7 @@ describe('@acusti/dropdown', () => {
             const user = userEvent.setup();
             render(
                 <Dropdown>
-                    <button>Custom</button>
+                    <button type="button">Custom</button>
                     <ul>
                         <li>Custom Item</li>
                     </ul>
@@ -528,7 +529,9 @@ describe('@acusti/dropdown', () => {
             const user = userEvent.setup();
             render(
                 <Dropdown>
-                    <button id="my-trigger">Custom</button>
+                    <button id="my-trigger" type="button">
+                        Custom
+                    </button>
                     <ul>
                         <li>Custom Item</li>
                     </ul>
@@ -1009,7 +1012,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('reports the jumped-to item to props.onActiveItem', async () => {
-            const handleActiveItem = vi.fn();
+            const handleActiveItem = vi.fn<(payload: Item) => void>();
             const user = userEvent.setup();
             renderMenu({ onActiveItem: handleActiveItem });
 
@@ -1144,8 +1147,8 @@ describe('@acusti/dropdown', () => {
 
     describe('click delegation to buttons and links', () => {
         it('invokes click on a button when the item contains exactly one button', async () => {
-            const handleButtonClick = vi.fn();
-            const handleSubmitItem = vi.fn();
+            const handleButtonClick = vi.fn<() => void>();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -1157,7 +1160,9 @@ describe('@acusti/dropdown', () => {
                             data-ukt-item
                             data-ukt-value="action"
                         >
-                            <button onClick={handleButtonClick}>Action</button>
+                            <button onClick={handleButtonClick} type="button">
+                                Action
+                            </button>
                         </li>
                         <li data-ukt-item>Other Item</li>
                     </ul>
@@ -1183,8 +1188,10 @@ describe('@acusti/dropdown', () => {
         });
 
         it('invokes click on a link when the item contains exactly one link', async () => {
-            const handleLinkClick = vi.fn((e: MouseEvent) => e.preventDefault());
-            const handleSubmitItem = vi.fn();
+            const handleLinkClick = vi.fn<(e: MouseEvent) => void>((e) =>
+                e.preventDefault(),
+            );
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -1220,9 +1227,9 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not invoke click when item contains multiple buttons', async () => {
-            const handleButton1Click = vi.fn();
-            const handleButton2Click = vi.fn();
-            const handleSubmitItem = vi.fn();
+            const handleButton1Click = vi.fn<() => void>();
+            const handleButton2Click = vi.fn<() => void>();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -1234,8 +1241,12 @@ describe('@acusti/dropdown', () => {
                             data-ukt-item
                             data-ukt-value="actions"
                         >
-                            <button onClick={handleButton1Click}>Edit</button>
-                            <button onClick={handleButton2Click}>Delete</button>
+                            <button onClick={handleButton1Click} type="button">
+                                Edit
+                            </button>
+                            <button onClick={handleButton2Click} type="button">
+                                Delete
+                            </button>
                         </li>
                         <li data-ukt-item>Other Item</li>
                     </ul>
@@ -1262,9 +1273,11 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not invoke click when item contains both button and link', async () => {
-            const handleButtonClick = vi.fn();
-            const handleLinkClick = vi.fn((e: MouseEvent) => e.preventDefault());
-            const handleSubmitItem = vi.fn();
+            const handleButtonClick = vi.fn<() => void>();
+            const handleLinkClick = vi.fn<(e: MouseEvent) => void>((e) =>
+                e.preventDefault(),
+            );
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -1272,9 +1285,11 @@ describe('@acusti/dropdown', () => {
                     Menu
                     <ul>
                         <li data-testid="mixed-item" data-ukt-item data-ukt-value="mixed">
-                            <button onClick={handleButtonClick}>Button</button>
+                            <button onClick={handleButtonClick} type="button">
+                                Button
+                            </button>
                             <a href="/link" onClick={handleLinkClick}>
-                                Link
+                                View details
                             </a>
                         </li>
                         <li data-ukt-item>Other Item</li>
@@ -1302,7 +1317,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('uses normal onSubmitItem behavior when item has no buttons or links', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -1334,8 +1349,8 @@ describe('@acusti/dropdown', () => {
         });
 
         it('invokes button click via keyboard navigation', async () => {
-            const handleButtonClick = vi.fn();
-            const handleSubmitItem = vi.fn();
+            const handleButtonClick = vi.fn<() => void>();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -1343,7 +1358,9 @@ describe('@acusti/dropdown', () => {
                     Menu
                     <ul>
                         <li data-ukt-item data-ukt-value="keyboard-action">
-                            <button onClick={handleButtonClick}>Action</button>
+                            <button onClick={handleButtonClick} type="button">
+                                Action
+                            </button>
                         </li>
                         <li data-ukt-item>Other Item</li>
                     </ul>
@@ -1369,8 +1386,8 @@ describe('@acusti/dropdown', () => {
         });
 
         it('invokes click on input[type="button"] when the item contains exactly one', async () => {
-            const handleInputClick = vi.fn();
-            const handleSubmitItem = vi.fn();
+            const handleInputClick = vi.fn<() => void>();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -1411,8 +1428,8 @@ describe('@acusti/dropdown', () => {
         });
 
         it('invokes click on input[type="submit"] when the item contains exactly one', async () => {
-            const handleInputClick = vi.fn();
-            const handleSubmitItem = vi.fn();
+            const handleInputClick = vi.fn<() => void>();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -1453,8 +1470,8 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not invoke button click twice when clicking the button directly', async () => {
-            const handleButtonClick = vi.fn();
-            const handleSubmitItem = vi.fn();
+            const handleButtonClick = vi.fn<() => void>();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -1462,7 +1479,9 @@ describe('@acusti/dropdown', () => {
                     Menu
                     <ul>
                         <li data-ukt-item data-ukt-value="action">
-                            <button onClick={handleButtonClick}>Action</button>
+                            <button onClick={handleButtonClick} type="button">
+                                Action
+                            </button>
                         </li>
                         <li data-ukt-item>Other Item</li>
                     </ul>
@@ -1482,19 +1501,27 @@ describe('@acusti/dropdown', () => {
         });
 
         it('works when buttons themselves are the dropdown items', async () => {
-            const handleSaveClick = vi.fn();
-            const handleCancelClick = vi.fn();
-            const handleSubmitItem = vi.fn();
+            const handleSaveClick = vi.fn<() => void>();
+            const handleCancelClick = vi.fn<() => void>();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
                 <Dropdown onSubmitItem={handleSubmitItem}>
                     Menu
                     <div>
-                        <button data-ukt-value="save" onClick={handleSaveClick}>
+                        <button
+                            data-ukt-value="save"
+                            onClick={handleSaveClick}
+                            type="button"
+                        >
                             Save
                         </button>
-                        <button data-ukt-value="cancel" onClick={handleCancelClick}>
+                        <button
+                            data-ukt-value="cancel"
+                            onClick={handleCancelClick}
+                            type="button"
+                        >
                             Cancel
                         </button>
                     </div>
@@ -1539,9 +1566,13 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not invoke link click when controlled dropdown selects already-active item', async () => {
-            const handleHomeClick = vi.fn((e: MouseEvent) => e.preventDefault());
-            const handleAboutClick = vi.fn((e: MouseEvent) => e.preventDefault());
-            const handleSubmitItem = vi.fn();
+            const handleHomeClick = vi.fn<(e: MouseEvent) => void>((e) =>
+                e.preventDefault(),
+            );
+            const handleAboutClick = vi.fn<(e: MouseEvent) => void>((e) =>
+                e.preventDefault(),
+            );
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             // Controlled dropdown showing current page (home)
@@ -1628,7 +1659,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('detects a no-op by the value identity, not the displayed label', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             render(
                 <Dropdown
@@ -2064,7 +2095,7 @@ describe('@acusti/dropdown', () => {
 
     describe('submitting with no active item', () => {
         it('does not call onSubmitItem when a non-searchable dropdown is submitted with nothing selected', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -2090,7 +2121,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not call onSubmitItem when the pointer is released on non-item menu chrome', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -2114,7 +2145,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not adopt a non-text input in a custom trigger as the value source', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             // a submit input is not a text input, so there is still nothing
@@ -2138,7 +2169,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not call onSubmitItem when allowCreate is set but there is no input to source a value', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             // allowCreate has nothing to create from without a text input, so
@@ -2162,7 +2193,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('still submits an item whose value is explicitly empty', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -2189,7 +2220,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('still lets a searchable dropdown submit an empty (cleared) value', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -2214,7 +2245,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('still lets a custom text-input trigger submit an empty (cleared) value when not searchable', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             // No isSearchable, but the custom trigger contains a text input,
@@ -2242,7 +2273,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('enforces allowEmpty={false} on the allowCreate path (cleared input does not submit)', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -2270,7 +2301,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('still lets allowCreate with default allowEmpty submit a cleared value', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
 
             render(
@@ -2315,7 +2346,7 @@ describe('@acusti/dropdown', () => {
             );
 
         it('submits the clicked item, not a divergent keyboard-active item', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderMenu(handleSubmitItem);
 
@@ -2330,7 +2361,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not submit the active item when the click lands on a separator', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderMenu(handleSubmitItem);
 
@@ -2345,7 +2376,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not submit the active item when the click lands on a disabled item', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderMenu(handleSubmitItem);
 
@@ -2437,7 +2468,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('applies the flat item-detection heuristic within submenu bodies with no marked items', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             render(
                 <Dropdown onSubmitItem={handleSubmitItem}>
@@ -2483,7 +2514,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('collapses expanded descendant submenus when surfacing with ←', async () => {
-            const handleMoreClose = vi.fn();
+            const handleMoreClose = vi.fn<() => void>();
             const user = userEvent.setup();
             render(
                 <Dropdown>
@@ -2525,7 +2556,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('opens the submenu on Enter instead of submitting (parent items never submit)', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderFormatMenu({ onSubmitItem: handleSubmitItem });
 
@@ -2542,7 +2573,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('submits leaf items with their ancestor path', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderFormatMenu({ onSubmitItem: handleSubmitItem });
 
@@ -2562,7 +2593,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('submits top-level leaf items with an empty path', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderFormatMenu({ onSubmitItem: handleSubmitItem });
 
@@ -2619,7 +2650,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('closes the whole menu on Escape and returns focus to the trigger', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderFormatMenu({ onSubmitItem: handleSubmitItem });
 
@@ -2634,10 +2665,10 @@ describe('@acusti/dropdown', () => {
         });
 
         it('dispatches scoped onOpen/onClose/onSubmitItem to the nested Dropdown', async () => {
-            const handleRootSubmitItem = vi.fn();
-            const handleAlignClose = vi.fn();
-            const handleAlignOpen = vi.fn();
-            const handleAlignSubmitItem = vi.fn();
+            const handleRootSubmitItem = vi.fn<() => void>();
+            const handleAlignClose = vi.fn<() => void>();
+            const handleAlignOpen = vi.fn<() => void>();
+            const handleAlignSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderFormatMenu(
                 { onSubmitItem: handleRootSubmitItem },
@@ -2664,8 +2695,8 @@ describe('@acusti/dropdown', () => {
         });
 
         it('dispatches a submenu leaf submission to both the root and the nested Dropdown', async () => {
-            const handleRootSubmitItem = vi.fn();
-            const handleAlignSubmitItem = vi.fn();
+            const handleRootSubmitItem = vi.fn<() => void>();
+            const handleAlignSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderFormatMenu(
                 { onSubmitItem: handleRootSubmitItem },
@@ -2687,7 +2718,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('toggles the submenu open on click without submitting or closing the menu', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderFormatMenu({ onSubmitItem: handleSubmitItem });
 
@@ -2704,7 +2735,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('submits a hovered submenu leaf on mouseup with its path', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             renderFormatMenu({ onSubmitItem: handleSubmitItem });
 
@@ -2887,13 +2918,15 @@ describe('@acusti/dropdown', () => {
             const user = userEvent.setup();
             render(
                 <Dropdown hasItems={false}>
-                    <button>Settings</button>
+                    <button type="button">Settings</button>
                     <div>
                         <label>
                             Full name <input />
                         </label>
                         <Dropdown hasItems={false}>
-                            <button aria-label="About full name">ℹ️</button>
+                            <button aria-label="About full name" type="button">
+                                ℹ️
+                            </button>
                             <p data-testid="info-popover">Used for your profile.</p>
                         </Dropdown>
                     </div>
@@ -2923,13 +2956,15 @@ describe('@acusti/dropdown', () => {
             const user = userEvent.setup();
             render(
                 <Dropdown hasItems={false}>
-                    <button>Settings</button>
+                    <button type="button">Settings</button>
                     <div>
                         <label>
                             Full name <input />
                         </label>
                         <Dropdown hasItems={false}>
-                            <button aria-label="About full name">ℹ️</button>
+                            <button aria-label="About full name" type="button">
+                                ℹ️
+                            </button>
                             <p data-testid="info-popover">Used for your profile.</p>
                         </Dropdown>
                     </div>
@@ -2949,7 +2984,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('does not submit the outer menu when opening a nested popover from an item', async () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             const user = userEvent.setup();
             render(
                 <Dropdown onSubmitItem={handleSubmitItem}>
@@ -2958,7 +2993,9 @@ describe('@acusti/dropdown', () => {
                         <li data-ukt-item>
                             Alpha
                             <Dropdown hasItems={false}>
-                                <button aria-label="About alpha">ℹ️</button>
+                                <button aria-label="About alpha" type="button">
+                                    ℹ️
+                                </button>
                                 <p data-testid="alpha-info">Alpha info.</p>
                             </Dropdown>
                         </li>
@@ -2977,7 +3014,7 @@ describe('@acusti/dropdown', () => {
         });
 
         it('renders a menu Dropdown nested inside a hasItems={false} dropdown as an independent, click-selectable picker', () => {
-            const handleSubmitItem = vi.fn();
+            const handleSubmitItem = vi.fn<() => void>();
             render(
                 <Dropdown hasItems={false}>
                     <button type="button">Score report</button>

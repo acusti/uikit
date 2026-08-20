@@ -23,7 +23,7 @@ describe('@acusti/use-keyboard-events', () => {
                     handler: noop,
                 });
                 // priority should default to 0, which gets normalized to 50
-                expect(handlersData.keydown[50].has(noop)).toBe(true);
+                expect(handlersData.keydown[50]!.has(noop)).toBe(true);
                 expect(handlersData.keydown[0]).toBe(undefined);
                 const cleanupKeyPressHandler = addHandler({
                     eventType: 'keypress',
@@ -31,7 +31,7 @@ describe('@acusti/use-keyboard-events', () => {
                     priority: 10,
                 });
                 // priority of 10 normalizes to 60
-                expect(handlersData.keypress[60].has(noop)).toBe(true);
+                expect(handlersData.keypress[60]!.has(noop)).toBe(true);
                 expect(handlersData.keypress[50]).toBe(undefined);
                 const cleanupKeyUpHandler = addHandler({
                     eventType: 'keyup',
@@ -39,7 +39,7 @@ describe('@acusti/use-keyboard-events', () => {
                     priority: -50,
                 });
                 // minimum priority (-50) normalizes to 0
-                expect(handlersData.keyup[0].has(noop)).toBe(true);
+                expect(handlersData.keyup[0]!.has(noop)).toBe(true);
                 expect(handlersData.keyup[50]).toBe(undefined);
                 cleanupKeyDownHandler();
                 cleanupKeyPressHandler();

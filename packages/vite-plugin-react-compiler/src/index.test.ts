@@ -107,7 +107,9 @@ describe('vite-plugin-react-compiler', () => {
         // position is an index into the code string (what rollup expects),
         // not oxc’s utf-8 byte offset, which is 3 higher here
         const broken = "const s = 'héllo💜';\nconst = ;";
-        await expect(transformCode(broken, '/src/broken.tsx')).rejects.toThrow();
+        await expect(transformCode(broken, '/src/broken.tsx')).rejects.toThrow(
+            'Unexpected token',
+        );
 
         expect(errorCalls).toHaveLength(1);
         expect(errorCalls[0].message).toContain('Unexpected token');
@@ -117,7 +119,9 @@ describe('vite-plugin-react-compiler', () => {
         expect(errorCalls[0].pos).toBe(broken.indexOf('= ;'));
 
         // failed transforms aren’t cached: an identical retry runs again
-        await expect(transformCode(broken, '/src/broken.tsx')).rejects.toThrow();
+        await expect(transformCode(broken, '/src/broken.tsx')).rejects.toThrow(
+            'Unexpected token',
+        );
         expect(errorCalls).toHaveLength(2);
     });
 

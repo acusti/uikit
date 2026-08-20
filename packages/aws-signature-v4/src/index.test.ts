@@ -6,8 +6,6 @@ import {
     getRegionFromResource,
 } from './index.js';
 
-export {}; // empty export to make this file a module
-
 const REGION = 'us-west-2';
 const HOST = `abcdefghijklmnopqrstuvwxyz.appsync-api.${REGION}.amazonaws.com`;
 const RESOURCE = `https://${HOST}/graphql`;
@@ -18,6 +16,7 @@ const SESSION_TOKEN = 'thisisafakesessiontoken';
 const DATE_TIME_STRING = '20150830T123600Z';
 
 describe('utils', () => {
+    // eslint-disable-next-line typescript/unbound-method -- saved only for restoration in afterAll, never called detached
     const originalToISOString = Date.prototype.toISOString;
 
     beforeAll(() => {

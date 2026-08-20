@@ -107,7 +107,7 @@ describe('CSSValueInput.tsx', () => {
 
     it('submits the ancestor form and normalizes the value on Enter', async () => {
         const user = userEvent.setup();
-        const onSubmit = vi.fn();
+        const onSubmit = vi.fn<() => void>();
         render(
             <form
                 onSubmit={(event) => {

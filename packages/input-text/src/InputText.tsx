@@ -185,9 +185,10 @@ export default function InputText({
         inputRef.current = element;
 
         // Forward the ref and capture any cleanup function it returns
-        let cleanup: (() => void) | void = undefined;
+        let cleanup: (() => void) | undefined = undefined;
         if (typeof ref === 'function') {
-            cleanup = ref(element);
+            const refCleanup = ref(element);
+            cleanup = typeof refCleanup === 'function' ? refCleanup : undefined;
         } else if (ref) {
             ref.current = element;
         }
@@ -395,7 +396,7 @@ function hasNonPrimaryModifier(event: KeyboardEvent<InputElement>) {
 
 function isHeightEmpty(
     value?: null | number | string,
-): value is '' | 0 | null | typeof Infinity | undefined {
+): value is '' | null | typeof Infinity | undefined {
     return value == null || value === '' || value === 0 || value === Infinity;
 }
 
