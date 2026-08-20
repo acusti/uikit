@@ -150,11 +150,11 @@ if (orderedNames.length !== selectedWorkspaces.length) {
     process.exit(1);
 }
 
-// @acusti/vite-plugin-react-compiler is imported by every package's shared
+// @acusti/vite-plugin-react-compiler is imported by every package’s shared
 // vite.config.base.js (see that file for why), including its own — nothing
-// can express "after itself" in the dependency graph the sort above reads,
+// can express “after itself” in the dependency graph the sort above reads,
 // so its build order has to be forced here instead. Move it to the front
-// unconditionally so its dist/ always exists before any other package's
+// unconditionally so its dist/ always exists before any other package’s
 // vite config gets loaded.
 const buildFirstNames = ['@acusti/vite-plugin-react-compiler'];
 
