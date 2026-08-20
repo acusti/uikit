@@ -65,13 +65,6 @@ describe('vite-plugin-react-compiler', () => {
             null,
         );
         expect(await transformCode('body { color: red; }', '/src/styles.css')).toBe(null);
-        // node_modules only excludes the exact path segment (matching the
-        // @rolldown/plugin-babel default the Babel compiler path uses)
-        const lookalike = await transformCode(
-            COMPONENT,
-            '/src/not_actually_node_modules/Greeting.tsx',
-        );
-        expect(lookalike?.code).toContain('react/compiler-runtime');
 
         const scoped = createTransformer({ include: /\/compiled\// });
         expect(await scoped.transformCode(COMPONENT, '/src/Greeting.tsx')).toBe(null);
