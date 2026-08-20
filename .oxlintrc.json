@@ -1,11 +1,11 @@
 {
     "$schema": "./node_modules/oxlint/configuration_schema.json",
     "categories": {
-        "correctness": "off",
+        "correctness": "error",
         "nursery": "off",
         "pedantic": "off",
         "perf": "off",
-        "restriction": "off",
+        "restriction": "error",
         "style": "off",
         "suspicious": "off"
     },
@@ -13,13 +13,7 @@
     "jsPlugins": ["eslint-plugin-perfectionist"],
     "ignorePatterns": ["**/build/", "**/node_modules/", "**/public/"],
     "rules": {
-        "jsx-a11y/click-events-have-key-events": "error",
-        "jsx-a11y/label-has-associated-control": "error",
-        "jsx-a11y/mouse-events-have-key-events": "error",
-        "jsx-a11y/no-autofocus": "error",
-        "jsx-a11y/no-static-element-interactions": "error",
         "no-duplicate-imports": "error",
-        "no-empty-function": "error",
         "no-shadow": "error",
         "perfectionist/sort-modules": [
             "error",
@@ -30,29 +24,11 @@
         ],
         "prefer-const": ["error", { "destructuring": "all" }],
         "react/capitalized-calls": "error",
-        "react/error-boundaries": "error",
-        "react/exhaustive-deps": "error",
         "react/exhaustive-effect-dependencies": "error",
-        "react/globals": "error",
         "react/hooks": "error",
-        "react/immutability": "error",
-        "react/incompatible-library": "error",
-        "react/invariant": "error",
         "react/memo-dependencies": "error",
         "react/no-deriving-state-in-effects": "error",
-        "react/preserve-manual-memoization": "error",
-        "react/purity": "error",
-        "react/refs": "error",
-        "react/rule-suppression": "error",
         "react/rules-of-hooks": "error",
-        "react/set-state-in-effect": "error",
-        "react/set-state-in-render": "error",
-        "react/static-components": "error",
-        "react/syntax": "error",
-        "react/todo": "error",
-        "react/unsupported-syntax": "error",
-        "react/use-memo": "error",
-        "react/void-use-memo": "error",
         "react/no-unknown-property": [
             "error",
             {
@@ -61,6 +37,40 @@
         ],
         "sort-imports": "off",
         "sort-keys": "off",
+        "class-methods-use-this": "off",
+        "default-case": "off",
+        "no-alert": "off",
+        "no-bitwise": "off",
+        "no-console": "off",
+        "no-eq-null": "off",
+        "no-param-reassign": "off",
+        "no-plusplus": "off",
+        "no-undefined": "off",
+        "no-use-before-define": "off",
+        "no-void": "off",
+        "complexity": "off",
+        "jsx-a11y/interactive-supports-focus": "off",
+        "jsx-a11y/no-noninteractive-tabindex": "off",
+        "jsx-a11y/prefer-tag-over-role": "off",
+        "jsx-a11y/role-has-required-aria-props": "off",
+        "jsx-a11y/role-supports-aria-props": "off",
+        "react/forbid-component-props": "off",
+        "react/jsx-filename-extension": ["error", { "extensions": ["jsx", "tsx"] }],
+        "react/jsx-no-literals": "off",
+        "react/no-clone-element": "off",
+        "react/no-multi-comp": "off",
+        "react/no-react-children": "off",
+        "react/only-export-components": "off",
+        "typescript/explicit-function-return-type": "off",
+        "typescript/explicit-member-accessibility": "off",
+        "typescript/explicit-module-boundary-types": "off",
+        "typescript/no-dynamic-delete": "off",
+        "typescript/no-import-type-side-effects": "off",
+        "typescript/no-non-null-assertion": "off",
+        "typescript/non-nullable-type-assertion-style": "off",
+        "typescript/promise-function-async": "off",
+        "typescript/use-unknown-in-catch-callback-variable": "off",
+        "vitest/require-test-timeout": "off",
         "typescript/array-type": ["error", { "default": "generic" }],
         "typescript/consistent-type-definitions": ["error", "type"],
         "typescript/consistent-type-imports": [
@@ -93,9 +103,21 @@
                 "allowNullableBoolean": true,
                 "allowNullableString": true
             }
-        ]
+        ],
+        "vitest/expect-expect": [
+            "error",
+            {
+                "assertFunctionNames": ["expect", "expectMenubarOwnsOnlyAllowedRoles"]
+            }
+        ],
+        "vitest/valid-expect": ["error", { "maxArgs": 2 }]
     },
     "settings": {
+        "jsx-a11y": {
+            "components": {
+                "InputText": "input"
+            }
+        },
         "react": {
             "version": "19.2.4"
         }

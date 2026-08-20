@@ -81,7 +81,7 @@ export const getLabelFromChildren = (
             if (label != null || !isValidElement(child)) return;
             const childProps = child.props as {
                 children?: ReactNode;
-                'data-ukt-value'?: unknown;
+                'data-ukt-value'?: boolean | number | string;
             };
             const uktValue = childProps['data-ukt-value'];
             // Compare as strings: the DOM stringifies dataset values, so

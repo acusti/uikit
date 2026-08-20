@@ -1197,7 +1197,7 @@ function RootDropdown({
 
     useKeyboardEvents({ ignoreUsedKeyboardEvents: false, onKeyDown: handleKeyDown });
 
-    const handleRef = (ref: HTMLDivElement | null): (() => void) | void => {
+    const handleRef = (ref: HTMLDivElement | null): (() => void) | undefined => {
         setDropdownElement(ref);
         if (!ref) return;
 
