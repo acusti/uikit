@@ -6,9 +6,9 @@ export const defineConfig: (options?: {
     entry?: string[];
     formats?: string[];
     plugins?: NonNullable<UserConfig['plugins']>;
-    react?: boolean;
+    react?: boolean | 'no-compiler';
     target?: string;
-}) => UserConfig;
+}) => Promise<UserConfig>;
 
 export const compilerOptions: {
     environment: {

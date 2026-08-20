@@ -1,8 +1,3 @@
-import reactCompiler from '@acusti/vite-plugin-react-compiler';
+import { defineConfig } from '../../vite.config.base.js';
 
-import { compilerOptions, defineConfig } from '../../vite.config.base.js';
-
-export default defineConfig({
-    plugins: [reactCompiler({ reactCompiler: compilerOptions })],
-    react: true,
-});
+export default defineConfig({ react: true });
