@@ -112,7 +112,7 @@
     },
     "packages/docs": {
       "name": "@acusti/uikit-docs",
-      "version": "0.6.4-alpha.0",
+      "version": "0.6.5",
       "dependencies": {
         "@acusti/css-value-input": "workspace:^",
         "@acusti/date-picker": "workspace:^",
@@ -140,10 +140,10 @@
     },
     "packages/dropdown": {
       "name": "@acusti/dropdown",
-      "version": "1.0.0-beta.1",
+      "version": "1.0.0-beta.2",
       "dependencies": {
         "@acusti/matchmaking": "^0.10.0",
-        "@acusti/use-keyboard-events": "^0.11.1",
+        "@acusti/use-keyboard-events": "^0.12.0",
         "clsx": "^2",
       },
       "devDependencies": {
@@ -286,7 +286,7 @@
     },
     "packages/use-keyboard-events": {
       "name": "@acusti/use-keyboard-events",
-      "version": "0.11.1",
+      "version": "0.12.0",
       "devDependencies": {
         "@testing-library/dom": "^10.4.1",
         "@testing-library/react": "^16.3.2",
@@ -306,7 +306,7 @@
     },
     "packages/vite-plugin-react-compiler": {
       "name": "@acusti/vite-plugin-react-compiler",
-      "version": "0.0.0",
+      "version": "0.1.0",
       "dependencies": {
         "oxc-transform-react": "0.144.0",
       },
