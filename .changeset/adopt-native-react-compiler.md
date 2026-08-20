@@ -1,5 +1,4 @@
 ---
-'@acusti/css-value-input': patch
 '@acusti/date-picker': patch
 '@acusti/dropdown': patch
 '@acusti/input-text': patch
