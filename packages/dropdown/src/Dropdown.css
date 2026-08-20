@@ -196,16 +196,8 @@
 
     [aria-selected="true"] {
         background-color: var(--uktdd-body-bg-color-selected);
-        /* forced-colors mode drops the tint to a few percent of the forced
-           foreground, which is imperceptible against the forced background —
-           color-mix keeps computing, but with no reliable value left to mix
-           in. An inset outline is a second, non-color-alone signal that
-           survives. currentColor rather than a fixed Highlight: this item
-           can also be the active/hover target, whose rule below paints the
-           same background Highlight — an outline in that same color would
-           vanish into its own fill. currentColor instead tracks whichever
-           color that rule leaves in effect: CanvasText normally, or
-           HighlightText once the active rule’s `color` also applies */
+        /* forced-colors mode makes the selected item tint imperceptible, so
+           we use an inset outline as a second, non-color-alone signal */
         @media (forced-colors: active) {
             outline: 2px solid currentColor;
             outline-offset: -2px;
