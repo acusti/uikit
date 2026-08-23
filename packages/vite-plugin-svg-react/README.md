@@ -42,7 +42,8 @@ to SVGR, which parses and re-prints the module through Babel. Attribute
 conversion matches what SVGR produced (kebab-case presentation attributes
 to camelCase, `class` → `className`, `xlink:*`/`xml:*` to their React prop
 names, `data-*`/`aria-*` passed through, `style` strings to style objects),
-so the rendered components are the same. What consumers get out of it:
+so the rendered components are the same, apart from the SVGR bugs fixed
+below. What consumers get out of it:
 
 - **Zero dependencies:** no `@svgr/*` and no `@babel/*` in the dependency
   tree, which removes dozens of packages from a typical install.
@@ -50,6 +51,12 @@ so the rendered components are the same. What consumers get out of it:
   microseconds, and compiling it with oxc takes about a millisecond, so the
   first `.svg?react` import costs single-digit milliseconds instead of the
   hundreds of milliseconds it takes to load and warm up a Babel pipeline.
+- **Four SVGR conversion bugs fixed:** CDATA sections are preserved rather
+  than dropped; `px` style values stay strings (SVGR’s px-stripping
+  corrupted React-unitless properties, turning `line-height: 20px` into a
+  multiplier of 20); semicolons inside `url(…)` no longer truncate a style
+  value; and attribute values containing double quotes no longer emit
+  invalid JSX.
 
 One thing SVGR could do that this plugin doesn’t: run [SVGO][] optimization
 via `@svgr/plugin-svgo`. Optimizing SVGs is a build concern you can handle
