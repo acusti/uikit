@@ -12,6 +12,20 @@ const generate = (
 ) => generateComponentModule(svg, filePath, options);
 
 describe('generateComponentModule', () => {
+    it('rejects character references outside the XML character range', () => {
+        // decoding these would smuggle a NUL or a lone surrogate into the
+        // generated module rather than failing the malformed SVG
+        expect(() => generate('<svg data-x="a&#0;b"/>')).toThrow(
+            /&#0; is not a valid XML character \(1:\d+\)/,
+        );
+        expect(() => generate('<svg><text>a&#0;b</text></svg>')).toThrow(
+            /not a valid XML character/,
+        );
+        expect(() => generate('<svg data-x="&#xD800;"/>')).toThrow(/&#xD800;/);
+        // in-range references still decode
+        expect(generate('<svg><text>&#65;&#x2603;</text></svg>')).toContain('{"A☃"}');
+    });
+
     it('emits a typed default-export component that spreads props onto the root <svg>', () => {
         const code = generate(SIMPLE_SVG);
         expect(code).toContain(`import type { SVGProps } from 'react';`);
