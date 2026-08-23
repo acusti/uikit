@@ -1,4 +1,3 @@
-import reactCompiler from '@acusti/vite-plugin-react-compiler';
 import { type StorybookConfig } from '@storybook/react-vite';
 import react from '@vitejs/plugin-react';
 import { dirname, join } from 'path';
@@ -22,7 +21,7 @@ const main: StorybookConfig = {
         const { mergeConfig } = await import('vite');
 
         return mergeConfig(viteConfig, {
-            plugins: [react(), reactCompiler({ reactCompiler: compilerOptions })],
+            plugins: [react({ compiler: compilerOptions })],
         });
     },
 };
