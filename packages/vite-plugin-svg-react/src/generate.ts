@@ -131,6 +131,9 @@ const SPACES_REGEX = /[\t\n\r\u0085\u2028\u2029]+/g;
 // svgProps names are emitted as JSX attribute names verbatim, so they have
 // to be spellable as one: an identifier-ish head plus dashes for data-*/aria-*
 const SVG_PROP_NAME_REGEX = /^[A-Za-z_][\w-]*$/;
+// elements whose character data is rendered text, so whitespace between their
+// children is content rather than source formatting
+const TEXT_CONTENT_ELEMENTS = new Set(['altGlyph', 'text', 'textPath', 'tref', 'tspan']);
 const WHITESPACE_ONLY_REGEX = /^\s+$/;
 
 // # Name and value conversion
@@ -277,7 +280,10 @@ const toJSXElement = (
     const attributesText = attributes.length ? ` ${attributes.join(' ')}` : '';
     let children = '';
     for (const child of element.children) {
-        children += child.type === 'text' ? toJSXText(child) : toJSXElement(child);
+        children +=
+            child.type === 'text'
+                ? toJSXText(child, TEXT_CONTENT_ELEMENTS.has(name))
+                : toJSXElement(child);
     }
     if (children === '') return `<${name}${attributesText} />`;
     return `<${name}${attributesText}>${children}</${name}>`;
@@ -285,8 +291,16 @@ const toJSXElement = (
 
 // Text becomes a string-literal expression container ({"…"}) so that braces,
 // quotes, and backslashes in the source text can’t break the JSX.
-const toJSXText = (text: XMLText) => {
-    if (text.value === '' || WHITESPACE_ONLY_REGEX.test(text.value)) return '';
+//
+// Whitespace-only nodes are formatting noise between shapes, but inside a
+// text-content element they are content: dropping the space in
+// `<tspan>A</tspan> <tspan>B</tspan>` renders “AB”. Transcribing it is enough
+// — xml:space is the renderer’s to apply, and it strips or preserves the
+// result according to the mode in effect, which svgr never gave it the
+// chance to do.
+const toJSXText = (text: XMLText, keepWhitespace = false) => {
+    if (text.value === '') return '';
+    if (!keepWhitespace && WHITESPACE_ONLY_REGEX.test(text.value)) return '';
     return `{${JSON.stringify(text.value)}}`;
 };
 

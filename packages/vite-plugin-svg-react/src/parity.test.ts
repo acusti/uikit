@@ -7,7 +7,8 @@ import { type ComponentOptions, generateComponentModule } from './generate.js';
 // dependency was removed — byte-for-byte modulo quote style, except for the
 // documented deliberate divergences (CDATA preserved, px style values kept
 // as strings, semicolons inside url()/quotes not treated as declaration
-// boundaries, attribute values fully escaped at emission, svgProps overrides
+// boundaries, attribute values fully escaped at emission, whitespace between
+// the children of text-content elements preserved, svgProps overrides
 // appended instead of replaced in place, and namespaced element names
 // rejected at build time). The corpus covers the supported options
 // (dimensions, icon, svgProps) and the markup edge cases; svgr options the
@@ -72,5 +73,11 @@ describe('svgr parity corpus', () => {
 
     it('component naming from a digit-initial file name', () => {
         expect(generate(SIMPLE_SVG, undefined, '/x/2fast.svg')).toMatchSnapshot();
+    });
+
+    it('whitespace inside text content versus between shapes', () => {
+        const svg =
+            '<svg><text xml:space="preserve"><tspan>A</tspan> <tspan>B</tspan></text><g>\n  <rect/>\n</g></svg>';
+        expect(generate(svg)).toMatchSnapshot();
     });
 });
