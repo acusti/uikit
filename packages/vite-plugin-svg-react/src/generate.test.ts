@@ -129,8 +129,12 @@ describe('generateComponentModule', () => {
     });
 
     it('escapes text content containing braces, quotes, and backslashes', () => {
-        const code = generate('<svg><text>braces {here} "quoted" \\ and  </text></svg>');
-        expect(code).toContain('{"braces {here} \\"quoted\\" \\\\ and  "}');
+        // \u2028 as an escape, not the raw character: a bare line separator is
+        // invisible in review and some tooling silently normalizes it away
+        const code = generate(
+            '<svg><text>braces {here} "quoted" \\ and \u2028</text></svg>',
+        );
+        expect(code).toContain('{"braces {here} \\"quoted\\" \\\\ and \u2028"}');
     });
 
     it('preserves CDATA sections as literal text', () => {
