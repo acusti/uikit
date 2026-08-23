@@ -34,45 +34,43 @@ const COMPLEX_SVG = `<?xml version="1.0" encoding="UTF-8"?>
 const SIMPLE_SVG =
     '<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M0 0h1v1H0z"/></svg>';
 
-const CASES: Array<{
-    filePath?: string;
-    name: string;
-    options?: ComponentOptions;
-    svg?: string;
-}> = [
-    { name: 'defaults with the complex document', svg: COMPLEX_SVG },
-    { name: 'defaults with the simple document' },
-    {
-        filePath: '/x/arrow-left.svg',
-        name: 'icon true without dimensions',
-        options: { icon: true },
-        svg: '<svg viewBox="0 0 24 24"><path d="M0 0"/></svg>',
-    },
-    { name: 'icon numeric', options: { icon: 32 } },
-    { name: 'dimensions false', options: { dimensions: false } },
-    {
-        name: 'svgProps with an expression value',
-        options: { svgProps: { height: '{props.width}', role: 'img' } },
-    },
-    {
-        name: 'CDATA, entities, and multiline attributes',
-        svg: '<svg><style><![CDATA[.a > .b { fill: red; }]]></style><text font-family="A &amp; B &quot;C&quot;" x="5">a&#65;&lt;b&gt;</text><path d="M0 0\n  h1v1\tH0z"/></svg>',
-    },
-    {
-        filePath: '/x/2fast.svg',
-        name: 'component naming from a digit-initial file name',
-    },
-];
+const generate = (svg: string, options?: ComponentOptions, filePath = '/x/icon.svg') =>
+    generateComponentModule(svg, filePath, options);
 
 describe('svgr parity corpus', () => {
-    for (const parityCase of CASES) {
-        it(parityCase.name, () => {
-            const code = generateComponentModule(
-                parityCase.svg ?? SIMPLE_SVG,
-                parityCase.filePath ?? '/x/icon.svg',
-                parityCase.options,
-            );
-            expect(code).toMatchSnapshot();
-        });
-    }
+    it('defaults with the complex document', () => {
+        expect(generate(COMPLEX_SVG)).toMatchSnapshot();
+    });
+
+    it('defaults with the simple document', () => {
+        expect(generate(SIMPLE_SVG)).toMatchSnapshot();
+    });
+
+    it('icon true without dimensions', () => {
+        const svg = '<svg viewBox="0 0 24 24"><path d="M0 0"/></svg>';
+        expect(generate(svg, { icon: true }, '/x/arrow-left.svg')).toMatchSnapshot();
+    });
+
+    it('icon numeric', () => {
+        expect(generate(SIMPLE_SVG, { icon: 32 })).toMatchSnapshot();
+    });
+
+    it('dimensions false', () => {
+        expect(generate(SIMPLE_SVG, { dimensions: false })).toMatchSnapshot();
+    });
+
+    it('svgProps with an expression value', () => {
+        const svgProps = { height: '{props.width}', role: 'img' };
+        expect(generate(SIMPLE_SVG, { svgProps })).toMatchSnapshot();
+    });
+
+    it('CDATA, entities, and multiline attributes', () => {
+        const svg =
+            '<svg><style><![CDATA[.a > .b { fill: red; }]]></style><text font-family="A &amp; B &quot;C&quot;" x="5">a&#65;&lt;b&gt;</text><path d="M0 0\n  h1v1\tH0z"/></svg>';
+        expect(generate(svg)).toMatchSnapshot();
+    });
+
+    it('component naming from a digit-initial file name', () => {
+        expect(generate(SIMPLE_SVG, undefined, '/x/2fast.svg')).toMatchSnapshot();
+    });
 });
