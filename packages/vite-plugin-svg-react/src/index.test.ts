@@ -181,6 +181,10 @@ describe('vite-plugin-svg-react', () => {
             // @ts-expect-error svgProps is an object
             vitePluginSVGReact({ svg: { svgProps: 'role' } }),
         ).toThrow(/svgProps must be an object/);
+        expect(() =>
+            // @ts-expect-error svgProps values are strings
+            vitePluginSVGReact({ svg: { svgProps: { height: 10 } } }),
+        ).toThrow(/svgProps.height must be a string/);
     });
 
     it('rejects svgProps that would emit invalid JSX', () => {
