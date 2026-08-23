@@ -117,6 +117,21 @@ describe('rendered SVG components', () => {
         expect(svg.getAttribute('width')).toBe('32');
     });
 
+    it('round-trips entity-bearing attribute values to the DOM', async () => {
+        // the emitter escapes `&` and `"` into the JSX attribute string and
+        // relies on the compiler decoding them again. The other fixtures put
+        // their entities in text nodes, which take the JSON.stringify path
+        // instead — so nothing covered the attribute half of that contract.
+        const { default: Icon } = await loadFixture({ fixture: 'entities.svg' });
+        const { container } = render(<Icon />);
+        expect(container.querySelector('use')?.getAttribute('xlink:href')).toBe(
+            'https://x?a=1&b=2',
+        );
+        expect(container.querySelector('text')?.getAttribute('font-family')).toBe(
+            'A & B "C"',
+        );
+    });
+
     it('preserves CDATA content in <style> elements', async () => {
         const { default: Icon } = await loadFixture({ fixture: 'cdata.svg' });
         const { container } = render(<Icon />);

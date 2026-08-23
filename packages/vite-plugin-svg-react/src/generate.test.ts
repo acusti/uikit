@@ -12,6 +12,15 @@ const generate = (
 ) => generateComponentModule(svg, filePath, options);
 
 describe('generateComponentModule', () => {
+    it('lets dimensions false win over icon', () => {
+        // documented precedence: the else-if means icon is skipped entirely
+        const code = generate('<svg width="9" height="9"/>', {
+            dimensions: false,
+            icon: true,
+        });
+        expect(code).toContain('<svg {...props} />');
+    });
+
     it('rejects character references outside the XML character range', () => {
         // decoding these would smuggle a NUL or a lone surrogate into the
         // generated module rather than failing the malformed SVG
