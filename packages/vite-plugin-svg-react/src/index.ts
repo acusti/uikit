@@ -11,9 +11,8 @@ export type { ComponentOptions } from './generate.js';
 
 export type Options = {
     /**
-     * Options shaping the generated <svg> element — dimensions, icon, and
-     * svgProps — with the same semantics as svgr’s options of the same
-     * names. Nested so the top level stays free for plugin-level options.
+     * Options shaping the generated <svg> element (dimensions, icon, svgProps)
+     * with the same semantics as svgr’s options of the same names.
      */
     svg?: ComponentOptions;
 };
