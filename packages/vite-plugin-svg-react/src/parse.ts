@@ -2,8 +2,12 @@
 // up in real-world SVG files — XML prologs, doctypes (including internal
 // subsets), comments, CDATA sections, character references, self-closing
 // tags, and namespaced names — and throws on malformed markup rather than
-// guessing. It is not a general-purpose XML parser: it ignores content
-// outside the root element and doesn’t validate namespaces.
+// guessing, with one deliberate exception: a minimized attribute (`<svg
+// hidden>`) is read as an empty value. XML requires a value and browsers
+// reject such a file as image/svg+xml, but the same markup is legal inline
+// in HTML, so it reaches these files in practice and `hidden=""` is what it
+// means. It is not a general-purpose XML parser: it ignores content outside
+// the root element and doesn’t validate namespaces.
 
 export type XMLElement = {
     // insertion-ordered; a repeated attribute name updates the value in place
