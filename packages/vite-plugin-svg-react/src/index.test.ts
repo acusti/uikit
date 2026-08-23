@@ -218,4 +218,22 @@ describe('vite-plugin-svg-react', () => {
             }),
         ).not.toThrow();
     });
+
+    it('doesn’t mistake a string value ending in a brace for an expression', () => {
+        // only a leading brace means an expression was intended; this emits
+        // as a quoted string attribute and is valid JSX
+        expect(() =>
+            vitePluginSVGReact({ svg: { svgProps: { d: 'M0 0}' } } }),
+        ).not.toThrow();
+    });
+
+    it('leaves expressions it can’t confidently lex to the JSX compiler', () => {
+        // a slash may open a regex literal or a comment, either of which can
+        // hold an unmatched brace; rejecting these would block a valid config
+        for (const height of ['{/}/.test(x) ? 1 : 2}', '{props.width /* } */}']) {
+            expect(() =>
+                vitePluginSVGReact({ svg: { svgProps: { height } } }),
+            ).not.toThrow();
+        }
+    });
 });
