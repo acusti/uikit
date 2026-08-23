@@ -135,8 +135,18 @@ const WHITESPACE_ONLY_REGEX = /^\s+$/;
 
 // # Name and value conversion
 
+// Values read from the SVG also get XML attribute-value normalization, which
+// turns tabs, newlines, and exotic line separators into spaces before the
+// value ever reaches a consumer.
 const escapeAttributeValue = (value: string) =>
-    value.replace(SPACES_REGEX, ' ').replace(/&/g, '&amp;').replace(/"/g, '&quot;');
+    escapeJSXAttributeValue(value.replace(SPACES_REGEX, ' '));
+
+// Escape a value for a double-quoted JSX attribute: only `&` and `"` can end
+// the value or open an entity, so everything else stays literal. svgProps
+// values use this directly — they come from the vite config, where no XML
+// normalization applies and the caller’s string should survive verbatim.
+const escapeJSXAttributeValue = (value: string) =>
+    value.replace(/&/g, '&amp;').replace(/"/g, '&quot;');
 
 const hyphenToCamelCase = (name: string) =>
     name.replace(/-(.)/g, (_, character: string) => character.toUpperCase());
@@ -339,7 +349,7 @@ export function generateComponentModule(
             trailing.push(
                 isExpressionValue(value)
                     ? `${name}=${value}`
-                    : `${name}="${escapeAttributeValue(value)}"`,
+                    : `${name}="${escapeJSXAttributeValue(value)}"`,
             );
         }
     }
