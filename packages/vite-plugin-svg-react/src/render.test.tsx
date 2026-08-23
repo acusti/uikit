@@ -12,6 +12,10 @@ import { afterAll, afterEach, describe, expect, it } from 'vitest';
 
 import vitePluginSVGReact, { type Options } from './index.js';
 
+// structural stand-in for Rollup's output: importing RollupOutput from vite
+// pulls in a deprecated re-export
+type BuildResult = { output: Array<{ code: string }> };
+
 type SVGComponent = ComponentType<SVGProps<SVGSVGElement>>;
 
 // compiled modules must live inside the package so that their react imports
@@ -177,9 +181,12 @@ describe('rendered SVG components', () => {
             configFile: false,
             logLevel: 'silent',
             plugins: [vitePluginSVGReact()],
-        })) as Array<{ output: Array<{ code: string }> }>;
+        })) as BuildResult | Array<BuildResult>;
 
-        const chunk = result[0].output[0];
+        // build() returns a bare RollupOutput for a single output and an array
+        // for several; the shape isn’t worth pinning a test’s pass/fail on
+        const output = Array.isArray(result) ? result[0] : result;
+        const chunk = output.output[0];
         // built (not served) modules compile against the production runtime
         expect(chunk.code).toContain('react/jsx-runtime');
 
