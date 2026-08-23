@@ -153,6 +153,34 @@ describe('generateComponentModule', () => {
         expect(code).not.toContain('{"\\n');
     });
 
+    it('keeps whitespace between children of text-content elements', () => {
+        // dropping this space renders “AB”; svgr dropped it, and under
+        // xml:space="preserve" it is unambiguously content
+        expect(
+            generate(
+                '<svg><text xml:space="preserve"><tspan>A</tspan> <tspan>B</tspan></text></svg>',
+            ),
+        ).toContain('<tspan>{"A"}</tspan>{" "}<tspan>{"B"}</tspan>');
+        // also under the default mode, where SVG collapses runs to one space
+        // rather than deleting them — the renderer applies xml:space, so
+        // transcribing the node is enough
+        expect(
+            generate('<svg><text><tspan>A</tspan> <tspan>B</tspan></text></svg>'),
+        ).toContain('<tspan>{"A"}</tspan>{" "}<tspan>{"B"}</tspan>');
+        // tspan nests inside tspan, and textPath is text content too
+        expect(
+            generate('<svg><textPath><tspan>A</tspan> <tspan>B</tspan></textPath></svg>'),
+        ).toContain('{" "}');
+    });
+
+    it('still drops formatting whitespace outside text-content elements', () => {
+        const code = generate(
+            '<svg>\n  <path d="M0 0"/>\n  <g>\n    <rect/>\n  </g>\n</svg>',
+        );
+        expect(code).toContain('<path d="M0 0" /><g><rect /></g>');
+        expect(code).not.toContain('{"\\n');
+    });
+
     it('collapses tabs and newlines in attribute values to single spaces', () => {
         const code = generate('<svg><path d="M0 0\n  h1v1\tH0z"/></svg>');
         expect(code).toContain('d="M0 0   h1v1 H0z"');

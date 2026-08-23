@@ -51,12 +51,14 @@ below. What consumers get out of it:
   microseconds, and compiling it with oxc takes about a millisecond, so the
   first `.svg?react` import costs single-digit milliseconds instead of the
   hundreds of milliseconds it takes to load and warm up a Babel pipeline.
-- **Four SVGR conversion bugs fixed:** CDATA sections are preserved rather
+- **Five SVGR conversion bugs fixed:** CDATA sections are preserved rather
   than dropped; `px` style values stay strings (SVGR’s px-stripping
   corrupted React-unitless properties, turning `line-height: 20px` into a
   multiplier of 20); semicolons inside `url(…)` no longer truncate a style
-  value; and attribute values containing double quotes no longer emit
-  invalid JSX.
+  value; attribute values containing double quotes no longer emit invalid
+  JSX; and whitespace between the children of a text-content element
+  survives, so `<tspan>A</tspan> <tspan>B</tspan>` still renders “A B”
+  rather than “AB”.
 
 One thing SVGR could do that this plugin doesn’t: run [SVGO][] optimization
 via `@svgr/plugin-svgo`. Optimizing SVGs is a build concern you can handle

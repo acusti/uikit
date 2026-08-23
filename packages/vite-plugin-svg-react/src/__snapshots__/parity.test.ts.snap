@@ -55,3 +55,10 @@ const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.or
 export default SvgIcon;
 "
 `;
+
+exports[`svgr parity corpus > whitespace inside text content versus between shapes 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg {...props}><text xmlSpace="preserve"><tspan>{"A"}</tspan>{" "}<tspan>{"B"}</tspan></text><g><rect /></g></svg>;
+export default SvgIcon;
+"
+`;
