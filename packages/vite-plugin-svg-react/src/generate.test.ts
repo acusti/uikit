@@ -110,6 +110,25 @@ describe('generateComponentModule', () => {
         expect(escaped).toContain(`fontFamily: "'a\\\\'b; c'", fill: "red"`);
     });
 
+    it('removes CSS comments from style attributes', () => {
+        // a semicolon inside the comment isn’t a declaration boundary, and
+        // leaving the comment in the value would emit CSS the browser drops
+        expect(
+            generate('<svg><path style="fill: red /* a; b */; stroke: blue"/></svg>'),
+        ).toContain('style={{ fill: "red", stroke: "blue" }}');
+        // unterminated comments run to the end, as CSS says they do
+        expect(generate('<svg><path style="fill: red /* oops"/></svg>')).toContain(
+            'style={{ fill: "red" }}',
+        );
+        // but `/*` inside a url() or a quoted string is content, not a comment
+        expect(
+            generate('<svg><path style="background: url(a/*b.png); fill: red"/></svg>'),
+        ).toContain('background: "url(a/*b.png)"');
+        expect(
+            generate(`<svg><text style="font-family: 'a/*b'; fill: red"/></svg>`),
+        ).toContain(`fontFamily: "'a/*b'"`);
+    });
+
     it('maps lowercased camelCase tag names back to their JSX names', () => {
         const code = generate(
             '<svg><clippath id="c"/><lineargradient id="g"/><foreignobject/></svg>',
