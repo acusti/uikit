@@ -5,6 +5,7 @@ import {
     COMPONENT_OPTION_NAMES,
     type ComponentOptions,
     generateComponentModule,
+    getComponentOptionsError,
 } from './generate.js';
 
 export type { ComponentOptions } from './generate.js';
@@ -40,6 +41,20 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             `vite-plugin-svg-react: unsupported options: ${unsupportedTopLevel.join(', ')}. ${hint}`,
         );
     }
+    // a non-object svg value would slip past the key check below —
+    // Object.keys(true) is empty, so every option silently defaults, and
+    // Object.keys('icon') yields character indices and a nonsense message
+    if (
+        options.svg !== undefined &&
+        (typeof options.svg !== 'object' ||
+            options.svg === null ||
+            Array.isArray(options.svg))
+    ) {
+        throw new Error(
+            'vite-plugin-svg-react: svg must be an object with dimensions, icon, ' +
+                'and/or svgProps (see the README’s Options section).',
+        );
+    }
     const unsupportedOptions = Object.keys(options.svg ?? {}).filter(
         (name) => !COMPONENT_OPTION_NAMES.has(name),
     );
@@ -52,6 +67,15 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
     }
 
     const componentOptions: ComponentOptions = options.svg ?? {};
+    // option values, not just their names: svgProps reaches the generated
+    // module verbatim, so an invalid one has to fail here rather than as a
+    // JSX parse error attributed to whichever SVG happened to be loaded first
+    const componentOptionsError = getComponentOptionsError(componentOptions);
+    if (componentOptionsError != null) {
+        throw new Error(
+            `vite-plugin-svg-react: ${componentOptionsError} (see the README’s Options section).`,
+        );
+    }
     let development = false;
     return {
         configResolved(config) {
