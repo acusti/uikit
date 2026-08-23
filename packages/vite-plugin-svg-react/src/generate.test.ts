@@ -80,6 +80,19 @@ describe('generateComponentModule', () => {
         expect(code).toContain('opacity="50%"');
     });
 
+    it('only converts numbers that render identically as strings', () => {
+        // these all parse as numbers but don’t round-trip, so converting
+        // would change what the attribute renders — `id="001"` becoming
+        // id="1" breaks the `<use href="#001">` pointing at it
+        const code = generate(
+            '<svg id="001" data-code="0x10" data-v="1e5" data-pad="1.50"/>',
+        );
+        expect(code).toContain('id="001"');
+        expect(code).toContain('data-code="0x10"');
+        expect(code).toContain('data-v="1e5"');
+        expect(code).toContain('data-pad="1.50"');
+    });
+
     it('converts style strings to JSX style object literals', () => {
         const code = generate(
             '<svg><path style="fill: red; stroke-width: 2; margin-top: 4px; -webkit-transform: rotate(3deg); -ms-transform: none; --custom: 4"/></svg>',
