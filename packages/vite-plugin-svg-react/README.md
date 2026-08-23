@@ -28,7 +28,7 @@ This plugin instead generates each component module directly and compiles
 it with Vite 8’s exported `transformWithOxc`, so SVG-to-React conversion is
 oxc/rolldown end to end: no esbuild fallback, no version matrix, no
 compatibility shims for older Vite versions. If you are on Vite < 8, use
-vite-plugin-svgr.
+[vite-plugin-svgr][].
 
 [rolldown-vite]: https://vite.dev/guide/rolldown
 [svgr]: https://react-svgr.com
