@@ -8,14 +8,12 @@ the SVG as XML and emits the component as a JSX source string for Vite’s
 `transformWithOxc` to compile. The package now installs with zero
 dependencies (29 fewer packages), and the first `.svg?react` import costs
 single-digit milliseconds instead of the hundreds a Babel pipeline needs to
-warm up. Conversion was verified byte-for-byte against `@svgr/core@8.1`
-before the dependency was removed, and that corpus is checked in as
-snapshot tests. Four SVGR bugs are fixed along the way: CDATA sections are
-preserved rather than dropped; `px` style values stay strings (SVGR’s
-px-stripping corrupted React-unitless properties, turning
-`line-height: 20px` into a multiplier of 20); semicolons inside `url(…)` no
-longer truncate a style value; and attribute values containing double
-quotes no longer emit invalid JSX.
+warm up. Your components render as they did under SVGR, with four SVGR bugs
+fixed along the way: CDATA sections are preserved rather than dropped; `px`
+style values stay strings (SVGR’s px-stripping corrupted React-unitless
+properties, turning `line-height: 20px` into a multiplier of 20);
+semicolons inside `url(…)` no longer truncate a style value; and attribute
+values containing double quotes no longer emit invalid JSX.
 
 Migrating: `svgrOptions` is now `svg`, narrowed to the three options that
 shape the generated `<svg>` element — `dimensions`, `icon`, and `svgProps`
