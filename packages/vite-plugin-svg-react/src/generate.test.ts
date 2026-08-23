@@ -242,6 +242,13 @@ describe('generateComponentModule', () => {
         );
     });
 
+    it('reads a minimized attribute as an empty value rather than throwing', () => {
+        // the parser's one deliberate leniency: XML requires a value, but the
+        // same markup is legal inline in HTML, so it reaches real files
+        expect(generate('<svg data-foo><path d="M0 0"/></svg>')).toContain('data-foo=""');
+        expect(generate('<svg><path d/></svg>')).toContain('<path d="" />');
+    });
+
     it('throws on malformed SVG, naming the file and position', () => {
         expect(() => generate('<svg><path></svg>')).toThrow(
             /Invalid SVG in \/x\/icon\.svg: expected <\/path>.*\(1:\d+\)/,
