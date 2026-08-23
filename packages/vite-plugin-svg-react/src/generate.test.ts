@@ -120,6 +120,10 @@ describe('generateComponentModule', () => {
         expect(generate('<svg><path style="fill: red /* oops"/></svg>')).toContain(
             'style={{ fill: "red" }}',
         );
+        // a comment separates tokens, so removing it leaves a space behind
+        expect(generate('<svg><path style="margin: 1px/*c*/2px"/></svg>')).toContain(
+            'style={{ margin: "1px 2px" }}',
+        );
         // but `/*` inside a url() or a quoted string is content, not a comment
         expect(
             generate('<svg><path style="background: url(a/*b.png); fill: red"/></svg>'),

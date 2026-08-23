@@ -211,6 +211,9 @@ const splitStyleDeclarations = (style: string) => {
             const end = style.indexOf('*/', index + 2);
             // an unterminated comment runs to the end, as CSS says it does
             index = end === -1 ? style.length : end + 1;
+            // a comment separates tokens, so it leaves a space behind rather
+            // than closing the gap: `1px/*c*/2px` is two values, not "1px2px"
+            current += ' ';
             continue;
         } else if (character === '(') {
             depth += 1;
