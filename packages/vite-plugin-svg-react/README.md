@@ -149,8 +149,10 @@ svgReact({
 });
 ```
 
-- `dimensions: false` removes `width`/`height` from the root `<svg>`
-- `icon` sets `width`/`height` to `1em` (`true`) or to the value you pass
+- `dimensions: false` removes `width`/`height` from the root `<svg>`, and
+  wins over `icon` if you set both
+- `icon` sets `width`/`height` to `1em` (`true`) or to the value you pass,
+  and does nothing alongside `dimensions: false`
 - `svgProps` adds extra props to the root `<svg>` (string values, or
   `{expression}` strings inserted verbatim)
 
