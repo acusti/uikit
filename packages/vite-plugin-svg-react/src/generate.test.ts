@@ -177,6 +177,16 @@ describe('generateComponentModule', () => {
         expect(code.match(/height/g)).toHaveLength(1);
     });
 
+    it('keeps svgProps string values verbatim apart from JSX escaping', () => {
+        // XML attribute-value normalization applies to values read from the
+        // SVG, not to a string handed over in the vite config
+        const code = generate(SIMPLE_SVG, {
+            svgProps: { 'data-note': 'line1\nline2\tend', 'data-raw': 'a & b "c"' },
+        });
+        expect(code).toContain('data-note="line1\nline2\tend"');
+        expect(code).toContain('data-raw="a &amp; b &quot;c&quot;"');
+    });
+
     it('drops root attributes that svgProps override via their prop names', () => {
         const code = generate('<svg class="icon"><path d="M0 0"/></svg>', {
             svgProps: { className: 'overridden' },
