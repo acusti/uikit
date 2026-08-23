@@ -8,10 +8,11 @@ import { type ComponentOptions, generateComponentModule } from './generate.js';
 // documented deliberate divergences (CDATA preserved, px style values kept
 // as strings, semicolons inside url()/quotes/comments not treated as
 // declaration boundaries and CSS comments removed, attribute values fully
-// escaped at emission, whitespace between the children of text-content
-// elements preserved, svgProps overrides appended instead of replaced in
-// place, and namespaced element names and non-<svg> roots rejected at build
-// time). The corpus covers the supported options
+// escaped at emission and converted to numbers only when that round-trips,
+// whitespace between the children of text-content elements preserved,
+// svgProps overrides appended instead of replaced in place, and namespaced
+// element names, non-<svg> roots, and character references outside XML’s
+// range rejected at build time). The corpus covers the supported options
 // (dimensions, icon, svgProps) and the markup edge cases; svgr options the
 // plugin deliberately dropped are rejected at config time and aren’t
 // represented here. If a change to generate.ts, parse.ts, or mappings.ts
@@ -74,6 +75,13 @@ describe('svgr parity corpus', () => {
 
     it('component naming from a digit-initial file name', () => {
         expect(generate(SIMPLE_SVG, undefined, '/x/2fast.svg')).toMatchSnapshot();
+    });
+
+    it('numeric-looking attribute values that do and don’t round-trip', () => {
+        // re-checked against @svgr/core@8.1: it emitted id={1}, data-code={16},
+        // and data-pad={1.5} for these, changing what each one renders
+        const svg = '<svg id="001" data-code="0x10" data-pad="1.50" width="24"/>';
+        expect(generate(svg)).toMatchSnapshot();
     });
 
     it('whitespace inside text content versus between shapes', () => {

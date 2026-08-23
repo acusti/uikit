@@ -49,6 +49,13 @@ export default SvgArrowLeft;
 "
 `;
 
+exports[`svgr parity corpus > numeric-looking attribute values that do and don’t round-trip 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg id="001" data-code="0x10" data-pad="1.50" width={24} {...props} />;
+export default SvgIcon;
+"
+`;
+
 exports[`svgr parity corpus > svgProps with an expression value 1`] = `
 "import type { SVGProps } from 'react';
 const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} viewBox="0 0 24 24" height={props.width} role="img" {...props}><path d="M0 0h1v1H0z" /></svg>;
