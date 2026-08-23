@@ -6,11 +6,12 @@ import { type ComponentOptions, generateComponentModule } from './generate.js';
 // outputs were verified against @svgr/core@8.1 + @svgr/plugin-jsx before the
 // dependency was removed — byte-for-byte modulo quote style, except for the
 // documented deliberate divergences (CDATA preserved, px style values kept
-// as strings, semicolons inside url()/quotes not treated as declaration
-// boundaries, attribute values fully escaped at emission, whitespace between
-// the children of text-content elements preserved, svgProps overrides
-// appended instead of replaced in place, and namespaced element names
-// rejected at build time). The corpus covers the supported options
+// as strings, semicolons inside url()/quotes/comments not treated as
+// declaration boundaries and CSS comments removed, attribute values fully
+// escaped at emission, whitespace between the children of text-content
+// elements preserved, svgProps overrides appended instead of replaced in
+// place, and namespaced element names and non-<svg> roots rejected at build
+// time). The corpus covers the supported options
 // (dimensions, icon, svgProps) and the markup edge cases; svgr options the
 // plugin deliberately dropped are rejected at config time and aren’t
 // represented here. If a change to generate.ts, parse.ts, or mappings.ts

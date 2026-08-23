@@ -183,14 +183,22 @@ const toPropName = (name: string, elementName: string) => {
 
 // Split a style string into declarations at semicolons, ignoring semicolons
 // inside quotes or parentheses (e.g. url(data:image/png;base64,…)) and
-// honoring backslash escapes inside quoted strings.
+// honoring backslash escapes inside quoted strings. Comments are removed
+// rather than skipped over: a semicolon inside one isn’t a boundary, and
+// leaving the comment in the value would emit CSS the browser discards.
+//
+// Only outside parentheses, where a comment is both plausible and the only
+// thing that can break the split — inside them a semicolon is already not a
+// boundary, so treating `/*` as a comment there could only misread an
+// unquoted url() that happens to contain one.
 const splitStyleDeclarations = (style: string) => {
     const declarations: Array<string> = [];
     let current = '';
     let depth = 0;
     let escaped = false;
     let quote = '';
-    for (const character of style) {
+    for (let index = 0; index < style.length; index += 1) {
+        const character = style[index];
         if (escaped) {
             escaped = false;
         } else if (character === '\\') {
@@ -199,6 +207,11 @@ const splitStyleDeclarations = (style: string) => {
             if (character === quote) quote = '';
         } else if (character === '"' || character === "'") {
             quote = character;
+        } else if (depth === 0 && style.startsWith('/*', index)) {
+            const end = style.indexOf('*/', index + 2);
+            // an unterminated comment runs to the end, as CSS says it does
+            index = end === -1 ? style.length : end + 1;
+            continue;
         } else if (character === '(') {
             depth += 1;
         } else if (character === ')') {
