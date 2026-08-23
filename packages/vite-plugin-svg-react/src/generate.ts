@@ -154,10 +154,17 @@ const escapeJSXAttributeValue = (value: string) =>
 const hyphenToCamelCase = (name: string) =>
     name.replace(/-(.)/g, (_, character: string) => character.toUpperCase());
 
-const isNumericValue = (value: string) =>
-    value.trim() !== '' &&
-    !Number.isNaN(Number(value)) &&
-    !Number.isNaN(parseFloat(value));
+// Whether emitting the value as a number would render identically to the
+// string. Round-tripping is the whole test: `24` does, so `width={24}` is
+// free; `001`, `0x10`, and `1e5` don't, and converting them would change what
+// the attribute renders — which matters for `id`, `class`, and `data-*`,
+// where the value is an identifier rather than a quantity.
+const isNumericValue = (value: string) => {
+    const trimmed = value.trim();
+    if (trimmed === '') return false;
+    const parsed = Number(trimmed);
+    return !Number.isNaN(parsed) && String(parsed) === trimmed;
+};
 
 const kebabCase = (name: string) =>
     name.replace(KEBAB_REGEX, (match) => `-${match.toLowerCase()}`);
