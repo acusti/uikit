@@ -154,4 +154,68 @@ describe('vite-plugin-svg-react', () => {
             vitePluginSVGReact({ svgrOptions: { icon: true } }),
         ).toThrow(/svgrOptions was renamed to svg/);
     });
+
+    it('rejects a non-object svg value', () => {
+        // Object.keys(true) is empty, so these would otherwise pass the key
+        // check and silently default every option
+        for (const svg of [true, 42, 'icon', ['icon'], null]) {
+            expect(() =>
+                // @ts-expect-error svg must be an object
+                vitePluginSVGReact({ svg }),
+            ).toThrow(/svg must be an object/);
+        }
+    });
+
+    it('rejects svg option values of the wrong type', () => {
+        // TypeScript catches these on an object literal; a plain-JS
+        // vite.config gets nothing, and the option silently does nothing
+        expect(() =>
+            // @ts-expect-error dimensions is a boolean
+            vitePluginSVGReact({ svg: { dimensions: 'yes' } }),
+        ).toThrow(/dimensions must be a boolean/);
+        expect(() =>
+            // @ts-expect-error icon is a boolean, number, or string
+            vitePluginSVGReact({ svg: { icon: null } }),
+        ).toThrow(/icon must be a boolean, number, or string/);
+        expect(() =>
+            // @ts-expect-error svgProps is an object
+            vitePluginSVGReact({ svg: { svgProps: 'role' } }),
+        ).toThrow(/svgProps must be an object/);
+    });
+
+    it('rejects svgProps that would emit invalid JSX', () => {
+        // these reach the generated module verbatim, so an invalid one would
+        // otherwise die inside transformWithOxc blaming the SVG file
+        expect(() =>
+            vitePluginSVGReact({ svg: { svgProps: { 'data x': 'y' } } }),
+        ).toThrow(/svgProps name "data x" isn’t a valid JSX attribute name/);
+        expect(() =>
+            vitePluginSVGReact({ svg: { svgProps: { height: '{props.width}}' } } }),
+        ).toThrow(/isn’t a balanced \{expression\}/);
+        expect(() =>
+            vitePluginSVGReact({ svg: { svgProps: { height: '{a} {b}' } } }),
+        ).toThrow(/isn’t a balanced \{expression\}/);
+        // a truncated expression emits as a literal string rather than
+        // breaking the build, so it’s silently wrong without this check
+        expect(() =>
+            vitePluginSVGReact({ svg: { svgProps: { height: '{props.width' } } }),
+        ).toThrow(/isn’t a balanced \{expression\}/);
+    });
+
+    it('accepts valid svgProps names and expression values', () => {
+        expect(() =>
+            vitePluginSVGReact({
+                svg: {
+                    svgProps: {
+                        'aria-hidden': 'true',
+                        'data-testid': 'icon',
+                        // a brace inside a quoted string doesn’t unbalance it
+                        height: '{fn("}")}',
+                        role: 'img',
+                        width: '{props.width}',
+                    },
+                },
+            }),
+        ).not.toThrow();
+    });
 });

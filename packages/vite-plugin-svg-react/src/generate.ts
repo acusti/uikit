@@ -31,6 +31,84 @@ export const COMPONENT_OPTION_NAMES: ReadonlySet<string> = new Set(
     Object.keys(componentOptionNames),
 );
 
+// An svgProps value wrapped in braces is inserted into the JSX verbatim as
+// an expression container; anything else is emitted as a quoted string.
+const isExpressionValue = (value: string) => value.startsWith('{') && value.endsWith('}');
+
+// Whether the leading brace closes only at the final one, i.e. the value is a
+// single expression container rather than `{a} {b}` or `{props.width}}`.
+// Braces inside quoted strings don’t count, so `{t("}")}` stays balanced.
+const isBalancedExpression = (value: string) => {
+    let depth = 0;
+    let escaped = false;
+    let quote = '';
+    for (let index = 0; index < value.length; index += 1) {
+        const character = value[index];
+        if (escaped) {
+            escaped = false;
+        } else if (character === '\\') {
+            escaped = true;
+        } else if (quote !== '') {
+            if (character === quote) quote = '';
+        } else if (character === '"' || character === "'" || character === '`') {
+            quote = character;
+        } else if (character === '{') {
+            depth += 1;
+        } else if (character === '}') {
+            depth -= 1;
+            // closing early means the rest sits outside the container
+            if (depth === 0) return index === value.length - 1;
+        }
+    }
+    return false;
+};
+
+// Report the first option that would produce silently wrong output or invalid
+// JSX, or null if the options are usable. TypeScript catches these on an
+// object literal, but a plain-JS vite.config gets no diagnostic at all — and
+// svgProps names and expression values reach the generated module verbatim,
+// so a malformed one would otherwise surface as an oxc parse error blamed on
+// the SVG file rather than on the config that caused it.
+export const getComponentOptionsError = (options: ComponentOptions): null | string => {
+    // only undefined counts as “not provided”: an explicit null means the
+    // config meant something by it, and every option silently ignores it
+    // (icon: null is the loud one — it renders as width="null")
+    const { dimensions, icon, svgProps } = options;
+    if (dimensions !== undefined && typeof dimensions !== 'boolean') {
+        return 'dimensions must be a boolean';
+    }
+    if (
+        icon !== undefined &&
+        typeof icon !== 'boolean' &&
+        typeof icon !== 'number' &&
+        typeof icon !== 'string'
+    ) {
+        return 'icon must be a boolean, number, or string';
+    }
+    if (svgProps === undefined) return null;
+    if (typeof svgProps !== 'object' || svgProps === null || Array.isArray(svgProps)) {
+        return 'svgProps must be an object';
+    }
+    for (const [name, value] of Object.entries(svgProps)) {
+        if (!SVG_PROP_NAME_REGEX.test(name)) {
+            return `svgProps name ${JSON.stringify(name)} isn’t a valid JSX attribute name`;
+        }
+        if (typeof value !== 'string') {
+            return `svgProps.${name} must be a string`;
+        }
+        // a brace at either end means an expression was intended, so check
+        // the wider condition than isExpressionValue emits on: `{props.width`
+        // would otherwise pass as a literal string and render as one. Brace
+        // balance only — the expression’s own syntax is the JSX compiler’s to
+        // judge, and by then the message names the config value.
+        const looksLikeExpression = value.startsWith('{') || value.endsWith('}');
+        if (looksLikeExpression && !isBalancedExpression(value)) {
+            return `svgProps.${name} value ${JSON.stringify(value)} isn’t a balanced {expression}`;
+        }
+    }
+    return null;
+};
+
 const IDENTIFIER_REGEX = /^[A-Za-z_$][\w$]*$/;
 // lowercase-initial (intrinsic) JSX element names: JSX resolves these as
 // string tags; dashes and underscores are allowed after the first character
@@ -41,6 +119,9 @@ const MS_PREFIX_REGEX = /^-ms-/;
 // tabs, newlines, and exotic line separators collapse to a single space in
 // attribute values (regular spaces are preserved as-is)
 const SPACES_REGEX = /[\t\n\r\u0085\u2028\u2029]+/g;
+// svgProps names are emitted as JSX attribute names verbatim, so they have
+// to be spellable as one: an identifier-ish head plus dashes for data-*/aria-*
+const SVG_PROP_NAME_REGEX = /^[A-Za-z_][\w-]*$/;
 const WHITESPACE_ONLY_REGEX = /^\s+$/;
 
 // # Name and value conversion
@@ -246,9 +327,8 @@ export function generateComponentModule(
                     root.attributes.delete(attributeName);
                 }
             }
-            const isExpression = value.startsWith('{') && value.endsWith('}');
             trailing.push(
-                isExpression
+                isExpressionValue(value)
                     ? `${name}=${value}`
                     : `${name}="${escapeAttributeValue(value)}"`,
             );
