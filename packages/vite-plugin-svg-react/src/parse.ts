@@ -64,6 +64,9 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
     const { length } = input;
     let index = 0;
     let root: null | XMLElement = null;
+    // offset of the root's opening tag, so a wrong root points at itself
+    // rather than at wherever parsing happened to finish
+    let rootStart = 0;
     const stack: Array<XMLElement> = [];
 
     const fail = (message: string): never => {
@@ -172,6 +175,7 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
             }
         } else {
             // opening tag
+            const tagStart = index;
             index += 1;
             const element: XMLElement = {
                 attributes: new Map(),
@@ -185,6 +189,7 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
                 parent.children.push(element);
             } else if (root == null) {
                 root = element;
+                rootStart = tagStart;
             } else {
                 fail('multiple root elements');
             }
@@ -203,6 +208,13 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
     if (stack.length > 0) fail(`unclosed element <${stack[stack.length - 1].name}>`);
     // fail never returns; the return satisfies control-flow analysis
     if (root == null) return fail('no root element found');
+    // a .svg?react module is a component typed SVGProps<SVGSVGElement> that
+    // spreads onto its root, so a root that isn’t <svg> makes the wrapper a
+    // lie and emits an element nobody asked for
+    if (root.name !== 'svg') {
+        index = rootStart;
+        return fail(`root element must be <svg> but found <${root.name}>`);
+    }
     return root;
 
     function readAttributes(element: XMLElement) {

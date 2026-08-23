@@ -249,6 +249,15 @@ describe('generateComponentModule', () => {
         expect(generate('<svg><path d/></svg>')).toContain('<path d="" />');
     });
 
+    it('rejects a document whose root element isn’t <svg>', () => {
+        // the module wraps its root in SVGProps<SVGSVGElement> and spreads
+        // onto it, so any other root makes the generated type a lie
+        expect(() => generate('<div><span/></div>')).toThrow(
+            /root element must be <svg> but found <div> \(1:1\)/,
+        );
+        expect(() => generate('<symbol><rect/></symbol>')).toThrow(/<symbol>/);
+    });
+
     it('throws on malformed SVG, naming the file and position', () => {
         expect(() => generate('<svg><path></svg>')).toThrow(
             /Invalid SVG in \/x\/icon\.svg: expected <\/path>.*\(1:\d+\)/,
