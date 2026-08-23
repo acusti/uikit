@@ -231,13 +231,16 @@ describe('vite-plugin-svg-react', () => {
         ).not.toThrow();
     });
 
-    it('leaves expressions it can’t confidently lex to the JSX compiler', () => {
-        // a slash may open a regex literal or a comment, either of which can
-        // hold an unmatched brace; rejecting these would block a valid config
+    it('rejects an unmatched brace inside a regex literal or comment', () => {
+        // known and accepted: the balance check is a scanner, not a
+        // tokenizer. Letting a slash abandon the scan would let a truncated
+        // `{props.width / 2` through to fail inside oxc blaming the SVG,
+        // which is the failure this check exists to prevent — and a regex or
+        // comment in an svgProps value is theoretical next to a typo’d one
         for (const height of ['{/}/.test(x) ? 1 : 2}', '{props.width /* } */}']) {
-            expect(() =>
-                vitePluginSVGReact({ svg: { svgProps: { height } } }),
-            ).not.toThrow();
+            expect(() => vitePluginSVGReact({ svg: { svgProps: { height } } })).toThrow(
+                /isn’t a balanced \{expression\}/,
+            );
         }
     });
 });

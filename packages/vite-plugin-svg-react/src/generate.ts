@@ -39,12 +39,15 @@ const isExpressionValue = (value: string) => value.startsWith('{') && value.ends
 // single expression container rather than `{a} {b}` or `{props.width}}`.
 // Braces inside quoted strings don’t count, so `{t("}")}` stays balanced.
 //
-// Returns null for “can’t tell”: a slash may open a regex literal or a
-// comment, either of which can hold an unmatched brace, and telling those
-// from division needs real tokenization rather than a scanner. Those values
-// go unvalidated instead of risking a false positive on a working config —
-// rejecting valid config is worse than the oxc error this check front-runs.
-const isBalancedExpression = (value: string): boolean | null => {
+// Deliberately a scanner and not a tokenizer: an unmatched brace inside a
+// regex literal or a comment reads as unbalanced here. Letting those through
+// unvalidated would mean a truncated expression that happens to contain a
+// slash (`{props.width / 2`) passes and then dies inside oxc blaming the SVG
+// — the failure this check exists to prevent. A rejection names the config
+// value that caused it; the miss it would trade for does not, so this errs
+// toward rejecting. Regexes and comments in an svgProps value are the
+// theoretical case; a typo’d expression is the one people actually hit.
+const isBalancedExpression = (value: string) => {
     let depth = 0;
     let escaped = false;
     let quote = '';
@@ -58,8 +61,6 @@ const isBalancedExpression = (value: string): boolean | null => {
             if (character === quote) quote = '';
         } else if (character === '"' || character === "'" || character === '`') {
             quote = character;
-        } else if (character === '/') {
-            return null;
         } else if (character === '{') {
             depth += 1;
         } else if (character === '}') {
@@ -108,10 +109,9 @@ export const getComponentOptionsError = (options: ComponentOptions): null | stri
         // than the both-ends rule isExpressionValue emits on: `{props.width`
         // would otherwise pass as a literal string and render as one. A
         // trailing brace alone doesn’t qualify — `d="M0 0}"` is a fine string
-        // value. Brace balance only, and only when confidently lexed: the
-        // expression’s own syntax is the JSX compiler’s to judge, and by then
-        // the message names the config value.
-        if (value.startsWith('{') && isBalancedExpression(value) === false) {
+        // value. Brace balance only: the expression’s own syntax is the JSX
+        // compiler’s to judge, and by then the message names the config value.
+        if (value.startsWith('{') && !isBalancedExpression(value)) {
             return `svgProps.${name} value ${JSON.stringify(value)} isn’t a balanced {expression}`;
         }
     }
