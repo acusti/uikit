@@ -13,7 +13,6 @@
         { "path": "../input-text" },
         { "path": "../styling" },
         { "path": "../use-is-out-of-bounds" },
-        { "path": "../use-keyboard-events" },
-        { "path": "../vite-plugin-react-compiler" }
+        { "path": "../use-keyboard-events" }
     ]
 }
