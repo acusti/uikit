@@ -25,15 +25,29 @@ const NAME_START = /[A-Za-z_:]/;
 const NAME_CHARS = /[^\s='"/>]+/y;
 const WHITESPACE = /\s*/y;
 
+// XML 1.0 Char: tab, LF, CR, then the scalar ranges, excluding surrogates
+// and the two noncharacters at the end of the BMP
+const isXMLCharacter = (codePoint: number) =>
+    codePoint === 0x9 ||
+    codePoint === 0xa ||
+    codePoint === 0xd ||
+    (codePoint >= 0x20 && codePoint <= 0xd7ff) ||
+    (codePoint >= 0xe000 && codePoint <= 0xfffd) ||
+    (codePoint >= 0x10000 && codePoint <= 0x10ffff);
+
 // Decode the five predefined XML entities plus decimal/hex character
 // references. Unrecognized names (e.g. HTML-only ones like &nbsp;, which XML
-// doesn’t define) pass through literally — and stay literal in the rendered
-// output, because attribute values are fully re-escaped at emission, so the
-// JSX compiler never gets a second pass at them. That’s a deliberate
-// trade-off: the reference pipeline left values raw for the JSX layer to
-// decode, which double-decoded entity-shaped text and emitted invalid JSX
-// for values containing double quotes.
-export function decodeEntities(text: string): string {
+// doesn’t define) pass through literally, and stay literal in the rendered
+// output: emission escapes the `&` to `&amp;`, which the JSX compiler decodes
+// back to a literal `&nbsp;` rather than to a non-breaking space. That’s the
+// deliberate trade-off — the reference pipeline left values raw for the JSX
+// layer to decode, which double-decoded entity-shaped text and emitted
+// invalid JSX for values containing double quotes.
+//
+// A reference naming a character XML forbids is a different case: it can’t
+// pass through literally without smuggling e.g. a NUL into the generated
+// module, so it fails the parse instead.
+export function decodeEntities(text: string, fail?: (message: string) => never): string {
     if (!text.includes('&')) return text;
     return text.replace(
         /&(?:#x([0-9A-Fa-f]+)|#([0-9]+)|(amp|apos|gt|lt|quot));/g,
@@ -46,6 +60,10 @@ export function decodeEntities(text: string): string {
                 return '"';
             }
             const codePoint = parseInt(hex ?? dec ?? '', hex == null ? 10 : 16);
+            if (!isXMLCharacter(codePoint)) {
+                if (fail) fail(`${match} is not a valid XML character`);
+                return match;
+            }
             try {
                 return String.fromCodePoint(codePoint);
             } catch (_error) {
@@ -99,7 +117,10 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
             const value = input.slice(index, end === -1 ? length : end);
             const parent: undefined | XMLElement = stack[stack.length - 1];
             if (parent != null) {
-                parent.children.push({ type: 'text', value: decodeEntities(value) });
+                parent.children.push({
+                    type: 'text',
+                    value: decodeEntities(value, fail),
+                });
             } else if (value.trim() !== '') {
                 fail('text content outside of the root element');
             }
@@ -239,7 +260,7 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
             index += 1;
             const end = input.indexOf(quote, index);
             if (end === -1) fail(`unterminated value for attribute ${name}`);
-            element.attributes.set(name, decodeEntities(input.slice(index, end)));
+            element.attributes.set(name, decodeEntities(input.slice(index, end), fail));
             index = end + 1;
         }
     }
