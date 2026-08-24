@@ -31,7 +31,6 @@ export type Options = {
      * Options passed verbatim to React Compiler, using the same names as
      * babel-plugin-react-compiler (compilationMode, panicThreshold
      * (defaults to 'none'), target (defaults to '19'), environment, etc.).
-     * Named to match @vitejs/plugin-react’s `compiler` option.
      */
     compiler?: ReactCompilerOptions;
 };
