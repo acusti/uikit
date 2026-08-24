@@ -87,14 +87,15 @@ The plugin takes an optional options object with four properties:
   [`createFilter`](https://vite.dev/guide/api-plugin#filtering-include-exclude-pattern)
   patterns selecting which modules get the compiler pass. Defaults:
   `include: /\.[jt]sx?$/`, `exclude: /[/\\]node_modules[/\\]/`.
-- **`reactCompiler`**: options passed verbatim to React Compiler, using the
-  same names as [babel-plugin-react-compiler][compiler options]:
+- **`compiler`**: options passed verbatim to React Compiler, using the same
+  names as [babel-plugin-react-compiler][compiler options]:
   `compilationMode`, `panicThreshold` (defaults to `'none'`), `target`
   (defaults to `'19'`), `environment` flags like
   `enableTreatRefLikeIdentifiersAsRefs`, and so on. Callback-valued options
   (e.g. `logger`, function-valued `sources`) don’t cross the native
   boundary and aren’t supported; `sources` accepts an array of filename
-  substrings instead.
+  substrings instead. Named to match [@vitejs/plugin-react][]’s own
+  `compiler` option.
 - **`memoize`**: cache transform results per module id, keyed by a content
   hash (bounded to one entry per file). Multi-environment builds (e.g.
   React Router apps building client + SSR environments) run every transform
@@ -104,7 +105,7 @@ The plugin takes an optional options object with four properties:
 ```ts
 reactCompiler({
     exclude: [/node_modules/, /\.stories\./],
-    reactCompiler: {
+    compiler: {
         environment: { enableTreatRefLikeIdentifiersAsRefs: true },
     },
 });
@@ -116,6 +117,8 @@ Babel syntax error would. Nonfatal compiler bail-outs behave as they do
 with the Babel plugin under `panicThreshold: 'none'`: the affected function
 is left uncompiled and the build continues.
 
+[@vitejs/plugin-react]:
+    https://github.com/vitejs/vite-plugin-react/tree/main/packages/plugin-react
 [compiler options]:
     https://react.dev/reference/react-compiler/configuration
 
