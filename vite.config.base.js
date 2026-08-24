@@ -40,7 +40,6 @@ export const defineConfig = (options = {}) => {
         },
         ...(css ? { css } : {}),
         plugins: [
-            // (for code that by design accesses refs during render)
             ...(isReact
                 ? [react(isReact === true ? { compiler: compilerOptions } : {})]
                 : []),
