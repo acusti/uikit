@@ -1,5 +1,19 @@
 # @acusti/css-value-input
 
+## 2.4.1
+
+### Patch Changes
+
+- 09f3ea5: Compile with React Compiler
+
+    This package’s build now runs through React Compiler, so its internals
+    are automatically memoized for better runtime performance. This is its
+    first published release built with the compiler. No API or behavior
+    changes.
+
+- Updated dependencies [f329612]
+    - @acusti/input-text@2.4.4
+
 ## 2.4.0
 
 ### Minor Changes

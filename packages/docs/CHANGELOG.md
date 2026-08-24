@@ -1,5 +1,47 @@
 # @acusti/uikit-docs
 
+## 0.6.6
+
+### Patch Changes
+
+- Updated dependencies [f329612]
+- Updated dependencies [09f3ea5]
+- Updated dependencies [fb483ea]
+- Updated dependencies [c50a281]
+- Updated dependencies [41a63e6]
+- Updated dependencies [870ceb8]
+- Updated dependencies [8e47cee]
+- Updated dependencies [83ffdff]
+- Updated dependencies [5ddd59c]
+- Updated dependencies [07cc5b5]
+- Updated dependencies [7396d2f]
+- Updated dependencies [9fc5334]
+- Updated dependencies [1fe2837]
+- Updated dependencies [d3a24b8]
+- Updated dependencies [18bf9c3]
+- Updated dependencies [fb4531d]
+- Updated dependencies [2b4001c]
+- Updated dependencies [83acc70]
+- Updated dependencies [0f2a467]
+- Updated dependencies [9ef9990]
+- Updated dependencies [2e7d1f1]
+- Updated dependencies [a8111ed]
+- Updated dependencies [06ab6fa]
+- Updated dependencies [d0a147b]
+- Updated dependencies [78c7086]
+- Updated dependencies [fb483ea]
+- Updated dependencies [a14147e]
+- Updated dependencies [a2eb341]
+- Updated dependencies [bc8cbbe]
+- Updated dependencies [ca0f949]
+- Updated dependencies [9f9e85f]
+- Updated dependencies [38c4851]
+    - @acusti/date-picker@0.16.2
+    - @acusti/dropdown@1.0.0-rc.1
+    - @acusti/input-text@2.4.4
+    - @acusti/use-keyboard-events@0.13.0
+    - @acusti/css-value-input@2.4.1
+
 ## 0.6.5
 
 ### Patch Changes

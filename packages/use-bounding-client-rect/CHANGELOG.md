@@ -1,5 +1,16 @@
 # @acusti/use-bounding-client-rect
 
+## 2.0.3
+
+### Patch Changes
+
+- f329612: Rebuild with a new React Compiler toolchain
+
+    The published build now runs through a different React Compiler
+    toolchain internally. Output is verified equivalent to the previous
+    build: React Compiler memoization is unchanged, with zero compiler
+    bailouts. No API or behavior changes.
+
 ## 2.0.2
 
 ### Patch Changes

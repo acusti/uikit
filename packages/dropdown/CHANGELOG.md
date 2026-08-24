@@ -1,5 +1,19 @@
 # @acusti/dropdown
 
+## 1.0.0-rc.1
+
+### Patch Changes
+
+- f329612: Rebuild with a new React Compiler toolchain
+
+    The published build now runs through a different React Compiler
+    toolchain internally. Output is verified equivalent to the previous
+    build: React Compiler memoization is unchanged, with zero compiler
+    bailouts. No API or behavior changes.
+
+- Updated dependencies [f329612]
+    - @acusti/use-keyboard-events@0.13.0
+
 ## 1.0.0-rc.0
 
 ### Patch Changes
