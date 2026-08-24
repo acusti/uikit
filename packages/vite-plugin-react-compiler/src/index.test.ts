@@ -75,17 +75,17 @@ describe('vite-plugin-react-compiler', () => {
         expect(result?.code).toContain('react/compiler-runtime');
     });
 
-    it('passes reactCompiler options through to the compiler', async () => {
+    it('passes compiler options through to React Compiler', async () => {
         // target '18' memoizes via the react-compiler-runtime package
         const { transformCode } = createTransformer({
-            reactCompiler: { target: '18' },
+            compiler: { target: '18' },
         });
         const result = await transformCode(COMPONENT, '/src/Greeting.tsx');
         expect(result?.code).toContain('react-compiler-runtime');
 
         // annotation mode skips components without a 'use memo' directive
         const annotation = createTransformer({
-            reactCompiler: { compilationMode: 'annotation' },
+            compiler: { compilationMode: 'annotation' },
         });
         const annotationResult = await annotation.transformCode(
             COMPONENT,

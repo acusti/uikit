@@ -31,8 +31,9 @@ export type Options = {
      * Options passed verbatim to React Compiler, using the same names as
      * babel-plugin-react-compiler (compilationMode, panicThreshold
      * (defaults to 'none'), target (defaults to '19'), environment, etc.).
+     * Named to match @vitejs/plugin-react’s `compiler` option.
      */
-    reactCompiler?: ReactCompilerOptions;
+    compiler?: ReactCompilerOptions;
 };
 
 type CachedTransform = {
@@ -72,7 +73,7 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
                 const transformed = await transform(filepath, code, {
                     // leave JSX for vite’s own pipeline (refresh, dev runtime)
                     jsx: 'preserve',
-                    reactCompiler: options.reactCompiler ?? {},
+                    reactCompiler: options.compiler ?? {},
                     sourcemap: true,
                 });
 
