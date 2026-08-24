@@ -1,5 +1,5 @@
 ---
-'@acusti/vite-plugin-react-compiler': minor
+'@acusti/vite-plugin-react-compiler': major
 ---
 
 Rename the `reactCompiler` option to `compiler`, matching the option name
