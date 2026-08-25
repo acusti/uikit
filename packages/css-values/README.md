@@ -1,9 +1,10 @@
 # @acusti/css-values
 
-[![latest version](https://img.shields.io/npm/v/@acusti/css-values?style=for-the-badge)](https://www.npmjs.com/package/@acusti/css-values)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/css-values?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fcss-values)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/css-values?style=for-the-badge)](https://www.npmjs.com/package/@acusti/css-values)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/css-values)](https://bundlejs.com/?q=%40acusti%2Fcss-values)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/css-values)](https://npmx.dev/package/@acusti/css-values)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/css-values)](https://npmx.dev/package/@acusti/css-values)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/css-values)](https://npmx.dev/package/@acusti/css-values)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/css-values)](https://npmx.dev/package/@acusti/css-values)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/css-values)](https://npmx.dev/package/@acusti/css-values)
 
 Utilities for parsing, manipulating, and working with different types of
 CSS values including lengths, angles, times, percentages, and integers.

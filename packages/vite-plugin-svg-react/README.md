@@ -1,8 +1,10 @@
 # @acusti/vite-plugin-svg-react
 
-[![latest version](https://img.shields.io/npm/v/@acusti/vite-plugin-svg-react?style=for-the-badge)](https://www.npmjs.com/package/@acusti/vite-plugin-svg-react)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/vite-plugin-svg-react?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fvite-plugin-svg-react)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/vite-plugin-svg-react?style=for-the-badge)](https://www.npmjs.com/package/@acusti/vite-plugin-svg-react)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/vite-plugin-svg-react)](https://npmx.dev/package/@acusti/vite-plugin-svg-react)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/vite-plugin-svg-react)](https://npmx.dev/package/@acusti/vite-plugin-svg-react)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/vite-plugin-svg-react)](https://npmx.dev/package/@acusti/vite-plugin-svg-react)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/vite-plugin-svg-react)](https://npmx.dev/package/@acusti/vite-plugin-svg-react)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/vite-plugin-svg-react)](https://npmx.dev/package/@acusti/vite-plugin-svg-react)
 
 A [Vite][] plugin that turns SVG files into typed React components:
 

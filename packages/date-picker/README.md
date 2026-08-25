@@ -1,9 +1,10 @@
 # @acusti/date-picker
 
-[![latest version](https://img.shields.io/npm/v/@acusti/date-picker?style=for-the-badge)](https://www.npmjs.com/package/@acusti/date-picker)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/date-picker?style=for-the-badge)](https://www.npmjs.com/package/@acusti/date-picker)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/date-picker)](https://bundlejs.com/?q=%40acusti%2Fdate-picker)
-[![supply chain security](https://socket.dev/api/badge/npm/package/@acusti/date-picker/0.14.1)](https://socket.dev/npm/package/@acusti/date-picker/overview/0.14.1)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
 
 A comprehensive React date picker library with support for single date
 selection, date ranges, and two-up month calendar views. Built with

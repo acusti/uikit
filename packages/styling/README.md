@@ -1,9 +1,10 @@
 # @acusti/styling
 
-[![latest version](https://img.shields.io/npm/v/@acusti/styling?style=for-the-badge)](https://www.npmjs.com/package/@acusti/styling)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/styling?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fstyling)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/styling?style=for-the-badge)](https://www.npmjs.com/package/@acusti/styling)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/styling)](https://bundlejs.com/?q=%40acusti%2Fstyling)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
 
 `@acusti/styling` provides React 19+ optimized styling utilities, including
 the `Style` component that leverages React’s new `<style>` element special

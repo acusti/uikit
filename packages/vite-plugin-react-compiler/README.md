@@ -1,8 +1,10 @@
 # @acusti/vite-plugin-react-compiler
 
-[![latest version](https://img.shields.io/npm/v/@acusti/vite-plugin-react-compiler?style=for-the-badge)](https://www.npmjs.com/package/@acusti/vite-plugin-react-compiler)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/vite-plugin-react-compiler?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fvite-plugin-react-compiler)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/vite-plugin-react-compiler?style=for-the-badge)](https://www.npmjs.com/package/@acusti/vite-plugin-react-compiler)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/vite-plugin-react-compiler)](https://npmx.dev/package/@acusti/vite-plugin-react-compiler)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/vite-plugin-react-compiler)](https://npmx.dev/package/@acusti/vite-plugin-react-compiler)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/vite-plugin-react-compiler)](https://npmx.dev/package/@acusti/vite-plugin-react-compiler)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/vite-plugin-react-compiler)](https://npmx.dev/package/@acusti/vite-plugin-react-compiler)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/vite-plugin-react-compiler)](https://npmx.dev/package/@acusti/vite-plugin-react-compiler)
 
 A [Vite][] plugin that runs [React Compiler][] via [oxc-transform-react][],
 the native Node bindings for the oxc project’s Rust port of the compiler —

@@ -1,9 +1,10 @@
 # @acusti/dropdown
 
-[![latest version](https://img.shields.io/npm/v/@acusti/dropdown?style=for-the-badge)](https://www.npmjs.com/package/@acusti/dropdown)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/dropdown?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fdropdown)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/dropdown?style=for-the-badge)](https://www.npmjs.com/package/@acusti/dropdown)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/dropdown)](https://bundlejs.com/?q=%40acusti%2Fdropdown)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/dropdown)](https://npmx.dev/package/@acusti/dropdown)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/dropdown)](https://npmx.dev/package/@acusti/dropdown)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/dropdown)](https://npmx.dev/package/@acusti/dropdown)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/dropdown)](https://npmx.dev/package/@acusti/dropdown)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/dropdown)](https://npmx.dev/package/@acusti/dropdown)
 
 `Dropdown` is a React component that renders a menu-like UI with a trigger
 that the user clicks to disclose a dropdown anchored to that trigger. The

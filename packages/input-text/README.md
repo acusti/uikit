@@ -1,9 +1,10 @@
 # @acusti/input-text
 
-[![latest version](https://img.shields.io/npm/v/@acusti/input-text?style=for-the-badge)](https://www.npmjs.com/package/@acusti/input-text)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/input-text?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Finput-text)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/input-text?style=for-the-badge)](https://www.npmjs.com/package/@acusti/input-text)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/input-text)](https://bundlejs.com/?q=%40acusti%2Finput-text)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)
 
 A React text input component that combines the simplicity of uncontrolled
 inputs with the power of automatic resizing, smart text selection, and

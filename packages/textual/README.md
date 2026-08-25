@@ -1,9 +1,10 @@
 # @acusti/textual
 
-[![latest version](https://img.shields.io/npm/v/@acusti/textual?style=for-the-badge)](https://www.npmjs.com/package/@acusti/textual)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/textual?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Ftextual)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/textual?style=for-the-badge)](https://www.npmjs.com/package/@acusti/textual)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/textual)](https://bundlejs.com/?q=%40acusti%2Ftextual)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/textual)](https://npmx.dev/package/@acusti/textual)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/textual)](https://npmx.dev/package/@acusti/textual)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/textual)](https://npmx.dev/package/@acusti/textual)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/textual)](https://npmx.dev/package/@acusti/textual)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/textual)](https://npmx.dev/package/@acusti/textual)
 
 Utilities for transforming and formatting text (i.e. strings). These
 functions provide common text manipulation operations that are useful in UI

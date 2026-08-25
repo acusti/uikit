@@ -1,9 +1,10 @@
 # @acusti/css-value-input
 
-[![latest version](https://img.shields.io/npm/v/@acusti/css-value-input?style=for-the-badge)](https://www.npmjs.com/package/@acusti/css-value-input)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/css-value-input?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fcss-value-input)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/css-value-input?style=for-the-badge)](https://www.npmjs.com/package/@acusti/css-value-input)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/css-value-input)](https://bundlejs.com/?q=%40acusti%2Fcss-value-input)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)
 
 `CSSValueInput` is a React component that renders a specialized text input
 for CSS values with intelligent unit handling, increment/decrement

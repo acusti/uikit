@@ -1,9 +1,10 @@
 # @acusti/uniquify
 
-[![latest version](https://img.shields.io/npm/v/@acusti/uniquify?style=for-the-badge)](https://www.npmjs.com/package/@acusti/uniquify)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/uniquify?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Funiquify)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/uniquify?style=for-the-badge)](https://www.npmjs.com/package/@acusti/uniquify)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/uniquify)](https://bundlejs.com/?q=%40acusti%2Funiquify)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
 
 `uniquify` is a function that takes an array of items and a string and
 returns a string that is unique amongst those items, appending a counter

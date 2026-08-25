@@ -1,9 +1,10 @@
 # @acusti/matchmaking
 
-[![latest version](https://img.shields.io/npm/v/@acusti/matchmaking?style=for-the-badge)](https://www.npmjs.com/package/@acusti/matchmaking)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/matchmaking?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fmatchmaking)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/matchmaking?style=for-the-badge)](https://www.npmjs.com/package/@acusti/matchmaking)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/matchmaking)](https://bundlejs.com/?q=%40acusti%2Fmatchmaking)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)
 
 **Intuitive approximate string matching (fuzzy search) with intelligent
 scoring**

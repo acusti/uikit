@@ -1,9 +1,10 @@
 # @acusti/appsync-fetch
 
-[![latest version](https://img.shields.io/npm/v/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/appsync-fetch?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fappsync-fetch)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/appsync-fetch?style=for-the-badge)](https://www.npmjs.com/package/@acusti/appsync-fetch)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/appsync-fetch)](https://bundlejs.com/?q=%40acusti%2Fappsync-fetch)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/appsync-fetch)](https://npmx.dev/package/@acusti/appsync-fetch)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/appsync-fetch)](https://npmx.dev/package/@acusti/appsync-fetch)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/appsync-fetch)](https://npmx.dev/package/@acusti/appsync-fetch)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/appsync-fetch)](https://npmx.dev/package/@acusti/appsync-fetch)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/appsync-fetch)](https://npmx.dev/package/@acusti/appsync-fetch)
 
 `appsync-fetch` is a lightweight node.js module that uses [@acusti/post][]
 to make requests to an AWS AppSync graphql API. It expands on

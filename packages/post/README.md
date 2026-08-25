@@ -1,9 +1,10 @@
 # @acusti/post
 
-[![latest version](https://img.shields.io/npm/v/@acusti/post?style=for-the-badge)](https://www.npmjs.com/package/@acusti/post)
-[![maintenance status](https://img.shields.io/npms-io/maintenance-score/@acusti/post?style=for-the-badge)](https://npms.io/search?q=%40acusti%2Fpost)
-[![downloads per month](https://img.shields.io/npm/dm/@acusti/post?style=for-the-badge)](https://www.npmjs.com/package/@acusti/post)
-[![bundle size](https://deno.bundlejs.com/badge?q=@acusti/post)](https://bundlejs.com/?q=%40acusti%2Fpost)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/post)](https://npmx.dev/package/@acusti/post)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/post)](https://npmx.dev/package/@acusti/post)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/post)](https://npmx.dev/package/@acusti/post)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/post)](https://npmx.dev/package/@acusti/post)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/post)](https://npmx.dev/package/@acusti/post)
 
 `post` is a super minimal fetch-inspired API wrapper around node.js’ `http`
 and `https` modules for making POST requests. It’s a lean implementation
