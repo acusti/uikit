@@ -6,10 +6,10 @@
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
 
-A comprehensive React date picker library with support for single date
-selection, date ranges, and two-up month calendar views. Built with
-accessibility and user experience in mind, featuring smooth navigation,
-intelligent date range handling, and customizable styling.
+A small React date picker library with support for single date selection,
+date ranges, and two-up month calendar views. Built with accessibility and
+user experience in mind, featuring smooth navigation, intelligent date
+range handling, and customizable styling.
 
 ## Key Features
 
