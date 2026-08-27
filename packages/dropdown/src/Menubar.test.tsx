@@ -701,4 +701,65 @@ describe('@acusti/dropdown Menubar', () => {
             expect(screen.queryByTestId('edit-menu')).toBe(null);
         });
     });
+    describe('searchable members', () => {
+        // A searchable member is a combobox, not a menu item: it keeps its own
+        // semantics, so the bar neither consumes ←/→ within it nor roves to it
+        const renderWithSearchable = () =>
+            render(
+                <Menubar>
+                    <Dropdown isSearchable>
+                        <input data-testid="search" placeholder="Search" />
+                        <ul data-testid="search-menu">
+                            <li data-ukt-item>Alpha</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown>
+                        Edit
+                        <ul data-testid="edit-menu">
+                            <li data-ukt-item>Undo</li>
+                        </ul>
+                    </Dropdown>
+                    <Dropdown>
+                        View
+                        <ul data-testid="view-menu">
+                            <li data-ukt-item>Zoom In</li>
+                        </ul>
+                    </Dropdown>
+                </Menubar>,
+            );
+
+        it('leaves ←/→ to the caret inside a searchable member’s input', () => {
+            renderWithSearchable();
+
+            const input = screen.getByTestId('search') as HTMLInputElement;
+            input.focus();
+
+            // fireEvent returns false when a handler called preventDefault
+            expect(fireEvent.keyDown(input, { key: 'ArrowLeft' })).toBe(true);
+            expect(document.activeElement).toBe(input);
+
+            expect(fireEvent.keyDown(input, { key: 'ArrowRight' })).toBe(true);
+            expect(document.activeElement).toBe(input);
+        });
+
+        it('passes over a searchable member when roving with ←/→', async () => {
+            const user = userEvent.setup();
+            renderWithSearchable();
+
+            const editTrigger = screen.getByRole('menuitem', { name: 'Edit' });
+            const viewTrigger = screen.getByRole('menuitem', { name: 'View' });
+
+            editTrigger.focus();
+            await user.keyboard('{ArrowRight}');
+            expect(document.activeElement).toBe(viewTrigger);
+
+            // wrapping past the end skips the combobox back to Edit rather
+            // than landing in the search input
+            await user.keyboard('{ArrowRight}');
+            expect(document.activeElement).toBe(editTrigger);
+
+            await user.keyboard('{ArrowLeft}');
+            expect(document.activeElement).toBe(viewTrigger);
+        });
+    });
 });

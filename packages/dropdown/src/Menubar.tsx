@@ -1,3 +1,4 @@
+import { isEventTargetUsingKeyEvent } from '@acusti/use-keyboard-events';
 import clsx from 'clsx';
 import {
     type CSSProperties,
@@ -37,12 +38,18 @@ const compareDocumentOrder = (a: MenubarMember, b: MenubarMember) => {
 // disengaging the menubar.
 const NON_MENU_CONTROL_SELECTOR = 'a[href], button, input, select, textarea, [tabindex]';
 
-// The next member in `direction` that isn’t disabled, wrapping around and
-// skipping disabled ones — like macOS, where a disabled menu is passed over
-// rather than landed on. Returns null when no enabled member other than the
+// The members the bar navigates between: enabled, and menu items rather than
+// comboboxes. A searchable member keeps its own combobox semantics, so it
+// neither holds the bar’s tab stop nor is a destination for ←/→.
+const canHoldTabStop = (member: MenubarMember) =>
+    !member.isDisabled() && member.isMenuPopup();
+
+// The next member in `direction` the bar can land on, wrapping around and
+// passing over the rest — like macOS, where a disabled menu is passed over
+// rather than landed on. Returns null when no such member other than the
 // starting one exists, so an all-disabled bar (or a lone enabled menu) simply
 // stays put instead of closing what’s open and opening nothing.
-const findNextEnabledMember = (
+const findNextTargetMember = (
     members: Array<MenubarMember>,
     fromIndex: number,
     direction: -1 | 1,
@@ -52,14 +59,10 @@ const findNextEnabledMember = (
         // + length keeps the operand positive so % is a true modulo
         const member =
             members[(((fromIndex + direction * step) % length) + length) % length];
-        if (!member.isDisabled()) return member;
+        if (canHoldTabStop(member)) return member;
     }
     return null;
 };
-
-// Only an enabled member whose popup is a menu can hold the bar’s tab stop
-const canHoldTabStop = (member: MenubarMember) =>
-    !member.isDisabled() && member.isMenuPopup();
 
 // Combines sibling Dropdowns into a single menu, like the system menu in the
 // top toolbar of macOS: one menu open at a time, ←/→ move between menus, and
@@ -109,7 +112,7 @@ export default function Menubar({ children, className, style }: MenubarProps) {
                     (member) => member.element === fromElement,
                 );
                 if (index === -1) return;
-                const next = findNextEnabledMember(members, index, direction);
+                const next = findNextTargetMember(members, index, direction);
                 // Nothing enabled to move to: keep the current menu open
                 // rather than closing it and opening nothing
                 if (!next) return;
@@ -161,19 +164,25 @@ export default function Menubar({ children, className, style }: MenubarProps) {
     const handleKeyDown = (event: ReactKeyboardEvent<HTMLDivElement>) => {
         const { key } = event;
         if (key !== 'ArrowLeft' && key !== 'ArrowRight') return;
+        // ←/→ are caret movement while a text input has focus (a searchable
+        // member’s input, or one inside a custom trigger), so the bar stands
+        // down — the same rule the members’ own key handling follows
+        if (isEventTargetUsingKeyEvent(event.nativeEvent)) return;
         const members = getOrderedMembers();
         if (members.length < 2) return;
         if (members.some((member) => member.isOpen())) return;
         const eventTarget = event.target as HTMLElement;
         const index = members.findIndex((member) => member.element.contains(eventTarget));
-        if (index === -1) return;
+        // Only the bar’s menu items rove. A searchable member is a combobox
+        // that sits outside the bar’s navigation, so ←/→ within it stay its own
+        if (index === -1 || !members[index].isMenuPopup()) return;
         // Once focus is on a member, ←/→ belong to the bar, so the key is
         // consumed whether or not there's an enabled member to move to —
         // otherwise deciding to stay put would let it through to scroll the page
         event.preventDefault();
         event.stopPropagation();
         const direction = key === 'ArrowRight' ? 1 : -1;
-        const next = findNextEnabledMember(members, index, direction);
+        const next = findNextTargetMember(members, index, direction);
         if (!next) return;
         next.focusTrigger();
     };
