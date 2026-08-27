@@ -1043,7 +1043,8 @@ Menubar behaviors:
   tabbing away and back returns you where you were; it starts on (and falls
   back to) the first enabled member. A searchable member sits outside this
   — it’s a `combobox`, not a menu item, so it keeps its own native tab stop
-  and never takes the bar’s
+  and never takes the bar’s. ←/→ inside its input stay caret movement, and
+  the bar’s roving passes over it rather than landing in it
 - at most one menu in the bar is open at a time
 - opening a trigger’s menu (by click or keyboard) engages the bar
   (menu-mode). While engaged, hovering or focusing another trigger switches
