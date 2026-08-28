@@ -327,6 +327,54 @@ describe('@acusti/dropdown Menubar', () => {
                 screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('tabindex'),
             ).toBe('0');
         });
+
+        it('hands the tab stop on when the holder becomes disabled', async () => {
+            const user = userEvent.setup();
+            // Like the unmount above, this is driven by the members’ own state,
+            // so Menubar never re-renders on its own. The holder stops being
+            // eligible without leaving the set, so it’s the holder’s own
+            // re-registration that has to schedule the reconciliation.
+            const Members = () => {
+                const [isFileDisabled, setIsFileDisabled] = useState(false);
+                return (
+                    <>
+                        <button onClick={() => setIsFileDisabled(true)} type="button">
+                            disable File
+                        </button>
+                        <Dropdown disabled={isFileDisabled}>
+                            File
+                            <ul>
+                                <li data-ukt-item>New</li>
+                            </ul>
+                        </Dropdown>
+                        <Dropdown>
+                            Edit
+                            <ul>
+                                <li data-ukt-item>Undo</li>
+                            </ul>
+                        </Dropdown>
+                    </>
+                );
+            };
+            render(
+                <Menubar>
+                    <Members />
+                </Menubar>,
+            );
+
+            expect(
+                screen.getByRole('menuitem', { name: 'File' }).getAttribute('tabindex'),
+            ).toBe('0');
+
+            await user.click(screen.getByRole('button', { name: 'disable File' }));
+
+            expect(
+                screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('tabindex'),
+            ).toBe('0');
+            expect(
+                screen.getByRole('menuitem', { name: 'File' }).getAttribute('tabindex'),
+            ).toBe('-1');
+        });
     });
 
     it('keeps at most one menu open at a time', async () => {

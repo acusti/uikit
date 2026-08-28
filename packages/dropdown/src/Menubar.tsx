@@ -145,9 +145,14 @@ export default function Menubar({ children, className, style }: MenubarProps) {
                 );
                 return () => {
                     membersRef.current.delete(member);
-                    // say the set has settled, so the effect above can pick
-                    // up a tab stop stranded on an unmounted member
-                    reconcile();
+                    // Say the set has settled, so the effect above can pick up
+                    // a tab stop stranded on an unmounted member. Members
+                    // re-register on every render, so this cleanup runs far
+                    // more often than one actually leaves; only the holder
+                    // going (or becoming ineligible, which re-renders it here
+                    // too) can strand the tab stop, so bumping for the rest
+                    // would schedule a Menubar render that changes nothing.
+                    if (member.element === tabbableElement) reconcile();
                     // the tab stop is deliberately not released here: members
                     // re-register on every render, and React runs every cleanup
                     // before any setup, so releasing would hand it to whichever
