@@ -161,21 +161,25 @@ export default function Menubar({ children, className, style }: MenubarProps) {
                 return () => {
                     membersRef.current.delete(member);
                     // Say the set has settled, so the effect above can pick
-                    // up a tab stop stranded on an unmounted member. Members
-                    // re-register on every render, so this cleanup runs far
-                    // more often than one actually leaves: only the holder
-                    // actually going strands the tab stop, and React has
-                    // already detached its element by the time this runs,
-                    // which is what tells a departure from a re-render.
-                    // Bumping for the rest would schedule a Menubar render
-                    // that changes nothing. Losing eligibility without leaving
-                    // is handled on the registration side above.
-                    if (
-                        member.element === tabbableElement &&
-                        !member.element.isConnected
-                    ) {
+                    // up a tab stop stranded on a member that has gone.
+                    // Members re-register on every render, so this cleanup
+                    // runs far more often than one actually leaves, and
+                    // bumping for the rest would schedule a Menubar render
+                    // that changes nothing. Only the holder can strand the
+                    // stop, and a re-render re-registers it during this same
+                    // commit — so let the commit settle and bump only if this
+                    // element never came back. Whether the element is still in
+                    // the document doesn’t answer it: <Activity mode="hidden">
+                    // unmounts effects while keeping the DOM in place. Losing
+                    // eligibility without leaving is handled on the
+                    // registration side above.
+                    if (member.element !== tabbableElement) return;
+                    queueMicrotask(() => {
+                        for (const registered of membersRef.current) {
+                            if (registered.element === member.element) return;
+                        }
                         reconcile();
-                    }
+                    });
                     // the tab stop is deliberately not released here: members
                     // re-register on every render, and React runs every cleanup
                     // before any setup, so releasing would hand it to whichever

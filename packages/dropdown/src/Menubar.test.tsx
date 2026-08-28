@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { useState } from 'react';
+import { Activity, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Dropdown, { Menubar } from './Dropdown.js';
@@ -374,6 +374,60 @@ describe('@acusti/dropdown Menubar', () => {
             expect(
                 screen.getByRole('menuitem', { name: 'File' }).getAttribute('tabindex'),
             ).toBe('-1');
+        });
+
+        it('hands the tab stop on when the holder is hidden with <Activity>', async () => {
+            const user = userEvent.setup();
+            // Hiding a subtree with <Activity> unmounts its effects while
+            // leaving the DOM in place, so the holder deregisters with its
+            // trigger still in the document. Deciding it stayed because its
+            // element is still connected would strand the tab stop on a
+            // trigger nobody can reach.
+            const Members = () => {
+                const [isFileHidden, setIsFileHidden] = useState(false);
+                return (
+                    <>
+                        <button onClick={() => setIsFileHidden(true)} type="button">
+                            hide File
+                        </button>
+                        <Activity mode={isFileHidden ? 'hidden' : 'visible'}>
+                            <Dropdown>
+                                File
+                                <ul>
+                                    <li data-ukt-item>New</li>
+                                </ul>
+                            </Dropdown>
+                        </Activity>
+                        <Dropdown>
+                            Edit
+                            <ul>
+                                <li data-ukt-item>Undo</li>
+                            </ul>
+                        </Dropdown>
+                    </>
+                );
+            };
+            render(
+                <Menubar>
+                    <Members />
+                </Menubar>,
+            );
+
+            expect(
+                screen.getByRole('menuitem', { name: 'File' }).getAttribute('tabindex'),
+            ).toBe('0');
+
+            await user.click(screen.getByRole('button', { name: 'hide File' }));
+
+            // the reconciliation waits for the commit to settle, so that a
+            // member that merely re-rendered isn’t mistaken for one that left
+            await waitFor(() => {
+                expect(
+                    screen
+                        .getByRole('menuitem', { name: 'Edit' })
+                        .getAttribute('tabindex'),
+                ).toBe('0');
+            });
         });
     });
 
