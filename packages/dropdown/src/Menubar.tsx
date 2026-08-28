@@ -138,21 +138,16 @@ export default function Menubar({ children, className, style }: MenubarProps) {
             },
             registerMember(member: MenubarMember) {
                 membersRef.current.add(member);
-                // Claim the tab stop when it’s going spare; members register
-                // in document order, so the first enabled one gets it
                 setTabbableElement((current) => {
-                    // Claim the tab stop when it’s going spare; members
-                    // register in document order, so the first enabled one
-                    // gets it
+                    // members register in document order, so a stop going
+                    // spare lands on the first eligible one
                     if (current == null) {
                         return canHoldTabStop(member) ? member.element : current;
                     }
-                    // A holder that re-registers no longer able to hold it
-                    // (disabled, or no longer a menu) gives it up here, where
-                    // the fresh member reflects the props that changed; the
-                    // effect above then rehomes it. Every other
-                    // re-registration returns `current` untouched, so React
-                    // bails out instead of re-rendering the bar.
+                    // the holder re-registering ineligible — now disabled, or
+                    // no longer a menu — drops the stop for the effect above
+                    // to rehome. Every other re-registration returns `current`
+                    // unchanged, so React bails out of rendering the bar.
                     if (current === member.element && !canHoldTabStop(member)) {
                         return null;
                     }
@@ -160,19 +155,13 @@ export default function Menubar({ children, className, style }: MenubarProps) {
                 });
                 return () => {
                     membersRef.current.delete(member);
-                    // Say the set has settled, so the effect above can pick
-                    // up a tab stop stranded on a member that has gone.
-                    // Members re-register on every render, so this cleanup
-                    // runs far more often than one actually leaves, and
-                    // bumping for the rest would schedule a Menubar render
-                    // that changes nothing. Only the holder can strand the
-                    // stop, and a re-render re-registers it during this same
-                    // commit — so let the commit settle and bump only if this
-                    // element never came back. Whether the element is still in
-                    // the document doesn’t answer it: <Activity mode="hidden">
-                    // unmounts effects while keeping the DOM in place. Losing
-                    // eligibility without leaving is handled on the
-                    // registration side above.
+                    // Only the holder leaving strands the stop, and members
+                    // re-register on every render — so wait out the commit and
+                    // bump only if this element never came back. Still being in
+                    // the document proves nothing: <Activity mode="hidden">
+                    // tears down effects but keeps the DOM. Releasing the stop
+                    // here instead would hand it to whichever member
+                    // re-registers first, not back to the holder.
                     if (member.element !== tabbableElement) return;
                     queueMicrotask(() => {
                         for (const registered of membersRef.current) {
@@ -180,10 +169,6 @@ export default function Menubar({ children, className, style }: MenubarProps) {
                         }
                         reconcile();
                     });
-                    // the tab stop is deliberately not released here: members
-                    // re-register on every render, and React runs every cleanup
-                    // before any setup, so releasing would hand it to whichever
-                    // member re-registers first rather than back to the holder
                 };
             },
             tabbableElement,
