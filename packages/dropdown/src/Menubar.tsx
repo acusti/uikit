@@ -140,19 +140,42 @@ export default function Menubar({ children, className, style }: MenubarProps) {
                 membersRef.current.add(member);
                 // Claim the tab stop when it’s going spare; members register
                 // in document order, so the first enabled one gets it
-                setTabbableElement((current) =>
-                    current == null && canHoldTabStop(member) ? member.element : current,
-                );
+                setTabbableElement((current) => {
+                    // Claim the tab stop when it’s going spare; members
+                    // register in document order, so the first enabled one
+                    // gets it
+                    if (current == null) {
+                        return canHoldTabStop(member) ? member.element : current;
+                    }
+                    // A holder that re-registers no longer able to hold it
+                    // (disabled, or no longer a menu) gives it up here, where
+                    // the fresh member reflects the props that changed; the
+                    // effect above then rehomes it. Every other
+                    // re-registration returns `current` untouched, so React
+                    // bails out instead of re-rendering the bar.
+                    if (current === member.element && !canHoldTabStop(member)) {
+                        return null;
+                    }
+                    return current;
+                });
                 return () => {
                     membersRef.current.delete(member);
-                    // Say the set has settled, so the effect above can pick up
-                    // a tab stop stranded on an unmounted member. Members
+                    // Say the set has settled, so the effect above can pick
+                    // up a tab stop stranded on an unmounted member. Members
                     // re-register on every render, so this cleanup runs far
-                    // more often than one actually leaves; only the holder
-                    // going (or becoming ineligible, which re-renders it here
-                    // too) can strand the tab stop, so bumping for the rest
-                    // would schedule a Menubar render that changes nothing.
-                    if (member.element === tabbableElement) reconcile();
+                    // more often than one actually leaves: only the holder
+                    // actually going strands the tab stop, and React has
+                    // already detached its element by the time this runs,
+                    // which is what tells a departure from a re-render.
+                    // Bumping for the rest would schedule a Menubar render
+                    // that changes nothing. Losing eligibility without leaving
+                    // is handled on the registration side above.
+                    if (
+                        member.element === tabbableElement &&
+                        !member.element.isConnected
+                    ) {
+                        reconcile();
+                    }
                     // the tab stop is deliberately not released here: members
                     // re-register on every render, and React runs every cleanup
                     // before any setup, so releasing would hand it to whichever
