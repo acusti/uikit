@@ -79,8 +79,16 @@ function SelectOnFocusInput() {
 
 ### InputText Component
 
+Every `aria-*` attribute and `role` is also accepted and forwarded as-is to
+the underlying `<input>`/`<textarea>`, so the component can be labelled and
+annotated exactly like the native element:
+
 ```tsx
-type Props = {
+<InputText aria-label="City" aria-describedby="city-hint" />
+```
+
+```tsx
+type Props = AriaAttributes & {
     /** Controls text capitalization behavior */
     autoCapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters';
 
@@ -190,6 +198,9 @@ type Props = {
 
     /** Whether the input is required for form submission */
     required?: boolean;
+
+    /** ARIA role for the underlying input element */
+    role?: AriaRole;
 
     /** Initial number of rows for multi-line inputs */
     rows?: number;

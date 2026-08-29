@@ -1,4 +1,6 @@
 import {
+    type AriaAttributes,
+    type AriaRole,
     type ChangeEvent,
     type ClipboardEvent,
     type CSSProperties,
@@ -14,7 +16,13 @@ import {
 
 export type InputElement = HTMLInputElement | HTMLTextAreaElement;
 
-export type Props = {
+/**
+ * Every aria-* attribute (and role) is forwarded as-is to the underlying
+ * <input>/<textarea>, so the component can be labelled and annotated the same
+ * way the native element is — including by a parent that clones it to inject
+ * combobox semantics, e.g. @acusti/dropdown’s custom trigger.
+ */
+export type Props = AriaAttributes & {
     autoCapitalize?: 'characters' | 'none' | 'off' | 'sentences' | 'words';
     autoComplete?: HTMLInputElement['autocomplete'];
     autoFocus?: boolean;
@@ -75,6 +83,7 @@ export type Props = {
     readOnly?: boolean;
     ref?: Ref<HTMLInputElement>;
     required?: boolean;
+    role?: AriaRole;
     rows?: number;
     /** If true, the contents of the input are selected when it’s focused. */
     selectTextOnFocus?: boolean;
@@ -138,6 +147,7 @@ export default function InputText({
     tabIndex,
     title,
     type = 'text',
+    ...restProps
 }: Props) {
     const inputRef = useRef<InputRef>(null);
     const valueFromProps = initialValue ?? '';
@@ -344,6 +354,7 @@ export default function InputText({
 
     return (
         <Element
+            {...restProps}
             autoCapitalize={autoCapitalize}
             autoComplete={autoComplete}
             autoFocus={autoFocus} // eslint-disable-line jsx-a11y/no-autofocus
