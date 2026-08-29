@@ -409,4 +409,38 @@ describe('CSSValueInput.tsx', () => {
         expect(height).toBeGreaterThanOrEqual(50);
         expect(height).toBeLessThanOrEqual(100);
     });
+
+    it('forwards aria-* attributes and role to the input', () => {
+        render(
+            <InputText
+                aria-controls="listbox-id"
+                aria-expanded={false}
+                aria-label="City"
+                initialValue="Toronto"
+                role="combobox"
+            />,
+        );
+        const input = screen.getByRole('combobox');
+        expect(input.tagName).toBe('INPUT');
+        expect(input.getAttribute('aria-label')).toBe('City');
+        expect(input.getAttribute('aria-controls')).toBe('listbox-id');
+        expect(input.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('forwards aria-* attributes to the textarea when multiLine', () => {
+        render(<InputText aria-describedby="hint-id" aria-label="Notes" multiLine />);
+        const textarea = screen.getByRole('textbox');
+        expect(textarea.tagName).toBe('TEXTAREA');
+        expect(textarea.getAttribute('aria-label')).toBe('Notes');
+        expect(textarea.getAttribute('aria-describedby')).toBe('hint-id');
+    });
+
+    it('doesn’t let forwarded props override the props the component owns', () => {
+        // aria-readonly is forwarded, but readOnly itself stays under the
+        // component’s control (doubleClickToEdit renders readonly to start)
+        render(<InputText aria-readonly="false" doubleClickToEdit />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+        expect(input.getAttribute('aria-readonly')).toBe('false');
+        expect(input.readOnly).toBe(true);
+    });
 });
