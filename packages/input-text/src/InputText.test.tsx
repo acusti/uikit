@@ -19,7 +19,7 @@ vi.unstubAllGlobals();
 
 afterEach(cleanup);
 
-describe('CSSValueInput.tsx', () => {
+describe('InputText.tsx', () => {
     it('renders a text input with the given props.initialValue', () => {
         render(<InputText initialValue="foo Bar" />);
         const input = screen.getByRole('textbox') as HTMLInputElement;
