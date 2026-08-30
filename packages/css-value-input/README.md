@@ -76,8 +76,17 @@ function StyleEditor() {
 
 ### Props
 
+Every `aria-*` attribute and `role` is also accepted and forwarded to the
+underlying input (not to the wrapping `<label>`), so the input can be
+annotated directly. An `aria-label` passed here names the input and takes
+precedence over the name it would otherwise get from `label` or `title`:
+
+```tsx
+<CSSValueInput aria-label="Width" aria-describedby="width-hint" … />
+```
+
 ```ts
-type Props = {
+type Props = AriaAttributes & {
     /**
      * Boolean indicating if the user can submit an empty value (i.e. clear
      * the value). Defaults to true.
@@ -137,6 +146,9 @@ type Props = {
 
     /** Placeholder text when input is empty */
     placeholder?: string;
+
+    /** ARIA role for the underlying input element */
+    role?: AriaRole;
 
     /** Step size for arrow key increments (default: 1) */
     step?: number;

@@ -10,6 +10,8 @@ import {
 import InputText, { type InputElement } from '@acusti/input-text';
 import clsx from 'clsx';
 import {
+    type AriaAttributes,
+    type AriaRole,
     type ChangeEvent,
     type FocusEvent,
     type KeyboardEvent,
@@ -20,7 +22,13 @@ import {
     useRef,
 } from 'react';
 
-export type Props = {
+/**
+ * Every aria-* attribute (and role) is forwarded as-is to the underlying
+ * input, not to the wrapping <label>, so the input is annotated directly. An
+ * aria-label passed here names the input and takes precedence over the name
+ * it would otherwise get from props.label or props.title.
+ */
+export type Props = AriaAttributes & {
     /**
      * Boolean indicating if the user can submit an empty value (i.e. clear
      * the value). Defaults to true.
@@ -52,6 +60,7 @@ export type Props = {
     onSubmitValue: (value: string) => unknown;
     placeholder?: string;
     ref?: Ref<HTMLInputElement>;
+    role?: AriaRole;
     step?: number;
     tabIndex?: number;
     title?: string;
@@ -88,6 +97,7 @@ export default function CSSValueInput({
     unit = DEFAULT_UNIT_BY_CSS_VALUE_TYPE[cssValueType],
     validator,
     value: valueFromProps,
+    ...restProps
 }: Props) {
     // props.value should be a string; if it’s a number, convert it here
     const value =
@@ -262,6 +272,7 @@ export default function CSSValueInput({
             ) : null}
             <div className={`${ROOT_CLASS_NAME}-value`}>
                 <InputText
+                    {...restProps}
                     disabled={disabled}
                     discardOnEscape
                     initialValue={value}
