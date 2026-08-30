@@ -87,8 +87,6 @@ const SUBMIT_ON_ENTER_PROPS = {
     submitOnEnter: true,
 };
 
-const MIN_PASSPHRASE_LENGTH = 8;
-
 const formatDate = new Intl.DateTimeFormat(undefined, {
     timeStyle: 'medium',
 }).format;
@@ -410,6 +408,8 @@ export const InputWithAriaLabel: Story = {
         },
     },
 };
+
+const MIN_PASSPHRASE_LENGTH = 8;
 
 export const InputWithHintAndValidationState: Story = {
     args: {
