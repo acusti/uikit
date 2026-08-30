@@ -139,15 +139,17 @@ export default function Menubar({ children, className, style }: MenubarProps) {
             registerMember(member: MenubarMember) {
                 membersRef.current.add(member);
                 setTabbableElement((current) => {
-                    // members register in document order, so a stop going
-                    // spare lands on the first eligible one
+                    // no member holds the tab stop yet, so the first
+                    // eligible one to register takes it — and they register
+                    // in document order
                     if (current == null) {
                         return canHoldTabStop(member) ? member.element : current;
                     }
-                    // the holder re-registering ineligible — now disabled, or
-                    // no longer a menu — drops the stop for the effect above
-                    // to rehome. Every other re-registration returns `current`
-                    // unchanged, so React bails out of rendering the bar.
+                    // this member holds the tab stop but can no longer keep
+                    // it: it has just been disabled, or has stopped being a
+                    // menu. Clearing the stop lets the effect above hand it
+                    // to another member. Every other re-registration returns
+                    // `current` untouched, so React skips re-rendering the bar.
                     if (current === member.element && !canHoldTabStop(member)) {
                         return null;
                     }
