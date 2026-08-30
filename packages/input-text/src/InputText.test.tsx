@@ -3,6 +3,8 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
+import type { Props } from './InputText.js';
+
 // Stub CSS.supports to return false for field-sizing to test fallback behavior
 vi.stubGlobal('CSS', {
     supports: (property: string, value: string) => {
@@ -435,12 +437,18 @@ describe('InputText.tsx', () => {
         expect(textarea.getAttribute('aria-describedby')).toBe('hint-id');
     });
 
-    it('doesn’t let forwarded props override the props the component owns', () => {
-        // aria-readonly is forwarded, but readOnly itself stays under the
-        // component’s control (doubleClickToEdit renders readonly to start)
-        render(<InputText aria-readonly="false" doubleClickToEdit />);
+    it('doesn’t let a forwarded prop override the props the component owns', async () => {
+        const user = userEvent.setup();
+        // Props models no prop that collides, but an untyped consumer can pass
+        // one anyway. The rest is spread first, so the component’s own props
+        // win: doubleClickToEdit’s handler survives a consumer’s onDoubleClick
+        // (which is dropped) rather than being replaced by it.
+        const onDoubleClick = vi.fn<() => void>();
+        render(<InputText {...({ onDoubleClick } as Props)} doubleClickToEdit />);
         const input = screen.getByRole('textbox') as HTMLInputElement;
-        expect(input.getAttribute('aria-readonly')).toBe('false');
         expect(input.readOnly).toBe(true);
+        await user.dblClick(input);
+        expect(input.readOnly).toBe(false);
+        expect(onDoubleClick).not.toHaveBeenCalled();
     });
 });
