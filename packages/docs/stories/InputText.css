@@ -50,3 +50,30 @@
     padding: 25px 30px;
     border-radius: 5px;
 }
+
+.input-text-field {
+    display: flex;
+    flex-direction: column;
+    font-family: system-ui, sans-serif;
+    gap: 4px;
+    max-width: 260px;
+}
+
+.input-text-label {
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.input-text-hint,
+.input-text-error {
+    font-size: 12px;
+    margin: 0;
+}
+
+.input-text-hint {
+    color: rgb(90, 90, 90);
+}
+
+.input-text-error {
+    color: rgb(180, 30, 30);
+}

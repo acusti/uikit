@@ -110,6 +110,36 @@ export const LabelLess: Story = {
     },
 };
 
+export const LabelLessWithAriaLabel: Story = {
+    args: {
+        'aria-describedby': 'letter-spacing-hint',
+        'aria-label': 'Letter spacing',
+        className: 'my-special-input',
+        cssValueType: 'length',
+        name: 'labelless-aria-label',
+        placeholder: '0',
+        unit: 'em',
+        value: '0.05em',
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'With `props.label` the visible label text names the input, which is what the labelled stories above rely on. Without one, `aria-label` names it directly — clearer than leaning on `props.title`, which doubles as the tooltip. `aria-describedby` attaches help text alongside that name. Both land on the input itself rather than the wrapping `<label>`.',
+            },
+        },
+    },
+    render(args) {
+        return (
+            <div>
+                <CSSValueInput {...args} />
+                <p className="cssvalueinput-hint" id="letter-spacing-hint">
+                    Tracking added to each character. Use ↑/↓ to adjust.
+                </p>
+            </div>
+        );
+    },
+};
+
 export const CustomGetValueAsNumber: Story = {
     args: {
         className: 'letter-spacing',

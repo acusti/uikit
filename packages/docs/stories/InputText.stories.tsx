@@ -36,6 +36,7 @@ type Story = StoryObj<typeof InputText>;
 
 export const EmptyInput: Story = {
     args: {
+        'aria-label': 'Text',
         className: 'input-text',
         name: 'empty',
         placeholder: 'enter text here…',
@@ -44,6 +45,7 @@ export const EmptyInput: Story = {
 
 export const InputWithInitialValue: Story = {
     args: {
+        'aria-label': 'Country',
         className: 'input-text',
         initialValue: 'Bolivia',
         placeholder: 'enter country name',
@@ -52,6 +54,7 @@ export const InputWithInitialValue: Story = {
 
 export const InputWithInitialValueAndSelectTextOnFocus: Story = {
     args: {
+        'aria-label': 'Country',
         className: 'input-text',
         initialValue: 'Bolivia',
         name: 'country',
@@ -62,6 +65,7 @@ export const InputWithInitialValueAndSelectTextOnFocus: Story = {
 
 export const MultiLineInputWithInitialValueAndSelectTextOnFocus: Story = {
     args: {
+        'aria-label': 'Long text',
         className: 'multi-line-input-text',
         initialValue:
             'The Black Hawk War, or, How to Demolish an Entire Civilization and Still Feel Good About Yourself in the Morning, or, We Apologize for the Inconvenience but You’re Going to Have to Leave Now, or, “I have fought the Big Knives and will continue to fight them until they are off our lands!”',
@@ -74,6 +78,7 @@ export const MultiLineInputWithInitialValueAndSelectTextOnFocus: Story = {
 };
 
 const SUBMIT_ON_ENTER_PROPS = {
+    'aria-label': 'Message',
     className: 'multi-line-input-text',
     maxHeight: 600,
     multiLine: true,
@@ -81,6 +86,8 @@ const SUBMIT_ON_ENTER_PROPS = {
     placeholder: 'enter text of any length',
     submitOnEnter: true,
 };
+
+const MIN_PASSPHRASE_LENGTH = 8;
 
 const formatDate = new Intl.DateTimeFormat(undefined, {
     timeStyle: 'medium',
@@ -165,6 +172,7 @@ function ChatLikeInputDemo(props: ComponentProps<typeof InputText>) {
 
 export const ChatLikeInputWithSubmitOnEnter: Story = {
     args: {
+        'aria-label': 'Message',
         className: 'input-text',
         keepFocusOnSubmit: true,
         placeholder: 'Type then press Enter',
@@ -176,6 +184,7 @@ export const ChatLikeInputWithSubmitOnEnter: Story = {
 };
 
 const DOUBLE_CLICK_TO_EDIT_PROPS = {
+    'aria-label': 'Title',
     className: 'input-text-double-click-to-edit',
     doubleClickToEdit: true,
     initialValue: 'Lorem ipsum dolor sit amet',
@@ -187,6 +196,7 @@ export const InputWithDoubleClickToEdit: Story = {
 };
 
 const DISCARD_ON_ESCAPE_PROPS = {
+    'aria-label': 'Title',
     className: 'input-text',
     discardOnEscape: true,
     initialValue: 'Lorem ipsum',
@@ -207,6 +217,7 @@ export const InputWithDoubleClickToEditAndDiscardOnEscape: Story = {
 
 const MULTI_LINE_INPUT_WITH_SUBMIT_ON_ENTER_AND_DOUBLE_CLICK_TO_EDIT_PROPS = {
     ...SUBMIT_ON_ENTER_PROPS,
+    'aria-label': 'Note',
     className: 'multi-line-input-double-click-to-edit',
     discardOnEscape: true,
     doubleClickToEdit: true,
@@ -238,6 +249,7 @@ export const MultiLineInputWithSubmitOnEnterAndDoubleClickToEditAndDiscardOnEsca
 
 export const InputWithAutoFocus: Story = {
     args: {
+        'aria-label': 'Autofocused text',
         autoFocus: true,
         name: 'autofocus-input',
     },
@@ -245,6 +257,7 @@ export const InputWithAutoFocus: Story = {
 
 export const MultiLineInputWithMinHeight: Story = {
     args: {
+        'aria-label': 'Notes',
         className: 'multi-line-input-text',
         initialValue:
             'This textarea has a minHeight of 50px.\n\nTry deleting this text to see that the textarea does not shrink below the minimum height.',
@@ -257,6 +270,7 @@ export const MultiLineInputWithMinHeight: Story = {
 
 export const MultiLineInputWithMaxHeight: Story = {
     args: {
+        'aria-label': 'Notes',
         className: 'multi-line-input-text',
         initialValue:
             'This textarea has a maxHeight of 150px.\n\nLine 3\nLine 4\nLine 5\nLine 6\nLine 7\nLine 8\nLine 9\nLine 10',
@@ -269,6 +283,7 @@ export const MultiLineInputWithMaxHeight: Story = {
 
 export const MultiLineInputWithMinHeightAndMaxHeight: Story = {
     args: {
+        'aria-label': 'Notes',
         className: 'multi-line-input-text',
         initialValue: 'This textarea has minHeight of 100px and maxHeight of 200px.',
         maxHeight: 200,
@@ -281,6 +296,7 @@ export const MultiLineInputWithMinHeightAndMaxHeight: Story = {
 
 export const MultiLineInputWithCSSTransition: Story = {
     args: {
+        'aria-label': 'Quick note',
         className: 'multi-line-input-css-transition',
         multiLine: true,
         name: 'multi-line-input-css-transition',
@@ -290,6 +306,7 @@ export const MultiLineInputWithCSSTransition: Story = {
 };
 
 const MULTI_LINE_INPUT_IN_POPOVER_PROPS = {
+    'aria-label': 'Note',
     className: 'multi-line-input-text',
     initialValue:
         'This multi-line input should resize to fit its contents when the popover opens even though it initializes with display: none as a result of being inside a hidden popover element so it doesn’t have any dimensions when the component initially renders.',
@@ -317,6 +334,7 @@ export const MultiLineInputInPopover: Story = {
 };
 
 const MULTI_LINE_INPUT_WITH_AUTO_FOCUS_PROPS = {
+    'aria-label': 'Note',
     autoFocus: true,
     initialValue: 'This multi-line input should be focused when the popover opens',
     multiLine: true,
@@ -340,6 +358,104 @@ export const MultiLineInputWithAutoFocusInPopover: Story = {
                     <InputText {...args} />
                 </div>
             </>
+        );
+    },
+};
+
+// A form control needs an accessible name, and a placeholder isn’t one: it
+// disappears as soon as the field has a value, and screen readers don’t treat
+// it as a label. Every aria-* attribute is forwarded to the underlying
+// <input>/<textarea>, so the component can be named and annotated exactly like
+// the native element.
+
+export const InputWithVisibleLabel: Story = {
+    args: {
+        className: 'input-text',
+        id: 'labelled-city-input',
+        name: 'city',
+        placeholder: 'e.g. Montréal',
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'A visible `<label>` tied to the input with `htmlFor`/`id` is the best option: it names the input for assistive tech, and clicking it focuses the input. Prefer this over `aria-label` whenever there is room for a label.',
+            },
+        },
+    },
+    render(args) {
+        return (
+            <div className="input-text-field">
+                <label className="input-text-label" htmlFor={args.id}>
+                    City
+                </label>
+                <InputText {...args} />
+            </div>
+        );
+    },
+};
+
+export const InputWithAriaLabel: Story = {
+    args: {
+        'aria-label': 'Search',
+        className: 'input-text',
+        name: 'search',
+        placeholder: 'Search…',
+        type: 'search',
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'When a visible label doesn’t fit — a search field in a toolbar, an input beside an icon — `aria-label` names the input instead. It is a fallback for that case, not a replacement for a visible label.',
+            },
+        },
+    },
+};
+
+export const InputWithHintAndValidationState: Story = {
+    args: {
+        className: 'input-text',
+        id: 'passphrase-input',
+        name: 'passphrase',
+        required: true,
+        type: 'password',
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: '`aria-describedby` points at help text so it’s announced along with the label, and `aria-invalid` marks the value as failing validation. The error message is referenced too, and given `role="alert"` so it’s announced when it appears.',
+            },
+        },
+    },
+    render(args) {
+        const [value, setValue] = useState('');
+        const isInvalid = value.length > 0 && value.length < MIN_PASSPHRASE_LENGTH;
+
+        return (
+            <div className="input-text-field">
+                <label className="input-text-label" htmlFor={args.id}>
+                    Passphrase
+                </label>
+                <InputText
+                    {...args}
+                    aria-describedby={
+                        isInvalid ? 'passphrase-hint passphrase-error' : 'passphrase-hint'
+                    }
+                    aria-invalid={isInvalid || undefined}
+                    onChangeValue={(nextValue) => {
+                        args.onChangeValue?.(nextValue);
+                        setValue(nextValue);
+                    }}
+                />
+                <p className="input-text-hint" id="passphrase-hint">
+                    Use at least {MIN_PASSPHRASE_LENGTH} characters.
+                </p>
+                {isInvalid ? (
+                    <p className="input-text-error" id="passphrase-error" role="alert">
+                        {MIN_PASSPHRASE_LENGTH - value.length} more character
+                        {MIN_PASSPHRASE_LENGTH - value.length === 1 ? '' : 's'} to go.
+                    </p>
+                ) : null}
+            </div>
         );
     },
 };

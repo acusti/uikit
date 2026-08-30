@@ -36,3 +36,11 @@
     font-size: 13px;
     line-height: 13px;
 }
+
+.cssvalueinput-hint {
+    color: rgb(90, 90, 90);
+    font-family: system-ui, sans-serif;
+    font-size: 12px;
+    margin: 4px 0 0;
+    max-width: 260px;
+}
