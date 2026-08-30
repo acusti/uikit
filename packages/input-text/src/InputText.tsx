@@ -81,7 +81,7 @@ export type Props = AriaAttributes & {
     pattern?: string;
     placeholder?: string;
     readOnly?: boolean;
-    ref?: Ref<HTMLInputElement>;
+    ref?: Ref<InputElement>;
     required?: boolean;
     role?: AriaRole;
     rows?: number;
@@ -101,7 +101,7 @@ export type Props = AriaAttributes & {
     type?: 'email' | 'number' | 'password' | 'search' | 'tel' | 'text' | 'url';
 };
 
-type InputRef = HTMLInputElement | null;
+type InputRef = InputElement | null;
 
 export default function InputText({
     autoCapitalize,

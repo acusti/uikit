@@ -1,6 +1,7 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
+import { createRef } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Props } from './InputText.js';
@@ -427,6 +428,19 @@ describe('InputText.tsx', () => {
         expect(input.getAttribute('aria-label')).toBe('City');
         expect(input.getAttribute('aria-controls')).toBe('listbox-id');
         expect(input.getAttribute('aria-expanded')).toBe('false');
+    });
+
+    it('gives the forwarded ref the element it renders', () => {
+        // Typing the ref as the textarea only compiles because props.ref takes
+        // InputElement, so this covers the prop type as well as the behavior
+        const textareaRef = createRef<HTMLTextAreaElement>();
+        render(<InputText multiLine ref={textareaRef} />);
+        expect(textareaRef.current?.tagName).toBe('TEXTAREA');
+
+        // …and a narrowly typed input ref still works for the single-line case
+        const inputRef = createRef<HTMLInputElement>();
+        render(<InputText ref={inputRef} />);
+        expect(inputRef.current?.tagName).toBe('INPUT');
     });
 
     it('forwards aria-* attributes to the textarea when multiLine', () => {
