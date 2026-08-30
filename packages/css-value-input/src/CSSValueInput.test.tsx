@@ -125,4 +125,37 @@ describe('CSSValueInput.tsx', () => {
         expect(input.value).toBe('14px');
         expect(onSubmit).toHaveBeenCalledTimes(1);
     });
+
+    it('forwards aria-* attributes and role to the input, not the wrapper label', () => {
+        render(
+            <CSSValueInput
+                aria-describedby="hint-id"
+                aria-invalid
+                onSubmitValue={noop}
+                role="spinbutton"
+                title="Width"
+                value="24px"
+            />,
+        );
+        const input = screen.getByRole('spinbutton');
+        expect(input.tagName).toBe('INPUT');
+        expect(input.getAttribute('aria-describedby')).toBe('hint-id');
+        expect(input.getAttribute('aria-invalid')).toBe('true');
+        const wrapper = input.closest('label')!;
+        expect(wrapper.hasAttribute('aria-describedby')).toBe(false);
+        expect(wrapper.hasAttribute('role')).toBe(false);
+    });
+
+    it('names the input by props aria-label ahead of props.label and props.title', () => {
+        render(
+            <CSSValueInput
+                aria-label="Width"
+                label="W"
+                onSubmitValue={noop}
+                title="Element width"
+                value="24px"
+            />,
+        );
+        expect(screen.getByRole('textbox', { name: 'Width' })).toBeTruthy();
+    });
 });
