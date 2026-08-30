@@ -24,9 +24,8 @@ import {
 
 /**
  * Every aria-* attribute (and role) is forwarded as-is to the underlying
- * input, not to the wrapping <label>, so the input is annotated directly. An
- * aria-label passed here names the input and takes precedence over the name
- * it would otherwise get from props.label or props.title.
+ * input. An aria-label passed here names the input and takes precedence over
+ * the name it would otherwise get from props.label or props.title.
  */
 export type Props = AriaAttributes & {
     /**

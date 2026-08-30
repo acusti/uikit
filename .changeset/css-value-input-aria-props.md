@@ -11,7 +11,6 @@ for the icon-only case, the `aria-label` the component puts on its wrapping
 `<label>` from `title`, neither of which the consumer could override.
 
 `Props` now intersects React’s `AriaAttributes` and adds `role`, and any of
-those props not consumed by the component are spread onto the nested
-`InputText` rather than the wrapping `<label>`, so they annotate the input
-itself. An `aria-label` passed in names the input and, by the accessible
-name precedence, wins over the wrapper’s label text or title.
+those props not consumed by the component are spread onto the nested input.
+An `aria-label` passed in names the input and, by the accessible name
+precedence, wins over the wrapper’s label text or title.
