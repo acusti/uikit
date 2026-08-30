@@ -1,5 +1,38 @@
 # @acusti/input-text
 
+## 2.5.0
+
+### Minor Changes
+
+- 9e12c44: Forward aria-\* attributes and role to the underlying input
+
+    `Props` didn’t include any of the ARIA attributes, so an `aria-label`
+    or an `aria-describedby` passed to `InputText` was both a type error
+    and silently dropped — the only accessible name available was one
+    supplied by a wrapping `<label>`. It also meant a parent that annotates
+    its trigger by cloning it, like `@acusti/dropdown`, couldn’t give an
+    `InputText` trigger the combobox semantics it injects.
+
+    `Props` now intersects React’s `AriaAttributes` and adds `role`, and
+    any of those props not consumed by the component are spread onto the
+    `<input>` or `<textarea>`.
+
+### Patch Changes
+
+- 6afc8d4: Type props.ref as the element the component actually renders
+
+    `props.ref` promised an `HTMLInputElement`, but under `multiLine` the
+    component renders a `<textarea>` and the ref receives an
+    `HTMLTextAreaElement`. Anything reading an input-only API off the ref
+    was unsound in multi-line mode, and the README’s own chat example
+    passes a ref to a `multiLine` input.
+
+    Updated `props.ref` and the internal ref type from `HTMLInputElement`
+    to `InputElement`, the union of `<input>` and `<textarea>` this package
+    already exports and uses for its event handler types. Existing refs
+    keep working: a narrowly typed object ref stays assignable, and so does
+    a narrowly typed callback ref.
+
 ## 2.4.4
 
 ### Patch Changes
