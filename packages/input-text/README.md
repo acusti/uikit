@@ -80,8 +80,7 @@ function SelectOnFocusInput() {
 ### InputText Component
 
 Every `aria-*` attribute and `role` is also accepted and forwarded as-is to
-the underlying `<input>`/`<textarea>`, so the component can be labelled and
-annotated exactly like the native element:
+the underlying `<input>`/`<textarea>`:
 
 ```tsx
 <InputText aria-label="City" aria-describedby="city-hint" />

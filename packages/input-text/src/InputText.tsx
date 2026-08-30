@@ -18,9 +18,9 @@ export type InputElement = HTMLInputElement | HTMLTextAreaElement;
 
 /**
  * Every aria-* attribute (and role) is forwarded as-is to the underlying
- * <input>/<textarea>, so the component can be labelled and annotated the same
- * way the native element is — including by a parent that clones it to inject
- * combobox semantics, e.g. @acusti/dropdown’s custom trigger.
+ * <input>/<textarea>, so the component can be labelled and annotated,
+ * including by a parent that clones it to inject combobox semantics, e.g.
+ * @acusti/dropdown’s custom trigger.
  */
 export type Props = AriaAttributes & {
     autoCapitalize?: 'characters' | 'none' | 'off' | 'sentences' | 'words';

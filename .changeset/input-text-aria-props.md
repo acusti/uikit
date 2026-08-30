@@ -13,7 +13,4 @@ semantics it injects.
 
 `Props` now intersects React’s `AriaAttributes` and adds `role`, and any of
 those props not consumed by the component are spread onto the `<input>` or
-`<textarea>`. The spread comes first, so the props the component owns
-(`readOnly` under `doubleClickToEdit`, `defaultValue`, its event handlers)
-still win, and the prop type stays closed: props `InputText` doesn’t model
-remain type errors rather than passing through.
+`<textarea>`.
