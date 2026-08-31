@@ -132,6 +132,17 @@ type Props = AriaAttributes & {
      */
     initialValue?: string;
 
+    /** Hint for virtual keyboard input mode */
+    inputMode?:
+        | 'none'
+        | 'text'
+        | 'decimal'
+        | 'numeric'
+        | 'tel'
+        | 'search'
+        | 'email'
+        | 'url';
+
     /** ID of a datalist element for autocomplete suggestions */
     list?: string;
 

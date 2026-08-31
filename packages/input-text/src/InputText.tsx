@@ -49,6 +49,7 @@ export type Props = AriaAttributes & {
      * any point, the new value will override the local state of the input.
      */
     initialValue?: string;
+    inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode'];
     /**
      * If true, pressing enter/return while submitOnEnter is enabled keeps
      * focus on the input instead of blurring.
@@ -116,6 +117,7 @@ export default function InputText({
     form,
     id,
     initialValue,
+    inputMode,
     keepFocusOnSubmit,
     list,
     max,
@@ -365,6 +367,7 @@ export default function InputText({
             enterKeyHint={enterKeyHint}
             form={form}
             id={id}
+            inputMode={inputMode}
             list={list}
             maxLength={maxLength}
             minLength={minLength}
