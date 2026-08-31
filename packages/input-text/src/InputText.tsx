@@ -5,6 +5,7 @@ import {
     type ClipboardEvent,
     type CSSProperties,
     type FocusEvent,
+    type HTMLInputAutoCompleteAttribute,
     type InputHTMLAttributes,
     type KeyboardEvent,
     type Ref,
@@ -24,7 +25,7 @@ export type InputElement = HTMLInputElement | HTMLTextAreaElement;
  */
 export type Props = AriaAttributes & {
     autoCapitalize?: 'characters' | 'none' | 'off' | 'sentences' | 'words';
-    autoComplete?: HTMLInputElement['autocomplete'];
+    autoComplete?: HTMLInputAutoCompleteAttribute;
     autoFocus?: boolean;
     className?: string;
     disabled?: boolean;

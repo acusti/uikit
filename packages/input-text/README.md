@@ -92,7 +92,7 @@ type Props = AriaAttributes & {
     autoCapitalize?: 'none' | 'off' | 'sentences' | 'words' | 'characters';
 
     /** Browser autocomplete hint */
-    autoComplete?: HTMLInputElement['autocomplete'];
+    autoComplete?: HTMLInputAutoCompleteAttribute;
 
     /** Whether input should be focused on mount */
     autoFocus?: boolean;
