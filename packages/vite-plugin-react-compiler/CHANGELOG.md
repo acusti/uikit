@@ -1,5 +1,11 @@
 # @acusti/vite-plugin-react-compiler
 
+## 0.4.0
+
+### Minor Changes
+
+- cfb7b2ab: Bump oxc-transform-react to 0.147.0 (no behavior changes)
+
 ## 0.3.0
 
 ### Major Changes
