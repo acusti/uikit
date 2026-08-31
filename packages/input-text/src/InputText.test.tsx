@@ -430,6 +430,16 @@ describe('InputText.tsx', () => {
         expect(input.getAttribute('aria-expanded')).toBe('false');
     });
 
+    it('forwards the inputMode prop to the input and to the textarea when multiLine', () => {
+        const { rerender } = render(<InputText inputMode="numeric" />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+        expect(input.inputMode).toBe('numeric');
+
+        rerender(<InputText inputMode="search" multiLine />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        expect(textarea.inputMode).toBe('search');
+    });
+
     it('gives the forwarded ref the element it renders', () => {
         // Typing the ref as the textarea only compiles because props.ref takes
         // InputElement, so this covers the prop type as well as the behavior
