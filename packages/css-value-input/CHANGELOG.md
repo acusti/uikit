@@ -1,5 +1,17 @@
 # @acusti/css-value-input
 
+## 2.6.0
+
+### Minor Changes
+
+- fe8cfaa: Hitting ↑/↓ keys on an empty input with a numeric placeholder
+  sets the value from that placeholder, preserving the unit if present
+
+### Patch Changes
+
+- Updated dependencies [950c1c7]
+    - @acusti/input-text@2.6.0
+
 ## 2.5.0
 
 ### Minor Changes

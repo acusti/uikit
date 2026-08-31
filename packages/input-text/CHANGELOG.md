@@ -1,5 +1,11 @@
 # @acusti/input-text
 
+## 2.6.0
+
+### Minor Changes
+
+- 950c1c7: Add `inputMode` prop to set the virtual keyboard’s input mode
+
 ## 2.5.1
 
 ### Patch Changes
