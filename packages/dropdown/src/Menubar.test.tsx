@@ -465,7 +465,11 @@ describe('@acusti/dropdown Menubar', () => {
             const afterMount = commits;
             for (let index = 0; index < 3; index++) {
                 await user.click(screen.getByRole('menuitem', { name: 'File' }));
+                // the count only means anything if each cycle really opened
+                // and closed the menu
+                expect(screen.getByRole('menu')).toBeTruthy();
                 await user.keyboard('{Escape}');
+                expect(screen.queryByRole('menu')).toBeNull();
             }
 
             expect(commits - afterMount).toBeLessThanOrEqual(12);
