@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { Activity, useState } from 'react';
+import { Activity, Profiler, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Dropdown, { Menubar } from './Dropdown.js';
@@ -428,6 +428,47 @@ describe('@acusti/dropdown Menubar', () => {
                         .getAttribute('tabindex'),
                 ).toBe('0');
             });
+        });
+
+        it('does not re-render the bar for re-registrations that leave the tab stop alone', async () => {
+            const user = userEvent.setup();
+            // Members re-register on every render, so bumping the reducer on
+            // every cleanup cost the bar a wasted render each time. Three
+            // open/close cycles below: 19 commits bumping unconditionally, 9
+            // as it stands. The gap only shows compiled (see vitest.config.js);
+            // uncompiled it’s 19 vs 18.
+            let commits = 0;
+            render(
+                <Profiler
+                    id="menubar"
+                    onRender={() => {
+                        commits += 1;
+                    }}
+                >
+                    <Menubar>
+                        <Dropdown>
+                            File
+                            <ul>
+                                <li data-ukt-item>New</li>
+                            </ul>
+                        </Dropdown>
+                        <Dropdown>
+                            Edit
+                            <ul>
+                                <li data-ukt-item>Undo</li>
+                            </ul>
+                        </Dropdown>
+                    </Menubar>
+                </Profiler>,
+            );
+
+            const afterMount = commits;
+            for (let index = 0; index < 3; index++) {
+                await user.click(screen.getByRole('menuitem', { name: 'File' }));
+                await user.keyboard('{Escape}');
+            }
+
+            expect(commits - afterMount).toBeLessThanOrEqual(12);
         });
     });
 
