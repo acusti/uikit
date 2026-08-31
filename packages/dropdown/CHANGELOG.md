@@ -1,5 +1,11 @@
 # @acusti/dropdown
 
+## 1.0.0-rc.3
+
+### Patch Changes
+
+- c4d3d6a: Halve the renders a Menubar does as its menus open and close
+
 ## 1.0.0-rc.2
 
 ### Patch Changes

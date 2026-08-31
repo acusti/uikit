@@ -1,5 +1,12 @@
 # @acusti/input-text
 
+## 2.5.1
+
+### Patch Changes
+
+- 97e2d5d: Match React’s `autoComplete` prop type, so every valid token is
+  accepted
+
 ## 2.5.0
 
 ### Minor Changes
