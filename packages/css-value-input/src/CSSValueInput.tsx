@@ -232,7 +232,7 @@ export default function CSSValueInput({
         if (onKeyDown) onKeyDown(event);
         if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
 
-        const currentValue = input.value ?? placeholder ?? `0${unit}`;
+        const currentValue = input.value || (placeholder ?? `0${unit}`);
         const nextValue = getNextValue({
             currentValue,
             multiplier: event.shiftKey ? 10 : 1,

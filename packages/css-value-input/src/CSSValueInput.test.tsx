@@ -35,6 +35,22 @@ describe('CSSValueInput.tsx', () => {
         expect(input.value).toBe('77%');
     });
 
+    it('steps from a numeric props.placeholder when the input is empty', async () => {
+        const user = userEvent.setup();
+        render(
+            <CSSValueInput
+                allowEmpty
+                onSubmitValue={noop}
+                placeholder="100vw"
+                value=""
+            />,
+        );
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+        expect(input.value).toBe('');
+        await user.type(input, '{ArrowUp}');
+        expect(input.value).toBe('101vw');
+    });
+
     it('supports custom props.step for ↑/↓ key handling', async () => {
         const user = userEvent.setup();
         render(<CSSValueInput onSubmitValue={noop} step={0.1} value="2rem" />);
