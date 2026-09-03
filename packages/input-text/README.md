@@ -112,13 +112,7 @@ type Props = AriaAttributes & {
 
     /** Hint for virtual keyboard enter key */
     enterKeyHint?:
-        | 'enter'
-        | 'done'
-        | 'go'
-        | 'next'
-        | 'previous'
-        | 'search'
-        | 'send';
+        'enter' | 'done' | 'go' | 'next' | 'previous' | 'search' | 'send';
 
     /** Associates input with a form element */
     form?: string;
