@@ -2,9 +2,7 @@ import { defineConfig } from '../../vite.config.base.js';
 
 export default defineConfig({
     build: {
-        rollupOptions: {
-            external: [/^node:/, 'vite'],
-        },
+        rolldownOptions: { external: [/^node:/, 'vite'] },
     },
     target: 'node20',
 });

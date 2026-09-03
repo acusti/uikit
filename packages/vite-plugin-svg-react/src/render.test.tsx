@@ -188,9 +188,7 @@ describe('rendered SVG components', () => {
                     formats: ['es'],
                 },
                 minify: false,
-                rollupOptions: {
-                    external: ['react', 'react/jsx-runtime'],
-                },
+                rolldownOptions: { external: ['react', 'react/jsx-runtime'] },
                 write: false,
             },
             configFile: false,

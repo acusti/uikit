@@ -23,7 +23,7 @@ export const defineConfig = (options = {}) => {
                 formats,
             },
             minify: false,
-            rollupOptions: {
+            rolldownOptions: {
                 external: [
                     /^node:/,
                     /^@acusti\//,
