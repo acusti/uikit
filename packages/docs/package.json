@@ -20,7 +20,7 @@
         "@types/react": "^19.2.17",
         "@vitejs/plugin-react": "^6.1.0",
         "core-js": "^3.48.0",
-        "oxc-transform-react": "^0.147.0",
+        "oxc-transform-react": "^0.148.0",
         "react": "^19.2.7",
         "react-dom": "^19.2.7",
         "storybook": "^10",
