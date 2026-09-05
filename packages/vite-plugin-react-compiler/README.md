@@ -20,25 +20,26 @@ production.
 
 ## Why this exists
 
-Vite/Rolldown decided against shipping the Rust React Compiler integration
-in Vite core over the binary size it would add, so the official React
-Compiler path for Vite remains Babel: @vitejs/plugin-react’s
-`reactCompilerPreset` running babel-plugin-react-compiler via
-[@rolldown/plugin-babel][]. That works, but it drags a full Babel
-parse/transform/print pipeline through every source file of an otherwise
-all-native oxc/rolldown build.
+Vite does ship a native React Compiler integration now: as of
+`@vitejs/plugin-react` 6.1, passing `compiler: true` runs
+[oxc-transform-react][] — the same Rust bindings this plugin uses — instead
+of Babel. For a plain Vite + React app, that flag is the whole story; this
+plugin has nothing to add.
 
-This plugin is the published native alternative: a `transform`-hook plugin
-that calls [oxc-transform-react][], the Rust React Compiler bindings the
-oxc project publishes. The compiler pass runs with `enforce: 'pre'` (the
-same position the Babel pass occupies today) and emits JSX untouched
-(`jsx: 'preserve'`), so Vite’s own oxc transform stays in charge of
-JSX/refresh/TypeScript handling downstream — the plugin only adds the
-compiler pass. (oxc-transform-react does strip TypeScript syntax, which
-matches how the Babel path uses @babel/preset-typescript.)
+The catch is that `compiler: true` is an option of `@vitejs/plugin-react`
+itself, and plenty of setups don’t run that plugin. React Router in
+framework mode is the common case: it runs `@react-router/dev/vite` in
+place of `@vitejs/plugin-react`, which means no `compiler: true`, and no
+`reactCompilerPreset` Babel fallback either, since that’s
+`@vitejs/plugin-react`’s too. Swap in a different React/JSX plugin and
+native React Compiler support goes with it.
 
-[@rolldown/plugin-babel]:
-    https://www.npmjs.com/package/@rolldown/plugin-babel
+This plugin is the compiler pass, decoupled from `@vitejs/plugin-react` so
+it can run under any of them: a `transform`-hook plugin that calls
+oxc-transform-react directly, with `enforce: 'pre'` (the position
+`@vitejs/plugin-react`’s own native pass occupies) and emits JSX untouched
+(`jsx: 'preserve'`), so whatever plugin is handling JSX/refresh/TypeScript
+downstream stays in charge of that.
 
 ## Usage
 
@@ -60,24 +61,23 @@ pins the newest version that passes this repo’s test suite and ships it in
 regular plugin releases. If you need a different version, use your package
 manager’s `overrides` (npm, pnpm, bun) or `resolutions` (yarn) to force it.
 
-Like [@acusti/vite-plugin-svg-react][], this plugin requires Vite ≥ 8, on
-purpose: its reason for existing is completing the all-native oxc/rolldown
-pipeline that Vite 8 introduced.
+Like [@acusti/vite-plugin-svg-react][], this plugin requires Vite ≥ 8: it
+plugs into the native oxc/rolldown transform pipeline that Vite 8
+introduced, and doesn’t work without it.
 
 [@acusti/vite-plugin-svg-react]:
     https://www.npmjs.com/package/@acusti/vite-plugin-svg-react
 
-Add the plugin to your vite config (and remove any Babel-based React
-Compiler wiring, e.g. `reactCompilerPreset` + @rolldown/plugin-babel):
+Add the plugin to your vite config alongside your other Vite plugins:
 
 ```ts
 // vite.config.ts
+import { reactRouter } from '@react-router/dev/vite';
 import reactCompiler from '@acusti/vite-plugin-react-compiler';
-import react from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-    plugins: [react(), reactCompiler()],
+    plugins: [reactRouter(), reactCompiler()],
 });
 ```
 
