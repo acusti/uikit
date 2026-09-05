@@ -8,15 +8,19 @@
 
 A [Vite][] plugin that runs [React Compiler][] via [oxc-transform-react][],
 the native Node bindings for the oxc project’s Rust port of the compiler —
-a drop-in alternative to the Babel-based React Compiler build path.
+a drop-in, ~16x-faster alternative to the Babel-based React Compiler build
+path.
 
-It was extracted from the build tooling of [Outlyne][], where it runs in
-production.
+It was extracted from the build tooling of [Outlyne][], where it replaced
+that Babel path in production and cut full production build times by
+~2.5x. See [Caveats, and results from production][caveats] for the
+methodology behind those numbers.
 
 [vite]: https://vite.dev
 [react compiler]: https://react.dev/learn/react-compiler
 [oxc-transform-react]: https://www.npmjs.com/package/oxc-transform-react
 [outlyne]: https://outlyne.io
+[caveats]: #caveats-and-results-from-production
 
 ## Why this exists
 
@@ -27,6 +31,15 @@ Compiler path for Vite remains Babel: @vitejs/plugin-react’s
 [@rolldown/plugin-babel][]. That works, but it drags a full Babel
 parse/transform/print pipeline through every source file of an otherwise
 all-native oxc/rolldown build.
+
+That pipeline isn’t just a local build-time annoyance — on a codebase of
+any size it’s wall-clock time paid again on every CI run, every PR, every
+deploy. And because babel-plugin-react-compiler’s tagged releases lag the
+Rust port, which tracks React Compiler’s `main` branch directly, staying
+on Babel also means waiting longer for upstream bug fixes and newly
+supported syntax to reach you (see [Caveats, and results from
+production][caveats] for what’s already pinned by this repo’s test
+suite).
 
 This plugin is the published native alternative: a `transform`-hook plugin
 that calls [oxc-transform-react][], the Rust React Compiler bindings the
