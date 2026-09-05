@@ -38,8 +38,9 @@ This plugin is the compiler pass, decoupled from `@vitejs/plugin-react` so
 it can run under any of them: a `transform`-hook plugin that calls
 oxc-transform-react directly, with `enforce: 'pre'` (the position
 `@vitejs/plugin-react`’s own native pass occupies) and emits JSX untouched
-(`jsx: 'preserve'`), so whatever plugin is handling JSX/refresh/TypeScript
-downstream stays in charge of that.
+(`jsx: 'preserve'`), so whatever plugin is handling JSX/refresh downstream
+stays in charge of that. (oxc-transform-react strips TypeScript syntax
+itself, matching how the Babel path uses @babel/preset-typescript.)
 
 ## Usage
 
