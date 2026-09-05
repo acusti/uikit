@@ -20,7 +20,7 @@ production.
 
 ## Why this exists
 
-Vite does ship a native React Compiler integration now: as of
+Vite ships a native React Compiler integration now: as of
 `@vitejs/plugin-react` 6.1, passing `compiler: true` runs
 [oxc-transform-react][] — the same Rust bindings this plugin uses — instead
 of Babel. For a plain Vite + React app, that flag is the whole story; this
