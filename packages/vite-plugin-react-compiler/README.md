@@ -24,22 +24,22 @@ methodology behind those numbers.
 
 ## Why this exists
 
-Vite/Rolldown decided against shipping the Rust React Compiler integration
-in Vite core over the binary size it would add, so the official React
-Compiler path for Vite remains Babel: @vitejs/plugin-react’s
-`reactCompilerPreset` running babel-plugin-react-compiler via
-[@rolldown/plugin-babel][]. That works, but it drags a full Babel
-parse/transform/print pipeline through every source file of an otherwise
-all-native oxc/rolldown build.
+The Rust port of React Compiler isn’t just a faster drop-in for the Babel
+plugin it’s chasing feature parity with — it’s where upstream investment
+is going. It tracks React Compiler’s `main` branch directly, so new bug
+fixes and newly supported syntax land there first; babel-plugin-react-
+compiler’s tagged releases catch up later (see [Caveats, and results from
+production][caveats] for what’s already pinned by this repo’s test suite).
+And the speed difference isn’t just a nicer local dev loop — on a
+codebase of any size it’s wall-clock time paid again on every CI run,
+every PR, every deploy, so it shows up directly in CI minutes.
 
-That pipeline isn’t just a local build-time annoyance — on a codebase of
-any size it’s wall-clock time paid again on every CI run, every PR, every
-deploy. And because babel-plugin-react-compiler’s tagged releases lag the
-Rust port, which tracks React Compiler’s `main` branch directly, staying
-on Babel also means waiting longer for upstream bug fixes and newly
-supported syntax to reach you (see [Caveats, and results from
-production][caveats] for what’s already pinned by this repo’s test
-suite).
+Vite/Rolldown decided against shipping that Rust integration in Vite core,
+though, over the binary size it would add, so the official React Compiler
+path for Vite remains Babel: @vitejs/plugin-react’s `reactCompilerPreset`
+running babel-plugin-react-compiler via [@rolldown/plugin-babel][]. That
+works, but it drags a full Babel parse/transform/print pipeline through
+every source file of an otherwise all-native oxc/rolldown build.
 
 This plugin is the published native alternative: a `transform`-hook plugin
 that calls [oxc-transform-react][], the Rust React Compiler bindings the
