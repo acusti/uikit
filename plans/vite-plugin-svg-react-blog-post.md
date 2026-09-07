@@ -36,6 +36,12 @@
   not as "the only plugin that works on Vite 8." This pushes v4 from a
   closing beat to the post's actual spine — see the retouched outline
   below.
+- **2026-09-07: perf comparison lands, confirming the narrowed thesis is
+  still worth publishing.** `@acusti/vite-plugin-svg-react` builds
+  outlyne's real 135-icon set ~2.1x faster than `vite-plugin-svgr@5.2.0`
+  in isolation, with byte-identical output — see "The perf comparison"
+  section below for the numbers, methodology, and (important) the caveat
+  about not overclaiming beyond the isolated transform step.
 - **This is set up as two posts.** Post 1 (outlined in full below) is the
   "four scars" origin/design story. Post 2 (not yet outlined) is the deep
   debugging story of the v3 heisenbug specifically — post 1 deliberately
@@ -186,6 +192,70 @@ Raw material worth keeping:
   rendered under happy-dom, and the assertions are on the DOM, not on
   emitted strings.
 
+## The perf comparison (2026-09-07, outlyne/outlyne repo) — hard numbers for the Babel-removal pitch
+
+Source: a perf-testing writeup (`svg-plugin-perf-comparison.md`) run
+against outlyne's real icon set (135 files, 317 import sites) once
+`vite-plugin-svgr` had a Vite-8-compatible release to test against.
+Verdict: keep `@acusti/vite-plugin-svg-react` — no migration warranted.
+This is the strongest piece of evidence for the post's post-2026-09-07
+thesis: it turns "we didn't want Babel" from an architectural-taste
+argument into a measured number.
+
+**Headline number (scope it carefully — see the caveat below): the
+isolated SVG transform is ~2.1x faster** than `vite-plugin-svgr@5.2.0`
+(2.13x median, 2.10x mean, over 20 interleaved A/B builds each; the two
+distributions don't overlap at all — `vite-plugin-svgr`'s fastest run,
+705.1ms, was still slower than `@acusti/vite-plugin-svg-react`'s slowest,
+513.5ms).
+
+| plugin                                     | median | mean    | stddev |
+| ------------------------------------------- | ------ | ------- | ------ |
+| `@acusti/vite-plugin-svg-react`             | 365.6ms| 376.6ms | 48.0   |
+| `vite-plugin-svgr` (jsxRuntime: automatic)  | 777.3ms| 792.0ms | 72.3   |
+
+**Output size is a wash, slightly in svgr's favor**: 137,798 vs. 137,795
+bytes raw (30,816 vs. 30,805 gzipped) once both plugins are configured for
+the automatic JSX runtime. Codegen is byte-identical across all 135 real
+icons except two cosmetic bytes (a debug-comment path-encoding difference,
+and one attribute rendered as a quoted string vs. a bare number literal —
+functionally identical either way). This closes off the obvious
+counter-argument ("sure it's faster, but is the output bloated?") before a
+reader can raise it.
+
+**Methodology worth reusing in the post, not just citing the conclusion:**
+- Measured a `vite build` (**lib mode** — a normal app build determined
+  all 135 icons were "unused" by the benchmark's own logic and tree-shook
+  the whole thing to nothing; lib mode treats every entry export as public
+  API, matching how the real app actually renders every icon) of a
+  synthetic entry re-exporting every real icon file, plugin swapped via
+  env var, fresh process per run.
+- `vite-plugin-svgr` was explicitly configured with
+  `svgrOptions: { jsxRuntime: 'automatic' }` to match
+  `@acusti/vite-plugin-svg-react`'s hardcoded runtime — comparing against
+  svgr's classic-runtime default would have been a strawman (an extra,
+  irrelevant `import * as React from 'react'` per component).
+- 7 warmup + 20 measured builds per plugin, **interleaved** A/B/A/B/…, not
+  block-run, so cache warmup / thermal drift over the run hits both
+  variants evenly instead of biasing whichever runs second.
+
+**The caveat that has to survive into the post, or the post undercuts its
+own numbers:** a full real-app build (`react-router build`: SSR +
+Cloudflare Workers + Sentry + React Compiler + LightningCSS) shows the
+SVG-transform delta **disappearing into noise** (21.5s vs. 21.3s wall time
+for matched configs) — the isolated ~400ms-per-build advantage is real but
+small relative to everything else a production build does. **The "2.1x
+faster" claim is true and worth leading with, but only when scoped
+explicitly to the SVG-transform step itself.** Never phrase it in the post
+as "your build will be 2.1x faster" — that's not what was measured, and
+the post's own corroboration data would contradict a broader claim.
+
+**Where this slots into the outline:** the headline stat (correctly
+scoped) belongs in section 1's `vite-plugin-svgr`-concession bullet; full
+methodology, both tables, and the byte-diff detail become section 6's
+actual payoff — the receipts for "why not just use `vite-plugin-svgr` now
+that it works on Vite 8."
+
 ### What v4 does to the post plan
 
 - The subhead's "a tiny SVGR plugin" and the SVGR leg of the taxonomy need
@@ -232,9 +302,14 @@ alternative.")
       it works on Vite 8 as of its v5.0.0 (March 2026). If a reader just
       wants SVGs working, that package is a perfectly fine, more
       established choice. The reason to reach for this one instead: zero
-      runtime dependencies and no Babel anywhere in the pipeline (v4's
-      rework), not broader compatibility. Say this early and plainly —
-      it's a stronger, more honest hook than implying exclusivity.
+      runtime dependencies, no Babel anywhere in the pipeline (v4's
+      rework), and — the headline stat from "The perf comparison"
+      section — the SVG transform itself runs ~2.1x faster with
+      byte-identical output, on outlyne's real 135-icon set. State the
+      stat's scope precisely (isolated transform step, not "your build");
+      see that section's caveat before drafting this. Say this early and
+      plainly — it's a stronger, more honest hook than implying
+      exclusivity.
     - One sentence on why components beat `<img>` for icons: props,
       `aria-*`, `currentColor`. Compress the full four-way taxonomy
       (`<img>`/CSS bg, inline-by-hand, sprite sheets, SVGR components) to
@@ -266,10 +341,14 @@ alternative.")
    `@acusti/vite-plugin-svg-react` as the four lessons shipped as defaults;
    the gist-vs-package pitch restated as the moral. **This section now
    carries the post's actual thesis, not just a closing beat:** v4's
-   Babel/`@svgr/*` removal (numbers, CDATA fix, the deliberately-shrunk
-   option surface with loud failures on dropped options) is the answer to
-   "why not just use `vite-plugin-svgr`, it works on Vite 8 too now" —
-   give it real room here, not a paragraph.
+   Babel/`@svgr/*` removal (CDATA fix, the deliberately-shrunk option
+   surface with loud failures on dropped options) plus the 2026-09-07 perf
+   comparison (both tables, the byte-diff detail, the methodology) are the
+   answer to "why not just use `vite-plugin-svgr`, it works on Vite 8 too
+   now" — give it real room here, not a paragraph. Preserve the perf
+   section's scoping caveat verbatim in spirit, don't let the full-app
+   corroboration data get cut for space while the isolated 2.1x number
+   stays — that combination is what makes the claim honest.
 7. **Closing** — the four lessons as a compact, shareable list; the
    decision rule one-liner (rewrite it now: not "here's the only plugin
    that works on Vite 8" but "use `vite-plugin-svgr` if that's fine for
@@ -303,9 +382,10 @@ alternative.")
 - Re-verify in prod, then tag package v1 (post 1's own closing pitch
   depends on the package being real, not just outlyne-internal).
 - Once the v4 branch (`svg-react/drop-svgr-babel`) merges and ships: sweep
-  the outline for stale svgr framing (subhead, taxonomy, "70 lines"),
-  decide whether the ending gets the fifth lesson box, and fold the perf
-  numbers into section 6's pitch.
+  the outline for stale svgr framing (subhead, taxonomy, "70 lines"), and
+  decide whether the ending gets the fifth lesson box.
+- ~~fold the perf numbers into section 6's pitch~~ — **done, 2026-09-07**:
+  see "The perf comparison" section above.
 - **Finalize the title/subhead rewrite** (drafts added 2026-09-07 above
   are placeholders) now that the Vite-8-exclusivity framing is retired —
   land on wording that owns "Babel-free" / "zero-dependency SVGR
