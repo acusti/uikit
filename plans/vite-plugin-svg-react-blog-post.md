@@ -20,6 +20,22 @@
   `3285c7f`, pending review): the plugin now generates component modules
   directly and drops `@svgr/*` — and with it Babel — entirely. See "v4 —
   dropping svgr" below; it changes the post's framing in a few places.
+- **2026-09-07: thesis correction — `vite-plugin-svgr` now supports
+  Vite 8, so gotcha #1 no longer justifies the package's existence.**
+  Verified: `vite-plugin-svgr` v5.0.0 (March 28, 2026, "Drop vite 2
+  support and add vite compat tests") added a real `vite3`–`vite8`
+  compat-test matrix — `scripts/test-vite-compat.js` swaps the `vite`
+  symlink and runs `pnpm test:e2e` against each aliased version, it's not
+  just a declared peer range — and widened `peerDependencies.vite` from
+  `>=2.6.0` to `>=3.0.0`. v5.1.0/v5.2.0 (April 2026) didn't touch that
+  matrix. So the v0→v1 Rolldown break (gotcha #1 below) is **history, not
+  a standing reason to avoid `vite-plugin-svgr` today** — a reader
+  googling "SVGs in Vite 8" now has a mainstream option that works. The
+  post's thesis narrows: `@acusti/vite-plugin-svg-react` earns its place
+  as the Babel-free, zero-runtime-dependency alternative (v4's rework),
+  not as "the only plugin that works on Vite 8." This pushes v4 from a
+  closing beat to the post's actual spine — see the retouched outline
+  below.
 - **This is set up as two posts.** Post 1 (outlined in full below) is the
   "four scars" origin/design story. Post 2 (not yet outlined) is the deep
   debugging story of the v3 heisenbug specifically — post 1 deliberately
@@ -76,7 +92,13 @@ Other structural decisions made along the way:
    dep tree, replaced a manually-added
    `/// <reference types="vite-plugin-svgr/client" />` with a self-owned
    5-line `svg-react.d.ts`. **Lesson 1: on Rolldown, the transform must be
-   oxc or it's a liability.**
+   oxc or it's a liability.** (Correction, 2026-09-07: this was a real gap
+   in mid-2025, not a standing one — `vite-plugin-svgr` shipped a real
+   `vite3`–`vite8` compat-test matrix in v5.0.0, March 2026. Tell this
+   beat as "this is what broke in July 2025," full stop; don't imply it's
+   still broken today. The lesson about oxc vs. a second parser stands on
+   its own merits — it's just no longer the thing that makes this package
+   necessary.)
 2. **v1 win worth its own subsection: delete your SVG mocks** (commit
    `fc34bb82d`, "Render real SVGs in tests instead of mocking"). Per-file
    `vi.mock('*.svg?react')` stubs clobbered each other in the shared module
@@ -176,6 +198,10 @@ Raw material worth keeping:
   earlier note to "resist a fifth section about the future" was about
   speculation; this is shipped, so it strengthens the ending instead of
   diluting it.
+- **Superseded by the 2026-09-07 thesis correction above:** v4 is no
+  longer just the final beat, it's the reason the post's pitch still
+  holds now that `vite-plugin-svgr` supports Vite 8. Section 6 needs more
+  weight than "final beat" — it's carrying the post's actual argument.
 - Candidate closing lesson if a fifth box is wanted: **the transform was
   never the hard part — SVG→JSX is a lookup table and an escape function,
   not a compiler pipeline.** (Lesson 1 said the compile must be oxc; v4
@@ -183,26 +209,47 @@ Raw material worth keeping:
 
 ## The full merged outline
 
-**Title:** The best way to render SVGs in React with Vite 8 + Rolldown
-**Subhead:** 70 lines, four scars — how a tiny SVGR plugin earned its
-shape. (Working title alternative considered: "SVGs as React components in
-Vite 8" — keep "Vite 8" and "Rolldown" in the title/slug either way, that's
-the search query this post owns.)
+**Title (DRAFT, needs the user's own pass):** SVGR-compatible, without
+SVGR — a zero-dependency, Babel-free SVG-to-React plugin for Vite 8
+**Subhead (DRAFT):** Four scars and a fifth cut — why we still ship our
+own SVG plugin even though `vite-plugin-svgr` caught up to Vite 8.
+(Retired: "The best way to render SVGs in React with Vite 8 + Rolldown."
+That framing implied the package was necessary for Vite-8 compatibility;
+it isn't anymore — `vite-plugin-svgr` v5.0.0+ works fine on Vite 8. Don't
+let the title/slug promise "the only way" or "the best way" on Vite-8
+support specifically; the search intent this post can still legitimately
+own is closer to "SVG to React without Babel" / "zero-dependency SVGR
+alternative.")
 
 1. **The answer first** (first screen, skimmer-complete)
     - `import CheckIcon from './check.svg?react'` → typed React component,
       compiled by the same oxc pipeline as the app. Install + two-line
       `vite.config` snippet + tsconfig types line. Vite ≥ 8 only, on
-      purpose.
+      purpose — but say explicitly this isn't a compatibility claim
+      (`vite-plugin-svgr` also runs on Vite 8 now); it's a design choice,
+      because the whole point is a transform that never leaves oxc.
+    - New bullet: **name `vite-plugin-svgr` and concede the point** —
+      it works on Vite 8 as of its v5.0.0 (March 2026). If a reader just
+      wants SVGs working, that package is a perfectly fine, more
+      established choice. The reason to reach for this one instead: zero
+      runtime dependencies and no Babel anywhere in the pipeline (v4's
+      rework), not broader compatibility. Say this early and plainly —
+      it's a stronger, more honest hook than implying exclusivity.
     - One sentence on why components beat `<img>` for icons: props,
       `aria-*`, `currentColor`. Compress the full four-way taxonomy
       (`<img>`/CSS bg, inline-by-hand, sprite sheets, SVGR components) to
       2–3 sentences with the decision rule and move on — cuttable if the
       post runs long.
-    - Transition line: _"The rest of this post is why those 70 lines look
-      the way they do. Every design decision was paid for."_
+    - Transition line (needs a rewrite pass, "70 lines" is stale — see v4
+      section): something like _"The rest of this post is why this
+      package still exists even after the ecosystem caught up. Every
+      design decision was paid for."_
 2. **v0: `vite-plugin-svgr`, and the Rolldown break** (May–July 2025) —
-   gotcha #1 above, Lesson 1.
+   gotcha #1 above, Lesson 1. Tell it as dated history — "this is what
+   broke in July 2025" — not as a standing knock on `vite-plugin-svgr`;
+   say plainly that it's since shipped Vite 8 compat tests (v5.0.0, March
+   2026). Don't let a reader who checks npm today catch the post
+   overstating a current gap.
 3. **v1: forty lines and a cute hack** (July 2025) — show the `.tsx`-suffix
    code; the "delete your SVG mocks" win (gotcha #2); the
    `importVitePlugins()` sharing-arc seed. Lesson 2.
@@ -217,10 +264,17 @@ the search query this post owns.)
 6. **The extraction — the ending writes itself** — the two-workspace
    sharing arc as "a package with commitment issues";
    `@acusti/vite-plugin-svg-react` as the four lessons shipped as defaults;
-   the gist-vs-package pitch restated as the moral.
+   the gist-vs-package pitch restated as the moral. **This section now
+   carries the post's actual thesis, not just a closing beat:** v4's
+   Babel/`@svgr/*` removal (numbers, CDATA fix, the deliberately-shrunk
+   option surface with loud failures on dropped options) is the answer to
+   "why not just use `vite-plugin-svgr`, it works on Vite 8 too now" —
+   give it real room here, not a paragraph.
 7. **Closing** — the four lessons as a compact, shareable list; the
-   decision rule one-liner; repo/package links; tease post 2; invite
-   issues.
+   decision rule one-liner (rewrite it now: not "here's the only plugin
+   that works on Vite 8" but "use `vite-plugin-svgr` if that's fine for
+   you; reach for this one when you want zero deps and no Babel in the
+   pipeline"); repo/package links; tease post 2; invite issues.
 
 ## Pre-v1 package hardening checklist (surfaced while migrating outlyne)
 
@@ -252,3 +306,15 @@ the search query this post owns.)
   the outline for stale svgr framing (subhead, taxonomy, "70 lines"),
   decide whether the ending gets the fifth lesson box, and fold the perf
   numbers into section 6's pitch.
+- **Finalize the title/subhead rewrite** (drafts added 2026-09-07 above
+  are placeholders) now that the Vite-8-exclusivity framing is retired —
+  land on wording that owns "Babel-free" / "zero-dependency SVGR
+  alternative" search intent instead.
+- **Write section 1's new `vite-plugin-svgr`-concession bullet and
+  section 6's expanded v4 case** for real, in prose — the notes above
+  describe the shape but the actual argument (with the v4 perf numbers)
+  needs to be drafted out.
+- Before publishing, re-check `vite-plugin-svgr`'s latest version and
+  peerDependencies once more — its Vite 8 support was verified 2026-09-07
+  against v5.2.0; if it's moved further by draft time, re-verify the
+  claim still holds.
