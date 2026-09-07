@@ -42,11 +42,14 @@
   in isolation, with byte-identical output — see "The perf comparison"
   section below for the numbers, methodology, and (important) the caveat
   about not overclaiming beyond the isolated transform step.
-- **This is set up as two posts.** Post 1 (outlined in full below) is the
-  "four scars" origin/design story. Post 2 (not yet outlined) is the deep
-  debugging story of the v3 heisenbug specifically — post 1 deliberately
-  keeps that era to two paragraphs and teases post 2 rather than spending
-  the material twice.
+- **2026-09-07: post 2 is cancelled — this is one post, full stop.** No
+  separate deep-dive on the v3 heisenbug; other things are a better use of
+  writing time. This removes the reason v3 was kept to two paragraphs (not
+  wanting to spend the material twice) — see the organizing-principle
+  bullet and section 5 below, both need a decision on whether v3 expands
+  now that its material has nowhere else to go, or stays tight simply
+  because tight served the post's pacing regardless. Flagged as an open
+  TODO rather than decided here.
 
 ## The organizing principle (the actual question asked and answered)
 
@@ -82,7 +85,9 @@ Other structural decisions made along the way:
   gist" case.
 - **Keep v3 (the dual-React bug) on a leash** — two paragraphs max, tease
   post 2. It's the climax here but post 2's whole plot; don't spend it
-  twice.
+  twice. (Moot as of 2026-09-07: post 2 isn't happening — see the TODO to
+  decide whether v3 should now expand instead of staying deliberately
+  short for a payoff that won't exist.)
 - **Resist a fifth section about the future** (import-attributes support,
   RSC, etc.) — the shape is "four scars, four lessons, shipped";
   speculation dilutes the ending.
@@ -333,9 +338,14 @@ alternative.")
    `this.resolve(..., { skipSelf: true })`, `transformWithOxc`, real
    sourcemaps). Includes the `?react`-vs-`with { type: 'react' }` FAQ as a
    sidebar here. Lesson 3.
-5. **v3: the heisenbug** (July 2026 — keep this tight) — verbatim error
-   string, the two-paragraph version of the
-   dep-scanner/cold-cache/dual-React story, tease post 2. Lesson 4.
+5. **v3: the heisenbug** (July 2026) — verbatim error string, the
+   dep-scanner/cold-cache/dual-React story. Lesson 4. **Length is an open
+   TODO as of 2026-09-07** (post 2 is cancelled): either give this the
+   full debugging-story treatment it was originally going to get its own
+   post for, or keep it to two paragraphs on pacing grounds alone (it's
+   already the climax of a "four scars" structure; a fifth-scar-length
+   digression here could unbalance the post even without a sequel to
+   protect). No "tease post 2" line either way — nothing to tease.
 6. **The extraction — the ending writes itself** — the two-workspace
    sharing arc as "a package with commitment issues";
    `@acusti/vite-plugin-svg-react` as the four lessons shipped as defaults;
@@ -353,7 +363,8 @@ alternative.")
    decision rule one-liner (rewrite it now: not "here's the only plugin
    that works on Vite 8" but "use `vite-plugin-svgr` if that's fine for
    you; reach for this one when you want zero deps and no Babel in the
-   pipeline"); repo/package links; tease post 2; invite issues.
+   pipeline"); repo/package links; invite issues. No post-2 tease — cut
+   as of 2026-09-07.
 
 ## Pre-v1 package hardening checklist (surfaced while migrating outlyne)
 
@@ -377,8 +388,14 @@ alternative.")
 
 ## Open TODOs before drafting
 
-- Decide when to write post 2 (the heisenbug debugging story) — post 1's
-  ending explicitly promises it.
+- ~~Decide when to write post 2 (the heisenbug debugging story)~~ —
+  **decided, 2026-09-07: not writing it.** Downstream cleanup done
+  (Status, organizing principle, sections 5/7 all had "tease post 2" /
+  "keep it short for the sequel" reasoning stripped or flagged). Still
+  open: **decide section 5's actual length** now that there's no sequel
+  to protect the material for — expand the v3 heisenbug into the full
+  debugging story, or keep it tight purely for the post's own pacing. See
+  the note on section 5 above.
 - Re-verify in prod, then tag package v1 (post 1's own closing pitch
   depends on the package being real, not just outlyne-internal).
 - Once the v4 branch (`svg-react/drop-svgr-babel`) merges and ships: sweep
