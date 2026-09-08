@@ -65,20 +65,13 @@ below. What consumers get out of it:
   only when that round-trips, so `id="001"` stays `001` rather than turning
   into `1` and breaking the `<use href="#001">` pointing at it.
 
-One thing SVGR could do that this plugin doesn’t: run [SVGO][] optimization
-via `@svgr/plugin-svgo`. Optimizing SVGs is a build concern you can handle
-before they reach the bundler (e.g. `svgo --folder`).
-
-### Future work
-
-An optional pre-optimization pass built on [OXVG][] — the Rust,
-SVGO-compatible SVG toolchain — would fit the plugin’s all-native pipeline
-and could slot in ahead of component generation without reintroducing a JS
-compiler. If you want it, add your 👍 to [this issue][oxvg issue].
+[SVGO][]-style optimization is available as an opt-in: the `optimize`
+option below runs each SVG through [OXVG][] — the Rust, SVGO-compatible SVG
+toolchain — ahead of component generation. Its dependency is optional, so
+the default install stays dependency-free.
 
 [svgo]: https://github.com/svg/svgo
 [oxvg]: https://github.com/noahbald/oxvg
-[oxvg issue]: https://github.com/acusti/uikit/issues/422
 
 ## Usage
 
@@ -139,10 +132,10 @@ project (e.g. `src/vite-env.d.ts`):
 
 ### Options
 
-The plugin takes an optional options object with a single property: `svg`,
-which shapes the generated `<svg>` element. It supports a deliberately
-small subset of the [SVGR options][svgr options], with the same names and
-semantics (the nesting keeps the top level free for plugin-level options):
+The plugin takes an optional options object with two properties:
+`optimize`, documented below, and `svg`, which shapes the generated `<svg>`
+element. `svg` supports a deliberately small subset of the [SVGR
+options][svgr options], with the same names and semantics:
 
 ```ts
 svgReact({
@@ -160,6 +153,126 @@ svgReact({
 - `svgProps` adds extra props to the root `<svg>` (string values, or
   `{expression}` strings inserted verbatim)
 
+#### `optimize`
+
+Off by default. Set `optimize: true` to run each SVG through OXVG before
+it’s converted to a component:
+
+```
+npm install --save-dev @oxvg/napi
+```
+
+```ts
+svgReact({ optimize: true });
+```
+
+`@oxvg/napi` is an optional peer dependency: install it to use `optimize`,
+and the plugin stays dependency-free if you don’t. Optimization runs on the
+raw SVG source, so the rest of the pipeline is unchanged by it.
+
+The default preset we pass is OXVG’s default preset with `cleanupIds`
+dropped. That preset already leaves `viewBox` alone (unlike SVGO’s
+`preset-default`), and nothing it runs renames an id or a class.
+
+`cleanupIds` minifies ids and removes unreferenced ones, which is a rename
+the optimizer can’t verify: anything pointing at an id from outside the
+file — your app’s CSS, `getElementById`, an `aria-labelledby` — breaks
+silently. It’s also what makes inlined components collide, since every
+file’s ids collapse to the same `a` and `b`, and then an internal
+`<use href="#a">` or `fill="url(#a)"` resolves against whichever component
+rendered first. `@svgr/plugin-svgo` works around that by adding `prefixIds`
+on top, which renames the ids a second time and renames class names with
+them; this plugin defaults to not renaming either, so ids stay exactly as
+unique as you made them, the way inline SVG written by hand already
+behaves.
+
+If you want the smaller output and none of your ids are referenced from
+outside their file, pass OXVG’s default preset as it ships and get
+`cleanupIds` back:
+
+```ts
+import { extend } from '@oxvg/napi';
+
+svgReact({ optimize: extend({ type: 'Default' }) });
+```
+
+Passing an object hands it to OXVG’s `optimise` as-is. An OXVG config is
+the complete list of the optimizations to run, not a set of overrides on
+top of a preset, so this one runs a single optimization and nothing else:
+
+```ts
+svgReact({ optimize: { collapseGroups: { field0: true } } });
+```
+
+For the default preset with a change to it, build the config with OXVG’s
+own `extend`:
+
+```ts
+import { extend } from '@oxvg/napi';
+
+svgReact({
+    optimize: extend(
+        { type: 'Default' },
+        { removeDesc: { removeAny: true } },
+    ),
+});
+```
+
+`extend` only adds, so drop a job by leaving it out of the object you pass:
+
+```ts
+import { extend } from '@oxvg/napi';
+
+// the plugin’s own default, minus inlineStyles
+const { cleanupIds, inlineStyles, ...optimize } = extend({
+    type: 'Default',
+});
+
+svgReact({ optimize });
+```
+
+The option is typed as a plain object rather than as OXVG’s `Jobs`, so that
+this package’s types don’t reference a dependency most installs won’t have.
+For a typed config, annotate it where you write it:
+
+```ts
+import type { Jobs } from '@oxvg/napi';
+
+svgReact({ optimize: { removeDesc: { removeAny: true } } satisfies Jobs });
+```
+
+Two more things about OXVG itself:
+
+1. A job name it doesn’t recognize is ignored silently, which is what
+   `satisfies Jobs` above is for.
+2. `inlineStyles`, in the default preset, folds a rule from an SVG’s own
+   `<style>` element into a `style` attribute and drops the `class` that
+   matched it — usually a generated name like `.cls-1`, but if you style by
+   class name from your app’s CSS and the SVG carries its own rule for that
+   class, leave `inlineStyles` out as above.
+
+#### SVG files the `optimize` option rejects
+
+This plugin’s own parser is deliberately tolerant of markup that real SVG
+files contain but XML rejects. OXVG’s parser runs first and isn’t, so
+turning `optimize` on narrows what builds. Each case fails loudly, naming
+the file and the line, and each still builds with `optimize` off:
+
+- **A doctype whose internal subset declares entities the root element
+  references** — how classic Illustrator (10–CS4) wrote its Adobe
+  namespaces. OXVG rejects any document with a DTD, so the prolog is
+  blanked before it gets there, and the references outlive it:
+  `unknown entity reference 'ns_extend'`.
+- **An unknown entity name** anywhere, such as the HTML-only `&nbsp;`,
+  which XML doesn’t define. Without `optimize` these pass through
+  literally; with it, `unknown entity reference 'nbsp'`.
+- **A minimized attribute** (`<svg hidden>`), which is legal inline in HTML
+  but not in XML. Without `optimize` it reads as `hidden=""`; with it,
+  `expected '=' not '>'`.
+
+If you hit one of these, it’s the option and not your file: normalize the
+SVG once (`svgo`, or any XML formatter) or don’t use the `optimize` option.
+
 The module wrapper is fixed: a typed component that spreads its props onto
 the root `<svg>`, exported as the default export. Any other option throws
 at config time — rejecting unknown options loudly beats silently generating
@@ -174,9 +287,11 @@ replacements:
   is also the only shape `client.d.ts` types
 - `typescript`: the emitted module is compiled immediately, so this had no
   observable effect
+- `svgoConfig`: the `optimize` option above, in OXVG’s config vocabulary
+  rather than SVGO’s
 - `jsxRuntime`, `expandProps`, `titleProp`, `descProp`,
-  `replaceAttrValues`, and SVGR’s pipeline options (`plugins`, `template`,
-  `svgoConfig`): not supported
+  `replaceAttrValues`, and SVGR’s remaining pipeline options (`plugins`,
+  `template`): not supported
 
 Migrating from vite-plugin-svgr (or from this plugin’s svgr-based 0.1
 release): the old `svgrOptions` key throws with a message pointing here —

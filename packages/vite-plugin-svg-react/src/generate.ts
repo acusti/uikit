@@ -1,3 +1,4 @@
+import { getErrorMessage } from './errors.js';
 import {
     ATTRIBUTE_MAPPINGS,
     ELEMENT_ATTRIBUTE_MAPPINGS,
@@ -398,8 +399,7 @@ export function generateComponentModule(
     } catch (error) {
         // prefix emitter errors with the source file, matching parseSVG’s
         // own diagnostics
-        const message = error instanceof Error ? error.message : String(error);
-        throw new Error(`Invalid SVG in ${filePath}: ${message}`);
+        throw new Error(`Invalid SVG in ${filePath}: ${getErrorMessage(error)}`);
     }
 
     const componentName = getComponentName(filePath);

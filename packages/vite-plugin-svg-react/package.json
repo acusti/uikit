@@ -44,6 +44,7 @@
         "tsc": "tsc --noEmit"
     },
     "devDependencies": {
+        "@oxvg/napi": "^0.0.7",
         "@testing-library/react": "^16.3.2",
         "@types/node": "^26.1.0",
         "@types/react": "^19.2.17",
@@ -55,6 +56,12 @@
         "vitest": "^4"
     },
     "peerDependencies": {
+        "@oxvg/napi": ">=0.0.7",
         "vite": ">=8.0.0"
+    },
+    "peerDependenciesMeta": {
+        "@oxvg/napi": {
+            "optional": true
+        }
     }
 }
