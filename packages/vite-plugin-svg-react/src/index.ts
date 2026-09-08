@@ -7,10 +7,22 @@ import {
     generateComponentModule,
     getComponentOptionsError,
 } from './generate.js';
+import { createOptimizer, type OptimizeConfig, type Optimizer } from './optimize.js';
 
 export type { ComponentOptions } from './generate.js';
+export type { OptimizeConfig } from './optimize.js';
 
 export type Options = {
+    /**
+     * Optimize each SVG with OXVG before it’s converted to a component.
+     * `true` runs OXVG’s default preset minus cleanupIds, so no id or class
+     * name is renamed; an object is an OXVG config used as-is.
+     *
+     * Needs the optional @oxvg/napi peer dependency installed.
+     *
+     * @default false
+     */
+    optimize?: boolean | OptimizeConfig;
     /**
      * Options shaping the generated <svg> element (dimensions, icon, svgProps)
      * with the same semantics as svgr’s options of the same names.
@@ -18,6 +30,7 @@ export type Options = {
     svg?: ComponentOptions;
 };
 
+const OPTION_NAMES: ReadonlySet<string> = new Set(['optimize', 'svg']);
 const svgReactImportFilter = /\.svg\?react$/;
 // virtual module prefix (Rollup/Vite convention)
 const VIRTUAL_PREFIX = '\0vite-plugin-svg-react:';
@@ -30,13 +43,15 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
     // silently dropped option surfaces as broken imports or missing behavior
     // with an error that points nowhere near the cause, and only TypeScript
     // consumers get a compile-time diagnostic.
-    const unsupportedTopLevel = Object.keys(options).filter((name) => name !== 'svg');
+    const unsupportedTopLevel = Object.keys(options).filter(
+        (name) => !OPTION_NAMES.has(name),
+    );
     if (unsupportedTopLevel.length > 0) {
         // point migrations from the svgr-era API (this plugin ≤ 0.1 and
         // vite-plugin-svgr) at the renamed, narrowed shape
         const hint = unsupportedTopLevel.includes('svgrOptions')
             ? 'svgrOptions was renamed to svg and narrowed to dimensions, icon, and svgProps (see the README’s Options section).'
-            : 'The only supported option is svg.';
+            : `Supported options: ${Array.from(OPTION_NAMES).join(', ')}.`;
         throw new Error(
             `vite-plugin-svg-react: unsupported options: ${unsupportedTopLevel.join(', ')}. ${hint}`,
         );
@@ -66,6 +81,24 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
         );
     }
 
+    // `false` and `true` both have to be spellable, so this reads the value
+    // rather than its presence; anything that isn’t a boolean or a config
+    // object would reach OXVG as one and be silently ignored there
+    const { optimize = false } = options;
+    if (
+        typeof optimize !== 'boolean' &&
+        (typeof optimize !== 'object' || optimize === null || Array.isArray(optimize))
+    ) {
+        throw new Error(
+            'vite-plugin-svg-react: optimize must be a boolean or an OXVG config object ' +
+                '(see the README’s Options section).',
+        );
+    }
+
+    // null when optimization is off; narrowing here keeps the setting’s two
+    // live shapes (the default preset, or a config object) intact downstream
+    const optimizeSetting = optimize === false ? null : optimize;
+
     const componentOptions: ComponentOptions = options.svg ?? {};
     // option values, not just their names: svgProps reaches the generated
     // module verbatim, so an invalid one has to fail here rather than as a
@@ -77,8 +110,13 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
         );
     }
     let development = false;
+    // memoized: the plugin loads @oxvg/napi and validates the config once,
+    // then every load shares the resulting optimizer
+    let optimizerPromise: null | Promise<Optimizer> = null;
+    const getOptimizer = (setting: OptimizeConfig | true) =>
+        (optimizerPromise ??= createOptimizer(setting));
     return {
-        configResolved(config) {
+        async configResolved(config) {
             // Match the jsx transform of the main pipeline (dev runtime
             // outside `vite build`) so dev SSR doesn’t import
             // react/jsx-runtime from these virtual modules only — the dep
@@ -87,6 +125,11 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             // forces a cold-cache re-optimization. See “Why the dev JSX
             // runtime in dev matters” in the README.
             development = config.command === 'serve';
+            // resolve the optimizer at config time so a missing @oxvg/napi or
+            // a config OXVG rejects fails with a message naming the option,
+            // rather than on the first .svg?react import with one naming
+            // whichever SVG got there first
+            if (optimizeSetting != null) await getOptimizer(optimizeSetting);
         },
         enforce: 'pre',
         async load(id) {
@@ -96,7 +139,10 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             // the virtual id hides the on-disk source from Rollup, so
             // editing the SVG wouldn’t invalidate this module otherwise
             this.addWatchFile(filePath);
-            const svg = await fs.readFile(filePath, 'utf-8');
+            let svg = await fs.readFile(filePath, 'utf-8');
+            if (optimizeSetting != null) {
+                svg = (await getOptimizer(optimizeSetting))(svg, filePath);
+            }
 
             const code = generateComponentModule(svg, filePath, componentOptions);
 
