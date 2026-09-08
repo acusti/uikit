@@ -35,6 +35,90 @@ const isXMLCharacter = (codePoint: number) =>
     (codePoint >= 0xe000 && codePoint <= 0xfffd) ||
     (codePoint >= 0x10000 && codePoint <= 0x10ffff);
 
+// Offset of the root element’s opening `<`, or -1 if there isn’t one to find
+// (an empty document, text before the root, an unterminated prolog construct).
+// Everything before that offset — a BOM, the xml prolog, a doctype, header
+// comments — is prolog that parseSVG discards, so slicing to it yields the
+// only part of the source a consumer of the parsed tree can observe.
+export function getRootElementOffset(svg: string): number {
+    let index = svg.charCodeAt(0) === 0xfeff ? 1 : 0;
+    while (index < svg.length) {
+        WHITESPACE.lastIndex = index;
+        WHITESPACE.exec(svg);
+        index = WHITESPACE.lastIndex;
+        if (svg[index] !== '<') return -1;
+        if (svg.startsWith('<?', index)) {
+            const end = svg.indexOf('?>', index + 2);
+            if (end === -1) return -1;
+            index = end + 2;
+        } else if (svg.startsWith('<!--', index)) {
+            const end = svg.indexOf('-->', index + 4);
+            if (end === -1) return -1;
+            index = end + 3;
+        } else if (svg.startsWith('<!', index)) {
+            const end = scanDoctypeEnd(svg, index);
+            if (end === -1) return -1;
+            index = end + 1;
+        } else {
+            return index;
+        }
+    }
+    return -1;
+}
+
+// Offset of the terminating '>' of the `<!…>` declaration (in practice, the
+// doctype) starting at `start`, ignoring '>' characters inside quoted
+// literals and inside the bracketed internal subset (which can hold entity
+// declarations with their own '>'s), and skipping comment and
+// processing-instruction bodies so their contents can’t derail the
+// quote/bracket tracking. Returns -1 when the declaration is unterminated,
+// reporting it through `fail` first when one is given.
+//
+// `fail` returns never, and that’s load-bearing rather than descriptive:
+// parseSVG advances past the returned offset unconditionally, so a callback
+// that returned instead of throwing would send it back to offset 0 and loop
+// over the document forever. Typing it this way makes the compiler hold the
+// caller to it.
+const scanDoctypeEnd = (
+    input: string,
+    start: number,
+    fail?: (message: string, at: number) => never,
+): number => {
+    let inSubset = false;
+    let quote = '';
+    for (let scan = start + 2; scan < input.length; scan += 1) {
+        const character = input[scan];
+        if (quote !== '') {
+            if (character === quote) quote = '';
+        } else if (input.startsWith('<!--', scan)) {
+            const commentEnd = input.indexOf('-->', scan + 4);
+            if (commentEnd === -1) {
+                // point the error at the comment, not the doctype
+                if (fail) fail('unterminated comment', scan);
+                return -1;
+            }
+            scan = commentEnd + 2;
+        } else if (input.startsWith('<?', scan)) {
+            const instructionEnd = input.indexOf('?>', scan + 2);
+            if (instructionEnd === -1) {
+                if (fail) fail('unterminated processing instruction', scan);
+                return -1;
+            }
+            scan = instructionEnd + 1;
+        } else if (character === '"' || character === "'") {
+            quote = character;
+        } else if (character === '[') {
+            inSubset = true;
+        } else if (character === ']') {
+            inSubset = false;
+        } else if (character === '>' && !inSubset) {
+            return scan;
+        }
+    }
+    if (fail) fail('unterminated doctype', start);
+    return -1;
+};
+
 // Decode the five predefined XML entities plus decimal/hex character
 // references. Unrecognized names (e.g. HTML-only ones like &nbsp;, which XML
 // doesn’t define) pass through literally, and stay literal in the rendered
@@ -143,45 +227,10 @@ export function parseSVG(svg: string, filePath?: string): XMLElement {
             parent?.children.push({ type: 'text', value: input.slice(start, end) });
             index = end + ']]>'.length;
         } else if (input.startsWith('<!', index)) {
-            // doctype: scan to the terminating '>', ignoring '>' characters
-            // inside quoted literals and inside the bracketed internal subset
-            // (which can hold entity declarations with their own '>'s), and
-            // skipping comment and processing-instruction bodies so their
-            // contents can't derail the quote/bracket tracking
-            let end = -1;
-            let inSubset = false;
-            let quote = '';
-            for (let scan = index + 2; scan < length; scan += 1) {
-                const character = input[scan];
-                if (quote !== '') {
-                    if (character === quote) quote = '';
-                } else if (input.startsWith('<!--', scan)) {
-                    const commentEnd = input.indexOf('-->', scan + 4);
-                    if (commentEnd === -1) {
-                        // point the error at the comment, not the doctype
-                        index = scan;
-                        fail('unterminated comment');
-                    }
-                    scan = commentEnd + 2;
-                } else if (input.startsWith('<?', scan)) {
-                    const instructionEnd = input.indexOf('?>', scan + 2);
-                    if (instructionEnd === -1) {
-                        index = scan;
-                        fail('unterminated processing instruction');
-                    }
-                    scan = instructionEnd + 1;
-                } else if (character === '"' || character === "'") {
-                    quote = character;
-                } else if (character === '[') {
-                    inSubset = true;
-                } else if (character === ']') {
-                    inSubset = false;
-                } else if (character === '>' && !inSubset) {
-                    end = scan;
-                    break;
-                }
-            }
-            if (end === -1) fail('unterminated doctype');
+            const end = scanDoctypeEnd(input, index, (message, at) => {
+                index = at;
+                return fail(message);
+            });
             index = end + 1;
         } else if (input.startsWith('</', index)) {
             index += 2;
