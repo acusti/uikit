@@ -54,16 +54,18 @@ below. What consumers get out of it:
   first `.svg?react` import costs single-digit milliseconds instead of the
   hundreds of milliseconds it takes to load and warm up a Babel pipeline.
 - **Seven SVGR conversion bugs fixed:** CDATA sections are preserved rather
-  than dropped; `px` style values stay strings (SVGR’s px-stripping
-  corrupted React-unitless properties, turning `line-height: 20px` into a
-  multiplier of 20); semicolons inside `url(…)` and inside CSS comments no
-  longer truncate a style value, and the comments themselves are removed
-  rather than left in as invalid CSS; attribute values containing double
-  quotes no longer emit invalid JSX; whitespace between the children of a
-  text-content element survives, so `<tspan>A</tspan> <tspan>B</tspan>`
-  still renders “A B” rather than “AB”; and attribute values become numbers
-  only when that round-trips, so `id="001"` stays `001` rather than turning
-  into `1` and breaking the `<use href="#001">` pointing at it.
+  than dropped; `px` values inside a `style` attribute stay strings (SVGR
+  stripped the unit, and React only adds it back to the CSS properties that
+  take one, so `line-height: 20px` became a multiplier of 20 and
+  `--gap: 6px` a bare `6`); semicolons inside `url(…)` and inside CSS
+  comments no longer truncate a style value, and the comments themselves
+  are removed rather than left in as invalid CSS; attribute values
+  containing double quotes no longer emit invalid JSX; whitespace between
+  the children of a text-content element survives, so
+  `<tspan>A</tspan> <tspan>B</tspan>` still renders “A B” rather than “AB”;
+  and attribute values become numbers only when that round-trips, so
+  `id="001"` stays `001` rather than turning into `1` and breaking the
+  `<use href="#001">` pointing at it.
 
 [SVGO][]-style optimization is available as an opt-in: the `optimize`
 option below runs each SVG through [OXVG][] — the Rust, SVGO-compatible SVG
