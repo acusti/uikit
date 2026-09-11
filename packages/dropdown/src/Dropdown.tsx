@@ -1001,7 +1001,7 @@ function RootDropdown({
             if (!isEventTargetingDropdown) return;
             // A disabled dropdown never opens. The generated trigger carries the
             // native disabled attribute, but a custom trigger can be any element
-            // (and .uktdropdown.disabled’s pointer-events only stops the mouse),
+            // (and .uktdropdown.is-disabled’s pointer-events only stops the mouse),
             // so the key path has to enforce it too. Only opening is gated —
             // a dropdown disabled while already open still closes on Escape.
             if (disabled) return;
@@ -1490,7 +1490,7 @@ function RootDropdown({
             </style>
             <div
                 className={clsx('uktdropdown', className, {
-                    disabled,
+                    'is-disabled': disabled,
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
                 })}
