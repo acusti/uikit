@@ -31,8 +31,7 @@ import {
 } from './context.js';
 import styles from './Dropdown.css?inline';
 import {
-    annotateItemRoles,
-    annotateParentItems,
+    annotateSubtree,
     clearActiveItems,
     collapseItem,
     collapseItemsOutsidePath,
@@ -49,6 +48,7 @@ import {
     getTriggerElement,
     isItemExpanded,
     isPointInTriangle,
+    LIST_CONTAINER_SELECTOR,
     type Point,
     setActiveItem,
     syncActiveDescendant,
@@ -388,7 +388,7 @@ function RootDropdown({
     // open in handleBodyRef)
     const consumerOwnsARIASelectedRef = useRef(false);
     // Body elements already annotated this open (see handleBodyRef)
-    const annotatedBodiesRef = useRef<WeakSet<HTMLElement>>(new WeakSet());
+    const annotatedElementsRef = useRef<WeakSet<HTMLElement>>(new WeakSet());
     const closingTimerRef = useRef<null | TimeoutID>(null);
     const isOpeningTimerRef = useRef<null | TimeoutID>(null);
     const currentInputMethodRef = useRef<'keyboard' | 'mouse'>('mouse');
@@ -457,12 +457,25 @@ function RootDropdown({
         () => ({
             registerSubmenu(registration: SubmenuRegistration) {
                 submenuRegistrationsRef.current.add(registration);
+                // A parent item registers each time its element is added to
+                // the DOM, so registration is also the moment to fill in the
+                // ARIA of elements the once-per-open pass in handleBodyRef
+                // never saw: a nested Dropdown that swapped its element after
+                // that pass ran, or one rendered into an already-open body.
+                // Latched per element, like the body pass, so re-registering
+                // the same element (a callback prop changing identity) doesn’t
+                // walk its subtree again.
+                const { element } = registration;
+                if (!annotatedElementsRef.current.has(element)) {
+                    annotatedElementsRef.current.add(element);
+                    annotateSubtree(element, popupRole);
+                }
                 return () => {
                     submenuRegistrationsRef.current.delete(registration);
                 };
             },
         }),
-        [],
+        [popupRole],
     );
 
     const dispatchToSubmenus = (key: 'onActiveItem' | 'onSubmitItem', payload: Item) => {
@@ -1389,7 +1402,9 @@ function RootDropdown({
     // These annotations run once per open (the body unmounts on close and is
     // annotated fresh each time); items rendered into an already-open body —
     // async-loaded or consumer-filtered — aren’t annotated until the next
-    // open. Custom implementations like that should set their own ARIA roles.
+    // open, except for nested Dropdowns, which annotate their own subtree
+    // when they register (see registerSubmenu). Other custom implementations
+    // should set their own ARIA roles.
     const handleBodyRef = (ref: HTMLDivElement | null) => {
         if (!ref) return;
         // Everything below must run exactly once per open: showPopover() throws
@@ -1400,8 +1415,8 @@ function RootDropdown({
         // one prop change — so the latch is what makes “once per open” true.
         // Keyed on the element, since each open mounts a fresh one, in a
         // WeakSet so it holds no unmounted bodies alive.
-        if (annotatedBodiesRef.current.has(ref)) return;
-        annotatedBodiesRef.current.add(ref);
+        if (annotatedElementsRef.current.has(ref)) return;
+        annotatedElementsRef.current.add(ref);
         // A consumer-authored aria-selected anywhere in the just-mounted body
         // (whether "true" or "false") means the consumer manages selection
         // ARIA themselves: the reveal below and the keepOpenOnSubmit move in
@@ -1409,8 +1424,7 @@ function RootDropdown({
         // ends up with two selected options (the usual your-values-win rule).
         consumerOwnsARIASelectedRef.current =
             ref.querySelector('[aria-selected]') != null;
-        annotateParentItems(ref);
-        if (popupRole !== 'dialog') annotateItemRoles(ref, popupRole);
+        annotateSubtree(ref, popupRole);
         // The Popover API is Baseline 2024, so showPopover() needs no feature
         // detection; the latch above is what keeps it off an already-shown
         // popover, which would throw.
@@ -1626,10 +1640,26 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
         style,
     } = props;
 
-    const itemRef = useRef<HTMLLIElement | null>(null);
+    const itemRef = useRef<HTMLElement | null>(null);
 
-    useEffect(() => {
-        const element = itemRef.current;
+    // The parent item is an <li> inside a list container (<ul>, <ol>, <menu>)
+    // and a <div> anywhere else, so it’s valid HTML in either kind of body.
+    // Which container it’s in isn’t knowable until the element is in the DOM,
+    // so it mounts as the <li> the docs recommend and switches before paint
+    // when the container turns out not to be a list.
+    const [ItemElement, setItemElement] = useState<'div' | 'li'>('li');
+    useLayoutEffect(() => {
+        const parent = itemRef.current?.parentElement;
+        if (parent && !parent.matches(LIST_CONTAINER_SELECTOR)) {
+            setItemElement('div');
+        }
+    }, []);
+
+    // Registration rides the ref rather than an effect so it follows the
+    // element itself: switching ItemElement remounts the item, and the ref’s
+    // cleanup unregisters the old element as the new one registers.
+    const handleItemRef = (element: HTMLElement | null) => {
+        itemRef.current = element;
         if (!element) return;
         return parentDropdown.registerSubmenu({
             element,
@@ -1638,7 +1668,7 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
             onOpen,
             onSubmitItem,
         });
-    }, [onActiveItem, onClose, onOpen, onSubmitItem, parentDropdown]);
+    };
 
     // Misuse feedback is unconditional, like the children-count error above
     const warnedRef = useRef(false);
@@ -1678,16 +1708,16 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
     );
 
     return (
-        <li
+        <ItemElement
             aria-disabled={disabled || undefined}
             className={className}
             data-ukt-item=""
-            ref={itemRef}
+            ref={handleItemRef}
             style={style}
         >
             {labelContent}
             {submenu}
-        </li>
+        </ItemElement>
     );
 }
 
