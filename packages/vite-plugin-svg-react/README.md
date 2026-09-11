@@ -172,20 +172,11 @@ svgReact({ optimize: true });
 and the plugin stays dependency-free if you don’t. Optimization runs on the
 raw SVG source, so the rest of the pipeline is unchanged by it.
 
-`optimize: true` runs OXVG’s default preset, which already leaves `viewBox`
-alone (unlike SVGO’s `preset-default`), plus one job of our own on top of
-it. The preset’s `cleanupIds` minifies ids and removes unreferenced ones,
-and it minifies every file’s ids down to the same `a` and `b` — so as soon
-as two components are inlined on one page, an internal `<use href="#a">` or
-`fill="url(#a)"` resolves against whichever component rendered first.
-SVGO’s `prefixIds` exists for exactly this, prefixing each file’s ids with
-its file name, but OXVG’s `optimise` takes no path, so its `Default` prefix
-is the literal string `prefix` in every file and the ids collide the same.
-This plugin does have the path, so it runs `prefixIds` with a prefix
-derived from each file: the file’s base name plus a 4-character hash of its
-path relative to the vite root, separated from the id by `_`. Two files
-named `arrow.svg` in different directories get different prefixes, and the
-output is the same on every machine:
+`optimize: true` runs OXVG’s default preset, which leaves `viewBox` alone
+(unlike SVGO’s `preset-default`), plus `prefixIds`. Ids come out minified
+and prefixed with the file’s base name and a 4-character hash of its path
+relative to the vite root, so they stay unique when components are inlined
+together and come out the same on every machine:
 
 ```
 // src/icons/arrow.svg, as authored
@@ -197,73 +188,118 @@ output is the same on every machine:
 <path fill="url(#arrow-58f3_a)"/>
 ```
 
-Class names aren’t prefixed (`prefixClassNames: false`), and nothing in the
-default preset renames a class, so the classes your app’s CSS targets stay
-as you wrote them. Ids don’t: an id referenced only from outside the file —
-your app’s CSS, `getElementById`, an `aria-labelledby` on another element —
-is unreferenced as far as `cleanupIds` can tell, and removed. References
-inside the file, `aria-labelledby` included, are rewritten with the id. The
-prefix is stable for a given path, but the minified part isn’t: which id
-becomes `a` depends on the order of references in the file, so an edit to
-the SVG can reassign it. If you reference ids from outside their files,
-don’t bind to the optimized names; drop `cleanupIds` from the preset and
-leave `prefixIds` out, which keeps every id exactly as unique as you made
-it, the way inline SVG written by hand already behaves:
+Every reference inside the file — `href="#…"`, `url(#…)`, `aria-labelledby`
+— is rewritten to match. Class names are left as you wrote them, with one
+exception: a class the SVG’s own `<style>` element styles is folded into a
+`style` attribute and dropped (`inlineStyles`, see the end of this
+section).
+
+To avoid issues, don’t reference an id inside an SVG from outside it (app
+CSS, `getElementById`, an `aria-labelledby` on another element). An `id`
+that isn’t referenced anywhere else in the file is removed, and the
+minified part isn’t stable — which id becomes `a` depends on the order of
+references in the file, so an edit to the SVG can reassign it. For an id
+the rest of your app needs, put it on the component instead. Props spread
+onto the root `<svg>`, so an `id` prop lands there, and everything inside
+is reachable from it by class:
+
+```tsx
+import Hero from './hero.svg?react';
+
+function Banner() {
+    return <Hero id="hero-art" />;
+}
+```
+
+```css
+#hero-art .wheel {
+    animation: spin 4s linear infinite;
+}
+```
+
+If an SVG’s ids have to stay as authored, leave `cleanupIds` out and pass
+the rest of the preset as `jobs`:
 
 ```ts
 import { extend } from '@oxvg/napi';
 
-// the default preset minus cleanupIds, and no prefixIds
-const { cleanupIds, ...optimize } = extend({ type: 'Default' });
+// the default preset minus cleanupIds
+const { cleanupIds, ...jobs } = extend({ type: 'Default' });
 
-svgReact({ optimize });
+svgReact({ optimize: { jobs } });
 ```
 
-Passing an object hands it to OXVG’s `optimise` as-is. An OXVG config is
-the complete list of the optimizations to run, not a set of overrides on
-top of a preset, so this one runs a single optimization and nothing else:
+Or keep the default and leave those files out of the pass. An object form
+of the option takes `include` and `exclude` patterns — a glob, a RegExp, or
+an array of either, matched with Vite’s `createFilter` against each SVG’s
+path relative to the vite root (`icons/star.svg`), for RegExps and globs
+alike — alongside the `jobs` to run. Each is optional: with no `jobs`, the
+default preset runs; with no `include`, every SVG that `exclude` doesn’t
+match is optimized. Excluded SVGs still become components, just from their
+source as written:
 
 ```ts
-svgReact({ optimize: { collapseGroups: { field0: true } } });
+svgReact({
+    optimize: {
+        exclude: ['src/illustrations/**', /\.animated\.svg$/],
+        include: 'src/**',
+    },
+});
 ```
 
-The one value the plugin fills in is a `prefixIds` prefix of
-`{ type: 'Default' }`, which is meaningless to `optimise` without a path:
-it resolves to the same per-file prefix `optimize: true` uses, so this is
-the default preset with `prefixIds` also prefixing class names:
+`jobs` is handed to OXVG’s `optimise` as-is. An OXVG job list is the
+complete list of the optimizations to run, not a set of overrides on top of
+a preset, so this one runs a single optimization and nothing else:
+
+```ts
+svgReact({ optimize: { jobs: { collapseGroups: { field0: true } } } });
+```
+
+The plugin owns one key in the list, `prefixIds`. A job list with
+`cleanupIds` gets the per-file `prefixIds` that `optimize: true` uses
+unless it brings its own, so a customized preset stays as collision-safe as
+the default one, and a list without `cleanupIds` isn’t prefixed. In a
+`prefixIds` of your own, a `prefix` of `{ type: 'Default' }` — which is
+meaningless to `optimise` without a path — resolves to that same per-file
+prefix, so this is the default preset with `prefixIds` also prefixing class
+names:
 
 ```ts
 import { extend } from '@oxvg/napi';
 
 svgReact({
-    optimize: extend(
-        { type: 'Default' },
-        {
-            prefixIds: {
-                delim: '_',
-                prefix: { type: 'Default' },
-                prefixClassNames: true,
-                prefixIds: true,
+    optimize: {
+        jobs: extend(
+            { type: 'Default' },
+            {
+                prefixIds: {
+                    delim: '_',
+                    prefix: { type: 'Default' },
+                    prefixClassNames: true,
+                    prefixIds: true,
+                },
             },
-        },
-    ),
+        ),
+    },
 });
 ```
 
 A `prefix` of `{ type: 'Prefix', field0: 'app' }` or `{ type: 'None' }` is
 left alone.
 
-For the default preset with a change to it, build the config with OXVG’s
+For the default preset with a change to it, build the job list with OXVG’s
 own `extend`:
 
 ```ts
 import { extend } from '@oxvg/napi';
 
 svgReact({
-    optimize: extend(
-        { type: 'Default' },
-        { removeDesc: { removeAny: true } },
-    ),
+    optimize: {
+        jobs: extend(
+            { type: 'Default' },
+            { removeDesc: { removeAny: true } },
+        ),
+    },
 });
 ```
 
@@ -272,21 +308,22 @@ svgReact({
 ```ts
 import { extend } from '@oxvg/napi';
 
-// the default preset minus inlineStyles (and, since this is a config
-// object, without the prefixIds that `optimize: true` adds)
-const { inlineStyles, ...optimize } = extend({ type: 'Default' });
+// the default preset minus inlineStyles
+const { inlineStyles, ...jobs } = extend({ type: 'Default' });
 
-svgReact({ optimize });
+svgReact({ optimize: { jobs } });
 ```
 
-The option is typed as a plain object rather than as OXVG’s `Jobs`, so that
+`jobs` is typed as a plain object rather than as OXVG’s `Jobs`, so that
 this package’s types don’t reference a dependency most installs won’t have.
-For a typed config, annotate it where you write it:
+For a typed job list, annotate it where you write it:
 
 ```ts
 import type { Jobs } from '@oxvg/napi';
 
-svgReact({ optimize: { removeDesc: { removeAny: true } } satisfies Jobs });
+svgReact({
+    optimize: { jobs: { removeDesc: { removeAny: true } } satisfies Jobs },
+});
 ```
 
 Two more things about OXVG itself:

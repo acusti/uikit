@@ -7,7 +7,6 @@ import { extend } from '@oxvg/napi';
 import { describe, expect, it } from 'vitest';
 
 import vitePluginSVGReact, { type Options } from './index.js';
-import { getIdPrefix, PREFIX_DELIMITER } from './optimize.js';
 
 const SVG = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v1H0z"/></svg>';
 
@@ -284,7 +283,7 @@ describe('vite-plugin-svg-react', () => {
         // a one-job config leaves everything the default preset would do
         const { code } = await loadSVGComponent({
             command: 'build',
-            optimize: { collapseGroups: { field0: true } },
+            optimize: { jobs: { collapseGroups: { field0: true } } },
             source:
                 '<svg xmlns="http://www.w3.org/2000/svg">' +
                 '<desc>kept</desc><g><path d="M0 0h1"/></g></svg>',
@@ -298,7 +297,7 @@ describe('vite-plugin-svg-react', () => {
         // cleanupIds minifies every file’s ids down to the same `a` and
         // `b`, which is what makes inlined components collide; prefixIds
         // with a prefix derived from the file makes them unique again
-        const { code, filePath } = await loadSVGComponent({
+        const { code } = await loadSVGComponent({
             command: 'build',
             fileName: 'icons/brand.svg',
             optimize: true,
@@ -307,11 +306,10 @@ describe('vite-plugin-svg-react', () => {
                 '<defs><linearGradient id="brandGradient"><stop offset="0"/></linearGradient></defs>' +
                 '<path d="M0 0h1v1H0z" fill="url(#brandGradient)"/></svg>',
         });
-        const prefix = getIdPrefix(filePath, dirname(dirname(filePath)));
-        expect(prefix).toMatch(/^brand-[0-9a-f]{4}$/);
-        const id = `${prefix}${PREFIX_DELIMITER}a`;
-        expect(code).toContain(`id: "${id}"`);
-        expect(code).toContain(`url(#${id})`);
+        // the documented scheme, pinned rather than recomputed: sanitized
+        // base name, the first 4 hex chars of sha256('icons/brand.svg'), `_`
+        expect(code).toContain('id: "brand-bc08_a"');
+        expect(code).toContain('url(#brand-bc08_a)');
         expect(code).not.toContain('brandGradient');
     });
 
@@ -335,18 +333,20 @@ describe('vite-plugin-svg-react', () => {
         expect(ids[0]).not.toBe(ids[1]);
     });
 
-    it('resolves a config object’s Default prefix per file', async () => {
+    it('resolves a job list’s Default prefix per file', async () => {
         // `optimise` takes no path, so OXVG resolves `{ type: 'Default' }`
         // to the literal string `prefix` — the plugin has the path, and
         // fills in the same per-file prefix `optimize: true` uses
         const { code } = await loadSVGComponent({
             command: 'build',
             optimize: {
-                prefixIds: {
-                    delim: '_',
-                    prefix: { type: 'Default' },
-                    prefixClassNames: false,
-                    prefixIds: true,
+                jobs: {
+                    prefixIds: {
+                        delim: '_',
+                        prefix: { type: 'Default' },
+                        prefixClassNames: false,
+                        prefixIds: true,
+                    },
                 },
             },
             source: '<svg xmlns="http://www.w3.org/2000/svg"><path id="shape" d="M0 0h1"/></svg>',
@@ -359,11 +359,13 @@ describe('vite-plugin-svg-react', () => {
         const { code } = await loadSVGComponent({
             command: 'build',
             optimize: {
-                prefixIds: {
-                    delim: '-',
-                    prefix: { field0: 'app', type: 'Prefix' },
-                    prefixClassNames: false,
-                    prefixIds: true,
+                jobs: {
+                    prefixIds: {
+                        delim: '-',
+                        prefix: { field0: 'app', type: 'Prefix' },
+                        prefixClassNames: false,
+                        prefixIds: true,
+                    },
                 },
             },
             source: '<svg xmlns="http://www.w3.org/2000/svg"><path id="shape" d="M0 0h1"/></svg>',
@@ -371,14 +373,29 @@ describe('vite-plugin-svg-react', () => {
         expect(code).toContain('id: "app-shape"');
     });
 
-    it('leaves ids as authored when cleanupIds is dropped', async () => {
-        // the README’s recipe for ids referenced from outside the file (app
-        // CSS, getElementById): the default preset minus cleanupIds, and
-        // without the prefixIds `optimize: true` adds
-        const { cleanupIds: _cleanupIds, ...optimize } = extend({ type: 'Default' });
+    it('adds the per-file prefixIds to a job list that has cleanupIds', async () => {
+        // a customized preset stays as collision-safe as the default one:
+        // cleanupIds without a prefixIds of its own gets the plugin’s
         const { code } = await loadSVGComponent({
             command: 'build',
-            optimize,
+            optimize: {
+                jobs: extend({ type: 'Default' }, { removeDesc: { removeAny: true } }),
+            },
+            source:
+                '<svg xmlns="http://www.w3.org/2000/svg">' +
+                '<defs><path id="shape" d="M0 0h1"/></defs><use href="#shape"/></svg>',
+        });
+        expect(code).toMatch(/id: "icon-[0-9a-f]{4}_a"/);
+    });
+
+    it('leaves ids as authored when cleanupIds is dropped', async () => {
+        // the README’s recipe for ids referenced from outside the file (app
+        // CSS, getElementById): the default preset minus cleanupIds, which
+        // is also what keeps the plugin from adding prefixIds
+        const { cleanupIds: _cleanupIds, ...jobs } = extend({ type: 'Default' });
+        const { code } = await loadSVGComponent({
+            command: 'build',
+            optimize: { jobs },
             source:
                 '<svg xmlns="http://www.w3.org/2000/svg">' +
                 '<defs><linearGradient id="brandGradient"><stop offset="0"/></linearGradient></defs>' +
@@ -418,13 +435,13 @@ describe('vite-plugin-svg-react', () => {
         // interface, and TypeScript gives interfaces no implicit index
         // signature — so typing the option as Record<string, unknown> would
         // fail tsc right here, as it did for the README’s own examples
-        const { cleanupIds: _cleanupIds, ...optimize } = extend(
+        const { cleanupIds: _cleanupIds, ...jobs } = extend(
             { type: 'Default' },
             { removeDesc: { removeAny: true } },
         );
         const { code } = await loadSVGComponent({
             command: 'build',
-            optimize,
+            optimize: { jobs },
             source:
                 '<svg xmlns="http://www.w3.org/2000/svg">' +
                 '<desc>dropped</desc><g><path d="M0 0h1"/></g></svg>',
@@ -507,24 +524,94 @@ describe('vite-plugin-svg-react', () => {
         ).rejects.toThrow(/at 5:/);
     });
 
-    it('rejects an optimize value that is neither a boolean nor a config', () => {
-        for (const optimize of [42, 'true', ['collapseGroups'], null]) {
+    it('optimizes only the SVGs include matches', async () => {
+        // a glob and a RegExp both match the root-relative path; a RegExp
+        // anchored at the start would never match an absolute one
+        const source =
+            '<svg xmlns="http://www.w3.org/2000/svg"><g><path d="M 0,0 L 1,0"/></g></svg>';
+        const optimize = { include: ['icons/**', /^badges\//] };
+        const icon = await loadSVGComponent({
+            command: 'build',
+            fileName: 'icons/star.svg',
+            optimize,
+            source,
+        });
+        expect(icon.code).not.toContain('"g"');
+        const badge = await loadSVGComponent({
+            command: 'build',
+            fileName: 'badges/new.svg',
+            optimize,
+            source,
+        });
+        expect(badge.code).not.toContain('"g"');
+        const illustration = await loadSVGComponent({
+            command: 'build',
+            fileName: 'illustrations/hero.svg',
+            optimize,
+            source,
+        });
+        expect(illustration.code).toContain('"g"');
+    });
+
+    it('skips the SVGs exclude matches', async () => {
+        // patterns resolve against the vite root, the way every other
+        // plugin’s include/exclude do
+        const source =
+            '<svg xmlns="http://www.w3.org/2000/svg"><g><path d="M 0,0 L 1,0"/></g></svg>';
+        const optimize = { exclude: 'illustrations/**' };
+        const icon = await loadSVGComponent({
+            command: 'build',
+            fileName: 'icons/star.svg',
+            optimize,
+            source,
+        });
+        expect(icon.code).not.toContain('"g"');
+        const illustration = await loadSVGComponent({
+            command: 'build',
+            fileName: 'illustrations/hero.svg',
+            optimize,
+            source,
+        });
+        expect(illustration.code).toContain('"g"');
+    });
+
+    it('rejects an optimize value that is neither a boolean nor an object', () => {
+        // a Date has no own keys, so it would pass the unknown-keys check
+        // and silently enable optimization if any object were accepted
+        for (const optimize of [42, 'true', ['collapseGroups'], null, new Date()]) {
             expect(() =>
-                // @ts-expect-error optimize is a boolean or an OXVG config
+                // @ts-expect-error optimize is a boolean or an options object
                 vitePluginSVGReact({ optimize }),
-            ).toThrow(/optimize must be a boolean or an OXVG config object/);
+            ).toThrow(/optimize must be a boolean or an object/);
         }
     });
 
-    it('rejects an optimize config OXVG can’t read, at config time', async () => {
+    it('rejects an OXVG job list passed as optimize itself', () => {
+        // the ≤ 0.3 shape; the message has to name where the job list went
+        expect(() =>
+            // @ts-expect-error a job list goes under jobs
+            vitePluginSVGReact({ optimize: { collapseGroups: { field0: true } } }),
+        ).toThrow(/unsupported optimize options: collapseGroups.*under jobs/);
+    });
+
+    it('rejects an optimize.jobs value that isn’t an object', () => {
+        for (const jobs of [true, 'default', ['collapseGroups'], null]) {
+            expect(() =>
+                // @ts-expect-error jobs is an OXVG job list
+                vitePluginSVGReact({ optimize: { jobs } }),
+            ).toThrow(/optimize\.jobs must be an OXVG job list object/);
+        }
+    });
+
+    it('rejects a job list OXVG can’t read, at config time', async () => {
         // OXVG’s own message names no file, and this runs before any SVG is
         // loaded, so the error has to point back at the option itself
-        const plugin = vitePluginSVGReact({ optimize: { removeViewBox: {} } });
+        const plugin = vitePluginSVGReact({ optimize: { jobs: { removeViewBox: {} } } });
         const configResolved = plugin.configResolved as (
-            config: Pick<ResolvedConfig, 'command'>,
+            config: Pick<ResolvedConfig, 'command' | 'root'>,
         ) => Promise<void>;
-        await expect(configResolved({ command: 'build' })).rejects.toThrow(
-            /OXVG rejected the optimize config/,
+        await expect(configResolved({ command: 'build', root: '/app' })).rejects.toThrow(
+            /OXVG rejected optimize\.jobs/,
         );
     });
 

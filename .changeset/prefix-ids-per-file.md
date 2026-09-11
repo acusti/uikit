@@ -15,7 +15,7 @@ The cost is that an id referenced only from outside its file (app CSS,
 `cleanupIds` can tell, and is removed. To keep ids as authored, pass the
 default preset minus `cleanupIds` as a config object; the README shows how.
 
-For config objects, a `prefixIds` prefix of `{ type: 'Default' }` is now
-resolved to the same per-file prefix rather than reaching OXVG as the
-literal `prefix`; an explicit prefix or `{ type: 'None' }` is passed
+For a job list of your own, a `prefixIds` prefix of `{ type: 'Default' }`
+is now resolved to the same per-file prefix rather than reaching OXVG as
+the literal `prefix`; an explicit prefix or `{ type: 'None' }` is passed
 through unchanged.

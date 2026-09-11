@@ -61,24 +61,30 @@ const OXVG_MODULE = '@oxvg/napi';
  */
 export const PREFIX_DELIMITER = '_';
 
-// What `optimize: true` runs: OXVG’s default preset, whose cleanupIds
-// minifies every file’s ids down to the same `a` and `b`, plus prefixIds
-// with a per-file prefix (resolved below) to make them unique again once
-// components are inlined together. Class names aren’t prefixed: nothing in
-// the preset renames a class, and an app’s CSS is more likely to select by
-// class than by id.
+// The prefixIds job that rides along with cleanupIds: cleanupIds minifies
+// every file’s ids down to the same `a` and `b`, and a per-file prefix
+// (resolved below) makes them unique again once components are inlined
+// together. Class names aren’t prefixed: nothing in the preset renames a
+// class, and an app’s CSS is more likely to select by class than by id.
+const DEFAULT_PREFIX_IDS: PrefixIdsJob = {
+    delim: PREFIX_DELIMITER,
+    prefix: { type: 'Default' },
+    prefixClassNames: false,
+    prefixIds: true,
+};
+
+// what `optimize: true` runs: OXVG’s default preset plus the prefixIds above
 const getDefaultConfig = (extend: OXVG['extend']): OptimizeConfig =>
-    extend(
-        { type: 'Default' },
-        {
-            prefixIds: {
-                delim: PREFIX_DELIMITER,
-                prefix: { type: 'Default' },
-                prefixClassNames: false,
-                prefixIds: true,
-            } satisfies PrefixIdsJob,
-        },
-    );
+    extend({ type: 'Default' }, { prefixIds: DEFAULT_PREFIX_IDS });
+
+// A job list with cleanupIds gets the per-file prefixIds unless it brings
+// its own, so that a customized preset stays as collision-safe as the
+// default one, and a list without cleanupIds (the recipe for keeping ids as
+// authored) isn’t prefixed either.
+const withDefaultPrefixIds = (config: OptimizeConfig): OptimizeConfig =>
+    'cleanupIds' in config && !('prefixIds' in config)
+        ? { ...config, prefixIds: DEFAULT_PREFIX_IDS }
+        : config;
 
 const isPrefixIdsJob = (value: unknown): value is PrefixIdsJob =>
     typeof value === 'object' &&
@@ -162,14 +168,15 @@ export async function createOptimizer(
     root: string,
 ): Promise<Optimizer> {
     const { extend, optimise } = await loadOXVG();
-    // a config object is handed to `optimise` verbatim, because that’s what
+    // a job list is handed to `optimise` as-is, because that’s what
     // `optimise` does with it — an OXVG config isn’t merged into a preset,
-    // it *is* the job list (`{ mergePaths: … }` means “only merge paths”),
-    // and quietly adding or dropping jobs would make the option something
-    // other than the passthrough it’s documented as. The one value filled
-    // in is a prefixIds prefix of `{ type: 'Default' }`, which means nothing
-    // without a path (see getFilePrefixedJob), and only that value.
-    const config = options === true ? getDefaultConfig(extend) : options;
+    // it *is* the job list (`{ mergePaths: … }` means “only merge paths”).
+    // The plugin owns one key in it, prefixIds: added alongside cleanupIds
+    // when absent (withDefaultPrefixIds), and a prefix of
+    // `{ type: 'Default' }` — meaningless to `optimise`, which has no path —
+    // resolved per file (getFilePrefixedJob).
+    const config =
+        options === true ? getDefaultConfig(extend) : withDefaultPrefixIds(options);
     const filePrefixedJob = getFilePrefixedJob(config);
     const getConfig = (filePath: string): OptimizeConfig => {
         if (filePrefixedJob == null) return config;
@@ -223,8 +230,9 @@ export async function createOptimizer(
             getConfig(path.join(root, 'icon.svg')),
         );
     } catch (error) {
+        const option = options === true ? 'optimize' : 'optimize.jobs';
         throw new Error(
-            `vite-plugin-svg-react: OXVG rejected the optimize config: ${getErrorMessage(error)} ` +
+            `vite-plugin-svg-react: OXVG rejected ${option}: ${getErrorMessage(error)} ` +
                 '(see the README’s Options section).',
             { cause: error },
         );
