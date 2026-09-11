@@ -997,6 +997,12 @@ Like items, submenus are ultimately declared in the DOM. A nested
 </li>
 ```
 
+The parent item is an `<li>` when the nested `Dropdown` sits inside a
+`<ul>`, `<ol>`, or `<menu>`, and a `<div>` anywhere else (a body built from
+`<div data-ukt-item>` items, say), so it is valid HTML in either kind of
+body. `className` and `style` on the nested `Dropdown` land on that element
+either way.
+
 You can author that markup directly instead of nesting a `Dropdown`
 component; the two forms behave identically because the component form
 compiles to the attribute form. Rules for direct authoring:
@@ -1299,9 +1305,9 @@ so pass `props.label` when you want the popup named as well.)
 
 Item roles are filled in the same way when the body opens: items receive
 `role="option"` in a searchable (listbox) dropdown or `role="menuitem"` in
-a menu (always `menuitem` inside a submenu), and the `<ul>`/`<ol>` wrappers
-around them receive `role="presentation"` so the listbox or menu owns its
-items directly rather than through an intervening list. A natively
+a menu (always `menuitem` inside a submenu), and the `<ul>`/`<ol>`/`<menu>`
+wrappers around them receive `role="presentation"` so the listbox or menu
+owns its items directly rather than through an intervening list. A natively
 interactive item (a button, link, or input) or one with a role you set
 yourself keeps its own role.
 
