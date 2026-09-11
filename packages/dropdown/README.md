@@ -365,8 +365,7 @@ type Props = {
      * custom properties (e.g. `--uktdd-body-min-width`) for per-instance
      * placement and sizing, which plain `CSSProperties` rejects.
      */
-    style?: React.CSSProperties &
-        Record<`--${string}`, string | number | undefined>;
+    style?: StyleWithCustomProperties;
     /**
      * The generated search input’s tabIndex. Only used when isSearchable is true.
      */
@@ -386,6 +385,11 @@ type Props = {
     value?: ItemValue | string;
 };
 ```
+
+`Props` is also exported as `DropdownProps`, the name that pairs with
+`MenubarProps`. `StyleWithCustomProperties` is `React.CSSProperties`
+extended to accept the component’s `--uktdd-*` custom properties, and is
+the type of both components’ `style` prop.
 
 ### Item Types
 
