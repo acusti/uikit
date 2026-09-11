@@ -1580,7 +1580,6 @@ function RootDropdown({
                 style={styleFromProps}
             >
                 {trigger}
-                {/* TODO next version of Dropdown should use <Activity> for body https://react.dev/reference/react/Activity */}
                 {isOpen ? (
                     <div
                         aria-labelledby={bodyLabelledBy}
