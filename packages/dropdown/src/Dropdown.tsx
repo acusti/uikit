@@ -55,14 +55,22 @@ import {
 } from './helpers.js';
 
 export type Item = {
+    /**
+     * The item element. Null when the submitted value came from a text
+     * input rather than an item (a created value with allowCreate, or an
+     * empty value with allowEmpty).
+     */
     element: MaybeHTMLElement;
+    /** The mouse, keyboard, or input event that activated or submitted. */
     event: Event | SyntheticEvent<HTMLElement>;
+    /** The item’s visible text (or the input’s text when element is null). */
     label: string;
     /**
      * Ancestor parent items from the root level down to the item’s
      * immediate parent. Empty for top-level items.
      */
     path: Array<ItemValue>;
+    /** The item’s data-ukt-value, or its label if it has none. */
     value: string;
 };
 
@@ -91,9 +99,15 @@ export type Props = {
      */
     allowEmpty?: boolean;
     /**
-     * Can take a single React element or exactly two renderable children.
+     * Either a single React element (the dropdown body; the trigger is a
+     * generated button, or a generated search input when isSearchable) or
+     * exactly two renderable children: the trigger, then the body.
      */
     children: ChildrenTuple | ReactElement;
+    /**
+     * Applied to the dropdown root element. For a nested (submenu) Dropdown,
+     * applied to the parent item element instead.
+     */
     className?: string;
     /**
      * Prevents the dropdown from opening via user interaction: pointer,
@@ -106,9 +120,29 @@ export type Props = {
      * disabled doesn't override).
      */
     disabled?: boolean;
+    /**
+     * Whether the body is a list of selectable items (the default) or
+     * arbitrary interactive content such as a form. hasItems={false} turns
+     * off item selection and item keyboard navigation, gives the popup
+     * role="dialog", and keeps it open on clicks inside the body. Defaults to
+     * true; it is never inferred from the children.
+     */
     hasItems?: boolean;
+    /**
+     * Renders the dropdown already open on mount. Uncontrolled: it sets only
+     * the initial state.
+     */
     isOpenOnMount?: boolean;
+    /**
+     * Renders the trigger as a text input (a combobox) that filters the items
+     * as the user types, and the popup as a listbox.
+     */
     isSearchable?: boolean;
+    /**
+     * Whether the dropdown stays open after an item is submitted, e.g. for a
+     * multi-select. Defaults to !hasItems: a menu closes on submit, while a
+     * hasItems={false} dialog stays open.
+     */
     keepOpenOnSubmit?: boolean;
     /**
      * Label content for the trigger button (when using single child syntax).
@@ -116,16 +150,36 @@ export type Props = {
      */
     label?: ReactNode;
     /**
-     * Only usable in conjunction with {isSearchable: true}.
-     * Used as search input’s name.
+     * The generated search input’s name. Only used when isSearchable is true.
      */
     name?: string;
+    /**
+     * Called whenever the highlighted item changes, with the same payload as
+     * onSubmitItem.
+     */
     onActiveItem?: (payload: Item) => void;
+    /** Forwarded from the dropdown root element. */
     onClick?: (event: ReactMouseEvent<HTMLElement>) => unknown;
+    /**
+     * Called after the dropdown closes. For a nested (submenu) Dropdown,
+     * called when its submenu collapses.
+     */
     onClose?: () => unknown;
+    /** Forwarded from the dropdown root element. */
     onMouseDown?: (event: ReactMouseEvent<HTMLElement>) => unknown;
+    /** Forwarded from the dropdown root element. */
     onMouseUp?: (event: ReactMouseEvent<HTMLElement>) => unknown;
+    /**
+     * Called after the dropdown opens (on mount, when isOpenOnMount). For a
+     * nested (submenu) Dropdown, called when its submenu discloses.
+     */
     onOpen?: () => unknown;
+    /**
+     * Called when an item is submitted (click, Enter, or Space). Parent items
+     * (submenus) disclose rather than submit, so this fires for leaf items
+     * only. For a nested (submenu) Dropdown, fires for submissions within its
+     * subtree only.
+     */
     onSubmitItem?: (payload: Item) => void;
     /**
      * Opens the dropdown when the pointer hovers the trigger, and closes it a
@@ -136,8 +190,7 @@ export type Props = {
      */
     openOnHover?: boolean;
     /**
-     * Only usable in conjunction with {isSearchable: true}.
-     * Used as search input’s placeholder.
+     * The generated search input’s placeholder. Only used when isSearchable is true.
      */
     placeholder?: string;
     /**
@@ -147,8 +200,7 @@ export type Props = {
      */
     style?: CSSProperties & Record<`--${string}`, string | number | undefined>;
     /**
-     * Only usable in conjunction with {isSearchable: true}.
-     * Used as search input’s tabIndex.
+     * The generated search input’s tabIndex. Only used when isSearchable is true.
      */
     tabIndex?: number;
     /**
