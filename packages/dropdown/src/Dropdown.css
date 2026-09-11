@@ -113,7 +113,7 @@
     width: max-content;
     anchor-scope: --uktdd-anchor;
 
-    &.disabled {
+    &.is-disabled {
         pointer-events: none;
     }
 
