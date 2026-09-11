@@ -111,4 +111,107 @@ export default function Repro({ value }: { value: string }) {
         );
         expect(result?.code).toContain('react/compiler-runtime');
     });
+
+    // oxc_codegen dropped the parentheses around a private-in expression
+    // used as the left operand of a higher-precedence operator, printing
+    // `#x in v + 1` (which parses as `#x in (v + 1)` and throws at
+    // runtime); fixed upstream in 0.149.0
+    // (https://github.com/oxc-project/oxc/pull/26383)
+    it('parenthesizes private-in expressions used as binary operands', async () => {
+        const result = await transformCode(
+            `
+export function Comp({ o }: { o: object }) {
+    const Local = class {
+        #x = 1;
+        has(v: object) {
+            return (#x in v) + 1;
+        }
+    };
+    return <div>{new Local().has(o)}</div>;
+}
+`,
+            '/src/Comp.tsx',
+        );
+        expect(result?.code).toContain('(#x in v) + 1');
+    });
+
+    // oxc_codegen printed a string-literal import specifier whose binding
+    // matched its name as `import { "foo" } from "./m.js"`, which is a
+    // syntax error; fixed upstream in 0.149.0
+    // (https://github.com/oxc-project/oxc/pull/26386)
+    it('prints quoted import specifiers bound to a matching local name as identifiers', async () => {
+        const result = await transformCode(
+            `
+import { "foo" as foo, "bar" as baz } from './m.js';
+
+export function Comp() {
+    return <div>{foo()}{baz()}</div>;
+}
+`,
+            '/src/Comp.tsx',
+        );
+        expect(result?.code).toContain('import { foo, "bar" as baz } from "./m.js"');
+    });
+
+    // oxc_parser accumulated rounding error on hex/binary/octal literals
+    // beyond 2^53, so 0x10000000000000801 came out as 0x10000000000000000
+    // (2^64) rather than the correctly rounded 2^64 + 4096; fixed upstream
+    // in 0.149.0 (https://github.com/oxc-project/oxc/pull/26379)
+    it('rounds large nondecimal literals correctly', async () => {
+        const result = await transformCode(
+            `
+const BIG = 0x10000000000000801;
+
+export function Comp() {
+    return <div>{BIG}</div>;
+}
+`,
+            '/src/Comp.tsx',
+        );
+        const [, literal] = result?.code.match(/const BIG = ([^;]+);/) ?? [];
+        expect(Number(literal)).toBe(2 ** 64 + 4096);
+    });
+
+    // a labeled break/continue inside an arrow function is an early error
+    // (Babel rejects it too), but the parser used to accept it and the
+    // compiler then hoisted the closure with the jump silently dropped;
+    // rejected upstream since 0.149.0
+    // (https://github.com/oxc-project/oxc/pull/26357)
+    it('rejects labeled jumps that cross a closure boundary', async () => {
+        await expect(
+            transformCode(
+                `
+export function Comp() {
+    outer: for (const x of [1]) {
+        const f = () => {
+            break outer;
+        };
+        f();
+    }
+    return <div />;
+}
+`,
+                '/src/Comp.tsx',
+            ),
+        ).rejects.toThrow('Jump target cannot cross function boundary');
+    });
+
+    // `export { a } from;` used to parse (and compile to `export { a };`,
+    // an export of a nonexistent binding) instead of failing like every
+    // other parser; rejected upstream since 0.149.0
+    // (https://github.com/oxc-project/oxc/pull/26389)
+    it('rejects `export … from` without a module source', async () => {
+        await expect(
+            transformCode(
+                `
+export { a } from;
+
+export function Comp() {
+    return <div />;
+}
+`,
+                '/src/Comp.tsx',
+            ),
+        ).rejects.toThrow('Unexpected token');
+    });
 });
