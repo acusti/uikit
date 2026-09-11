@@ -155,7 +155,7 @@ element does **not** need its own padding:
 </Dropdown>
 
 // ✓ Override default padding via CSS variables if needed
-// .my-dropdown { --uktdd-body-pad-top: 16px; /* etc */ }
+// .my-dropdown { --uktdd-body-pad-block-start: 16px; /* etc */ }
 ```
 
 For the most reliable anchor-positioning behavior:
