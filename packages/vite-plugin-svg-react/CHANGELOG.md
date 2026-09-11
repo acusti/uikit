@@ -1,5 +1,45 @@
 # @acusti/vite-plugin-svg-react
 
+## 0.4.0
+
+### Minor Changes
+
+- 071df38: The object form of `optimize` is now
+  `{ exclude, include, jobs }`, each optional. `include` and `exclude`
+  narrow which SVGs the pass runs on — a glob, a RegExp, or an array of
+  either, matched against the path relative to the vite root with Vite’s
+  `createFilter` semantics — and `jobs` is the OXVG job list that the 0.3
+  release took as the option’s value itself. With no `jobs`, the default
+  preset runs, so `optimize: { exclude: ['src/illustrations/**'] }` is the
+  full default minus those files, which still become components from their
+  source as written. The `true` short form is not affected by this
+  reshaping (what it runs changed separately; see the entry below). A job
+  list with `cleanupIds` gets the per-file `prefixIds` unless it brings its
+  own, so a customized preset stays as collision-safe as the default, and
+  dropping `cleanupIds` keeps ids as authored.
+
+    Breaking: passing an OXVG job list as `optimize` directly now throws
+    with a message pointing at `jobs`; move it there.
+
+- 8dec403: `optimize: true` now runs OXVG’s full default preset,
+  `cleanupIds` included, and prefixes each file’s ids with a prefix derived
+  from the file: its base name, a `-`, and a 4-character hash of its path
+  relative to the vite root, with `_` between the prefix and the id
+  (`arrow-3f2a_a`). Ids come out minified, and unique across components
+  inlined on one page, where 0.3.0 left them untouched to avoid the
+  collisions `cleanupIds` alone causes. Class names still aren’t renamed.
+
+    The cost is that an id referenced only from outside its file (app CSS,
+    `getElementById`, an `aria-labelledby` elsewhere) is unreferenced as
+    far as `cleanupIds` can tell, and is removed. To keep ids as authored,
+    pass the default preset minus `cleanupIds` as a config object; the
+    README shows how.
+
+    For a job list of your own, a `prefixIds` prefix of
+    `{ type: 'Default' }` is now resolved to the same per-file prefix
+    rather than reaching OXVG as the literal `prefix`; an explicit prefix
+    or `{ type: 'None' }` is passed through unchanged.
+
 ## 0.3.0
 
 ### Minor Changes
