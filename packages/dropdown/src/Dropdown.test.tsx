@@ -823,6 +823,9 @@ describe('@acusti/dropdown', () => {
 
             const trigger = screen.getByRole('button', { name: 'Menu' });
             expect((trigger as HTMLButtonElement).disabled).toBe(true);
+            expect(
+                trigger.closest('.uktdropdown')?.classList.contains('is-disabled'),
+            ).toBe(true);
         });
 
         it('does not open on Enter when disabled', async () => {
