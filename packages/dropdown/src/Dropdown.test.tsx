@@ -2441,6 +2441,59 @@ describe('@acusti/dropdown', () => {
             expect(parentItem.getAttribute('aria-controls')).toBe(submenu.id);
         });
 
+        it('renders the parent item as a <div> when the nested Dropdown isn’t inside a list', async () => {
+            const handleAlignSubmitItem = vi.fn<() => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <div>
+                        <div data-ukt-item>Bold</div>
+                        <div data-ukt-item>Italic</div>
+                        <Dropdown label="Align" onSubmitItem={handleAlignSubmitItem}>
+                            <div>
+                                <div data-ukt-value="left">Left</div>
+                                <div data-ukt-value="center">Center</div>
+                            </div>
+                        </Dropdown>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+
+            const parentItem = screen.getByText('Align').closest('[data-ukt-item]');
+            expect(parentItem?.tagName).toBe('DIV');
+            expect(parentItem?.closest('li')).toBeNull();
+            // the element that replaced the <li> is annotated like the
+            // <li> was, along with the submenu it re-rendered
+            expect(parentItem?.getAttribute('role')).toBe('menuitem');
+            expect(parentItem?.getAttribute('aria-haspopup')).toBe('menu');
+            expect(parentItem?.getAttribute('aria-expanded')).toBe('false');
+            const submenu = parentItem?.querySelector('[data-ukt-submenu]');
+            expect(submenu?.getAttribute('role')).toBe('menu');
+            expect(parentItem?.getAttribute('aria-controls')).toBe(submenu?.id);
+            expect(screen.getByText('Left').getAttribute('role')).toBe('menuitem');
+            // the parent item that ended up in the DOM is the one registered
+            // with the root, so scoped callbacks and the submenu still work
+            await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}{ArrowRight}');
+            expect(parentItem?.getAttribute('aria-expanded')).toBe('true');
+            await user.keyboard('{Enter}');
+            expect(handleAlignSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleAlignSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'left' }),
+            );
+        });
+
+        it('renders the parent item as an <li> inside a list', async () => {
+            const user = userEvent.setup();
+            renderFormatMenu();
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+
+            expect(getParentItem().tagName).toBe('LI');
+        });
+
         it('dives into and surfaces out of a submenu with →/← while the parent item stays active', async () => {
             const user = userEvent.setup();
             renderFormatMenu();
