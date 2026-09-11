@@ -331,8 +331,12 @@
         "vitest": "^4",
       },
       "peerDependencies": {
+        "@oxvg/napi": ">=0.0.7",
         "vite": ">=8.0.0",
       },
+      "optionalPeers": [
+        "@oxvg/napi",
+      ],
     },
   },
   "overrides": {
