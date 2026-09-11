@@ -199,7 +199,7 @@ export type Props = {
      * the parent item element). Also accepts the component’s CSS custom
      * properties (e.g. `--uktdd-body-min-width`).
      */
-    style?: CSSProperties & Record<`--${string}`, string | number | undefined>;
+    style?: StyleWithCustomProperties;
     /**
      * The generated search input’s tabIndex. Only used when isSearchable is true.
      */
@@ -218,6 +218,16 @@ export type Props = {
      */
     value?: ItemValue | string;
 };
+
+/** Alias of Props named to pair with MenubarProps. */
+export type DropdownProps = Props;
+
+/**
+ * A style object that also accepts the component’s CSS custom properties
+ * (e.g. `--uktdd-body-min-width`), which plain `CSSProperties` rejects.
+ */
+export type StyleWithCustomProperties = CSSProperties &
+    Record<`--${string}`, number | string | undefined>;
 
 type ChildrenTuple = [ReactNode, ReactNode] | readonly [ReactNode, ReactNode];
 
