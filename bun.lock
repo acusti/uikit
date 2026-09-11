@@ -317,7 +317,7 @@
     },
     "packages/vite-plugin-svg-react": {
       "name": "@acusti/vite-plugin-svg-react",
-      "version": "0.2.0",
+      "version": "0.4.0",
       "devDependencies": {
         "@oxvg/napi": "^0.0.7",
         "@testing-library/react": "^16.3.2",
