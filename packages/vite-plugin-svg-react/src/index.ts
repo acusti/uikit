@@ -1,5 +1,6 @@
 import fs from 'node:fs/promises';
-import { type Plugin, transformWithOxc } from 'vite';
+import path from 'node:path';
+import { createFilter, type FilterPattern, type Plugin, transformWithOxc } from 'vite';
 
 import {
     COMPONENT_OPTION_NAMES,
@@ -12,21 +13,42 @@ import { createOptimizer, type OptimizeConfig, type Optimizer } from './optimize
 export type { ComponentOptions } from './generate.js';
 export type { OptimizeConfig } from './optimize.js';
 
+export type OptimizeOptions = {
+    /**
+     * SVGs not to optimize, as a glob, RegExp, or array of either, matched
+     * against the file path relative to the vite root (`icons/star.svg`)
+     * with Vite’s `createFilter`. Wins over `include`.
+     */
+    exclude?: FilterPattern;
+    /**
+     * The only SVGs to optimize, in the same form as `exclude`. Omit to
+     * optimize every SVG `exclude` doesn’t match.
+     */
+    include?: FilterPattern;
+    /**
+     * The OXVG jobs to run, as the complete job list `optimise` takes — not
+     * overrides on a preset. Omit for the default preset (see `optimize`).
+     * A list with cleanupIds gets the per-file prefixIds unless it brings
+     * its own, and a prefixIds prefix of `{ type: 'Default' }` is resolved
+     * per file the way the default preset’s is.
+     */
+    jobs?: OptimizeConfig;
+};
+
 export type Options = {
     /**
      * Optimize each SVG with OXVG before it’s converted to a component.
      * `true` runs OXVG’s default preset, which minifies ids, plus prefixIds
      * with a prefix derived from each file’s path, so the minified ids stay
      * unique across components inlined on one page; class names aren’t
-     * renamed. An object is an OXVG config used as-is, except that a
-     * prefixIds prefix of `{ type: 'Default' }` is resolved to that same
-     * per-file prefix.
+     * renamed. An object narrows which SVGs are optimized (`include`,
+     * `exclude`) and/or replaces the job list (`jobs`).
      *
      * Needs the optional @oxvg/napi peer dependency installed.
      *
      * @default false
      */
-    optimize?: boolean | OptimizeConfig;
+    optimize?: boolean | OptimizeOptions;
     /**
      * Options shaping the generated <svg> element (dimensions, icon, svgProps)
      * with the same semantics as svgr’s options of the same names.
@@ -35,6 +57,11 @@ export type Options = {
 };
 
 const OPTION_NAMES: ReadonlySet<string> = new Set(['optimize', 'svg']);
+const OPTIMIZE_OPTION_NAMES: ReadonlySet<string> = new Set([
+    'exclude',
+    'include',
+    'jobs',
+]);
 const svgReactImportFilter = /\.svg\?react$/;
 // virtual module prefix (Rollup/Vite convention)
 const VIRTUAL_PREFIX = '\0vite-plugin-svg-react:';
@@ -86,22 +113,54 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
     }
 
     // `false` and `true` both have to be spellable, so this reads the value
-    // rather than its presence; anything that isn’t a boolean or a config
-    // object would reach OXVG as one and be silently ignored there
+    // rather than its presence; anything that isn’t a boolean or an options
+    // object would otherwise be read as one and silently default
     const { optimize = false } = options;
-    if (
-        typeof optimize !== 'boolean' &&
-        (typeof optimize !== 'object' || optimize === null || Array.isArray(optimize))
-    ) {
+    if (typeof optimize !== 'boolean' && !isPlainObject(optimize)) {
         throw new Error(
-            'vite-plugin-svg-react: optimize must be a boolean or an OXVG config object ' +
-                '(see the README’s Options section).',
+            'vite-plugin-svg-react: optimize must be a boolean or an object with ' +
+                'exclude, include, and/or jobs (see the README’s Options section).',
         );
     }
 
-    // null when optimization is off; narrowing here keeps the setting’s two
-    // live shapes (the default preset, or a config object) intact downstream
-    const optimizeSetting = optimize === false ? null : optimize;
+    if (isPlainObject(optimize)) {
+        const unsupportedOptimizeOptions = Object.keys(optimize).filter(
+            (name) => !OPTIMIZE_OPTION_NAMES.has(name),
+        );
+        if (unsupportedOptimizeOptions.length > 0) {
+            // most likely an OXVG job list passed the way this plugin ≤ 0.3
+            // took it, so name the key it moved to
+            throw new Error(
+                `vite-plugin-svg-react: unsupported optimize options: ${unsupportedOptimizeOptions.join(', ')}. ` +
+                    'Supported options: exclude, include, jobs; an OXVG job list ' +
+                    'goes under jobs (see the README’s Options section).',
+            );
+        }
+        // an OXVG job list is an object; anything else reaches `optimise` as
+        // one and is ignored silently
+        if (optimize.jobs !== undefined && !isPlainObject(optimize.jobs)) {
+            throw new Error(
+                'vite-plugin-svg-react: optimize.jobs must be an OXVG job list object ' +
+                    '(see the README’s Options section).',
+            );
+        }
+    }
+
+    // null when optimization is off, so the two live settings (the default
+    // preset, or a job list) stay intact downstream
+    const optimizeSetting: null | OptimizeConfig | true =
+        optimize === false ? null : optimize === true ? true : (optimize.jobs ?? true);
+    // which SVGs the pass runs on. The filter sees the root-relative path,
+    // not the absolute one: createFilter’s `resolve` option roots string
+    // globs only and tests a RegExp against whatever id it’s given, so
+    // resolving against the absolute path would make `/^icons\//` match
+    // nothing while `icons/**` matched
+    const optimizeFilter = isPlainObject(optimize)
+        ? createFilter(optimize.include, optimize.exclude, { resolve: false })
+        : null;
+    const shouldOptimize = (filePath: string) =>
+        optimizeFilter == null ||
+        optimizeFilter(path.relative(root, filePath).split(path.sep).join('/'));
 
     const componentOptions: ComponentOptions = options.svg ?? {};
     // option values, not just their names: svgProps reaches the generated
@@ -148,7 +207,7 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             // editing the SVG wouldn’t invalidate this module otherwise
             this.addWatchFile(filePath);
             let svg = await fs.readFile(filePath, 'utf-8');
-            if (optimizeSetting != null) {
+            if (optimizeSetting != null && shouldOptimize(filePath)) {
                 svg = (await getOptimizer(optimizeSetting))(svg, filePath);
             }
 
@@ -180,4 +239,12 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             return { id: VIRTUAL_PREFIX + resolved.id };
         },
     };
+}
+
+// a plain object only: a Date or a class instance has no own keys to fail
+// the unknown-keys check, so it would silently pass as `{}`
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+    if (value == null || typeof value !== 'object') return false;
+    const prototype: unknown = Object.getPrototypeOf(value);
+    return prototype === Object.prototype || prototype === null;
 }
