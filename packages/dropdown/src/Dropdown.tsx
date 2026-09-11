@@ -55,14 +55,22 @@ import {
 } from './helpers.js';
 
 export type Item = {
+    /**
+     * The item element. Null when the submitted value came from a text
+     * input rather than an item (a created value with allowCreate, or an
+     * empty value with allowEmpty).
+     */
     element: MaybeHTMLElement;
+    /** The mouse, keyboard, or input event that activated or submitted. */
     event: Event | SyntheticEvent<HTMLElement>;
+    /** The item’s visible text (or the input’s text when element is null). */
     label: string;
     /**
      * Ancestor parent items from the root level down to the item’s
      * immediate parent. Empty for top-level items.
      */
     path: Array<ItemValue>;
+    /** The item’s data-ukt-value, or its label if it has none. */
     value: string;
 };
 
@@ -91,9 +99,15 @@ export type Props = {
      */
     allowEmpty?: boolean;
     /**
-     * Can take a single React element or exactly two renderable children.
+     * Either a single React element (the dropdown body; the trigger is a
+     * generated button, or a generated search input when isSearchable) or
+     * exactly two renderable children: the trigger, then the body.
      */
     children: ChildrenTuple | ReactElement;
+    /**
+     * Applied to the dropdown root element. For a nested (submenu) Dropdown,
+     * applied to the parent item element instead.
+     */
     className?: string;
     /**
      * Prevents the dropdown from opening via user interaction: pointer,
@@ -106,9 +120,29 @@ export type Props = {
      * disabled doesn't override).
      */
     disabled?: boolean;
+    /**
+     * Whether the body is a list of selectable items (the default) or
+     * arbitrary interactive content such as a form. hasItems={false} turns
+     * off item selection and item keyboard navigation, gives the popup
+     * role="dialog", and keeps it open on clicks inside the body. Defaults to
+     * true; it is never inferred from the children.
+     */
     hasItems?: boolean;
+    /**
+     * Renders the dropdown already open on mount. Uncontrolled: it sets only
+     * the initial state.
+     */
     isOpenOnMount?: boolean;
+    /**
+     * Renders the trigger as a text input (a combobox) that filters the items
+     * as the user types, and the popup as a listbox.
+     */
     isSearchable?: boolean;
+    /**
+     * Whether the dropdown stays open after an item is submitted, e.g. for a
+     * multi-select. Defaults to !hasItems: a menu closes on submit, while a
+     * hasItems={false} dialog stays open.
+     */
     keepOpenOnSubmit?: boolean;
     /**
      * Label content for the trigger button (when using single child syntax).
@@ -116,16 +150,36 @@ export type Props = {
      */
     label?: ReactNode;
     /**
-     * Only usable in conjunction with {isSearchable: true}.
-     * Used as search input’s name.
+     * The generated search input’s name. Only used when isSearchable is true.
      */
     name?: string;
+    /**
+     * Called whenever the highlighted item changes, with the same payload as
+     * onSubmitItem.
+     */
     onActiveItem?: (payload: Item) => void;
+    /** Forwarded from the dropdown root element. */
     onClick?: (event: ReactMouseEvent<HTMLElement>) => unknown;
+    /**
+     * Called after the dropdown closes. For a nested (submenu) Dropdown,
+     * called when its submenu collapses.
+     */
     onClose?: () => unknown;
+    /** Forwarded from the dropdown root element. */
     onMouseDown?: (event: ReactMouseEvent<HTMLElement>) => unknown;
+    /** Forwarded from the dropdown root element. */
     onMouseUp?: (event: ReactMouseEvent<HTMLElement>) => unknown;
+    /**
+     * Called after the dropdown opens (on mount, when isOpenOnMount). For a
+     * nested (submenu) Dropdown, called when its submenu discloses.
+     */
     onOpen?: () => unknown;
+    /**
+     * Called when an item is submitted (click, Enter, or Space). Parent items
+     * (submenus) disclose rather than submit, so this fires for leaf items
+     * only. For a nested (submenu) Dropdown, fires for submissions within its
+     * subtree only.
+     */
     onSubmitItem?: (payload: Item) => void;
     /**
      * Opens the dropdown when the pointer hovers the trigger, and closes it a
@@ -136,8 +190,7 @@ export type Props = {
      */
     openOnHover?: boolean;
     /**
-     * Only usable in conjunction with {isSearchable: true}.
-     * Used as search input’s placeholder.
+     * The generated search input’s placeholder. Only used when isSearchable is true.
      */
     placeholder?: string;
     /**
@@ -145,10 +198,9 @@ export type Props = {
      * custom properties (e.g. `--uktdd-body-min-width`) for per-instance
      * placement and sizing, which plain `CSSProperties` rejects.
      */
-    style?: CSSProperties & Record<`--${string}`, string | number | undefined>;
+    style?: StyleWithCustomProperties;
     /**
-     * Only usable in conjunction with {isSearchable: true}.
-     * Used as search input’s tabIndex.
+     * The generated search input’s tabIndex. Only used when isSearchable is true.
      */
     tabIndex?: number;
     /**
@@ -165,6 +217,16 @@ export type Props = {
      */
     value?: ItemValue | string;
 };
+
+/** The same as Props; named to pair with MenubarProps. */
+export type DropdownProps = Props;
+
+/**
+ * A style object that also accepts the component’s CSS custom properties
+ * (e.g. `--uktdd-body-min-width`), which plain `CSSProperties` rejects.
+ */
+export type StyleWithCustomProperties = CSSProperties &
+    Record<`--${string}`, number | string | undefined>;
 
 type ChildrenTuple = [ReactNode, ReactNode] | readonly [ReactNode, ReactNode];
 
@@ -394,12 +456,21 @@ function RootDropdown({
         () => ({
             registerSubmenu(registration: SubmenuRegistration) {
                 submenuRegistrationsRef.current.add(registration);
+                // A parent item registers whenever its element lands in the
+                // DOM, so this is where an element the open-time pass in
+                // handleBodyRef can’t reach gets its ARIA: a nested Dropdown
+                // swapping its element after that pass ran, or one rendered
+                // into an already-open body. Idempotent, so an element the
+                // pass did reach is left as it was.
+                const { element } = registration;
+                annotateParentItems(element);
+                if (popupRole !== 'dialog') annotateItemRoles(element, popupRole);
                 return () => {
                     submenuRegistrationsRef.current.delete(registration);
                 };
             },
         }),
-        [],
+        [popupRole],
     );
 
     const dispatchToSubmenus = (key: 'onActiveItem' | 'onSubmitItem', payload: Item) => {
@@ -1001,7 +1072,7 @@ function RootDropdown({
             if (!isEventTargetingDropdown) return;
             // A disabled dropdown never opens. The generated trigger carries the
             // native disabled attribute, but a custom trigger can be any element
-            // (and .uktdropdown.disabled’s pointer-events only stops the mouse),
+            // (and .uktdropdown.is-disabled’s pointer-events only stops the mouse),
             // so the key path has to enforce it too. Only opening is gated —
             // a dropdown disabled while already open still closes on Escape.
             if (disabled) return;
@@ -1326,7 +1397,9 @@ function RootDropdown({
     // These annotations run once per open (the body unmounts on close and is
     // annotated fresh each time); items rendered into an already-open body —
     // async-loaded or consumer-filtered — aren’t annotated until the next
-    // open. Custom implementations like that should set their own ARIA roles.
+    // open, except for nested Dropdowns, which annotate their own subtree
+    // when they register (see registerSubmenu). Other custom implementations
+    // like that should set their own ARIA roles.
     const handleBodyRef = (ref: HTMLDivElement | null) => {
         if (!ref) return;
         // Everything below must run exactly once per open: showPopover() throws
@@ -1490,7 +1563,7 @@ function RootDropdown({
             </style>
             <div
                 className={clsx('uktdropdown', className, {
-                    disabled,
+                    'is-disabled': disabled,
                     'is-open': isOpen,
                     'is-searchable': isSearchable,
                 })}
@@ -1507,7 +1580,6 @@ function RootDropdown({
                 style={styleFromProps}
             >
                 {trigger}
-                {/* TODO next version of Dropdown should use <Activity> for body https://react.dev/reference/react/Activity */}
                 {isOpen ? (
                     <div
                         aria-labelledby={bodyLabelledBy}
@@ -1546,6 +1618,9 @@ const INERT_SUBMENU_PROPS = [
     'value',
 ] as const;
 
+// The containers whose content model wants an <li> parent item
+const LIST_CONTAINER_SELECTOR = 'menu, ol, ul';
+
 // The nested (submenu) rendering of Dropdown: a parent item that discloses a
 // child menu. It renders the data-ukt-submenu protocol and registers with the
 // root dropdown, whose engine handles all interaction.
@@ -1563,10 +1638,26 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
         style,
     } = props;
 
-    const itemRef = useRef<HTMLLIElement | null>(null);
+    const itemRef = useRef<HTMLElement | null>(null);
 
-    useEffect(() => {
-        const element = itemRef.current;
+    // The parent item is an <li> inside a list container (<ul>, <ol>, <menu>)
+    // and a <div> anywhere else, so it’s valid HTML in either kind of body.
+    // Which container it’s in isn’t knowable until the element is in the DOM,
+    // so it mounts as the <li> the docs recommend and switches before paint
+    // (a layout effect) when the container turns out not to be a list.
+    const [ItemElement, setItemElement] = useState<'div' | 'li'>('li');
+    useLayoutEffect(() => {
+        const parent = itemRef.current?.parentElement;
+        if (parent && !parent.matches(LIST_CONTAINER_SELECTOR)) {
+            setItemElement('div');
+        }
+    }, []);
+
+    // Registration rides the ref rather than an effect so it follows the
+    // element itself: switching ItemElement remounts the item, and the ref’s
+    // cleanup unregisters the old element as the new one registers.
+    const handleItemRef = (element: HTMLElement | null) => {
+        itemRef.current = element;
         if (!element) return;
         return parentDropdown.registerSubmenu({
             element,
@@ -1575,7 +1666,7 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
             onOpen,
             onSubmitItem,
         });
-    }, [onActiveItem, onClose, onOpen, onSubmitItem, parentDropdown]);
+    };
 
     // Misuse feedback is unconditional, like the children-count error above
     const warnedRef = useRef(false);
@@ -1615,16 +1706,16 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
     );
 
     return (
-        <li
+        <ItemElement
             aria-disabled={disabled || undefined}
             className={className}
             data-ukt-item=""
-            ref={itemRef}
+            ref={handleItemRef}
             style={style}
         >
             {labelContent}
             {submenu}
-        </li>
+        </ItemElement>
     );
 }
 

@@ -1,7 +1,6 @@
 import { isEventTargetUsingKeyEvent } from '@acusti/use-keyboard-events';
 import clsx from 'clsx';
 import {
-    type CSSProperties,
     type FocusEvent as ReactFocusEvent,
     type KeyboardEvent as ReactKeyboardEvent,
     type MouseEvent as ReactMouseEvent,
@@ -18,11 +17,17 @@ import {
     type MenubarContextValue,
     type MenubarMember,
 } from './context.js';
+import { type StyleWithCustomProperties } from './Dropdown.js';
 
 export type MenubarProps = {
     children: ReactNode;
     className?: string;
-    style?: CSSProperties;
+    /**
+     * Applied to the menubar root element. Like Dropdown’s style prop, also
+     * accepts the component’s CSS custom properties (e.g.
+     * `--uktdd-menubar-trigger-bg-color-active`).
+     */
+    style?: StyleWithCustomProperties;
 };
 
 const compareDocumentOrder = (a: MenubarMember, b: MenubarMember) => {

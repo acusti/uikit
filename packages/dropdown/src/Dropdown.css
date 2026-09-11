@@ -42,10 +42,13 @@
     --uktdd-body-max-height: calc(100dvh - var(--uktdd-body-buffer));
     --uktdd-body-max-width: calc(100dvw - var(--uktdd-body-buffer));
     --uktdd-body-min-height: 30px;
-    --uktdd-body-pad-bottom: 0.5em;
-    --uktdd-body-pad-left: 0.6875em;
-    --uktdd-body-pad-right: 0.6875em;
-    --uktdd-body-pad-top: 0.5em;
+    /* the content region’s padding, one token per logical side (like the
+       placement tokens, so an override stays on the intended side in RTL
+       and vertical writing modes) */
+    --uktdd-body-pad-block-start: 0.5em;
+    --uktdd-body-pad-block-end: 0.5em;
+    --uktdd-body-pad-inline-start: 0.6875em;
+    --uktdd-body-pad-inline-end: 0.6875em;
     --uktdd-body-min-width: min(50px, 100%);
     --uktdd-body-position-area: block-end span-inline-end;
     /* The two author fallbacks, tried in order after the primary placement
@@ -72,7 +75,8 @@
        [data-ukt-active] path rule below; set this property directly to
        override it */
     --uktdd-body-color-path: currentColor;
-    --uktdd-label-pad-right: 0.625em;
+    /* the space between the label text and the trigger */
+    --uktdd-label-gap: 0.625em;
     --uktdd-submenu-position-area: inline-end span-block-end;
     /* the submenu’s only author fallback (the natural opposite placement) */
     --uktdd-submenu-position-try-fallback: --uktdd-submenu-inline-start;
@@ -113,7 +117,7 @@
     width: max-content;
     anchor-scope: --uktdd-anchor;
 
-    &.disabled {
+    &.is-disabled {
         pointer-events: none;
     }
 
@@ -129,10 +133,7 @@
 .uktdropdown-label {
     display: flex;
     align-items: center;
-}
-
-.uktdropdown-label-text {
-    padding-right: var(--uktdd-label-pad-right);
+    gap: var(--uktdd-label-gap);
 }
 
 .uktdropdown-body {
@@ -330,8 +331,9 @@
            drops and every fill option is evaluated at natural size — and
            rejected */
         --uktdd-body-gap: 0px;
-        padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right)
-            var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
+        padding-block: var(--uktdd-body-pad-block-start) var(--uktdd-body-pad-block-end);
+        padding-inline: var(--uktdd-body-pad-inline-start)
+            var(--uktdd-body-pad-inline-end);
         inline-size: max-content;
         max-inline-size: var(--uktdd-body-max-width);
         min-block-size: min(var(--uktdd-body-min-height), var(--uktdd-body-max-height));
@@ -378,8 +380,8 @@ div.uktdropdown-body {
     min-block-size: 0;
     overflow: auto;
     overscroll-behavior: contain;
-    padding: var(--uktdd-body-pad-top) var(--uktdd-body-pad-right)
-        var(--uktdd-body-pad-bottom) var(--uktdd-body-pad-left);
+    padding-block: var(--uktdd-body-pad-block-start) var(--uktdd-body-pad-block-end);
+    padding-inline: var(--uktdd-body-pad-inline-start) var(--uktdd-body-pad-inline-end);
 }
 
 /* An empty option for a fallback slot a recipe doesn’t use — e.g. a

@@ -351,19 +351,21 @@ export const annotateParentItems = (bodyElement: MaybeHTMLElement) => {
 // The <ul>/<ol> wrappers around the items get role="presentation" so their
 // implicit list role doesn’t sit between the listbox/menu and its items; a
 // submenu already carries role="menu", so its own role is left intact.
+// The root is the body, or — for a parent item annotating itself on
+// registration — the item, which is then included along with its subtree.
 export const annotateItemRoles = (
-    bodyElement: MaybeHTMLElement,
+    root: MaybeHTMLElement,
     popupRole: 'listbox' | 'menu',
 ) => {
-    if (!bodyElement) return;
-    for (const list of Array.from(bodyElement.querySelectorAll('ul, ol'))) {
+    if (!root) return;
+    for (const list of Array.from(root.querySelectorAll('ul, ol'))) {
         if (!list.hasAttribute('role') && list.querySelector(ITEM_SELECTOR)) {
             list.setAttribute('role', 'presentation');
         }
     }
-    for (const item of Array.from(
-        bodyElement.querySelectorAll(ITEM_SELECTOR),
-    ) as Array<HTMLElement>) {
+    const items = Array.from(root.querySelectorAll(ITEM_SELECTOR)) as Array<HTMLElement>;
+    if (root.matches(ITEM_SELECTOR)) items.unshift(root);
+    for (const item of items) {
         // Leave a consumer-set role, and a natively interactive item’s own role
         // (a button/link/input item keeps its element semantics), alone.
         if (

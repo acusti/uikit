@@ -33,9 +33,9 @@ The three primary design goals for the existence of this component:
        directly)
     5. To combine dropdowns into a menubar, wrap them in
        [`<Menubar>`](#menubar)
-    6. To style your dropdowns, use CSS; there are a
-       [collection of CSS custom properties](https://github.com/acusti/uikit/blob/main/packages/dropdown/src/Dropdown.css)
-       used internally to style them if that works best for you, or just
+    6. To style your dropdowns, use CSS; there is a
+       [collection of CSS custom properties](#css-custom-properties) used
+       internally to style them if that works best for you, or just
        override the minimal default CSS as appropriate
 3. **Lightweight bundle size** with the bare minimum of dependencies (see
    minzipped size above)
@@ -144,8 +144,9 @@ Internally, the dropdown renders:
 
 Custom padding and overflow styling belongs on the content region, not the
 outer shell. Note that `.uktdropdown-content` already applies default
-padding (see the `--uktdd-body-pad-*` variables below), so your body
-element does **not** need its own padding:
+padding (the `--uktdd-body-pad-*` custom properties, listed under
+[CSS custom properties](#css-custom-properties)), so your body element does
+**not** need its own padding:
 
 ```tsx
 // ✗ Don’t double-pad — the content region already has padding
@@ -155,7 +156,7 @@ element does **not** need its own padding:
 </Dropdown>
 
 // ✓ Override default padding via CSS variables if needed
-// .my-dropdown { --uktdd-body-pad-top: 16px; /* etc */ }
+// .my-dropdown { --uktdd-body-pad-block-start: 16px; /* etc */ }
 ```
 
 For the most reliable anchor-positioning behavior:
@@ -262,11 +263,18 @@ type Props = {
      */
     allowEmpty?: boolean;
     /**
-     * Can take a single React element or exactly two renderable children.
-     * - Single child: The dropdown body (trigger will be auto-generated button)
-     * - Two children: [trigger, body]
+     * Either a single React element (the dropdown body; the trigger is a
+     * generated button, or a generated search input when isSearchable) or
+     * exactly two renderable children: the trigger, then the body.
      */
-    children: ReactNode | [ReactNode, ReactNode];
+    children:
+        | ReactElement
+        | [ReactNode, ReactNode]
+        | readonly [ReactNode, ReactNode];
+    /**
+     * Applied to the dropdown root element. For a nested (submenu) Dropdown,
+     * applied to the parent item element instead.
+     */
     className?: string;
     /**
      * Prevents the dropdown from opening via user interaction: pointer,
@@ -280,21 +288,27 @@ type Props = {
      */
     disabled?: boolean;
     /**
-     * Whether the dropdown contains items that can be selected.
-     * Defaults to true if children contain elements with data-ukt-item or data-ukt-value.
+     * Whether the body is a list of selectable items (the default) or
+     * arbitrary interactive content such as a form. hasItems={false} turns
+     * off item selection and item keyboard navigation, gives the popup
+     * role="dialog", and keeps it open on clicks inside the body. Defaults to
+     * true; it is never inferred from the children.
      */
     hasItems?: boolean;
     /**
-     * Whether the dropdown should be open when first mounted.
+     * Renders the dropdown already open on mount. Uncontrolled: it sets only
+     * the initial state.
      */
     isOpenOnMount?: boolean;
     /**
-     * Whether the dropdown should include a search input for filtering options.
+     * Renders the trigger as a text input (a combobox) that filters the items
+     * as the user types, and the popup as a listbox.
      */
     isSearchable?: boolean;
     /**
-     * Whether the dropdown should remain open after selecting an item.
-     * Useful for multi-select scenarios.
+     * Whether the dropdown stays open after an item is submitted, e.g. for a
+     * multi-select. Defaults to !hasItems: a menu closes on submit, while a
+     * hasItems={false} dialog stays open.
      */
     keepOpenOnSubmit?: boolean;
     /**
@@ -303,19 +317,37 @@ type Props = {
      */
     label?: ReactNode;
     /**
-     * Name attribute for the search input (requires isSearchable: true).
+     * The generated search input’s name. Only used when isSearchable is true.
      */
     name?: string;
     /**
-     * Called when the active (highlighted) item changes. Receives the
-     * same payload as onSubmitItem.
+     * Called whenever the highlighted item changes, with the same payload as
+     * onSubmitItem.
      */
     onActiveItem?: (payload: Item) => void;
+    /** Forwarded from the dropdown root element. */
     onClick?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    /**
+     * Called after the dropdown closes. For a nested (submenu) Dropdown,
+     * called when its submenu collapses.
+     */
     onClose?: () => unknown;
+    /** Forwarded from the dropdown root element. */
     onMouseDown?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    /** Forwarded from the dropdown root element. */
     onMouseUp?: (event: React.MouseEvent<HTMLElement>) => unknown;
+    /**
+     * Called after the dropdown opens (on mount, when isOpenOnMount). For a
+     * nested (submenu) Dropdown, called when its submenu discloses.
+     */
     onOpen?: () => unknown;
+    /**
+     * Called when an item is submitted (click, Enter, or Space). Parent items
+     * (submenus) disclose rather than submit, so this fires for leaf items
+     * only. For a nested (submenu) Dropdown, fires for submissions within its
+     * subtree only.
+     */
+    onSubmitItem?: (payload: Item) => void;
     /**
      * Opens the dropdown when the pointer hovers the trigger, and closes it a
      * short moment after the pointer leaves the trigger and body entirely (the
@@ -325,36 +357,39 @@ type Props = {
      */
     openOnHover?: boolean;
     /**
-     * Called when an item is selected. The payload includes:
-     * - element: The DOM element that was clicked
-     * - event: The click or keyboard event
-     * - label: The visible text of the item
-     * - value: The value attribute or text content
-     */
-    onSubmitItem?: (payload: Item) => void;
-    /**
-     * Placeholder text for the search input (requires isSearchable: true).
+     * The generated search input’s placeholder. Only used when isSearchable is true.
      */
     placeholder?: string;
-    style?: React.CSSProperties;
     /**
-     * Tab index for the search input (requires isSearchable: true).
+     * Applied to the dropdown root element. Also accepts the component’s CSS
+     * custom properties (e.g. `--uktdd-body-min-width`) for per-instance
+     * placement and sizing, which plain `CSSProperties` rejects.
+     */
+    style?: StyleWithCustomProperties;
+    /**
+     * The generated search input’s tabIndex. Only used when isSearchable is true.
      */
     tabIndex?: number;
     /**
      * The dropdown’s controlled value. Pass a bare identifier when an item’s
      * stored value and its displayed label are the same, or a { label, value }
      * pair when they differ (e.g. a human-readable label shown for a stored
-     * id) — the same { label, value } shape onSubmitItem reports back. Used for
-     * change detection (skipping onSubmitItem when the already-selected item is
-     * re-submitted); the label is shown as the search input’s value when
-     * isSearchable is true. A bare identifier resolves to its label from the
-     * matching child’s data-ukt-value in the body, so children whose value
-     * and label differ need no explicit label.
+     * id) — the same { label, value } shape onSubmitItem reports back. The
+     * value determines whether the value has changed, to avoid triggering
+     * onSubmitItem when the already-selected item is re-submitted; the label is
+     * used as the search input’s value when props.isSearchable === true. A bare
+     * identifier is resolved to its label from the matching child’s
+     * data-ukt-value in the body — so children whose value and label differ
+     * need no explicit label; a { label, value } pair states it.
      */
     value?: ItemValue | string;
 };
 ```
+
+`Props` is also exported as `DropdownProps`, the name that pairs with
+`MenubarProps`. `StyleWithCustomProperties` is `React.CSSProperties`
+extended to accept the component’s `--uktdd-*` custom properties, and is
+the type of both components’ `style` prop.
 
 ### Item Types
 
@@ -362,25 +397,117 @@ Both types are exported alongside the component:
 
 ```ts
 /**
- * A { label, value } pair naming an item: value is the stored value (the
- * item’s data-ukt-value) and label is its displayed text. Accepted by the
+ * A { label, value } pair naming an item: `value` is the stored value (the
+ * item’s data-ukt-value) and `label` is its displayed text. Accepted by the
  * value prop when an item’s value and label differ; also the shape of an
  * Item’s path entries.
  */
 type ItemValue = { label: string; value: string };
 
 type Item = {
+    /**
+     * The item element. Null when the submitted value came from a text
+     * input rather than an item (a created value with allowCreate, or an
+     * empty value with allowEmpty).
+     */
     element: HTMLElement | null;
+    /** The mouse, keyboard, or input event that activated or submitted. */
     event: Event | React.SyntheticEvent<HTMLElement>;
+    /** The item’s visible text (or the input’s text when element is null). */
     label: string;
     /**
      * Ancestor parent items from the root level down to the item’s
      * immediate parent. Empty for top-level items.
      */
     path: Array<ItemValue>;
+    /** The item’s data-ukt-value, or its label if it has none. */
     value: string;
 };
 ```
+
+### CSS custom properties
+
+Every `--uktdd-*` custom property the component reads, with its default.
+Set them on the dropdown’s root (a class, or the `style` prop, which
+accepts them) or on an ancestor to theme a whole subtree. Anything not
+listed here — the `--uktdd-anchor` and `--uktdd-submenu-anchor` anchor
+names, and the `data-ukt-generated-id` attribute — is internal.
+
+Colors (see [Color Scheme](#color-scheme)):
+
+| Property                                  | Default                                              |
+| ----------------------------------------- | ---------------------------------------------------- |
+| `--uktdd-color-scheme`                    | `inherit`                                            |
+| `--uktdd-body-bg-color`                   | `Canvas`                                             |
+| `--uktdd-body-color`                      | `CanvasText`                                         |
+| `--uktdd-body-bg-color-hover`             | `Highlight`                                          |
+| `--uktdd-body-color-hover`                | `HighlightText`                                      |
+| `--uktdd-body-bg-color-selected`          | `color-mix(in oklab, currentColor 6%, transparent)`  |
+| `--uktdd-body-bg-color-path`              | 12% of the body color mixed into its background      |
+| `--uktdd-body-color-path`                 | `currentColor`                                       |
+| `--uktdd-body-border-color`               | `color-mix(in oklab, currentColor 15%, transparent)` |
+| `--uktdd-body-box-shadow`                 | `0 8px 18px rgba(0, 0, 0, 0.25)`                     |
+| `--uktdd-menubar-trigger-bg-color-active` | `color-mix(in oklab, currentColor 12%, transparent)` |
+
+Typography, sizing, and spacing:
+
+| Property                        | Default                                   |
+| ------------------------------- | ----------------------------------------- |
+| `--uktdd-font-family`           | the system UI font stack                  |
+| `--uktdd-body-buffer`           | `10px` (viewport inset for the max sizes) |
+| `--uktdd-body-min-height`       | `30px`                                    |
+| `--uktdd-body-max-height`       | `calc(100dvh - var(--uktdd-body-buffer))` |
+| `--uktdd-body-min-width`        | `min(50px, 100%)`                         |
+| `--uktdd-body-max-width`        | `calc(100dvw - var(--uktdd-body-buffer))` |
+| `--uktdd-body-pad-block-start`  | `0.5em`                                   |
+| `--uktdd-body-pad-block-end`    | `0.5em`                                   |
+| `--uktdd-body-pad-inline-start` | `0.6875em`                                |
+| `--uktdd-body-pad-inline-end`   | `0.6875em`                                |
+| `--uktdd-body-gap`              | `0px` (trigger ↔ body)                    |
+| `--uktdd-submenu-gap`           | `0px` (parent item ↔ submenu)             |
+| `--uktdd-label-gap`             | `0.625em` (`props.label` text ↔ trigger)  |
+
+Placement (see
+[Placement Customization](#placement-customization-with-css-variables) and
+[Submenu placement and styling](#submenu-placement-and-styling)):
+
+| Property                                | Default                                                  |
+| --------------------------------------- | -------------------------------------------------------- |
+| `--uktdd-body-position-area`            | `block-end span-inline-end`                              |
+| `--uktdd-body-position-try-fallback-1`  | `--uktdd-top-start`                                      |
+| `--uktdd-body-position-try-fallback-2`  | `--uktdd-bottom-end`                                     |
+| `--uktdd-body-fill-fallbacks`           | `--uktdd-fill-bottom, --uktdd-fill-top`                  |
+| `--uktdd-submenu-position-area`         | `inline-end span-block-end`                              |
+| `--uktdd-submenu-position-try-fallback` | `--uktdd-submenu-inline-start`                           |
+| `--uktdd-submenu-fill-fallbacks`        | `--uktdd-submenu-fill, --uktdd-submenu-fill flip-inline` |
+
+The `@position-try` placements the component ships, for use in the fallback
+slots above: `--uktdd-top-start`, `--uktdd-top-end`,
+`--uktdd-bottom-start`, `--uktdd-bottom-end`,
+`--uktdd-submenu-inline-start`, the fills `--uktdd-fill-bottom`,
+`--uktdd-fill-top`, `--uktdd-fill`, `--uktdd-fill-cover`, and
+`--uktdd-submenu-fill`, and the no-op `--uktdd-noop`.
+
+### Class names and data attributes
+
+The DOM the component renders is styleable by these class names, which are
+part of the public API along with the `data-ukt-*` attributes:
+
+- `.uktdropdown` — the root, with the state classes `.is-open`,
+  `.is-searchable`, and `.is-disabled`
+- `.uktdropdown-trigger` — the generated trigger (a custom trigger keeps
+  its own classes)
+- `.uktdropdown-label` and `.uktdropdown-label-text` — the wrapper and text
+  rendered for `props.label`
+- `.uktdropdown-body` — the anchored popover shell, with `.has-items`
+  unless `hasItems={false}`
+- `.uktdropdown-content` — the padded, scrollable region inside the body
+- `.uktmenubar` — the [`Menubar`](#menubar) root
+- `data-ukt-item` and `data-ukt-value` mark items, `data-ukt-submenu` marks
+  a [submenu](#the-data-ukt-submenu-protocol), and `data-ukt-active` marks
+  the highlighted item at each open level (the styling hook for the
+  highlight, alongside `aria-expanded` on open parent items and
+  `aria-selected` on the selected option)
 
 ## Usage Examples
 
@@ -869,6 +996,12 @@ Like items, submenus are ultimately declared in the DOM. A nested
     </ul>
 </li>
 ```
+
+The parent item is an `<li>` when the nested `Dropdown` sits inside a
+`<ul>`, `<ol>`, or `<menu>`, and a `<div>` anywhere else (a body built from
+`<div data-ukt-item>` items, say), so it is valid HTML in either kind of
+body. `className` and `style` on the nested `Dropdown` land on that element
+either way.
 
 You can author that markup directly instead of nesting a `Dropdown`
 component; the two forms behave identically because the component form
