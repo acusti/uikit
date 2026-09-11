@@ -172,30 +172,51 @@ svgReact({ optimize: true });
 and the plugin stays dependency-free if you don’t. Optimization runs on the
 raw SVG source, so the rest of the pipeline is unchanged by it.
 
-The default preset we pass is OXVG’s default preset with `cleanupIds`
-dropped. That preset already leaves `viewBox` alone (unlike SVGO’s
-`preset-default`), and nothing it runs renames an id or a class.
+`optimize: true` runs OXVG’s default preset, which already leaves `viewBox`
+alone (unlike SVGO’s `preset-default`), plus one job of our own on top of
+it. The preset’s `cleanupIds` minifies ids and removes unreferenced ones,
+and it minifies every file’s ids down to the same `a` and `b` — so as soon
+as two components are inlined on one page, an internal `<use href="#a">` or
+`fill="url(#a)"` resolves against whichever component rendered first.
+SVGO’s `prefixIds` exists for exactly this, prefixing each file’s ids with
+its file name, but OXVG’s `optimise` takes no path, so its `Default` prefix
+is the literal string `prefix` in every file and the ids collide the same.
+This plugin does have the path, so it runs `prefixIds` with a prefix
+derived from each file: the file’s base name plus a 4-character hash of its
+path relative to the vite root, separated from the id by `_`. Two files
+named `arrow.svg` in different directories get different prefixes, and the
+output is the same on every machine:
 
-`cleanupIds` minifies ids and removes unreferenced ones, which is a rename
-the optimizer can’t verify: anything pointing at an id from outside the
-file — your app’s CSS, `getElementById`, an `aria-labelledby` — breaks
-silently. It’s also what makes inlined components collide, since every
-file’s ids collapse to the same `a` and `b`, and then an internal
-`<use href="#a">` or `fill="url(#a)"` resolves against whichever component
-rendered first. `@svgr/plugin-svgo` works around that by adding `prefixIds`
-on top, which renames the ids a second time and renames class names with
-them; this plugin defaults to not renaming either, so ids stay exactly as
-unique as you made them, the way inline SVG written by hand already
-behaves.
+```
+// src/icons/arrow.svg, as authored
+<linearGradient id="arrowGradient">…</linearGradient>
+<path fill="url(#arrowGradient)"/>
 
-If you want the smaller output and none of your ids are referenced from
-outside their file, pass OXVG’s default preset as it ships and get
-`cleanupIds` back:
+// optimized
+<linearGradient id="arrow-58f3_a">…</linearGradient>
+<path fill="url(#arrow-58f3_a)"/>
+```
+
+Class names aren’t prefixed (`prefixClassNames: false`), and nothing in the
+default preset renames a class, so the classes your app’s CSS targets stay
+as you wrote them. Ids don’t: an id referenced only from outside the file —
+your app’s CSS, `getElementById`, an `aria-labelledby` on another element —
+is unreferenced as far as `cleanupIds` can tell, and removed. References
+inside the file, `aria-labelledby` included, are rewritten with the id. The
+prefix is stable for a given path, but the minified part isn’t: which id
+becomes `a` depends on the order of references in the file, so an edit to
+the SVG can reassign it. If you reference ids from outside their files,
+don’t bind to the optimized names; drop `cleanupIds` from the preset and
+leave `prefixIds` out, which keeps every id exactly as unique as you made
+it, the way inline SVG written by hand already behaves:
 
 ```ts
 import { extend } from '@oxvg/napi';
 
-svgReact({ optimize: extend({ type: 'Default' }) });
+// the default preset minus cleanupIds, and no prefixIds
+const { cleanupIds, ...optimize } = extend({ type: 'Default' });
+
+svgReact({ optimize });
 ```
 
 Passing an object hands it to OXVG’s `optimise` as-is. An OXVG config is
@@ -205,6 +226,32 @@ top of a preset, so this one runs a single optimization and nothing else:
 ```ts
 svgReact({ optimize: { collapseGroups: { field0: true } } });
 ```
+
+The one value the plugin fills in is a `prefixIds` prefix of
+`{ type: 'Default' }`, which is meaningless to `optimise` without a path:
+it resolves to the same per-file prefix `optimize: true` uses, so this is
+the default preset with `prefixIds` also prefixing class names:
+
+```ts
+import { extend } from '@oxvg/napi';
+
+svgReact({
+    optimize: extend(
+        { type: 'Default' },
+        {
+            prefixIds: {
+                delim: '_',
+                prefix: { type: 'Default' },
+                prefixClassNames: true,
+                prefixIds: true,
+            },
+        },
+    ),
+});
+```
+
+A `prefix` of `{ type: 'Prefix', field0: 'app' }` or `{ type: 'None' }` is
+left alone.
 
 For the default preset with a change to it, build the config with OXVG’s
 own `extend`:
@@ -225,10 +272,9 @@ svgReact({
 ```ts
 import { extend } from '@oxvg/napi';
 
-// the plugin’s own default, minus inlineStyles
-const { cleanupIds, inlineStyles, ...optimize } = extend({
-    type: 'Default',
-});
+// the default preset minus inlineStyles (and, since this is a config
+// object, without the prefixIds that `optimize: true` adds)
+const { inlineStyles, ...optimize } = extend({ type: 'Default' });
 
 svgReact({ optimize });
 ```

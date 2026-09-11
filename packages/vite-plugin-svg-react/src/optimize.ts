@@ -1,3 +1,6 @@
+import { createHash } from 'node:crypto';
+import path from 'node:path';
+
 import { getErrorMessage } from './errors.js';
 import { getRootElementOffset } from './parse.js';
 
@@ -32,6 +35,14 @@ type OXVG = {
     optimise: (svg: string, config?: OptimizeConfig) => string;
 };
 
+// The parameters of OXVG’s prefixIds job, as far as this plugin reads them
+type PrefixIdsJob = {
+    delim: string;
+    prefix: { type: 'Default' } | { type: 'None' } | { field0: string; type: 'Prefix' };
+    prefixClassNames: boolean;
+    prefixIds: boolean;
+};
+
 // Everything but a line feed, so blanking the prolog preserves line and
 // column. \n only is deliberate, and enough: under CRLF the \r sits at the
 // end of a line, so blanking it moves nothing, and OXVG counts lines by \n
@@ -41,15 +52,69 @@ type OXVG = {
 const NON_NEWLINE_REGEX = /[^\n]/g;
 const OXVG_MODULE = '@oxvg/napi';
 
-// What `optimize: true` runs: OXVG’s default preset minus cleanupIds, which
-// minifies ids and drops unreferenced ones. That’s a rename the optimizer
-// can’t verify — anything pointing at an id from outside the file (app CSS,
-// getElementById, an aria-labelledby) breaks silently — and collapsing every
-// file’s ids to the same `a` and `b` makes duplicate DOM ids likely as soon
-// as two components are inlined on one page.
-const getDefaultConfig = (extend: OXVG['extend']): OptimizeConfig => {
-    const { cleanupIds: _cleanupIds, ...defaults } = extend({ type: 'Default' });
-    return defaults;
+/**
+ * What separates a file’s prefix from the id it’s applied to. The prefix
+ * ends in a hash, so the delimiter only has to be unambiguous against that:
+ * `_` is, and unlike the `-` that joins the base name to the hash, it stays
+ * legible in a CSS selector, valid in an XML name, and needs no escaping
+ * anywhere an app might reference the resulting id.
+ */
+export const PREFIX_DELIMITER = '_';
+
+// What `optimize: true` runs: OXVG’s default preset, whose cleanupIds
+// minifies every file’s ids down to the same `a` and `b`, plus prefixIds
+// with a per-file prefix (resolved below) to make them unique again once
+// components are inlined together. Class names aren’t prefixed: nothing in
+// the preset renames a class, and an app’s CSS is more likely to select by
+// class than by id.
+const getDefaultConfig = (extend: OXVG['extend']): OptimizeConfig =>
+    extend(
+        { type: 'Default' },
+        {
+            prefixIds: {
+                delim: PREFIX_DELIMITER,
+                prefix: { type: 'Default' },
+                prefixClassNames: false,
+                prefixIds: true,
+            } satisfies PrefixIdsJob,
+        },
+    );
+
+const isPrefixIdsJob = (value: unknown): value is PrefixIdsJob =>
+    typeof value === 'object' &&
+    value !== null &&
+    typeof (value as { prefix?: unknown }).prefix === 'object' &&
+    (value as { prefix: null | object }).prefix !== null;
+
+// the config’s prefixIds job if it asks for the default prefix, which is the
+// one this plugin resolves per file
+const getFilePrefixedJob = (config: OptimizeConfig): null | PrefixIdsJob => {
+    const { prefixIds } = config as { prefixIds?: unknown };
+    if (!isPrefixIdsJob(prefixIds) || prefixIds.prefix.type !== 'Default') {
+        return null;
+    }
+    return prefixIds;
+};
+
+/**
+ * The id prefix for an SVG file: its base name, sanitized to the characters
+ * an id keeps unescaped in CSS, plus a short hash of its path relative to
+ * the vite root. The hash is what makes `icons/small/arrow.svg` and
+ * `icons/large/arrow.svg` differ; hashing the relative path rather than the
+ * absolute one keeps the output identical across machines and checkouts.
+ */
+export const getIdPrefix = (filePath: string, root: string): string => {
+    const relativePath = path.relative(root, filePath).split(path.sep).join('/');
+    const hash = createHash('sha256').update(relativePath).digest('hex').slice(0, 4);
+    const baseName = path
+        .basename(filePath)
+        .replace(/\.[^.]*$/, '')
+        .replace(/[^0-9A-Za-z_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+    // an id that starts with a digit or a hyphen has to be escaped in a CSS
+    // selector and isn’t a valid XML name; a leading underscore is both
+    const name = /^[A-Za-z_]/.test(baseName) ? baseName : `_${baseName}`;
+    return `${name}-${hash}`;
 };
 
 const importOXVG = async (): Promise<OXVG> => {
@@ -94,14 +159,30 @@ const loadOXVG = async (): Promise<OXVG> => {
  */
 export async function createOptimizer(
     options: OptimizeConfig | true,
+    root: string,
 ): Promise<Optimizer> {
     const { extend, optimise } = await loadOXVG();
     // a config object is handed to `optimise` verbatim, because that’s what
     // `optimise` does with it — an OXVG config isn’t merged into a preset,
     // it *is* the job list (`{ mergePaths: … }` means “only merge paths”),
     // and quietly adding or dropping jobs would make the option something
-    // other than the passthrough it’s documented as
+    // other than the passthrough it’s documented as. The one value filled
+    // in is a prefixIds prefix of `{ type: 'Default' }`, which means nothing
+    // without a path (see getFilePrefixedJob), and only that value.
     const config = options === true ? getDefaultConfig(extend) : options;
+    const filePrefixedJob = getFilePrefixedJob(config);
+    const getConfig = (filePath: string): OptimizeConfig => {
+        if (filePrefixedJob == null) return config;
+        // a spread keeps the job at its existing key, though OXVG runs jobs
+        // in its own fixed order (cleanupIds before prefixIds) regardless
+        return {
+            ...config,
+            prefixIds: {
+                ...filePrefixedJob,
+                prefix: { field0: getIdPrefix(filePath, root), type: 'Prefix' },
+            },
+        };
+    };
 
     const optimizer: Optimizer = (svg, filePath) => {
         // OXVG refuses a document with a DTD outright, and its parser has no
@@ -125,7 +206,7 @@ export async function createOptimizer(
                 : svg.slice(0, offset).replace(NON_NEWLINE_REGEX, ' ') +
                   svg.slice(offset);
         try {
-            return optimise(source, config);
+            return optimise(source, getConfig(filePath));
         } catch (error) {
             throw new Error(
                 `vite-plugin-svg-react: failed to optimize ${filePath}: ${getErrorMessage(error)}`,
@@ -135,7 +216,12 @@ export async function createOptimizer(
     };
 
     try {
-        optimise('<svg xmlns="http://www.w3.org/2000/svg"/>', config);
+        // resolved for a stand-in path, so what’s validated is the shape
+        // that runs, prefix included
+        optimise(
+            '<svg xmlns="http://www.w3.org/2000/svg"/>',
+            getConfig(path.join(root, 'icon.svg')),
+        );
     } catch (error) {
         throw new Error(
             `vite-plugin-svg-react: OXVG rejected the optimize config: ${getErrorMessage(error)} ` +
