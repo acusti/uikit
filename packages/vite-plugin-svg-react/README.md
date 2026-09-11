@@ -18,7 +18,7 @@ It was extracted from the build tooling of [Outlyne][], where it runs in
 production.
 
 [vite]: https://vite.dev
-[outlyne]: https://outlyne.io
+[outlyne]: https://outlyne.com
 
 ## Why Vite ≥ 8 only?
 
