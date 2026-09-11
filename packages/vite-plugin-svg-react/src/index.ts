@@ -15,8 +15,12 @@ export type { OptimizeConfig } from './optimize.js';
 export type Options = {
     /**
      * Optimize each SVG with OXVG before it’s converted to a component.
-     * `true` runs OXVG’s default preset minus cleanupIds, so no id or class
-     * name is renamed; an object is an OXVG config used as-is.
+     * `true` runs OXVG’s default preset, which minifies ids, plus prefixIds
+     * with a prefix derived from each file’s path, so the minified ids stay
+     * unique across components inlined on one page; class names aren’t
+     * renamed. An object is an OXVG config used as-is, except that a
+     * prefixIds prefix of `{ type: 'Default' }` is resolved to that same
+     * per-file prefix.
      *
      * Needs the optional @oxvg/napi peer dependency installed.
      *
@@ -110,11 +114,14 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
         );
     }
     let development = false;
+    // the id prefix hashes each SVG’s path relative to this, so that the
+    // output doesn’t depend on where the project is checked out
+    let root = process.cwd();
     // memoized: the plugin loads @oxvg/napi and validates the config once,
     // then every load shares the resulting optimizer
     let optimizerPromise: null | Promise<Optimizer> = null;
     const getOptimizer = (setting: OptimizeConfig | true) =>
-        (optimizerPromise ??= createOptimizer(setting));
+        (optimizerPromise ??= createOptimizer(setting, root));
     return {
         async configResolved(config) {
             // Match the jsx transform of the main pipeline (dev runtime
@@ -125,6 +132,7 @@ export default function vitePluginSVGReact(options: Options = {}): Plugin {
             // forces a cold-cache re-optimization. See “Why the dev JSX
             // runtime in dev matters” in the README.
             development = config.command === 'serve';
+            root = config.root;
             // resolve the optimizer at config time so a missing @oxvg/napi or
             // a config OXVG rejects fails with a message naming the option,
             // rather than on the first .svg?react import with one naming

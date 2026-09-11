@@ -1,12 +1,13 @@
 import type { ResolvedConfig } from 'vite';
 
-import { mkdtemp, rm, writeFile } from 'node:fs/promises';
+import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import { extend } from '@oxvg/napi';
 import { describe, expect, it } from 'vitest';
 
 import vitePluginSVGReact, { type Options } from './index.js';
+import { getIdPrefix, PREFIX_DELIMITER } from './optimize.js';
 
 const SVG = '<svg xmlns="http://www.w3.org/2000/svg"><path d="M0 0h1v1H0z"/></svg>';
 
@@ -56,13 +57,16 @@ async function loadSVGComponent({
 }) {
     const plugin = vitePluginSVGReact({ optimize, svg });
     const configResolved = plugin.configResolved as (
-        config: Pick<ResolvedConfig, 'command'>,
+        config: Pick<ResolvedConfig, 'command' | 'root'>,
     ) => Promise<void>;
-    await configResolved({ command });
 
+    // the temp directory stands in for the vite root, so fileName is the
+    // SVG’s root-relative path (a subdirectory is fine)
     const directory = await mkdtemp(join(tmpdir(), 'vite-plugin-svg-react-'));
     try {
+        await configResolved({ command, root: directory });
         const filePath = join(directory, fileName);
+        await mkdir(dirname(filePath), { recursive: true });
         await writeFile(filePath, source);
 
         const load = plugin.load as LoadHook;
@@ -290,28 +294,103 @@ describe('vite-plugin-svg-react', () => {
         expect(code).toContain('desc');
     });
 
-    it('leaves ids as authored', async () => {
-        // cleanupIds is dropped from the default preset: it renames ids the
-        // optimizer can’t see all the references to (app CSS,
-        // getElementById), and minifies every file’s down to the same single
-        // letters, which is what makes inlined components collide
+    it('minifies ids and prefixes them per file', async () => {
+        // cleanupIds minifies every file’s ids down to the same `a` and
+        // `b`, which is what makes inlined components collide; prefixIds
+        // with a prefix derived from the file makes them unique again
+        const { code, filePath } = await loadSVGComponent({
+            command: 'build',
+            fileName: 'icons/brand.svg',
+            optimize: true,
+            source:
+                '<svg xmlns="http://www.w3.org/2000/svg">' +
+                '<defs><linearGradient id="brandGradient"><stop offset="0"/></linearGradient></defs>' +
+                '<path d="M0 0h1v1H0z" fill="url(#brandGradient)"/></svg>',
+        });
+        const prefix = getIdPrefix(filePath, dirname(dirname(filePath)));
+        expect(prefix).toMatch(/^brand-[0-9a-f]{4}$/);
+        const id = `${prefix}${PREFIX_DELIMITER}a`;
+        expect(code).toContain(`id: "${id}"`);
+        expect(code).toContain(`url(#${id})`);
+        expect(code).not.toContain('brandGradient');
+    });
+
+    it('gives same-named files in different directories different prefixes', async () => {
+        const source =
+            '<svg xmlns="http://www.w3.org/2000/svg">' +
+            '<defs><path id="shape" d="M0 0h1"/></defs><use href="#shape"/></svg>';
+        const ids = await Promise.all(
+            ['small/arrow.svg', 'large/arrow.svg'].map(async (fileName) => {
+                const { code } = await loadSVGComponent({
+                    command: 'build',
+                    fileName,
+                    optimize: true,
+                    source,
+                });
+                return /id: "([^"]+)"/.exec(code ?? '')?.[1];
+            }),
+        );
+        expect(ids[0]).toMatch(/^arrow-[0-9a-f]{4}_a$/);
+        expect(ids[1]).toMatch(/^arrow-[0-9a-f]{4}_a$/);
+        expect(ids[0]).not.toBe(ids[1]);
+    });
+
+    it('resolves a config object’s Default prefix per file', async () => {
+        // `optimise` takes no path, so OXVG resolves `{ type: 'Default' }`
+        // to the literal string `prefix` — the plugin has the path, and
+        // fills in the same per-file prefix `optimize: true` uses
         const { code } = await loadSVGComponent({
             command: 'build',
-            optimize: true,
+            optimize: {
+                prefixIds: {
+                    delim: '_',
+                    prefix: { type: 'Default' },
+                    prefixClassNames: false,
+                    prefixIds: true,
+                },
+            },
+            source: '<svg xmlns="http://www.w3.org/2000/svg"><path id="shape" d="M0 0h1"/></svg>',
+        });
+        expect(code).toMatch(/id: "icon-[0-9a-f]{4}_shape"/);
+        expect(code).not.toContain('prefix_shape');
+    });
+
+    it('leaves an explicit prefixIds prefix alone', async () => {
+        const { code } = await loadSVGComponent({
+            command: 'build',
+            optimize: {
+                prefixIds: {
+                    delim: '-',
+                    prefix: { field0: 'app', type: 'Prefix' },
+                    prefixClassNames: false,
+                    prefixIds: true,
+                },
+            },
+            source: '<svg xmlns="http://www.w3.org/2000/svg"><path id="shape" d="M0 0h1"/></svg>',
+        });
+        expect(code).toContain('id: "app-shape"');
+    });
+
+    it('leaves ids as authored when cleanupIds is dropped', async () => {
+        // the README’s recipe for ids referenced from outside the file (app
+        // CSS, getElementById): the default preset minus cleanupIds, and
+        // without the prefixIds `optimize: true` adds
+        const { cleanupIds: _cleanupIds, ...optimize } = extend({ type: 'Default' });
+        const { code } = await loadSVGComponent({
+            command: 'build',
+            optimize,
             source:
                 '<svg xmlns="http://www.w3.org/2000/svg">' +
                 '<defs><linearGradient id="brandGradient"><stop offset="0"/></linearGradient></defs>' +
                 '<path id="unreferenced" d="M0 0h1v1H0z" fill="url(#brandGradient)"/></svg>',
         });
         expect(code).toContain('brandGradient');
-        // an unreferenced id is a hook for something outside the file, so it
-        // survives too
         expect(code).toContain('unreferenced');
     });
 
     it('leaves class names alone', async () => {
-        // the classes an app’s CSS targets can’t be renamed, which rules out
-        // prefixIds (it renames class names along with ids)
+        // the classes an app’s CSS targets can’t be renamed, so the
+        // prefixIds `optimize: true` adds runs with prefixClassNames off
         const { code } = await loadSVGComponent({
             command: 'build',
             optimize: true,
