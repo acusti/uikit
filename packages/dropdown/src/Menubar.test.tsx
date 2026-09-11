@@ -323,9 +323,17 @@ describe('@acusti/dropdown Menubar', () => {
 
             await user.click(screen.getByRole('button', { name: 'hide File' }));
 
-            expect(
-                screen.getByRole('menuitem', { name: 'Edit' }).getAttribute('tabindex'),
-            ).toBe('0');
+            // The holder really leaving is only settled a microtask after the
+            // commit, so the reconcile that hands the stop on — and the effect
+            // it schedules — land a render later than the click itself. The
+            // stop still has to arrive: if it never does, this times out.
+            await waitFor(() => {
+                expect(
+                    screen
+                        .getByRole('menuitem', { name: 'Edit' })
+                        .getAttribute('tabindex'),
+                ).toBe('0');
+            });
         });
 
         it('hands the tab stop on when the holder becomes disabled', async () => {
