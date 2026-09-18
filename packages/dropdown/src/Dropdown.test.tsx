@@ -2537,6 +2537,50 @@ describe('@acusti/dropdown', () => {
             expect(getParentItem().tagName).toBe('LI');
         });
 
+        it('renders the element props.as names and skips the container check', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        <Dropdown as="div" label="Align">
+                            <ul>
+                                <li data-ukt-value="left">Left</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+
+            // inside a <ul> detection would have kept the <li>; as wins
+            const parentItem = screen.getByText('Align').closest('[data-ukt-item]');
+            expect(parentItem?.tagName).toBe('DIV');
+            expect(parentItem?.getAttribute('role')).toBe('menuitem');
+        });
+
+        it('warns that props.as is ignored on a top-level Dropdown', () => {
+            const error = vi
+                .spyOn(console, 'error')
+                .mockImplementation(vi.fn<() => void>());
+
+            render(
+                <Dropdown as="div">
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect(error).toHaveBeenCalledWith(
+                expect.stringContaining('as only applies'),
+            );
+            error.mockRestore();
+        });
+
         it('annotates a nested Dropdown rendered into an already-open body', async () => {
             const user = userEvent.setup();
             const renderMenu = (withAlign: boolean) => (

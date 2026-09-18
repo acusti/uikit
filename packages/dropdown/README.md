@@ -263,6 +263,16 @@ type Props = {
      */
     allowEmpty?: boolean;
     /**
+     * For a nested (submenu) Dropdown, the element its parent item renders
+     * as. When unset, the item is an <li> inside a <ul>, <ol>, or <menu> and
+     * a <div> anywhere else, decided by checking its container once it’s in
+     * the DOM. Setting it skips that check, so the item mounts once and
+     * server output matches the client. Only a submenu Dropdown (one nested
+     * in a menu with hasItems left on) reads it; anywhere else it is ignored,
+     * with a warning.
+     */
+    as?: 'div' | 'li';
+    /**
      * Either a single React element (the dropdown body; the trigger is a
      * generated button, or a generated search input when isSearchable) or
      * exactly two renderable children: the trigger, then the body.
@@ -1010,8 +1020,12 @@ Like items, submenus are ultimately declared in the DOM. A nested
 The parent item is an `<li>` when the nested `Dropdown` sits inside a
 `<ul>`, `<ol>`, or `<menu>`, and a `<div>` anywhere else (a body built from
 `<div data-ukt-item>` items, say), so it is valid HTML in either kind of
-body. `className` and `style` on the nested `Dropdown` land on that element
-either way.
+body. That is decided by checking the container once the item is in the
+DOM, and for a non-list container the item then remounts as a `<div>`
+before paint. Pass `as="div"` (or `as="li"`) to name the element up front
+and skip the check — worth doing when the submenu body has mount effects of
+its own, or when server and client output must match exactly. `className`
+and `style` on the nested `Dropdown` land on that element either way.
 
 You can author that markup directly instead of nesting a `Dropdown`
 component; the two forms behave identically because the component form
@@ -1037,6 +1051,10 @@ Most props keep their meaning, scoped to the submenu:
 - `onActiveItem`, `onOpen`, `onClose`: scoped to the submenu
 - `disabled`: disables the parent item
 - `className`/`style`: applied to the parent item element
+- `as`: the parent item’s element (`'li'` or `'div'`), skipping the
+  container check described above and recommended for a non-list body;
+  submenu-only, and ignored (with a warning) anywhere else, including a
+  nested `hasItems={false}` `Dropdown`
 
 Props that only make sense at the top level (`allowCreate`, `allowEmpty`,
 `isOpenOnMount`, `isSearchable`, `keepOpenOnSubmit`, `name`, `openOnHover`,

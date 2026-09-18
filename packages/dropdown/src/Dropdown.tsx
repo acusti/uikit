@@ -99,6 +99,17 @@ export type Props = {
      */
     allowEmpty?: boolean;
     /**
+     * For a nested (submenu) Dropdown, the element its parent item renders
+     * as. When unset, the item is an <li> inside a <ul>, <ol>, or <menu> and
+     * a <div> anywhere else, decided by checking its container once it’s in
+     * the DOM. Setting it skips that check, so the item mounts once and
+     * server output matches the client; recommended for a body that isn’t a
+     * list, which otherwise pays for the check on every open. Only a submenu
+     * Dropdown (one nested in a menu with hasItems left on) reads it;
+     * anywhere else it is ignored, with a warning.
+     */
+    as?: 'div' | 'li';
+    /**
      * Either a single React element (the dropdown body; the trigger is a
      * generated button, or a generated search input when isSearchable) or
      * exactly two renderable children: the trigger, then the body.
@@ -298,6 +309,7 @@ export default function Dropdown(props: Props) {
 function RootDropdown({
     allowCreate,
     allowEmpty = true,
+    as: itemElementName,
     children,
     className,
     disabled,
@@ -439,6 +451,16 @@ function RootDropdown({
     // the trigger pointing at an item that is no longer in the document.
     useLayoutEffect(() => {
         if (isOpen) syncActiveDescendant(dropdownElement);
+    });
+
+    // Misuse feedback is unconditional, like the children-count error above
+    const warnedAboutAsRef = useRef(false);
+    useEffect(() => {
+        if (warnedAboutAsRef.current || itemElementName === undefined) return;
+        warnedAboutAsRef.current = true;
+        console.error(
+            '@acusti/dropdown: as only applies to a submenu Dropdown (one nested in a menu with hasItems on) and is ignored anywhere else.',
+        );
     });
 
     const isMountedRef = useRef(false);
@@ -1639,6 +1661,7 @@ const INERT_SUBMENU_PROPS = [
 // root dropdown, whose engine handles all interaction.
 function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }) {
     const {
+        as,
         children,
         className,
         disabled,
@@ -1657,14 +1680,19 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
     // and a <div> anywhere else, so it’s valid HTML in either kind of body.
     // Which container it’s in isn’t knowable until the element is in the DOM,
     // so it mounts as the <li> the docs recommend and switches before paint
-    // when the container turns out not to be a list.
-    const [ItemElement, setItemElement] = useState<'div' | 'li'>('li');
+    // when the container turns out not to be a list. That switch remounts
+    // the item’s subtree, so props.as names the element up front and skips
+    // the check for consumers who’d rather not pay for it (or who need the
+    // server and client to render the same element).
+    const [detectedElement, setDetectedElement] = useState<'div' | 'li'>('li');
+    const ItemElement = as ?? detectedElement;
     useLayoutEffect(() => {
+        if (as) return;
         const parent = itemRef.current?.parentElement;
         if (parent && !parent.matches(LIST_CONTAINER_SELECTOR)) {
-            setItemElement('div');
+            setDetectedElement('div');
         }
-    }, []);
+    }, [as]);
 
     // Registration rides the ref rather than an effect so it follows the
     // element itself: switching ItemElement remounts the item, and the ref’s
