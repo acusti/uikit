@@ -325,16 +325,25 @@ type Props = {
      * onSubmitItem.
      */
     onActiveItem?: (payload: Item) => void;
-    /** Applied to the dropdown root element. */
+    /**
+     * Applied to the dropdown root element. Ignored on a nested (submenu)
+     * Dropdown, which has no root element of its own.
+     */
     onClick?: (event: React.MouseEvent<HTMLElement>) => unknown;
     /**
      * Called after the dropdown closes. For a nested (submenu) Dropdown,
      * called when its submenu closes.
      */
     onClose?: () => unknown;
-    /** Applied to the dropdown root element. */
+    /**
+     * Applied to the dropdown root element. Ignored on a nested (submenu)
+     * Dropdown, which has no root element of its own.
+     */
     onMouseDown?: (event: React.MouseEvent<HTMLElement>) => unknown;
-    /** Applied to the dropdown root element. */
+    /**
+     * Applied to the dropdown root element. Ignored on a nested (submenu)
+     * Dropdown, which has no root element of its own.
+     */
     onMouseUp?: (event: React.MouseEvent<HTMLElement>) => unknown;
     /**
      * Called after the dropdown opens (on mount, when isOpenOnMount). For a
@@ -1030,7 +1039,8 @@ Most props keep their meaning, scoped to the submenu:
 
 Props that only make sense at the top level (`allowCreate`, `allowEmpty`,
 `isOpenOnMount`, `isSearchable`, `keepOpenOnSubmit`, `name`, `openOnHover`,
-`placeholder`, `tabIndex`, `value`) are ignored on a nested dropdown and
+`placeholder`, `tabIndex`, `value`, and the root-element event props
+`onClick`, `onMouseDown`, `onMouseUp`) are ignored on a nested dropdown and
 warn (unconditionally, matching the children-count misuse error). A submenu
 already discloses on hover intent — see [Submenus](#submenus) — so
 `openOnHover` has nothing to add there.
