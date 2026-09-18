@@ -2918,6 +2918,31 @@ describe('@acusti/dropdown', () => {
             expect(screen.getByText('Italic').hasAttribute('data-ukt-active')).toBe(true);
         });
 
+        it('warns that the root-element event props are ignored on a nested Dropdown', async () => {
+            const error = vi
+                .spyOn(console, 'error')
+                .mockImplementation(vi.fn<() => void>());
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        <Dropdown label="Align" onClick={vi.fn<() => void>()}>
+                            <ul>
+                                <li data-ukt-value="left">Left</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+
+            expect(error).toHaveBeenCalledWith(expect.stringContaining('onClick'));
+            error.mockRestore();
+        });
+
         it('warns about props that are ignored on a nested Dropdown', async () => {
             const consoleErrorSpy = vi
                 .spyOn(console, 'error')

@@ -159,16 +159,25 @@ export type Props = {
      * onSubmitItem.
      */
     onActiveItem?: (payload: Item) => void;
-    /** Applied to the dropdown root element. */
+    /**
+     * Applied to the dropdown root element. Ignored on a nested (submenu)
+     * Dropdown, which has no root element of its own.
+     */
     onClick?: (event: ReactMouseEvent<HTMLElement>) => unknown;
     /**
      * Called after the dropdown closes. For a nested (submenu) Dropdown,
      * called when its submenu collapses.
      */
     onClose?: () => unknown;
-    /** Applied to the dropdown root element. */
+    /**
+     * Applied to the dropdown root element. Ignored on a nested (submenu)
+     * Dropdown, which has no root element of its own.
+     */
     onMouseDown?: (event: ReactMouseEvent<HTMLElement>) => unknown;
-    /** Applied to the dropdown root element. */
+    /**
+     * Applied to the dropdown root element. Ignored on a nested (submenu)
+     * Dropdown, which has no root element of its own.
+     */
     onMouseUp?: (event: ReactMouseEvent<HTMLElement>) => unknown;
     /**
      * Called after the dropdown opens (on mount, when isOpenOnMount). For a
@@ -1616,6 +1625,9 @@ const INERT_SUBMENU_PROPS = [
     'isSearchable',
     'keepOpenOnSubmit',
     'name',
+    'onClick',
+    'onMouseDown',
+    'onMouseUp',
     'openOnHover',
     'placeholder',
     'tabIndex',
