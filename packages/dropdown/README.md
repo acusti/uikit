@@ -1019,14 +1019,15 @@ Like items, submenus are ultimately declared in the DOM. A nested
 
 The parent item is an `<li>` when the nested `Dropdown` sits inside a
 `<ul>`, `<ol>`, or `<menu>`, and a `<div>` anywhere else (a body built from
-`<div data-ukt-item>` items, say), so it is valid HTML in either kind of
-body. That is decided by checking the container once the item is in the
-DOM, and for a non-list container the item then remounts as a `<div>`
-before paint. Pass `itemAs="div"` (or `itemAs="li"`) to name the element up
-front and skip the check — worth doing when the submenu body has mount
-effects of its own, or when server and client output must match exactly.
-`className` and `style` on the nested `Dropdown` land on that element
-either way.
+`<div data-ukt-item>` items, say), so once mounted it is valid HTML in
+either kind of body. The container is checked when the item enters the DOM,
+and for a non-list container the item then remounts as a `<div>` before
+paint — on every open, since the body unmounts on close. For a non-list
+body, pass `itemAs="div"` to name the element up front and skip the check:
+the item mounts once, the submenu body’s own mount effects run once, and
+server output is valid too (without `itemAs`, a server-rendered
+`isOpenOnMount` dropdown still ships the `<li>`). `className` and `style`
+on the nested `Dropdown` land on that element either way.
 
 You can author that markup directly instead of nesting a `Dropdown`
 component; the two forms behave identically because the component form

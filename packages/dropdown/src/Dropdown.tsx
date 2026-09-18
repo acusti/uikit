@@ -32,6 +32,7 @@ import {
 import styles from './Dropdown.css?inline';
 import {
     annotateSubtree,
+    BODY_SELECTOR,
     clearActiveItems,
     collapseItem,
     collapseItemsOutsidePath,
@@ -418,7 +419,8 @@ function RootDropdown({
     // which case this component’s aria-selected fill-ins stand down (set per
     // open in handleBodyRef)
     const consumerOwnsARIASelectedRef = useRef(false);
-    // Body elements already annotated this open (see handleBodyRef)
+    // Elements already annotated this open: each open’s body (see
+    // handleBodyRef) and each nested Dropdown’s parent item (see registerSubmenu)
     const annotatedElementsRef = useRef<WeakSet<HTMLElement>>(new WeakSet());
     const closingTimerRef = useRef<null | TimeoutID>(null);
     const isOpeningTimerRef = useRef<null | TimeoutID>(null);
@@ -495,17 +497,28 @@ function RootDropdown({
             registerSubmenu(registration: SubmenuRegistration) {
                 submenuRegistrationsRef.current.add(registration);
                 // A parent item registers each time its element is added to
-                // the DOM, so registration is also the moment to fill in the
-                // ARIA of elements the once-per-open pass in handleBodyRef
-                // never saw: a nested Dropdown that swapped its element after
-                // that pass ran, or one rendered into an already-open body.
-                // Latched per element, like the body pass, so re-registering
-                // the same element (a callback prop changing identity) doesn’t
-                // walk its subtree again.
+                // the DOM, and again whenever a callback prop changes
+                // identity. Refs attach children first, so on a normal open
+                // this runs before handleBodyRef’s pass over the whole body,
+                // which is about to cover this subtree anyway. The walk here
+                // is for elements that pass never sees: a nested Dropdown
+                // that swapped its element after it ran, or one rendered into
+                // an already-open body. Both arrive after the body is
+                // latched, so that latch is the signal. The element is
+                // latched on its first registration either way, so a
+                // re-registration never walks its subtree. The body pass
+                // still walks an <li> that is about to be swapped for a
+                // <div>, burning a submenu id on it; the <div> is walked
+                // afresh when it registers.
                 const { element } = registration;
                 if (!annotatedElementsRef.current.has(element)) {
                     annotatedElementsRef.current.add(element);
-                    annotateSubtree(element, popupRole);
+                    const bodyElement = element.closest(
+                        BODY_SELECTOR,
+                    ) as HTMLElement | null;
+                    if (bodyElement && annotatedElementsRef.current.has(bodyElement)) {
+                        annotateSubtree(element, popupRole);
+                    }
                 }
                 return () => {
                     submenuRegistrationsRef.current.delete(registration);
@@ -876,7 +889,7 @@ function RootDropdown({
             popupRole === 'listbox' &&
             !consumerOwnsARIASelectedRef.current
         ) {
-            const bodyElement = element.closest('.uktdropdown-body');
+            const bodyElement = element.closest(BODY_SELECTOR);
             for (const selected of Array.from(
                 bodyElement?.querySelectorAll('[aria-selected="true"]') ?? [],
             )) {
@@ -946,7 +959,7 @@ function RootDropdown({
         if (!dropdownElement) return;
 
         const eventTarget = event.target as HTMLElement;
-        if (!eventTarget.closest('.uktdropdown-body')) return;
+        if (!eventTarget.closest(BODY_SELECTOR)) return;
 
         // Hover inside an open nested dropdown belongs to that dropdown
         const hoveredRoot = eventTarget.closest('.uktdropdown');
@@ -1039,7 +1052,7 @@ function RootDropdown({
         // A click only counts as inside the body if the closest body element
         // belongs to this dropdown (a nested dropdown’s trigger sits inside
         // the outer body, but the outer body isn’t the nested one’s own)
-        const targetBody = eventTarget.closest('.uktdropdown-body');
+        const targetBody = eventTarget.closest(BODY_SELECTOR);
         const isInOwnBody = Boolean(
             targetBody && targetBody.closest('.uktdropdown') === dropdownElement,
         );
@@ -1680,32 +1693,36 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
         style,
     } = props;
 
-    const itemRef = useRef<HTMLElement | null>(null);
-
     // The parent item is an <li> inside a list container (<ul>, <ol>, <menu>)
-    // and a <div> anywhere else, so it’s valid HTML in either kind of body.
-    // Which container it’s in isn’t knowable until the element is in the DOM,
-    // so it mounts as the <li> the docs recommend and switches before paint
-    // when the container turns out not to be a list. That switch remounts
-    // the item’s subtree, so props.itemAs names the element up front and skips
-    // the check for consumers who’d rather not pay for it (or who need the
-    // server and client to render the same element).
+    // and a <div> anywhere else, so once mounted it’s valid HTML in either
+    // kind of body. Which container it’s in isn’t knowable until the element
+    // is in the DOM, so it mounts as the <li> the docs recommend and, when the
+    // container turns out not to be a list, switches before paint. The switch
+    // remounts the item’s subtree, and the body unmounts on close, so every
+    // open of such a body pays for it (nothing stable identifies this item
+    // across remounts: useId is a fresh counter outside hydration);
+    // props.itemAs names the element up front and skips the check entirely.
     const [detectedElement, setDetectedElement] = useState<'div' | 'li'>('li');
     const ItemElement = itemAs ?? detectedElement;
-    useLayoutEffect(() => {
-        if (itemAs) return;
-        const parent = itemRef.current?.parentElement;
-        if (parent && !parent.matches(LIST_CONTAINER_SELECTOR)) {
-            setDetectedElement('div');
-        }
-    }, [itemAs]);
 
     // Registration rides the ref rather than an effect so it follows the
     // element itself: switching ItemElement remounts the item, and the ref’s
-    // cleanup unregisters the old element as the new one registers.
+    // cleanup unregisters the old element as the new one registers. The
+    // container check lives here too, ahead of registering, so an <li> about
+    // to be replaced is never registered or annotated. (A state update in a
+    // ref callback flushes before paint, like one in a layout effect.)
     const handleItemRef = (element: HTMLElement | null) => {
-        itemRef.current = element;
         if (!element) return;
+        const container = element.parentElement;
+        if (
+            !itemAs &&
+            detectedElement === 'li' &&
+            container &&
+            !container.matches(LIST_CONTAINER_SELECTOR)
+        ) {
+            setDetectedElement('div');
+            return;
+        }
         return parentDropdown.registerSubmenu({
             element,
             onActiveItem,
