@@ -2638,6 +2638,76 @@ describe('@acusti/dropdown', () => {
             error.mockRestore();
         });
 
+        it('dispatches every scoped callback to the swapped-in parent item', async () => {
+            const handleActiveItem = vi.fn<(item: Item) => void>();
+            const handleClose = vi.fn<() => void>();
+            const handleOpen = vi.fn<() => void>();
+            const handleSubmitItem = vi.fn<(item: Item) => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <div>
+                        <div data-ukt-item>Bold</div>
+                        <Dropdown
+                            label="Align"
+                            onActiveItem={handleActiveItem}
+                            onClose={handleClose}
+                            onOpen={handleOpen}
+                            onSubmitItem={handleSubmitItem}
+                        >
+                            <div>
+                                <div data-ukt-value="left">Left</div>
+                            </div>
+                        </Dropdown>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            await user.keyboard('{ArrowDown}{ArrowDown}');
+            expect(handleActiveItem).toHaveBeenCalledTimes(1);
+            expect(handleActiveItem).toHaveBeenLastCalledWith(
+                expect.objectContaining({ value: 'Align' }),
+            );
+            await user.keyboard('{ArrowRight}');
+            expect(handleOpen).toHaveBeenCalledTimes(1);
+            await user.keyboard('{ArrowLeft}');
+            expect(handleClose).toHaveBeenCalledTimes(1);
+            await user.keyboard('{ArrowRight}{Enter}');
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'left' }),
+            );
+        });
+
+        it('falls back to detection when props.itemAs is removed', async () => {
+            const user = userEvent.setup();
+            const renderMenu = (itemAs?: 'div' | 'li') => (
+                <Dropdown>
+                    Format
+                    <div>
+                        <div data-ukt-item>Bold</div>
+                        <Dropdown itemAs={itemAs} label="Align">
+                            <div>
+                                <div data-ukt-value="left">Left</div>
+                            </div>
+                        </Dropdown>
+                    </div>
+                </Dropdown>
+            );
+            const { rerender } = render(renderMenu('li'));
+            const getAlignItem = () =>
+                screen.getByText('Align').closest('[data-ukt-item]');
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            // an explicit li wins even in a div body
+            expect(getAlignItem()?.tagName).toBe('LI');
+
+            rerender(renderMenu(undefined));
+            expect(getAlignItem()?.tagName).toBe('DIV');
+        });
+
         it('annotates a nested Dropdown rendered into an already-open body', async () => {
             const user = userEvent.setup();
             const renderMenu = (withAlign: boolean) => (

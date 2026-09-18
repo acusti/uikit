@@ -3,6 +3,7 @@ import { Children, isValidElement, type ReactNode, type SyntheticEvent } from 'r
 
 import { type Item } from './Dropdown.js';
 
+export const BODY_SELECTOR = '.uktdropdown-body';
 export const ITEM_SELECTOR = '[data-ukt-item], [data-ukt-value]';
 export const SUBMENU_SELECTOR = '[data-ukt-submenu]';
 // The containers whose content model wants <li> children
@@ -16,7 +17,7 @@ export type OnToggleSubmenu = (item: HTMLElement, isExpanded: boolean) => void;
 type MaybeHTMLElement = HTMLElement | null;
 
 const getBodyElement = (dropdownElement: MaybeHTMLElement) =>
-    (dropdownElement?.querySelector('.uktdropdown-body') ?? null) as MaybeHTMLElement;
+    (dropdownElement?.querySelector(BODY_SELECTOR) ?? null) as MaybeHTMLElement;
 
 // The level root that owns an item: the closest [data-ukt-submenu] ancestor,
 // or null for items at the top level of the dropdown body
