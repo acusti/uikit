@@ -1,7 +1,8 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { type MouseEvent } from 'react';
+import { type MouseEvent, useEffect } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import Dropdown, { type Item, type Props } from './Dropdown.js';
@@ -2535,6 +2536,106 @@ describe('@acusti/dropdown', () => {
             await user.click(screen.getByRole('button', { name: 'Format' }));
 
             expect(getParentItem().tagName).toBe('LI');
+        });
+
+        it('renders the element props.itemAs names and skips the container check', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        <Dropdown itemAs="div" label="Align">
+                            <ul>
+                                <li data-ukt-value="left">Left</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+
+            // inside a <ul> detection would have kept the <li>; itemAs wins
+            const parentItem = screen.getByText('Align').closest('[data-ukt-item]');
+            expect(parentItem?.tagName).toBe('DIV');
+            expect(parentItem?.getAttribute('role')).toBe('menuitem');
+        });
+
+        it('mounts the submenu body once per open with props.itemAs, twice without it outside a list', async () => {
+            const user = userEvent.setup();
+            const onMount = vi.fn<() => void>();
+            const MountProbe = () => {
+                useEffect(onMount, []);
+                return null;
+            };
+            const renderMenu = (itemAs?: 'div') => (
+                <Dropdown>
+                    Format
+                    <div>
+                        <div data-ukt-item>Bold</div>
+                        <Dropdown itemAs={itemAs} label="Align">
+                            <div>
+                                <MountProbe />
+                                <div data-ukt-value="left">Left</div>
+                            </div>
+                        </Dropdown>
+                    </div>
+                </Dropdown>
+            );
+
+            const { unmount } = render(renderMenu('div'));
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            expect(onMount).toHaveBeenCalledTimes(1);
+            unmount();
+
+            onMount.mockClear();
+            render(renderMenu());
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            // the <li> → <div> switch remounts the submenu subtree
+            expect(onMount).toHaveBeenCalledTimes(2);
+        });
+
+        it('server-renders the element props.itemAs names, and an <li> without it', () => {
+            const renderMenu = (itemAs?: 'div') =>
+                renderToStaticMarkup(
+                    <Dropdown isOpenOnMount>
+                        Format
+                        <div>
+                            <div data-ukt-item>Bold</div>
+                            <Dropdown itemAs={itemAs} label="Align">
+                                <div>
+                                    <div data-ukt-value="left">Left</div>
+                                </div>
+                            </Dropdown>
+                        </div>
+                    </Dropdown>,
+                );
+
+            expect(renderMenu('div')).toMatch(/<div[^>]*data-ukt-item[^>]*>Align/);
+            expect(renderMenu('div')).not.toContain('<li');
+            // the container check can’t run on the server, so the <li> ships
+            expect(renderMenu()).toMatch(/<li[^>]*data-ukt-item[^>]*>Align/);
+        });
+
+        it('warns that props.itemAs is ignored on a top-level Dropdown', () => {
+            const error = vi
+                .spyOn(console, 'error')
+                .mockImplementation(vi.fn<() => void>());
+
+            render(
+                <Dropdown itemAs="div">
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect(error).toHaveBeenCalledWith(
+                expect.stringContaining('itemAs only applies'),
+            );
+            error.mockRestore();
         });
 
         it('annotates a nested Dropdown rendered into an already-open body', async () => {

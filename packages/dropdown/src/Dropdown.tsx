@@ -139,6 +139,17 @@ export type Props = {
      */
     isSearchable?: boolean;
     /**
+     * For a nested (submenu) Dropdown, its item element. When unset, it is
+     * an <li> inside a <ul>, <ol>, or <menu> and a <div> anywhere else,
+     * decided by checking its container once it’s in the DOM. Setting this
+     * skips that check, so the item mounts once and server output matches
+     * the client; recommended for a body that isn’t a list, which otherwise
+     * pays for the check on every open. Only a submenu Dropdown (one nested
+     * in a dropdown where hasItems is true) reads it; anywhere else it is
+     * ignored, with a warning.
+     */
+    itemAs?: 'div' | 'li';
+    /**
      * Whether the dropdown stays open after an item is submitted, e.g. for a
      * multi-select. Defaults to !hasItems: a menu closes on submit, while a
      * hasItems={false} dialog stays open.
@@ -282,6 +293,17 @@ const isTextInputElement = (element: ReactElement) => {
     return type == null || !NON_TEXT_INPUT_TYPES.includes(type);
 };
 
+// Misuse feedback is unconditional, like the children-count error in
+// Dropdown: the first render with a message logs it, once per mount.
+const useWarnOnce = (message: null | string) => {
+    const warnedRef = useRef(false);
+    useEffect(() => {
+        if (warnedRef.current || message == null) return;
+        warnedRef.current = true;
+        console.error(`@acusti/dropdown: ${message}`);
+    }, [message]);
+};
+
 export default function Dropdown(props: Props) {
     const parentDropdown = useContext(DropdownContext);
     // A Dropdown nested inside a menu dropdown’s body renders as a submenu
@@ -303,6 +325,7 @@ function RootDropdown({
     hasItems = true,
     isOpenOnMount,
     isSearchable,
+    itemAs: itemElementName,
     keepOpenOnSubmit = !hasItems,
     label,
     name,
@@ -439,6 +462,12 @@ function RootDropdown({
     useLayoutEffect(() => {
         if (isOpen) syncActiveDescendant(dropdownElement);
     });
+
+    useWarnOnce(
+        itemElementName === undefined
+            ? null
+            : 'itemAs only applies to a submenu Dropdown (one nested in a dropdown where hasItems is true) and is ignored anywhere else.',
+    );
 
     const isMountedRef = useRef(false);
 
@@ -1641,6 +1670,7 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
         children,
         className,
         disabled,
+        itemAs,
         label,
         onActiveItem,
         onClose,
@@ -1656,14 +1686,19 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
     // and a <div> anywhere else, so it’s valid HTML in either kind of body.
     // Which container it’s in isn’t knowable until the element is in the DOM,
     // so it mounts as the <li> the docs recommend and switches before paint
-    // when the container turns out not to be a list.
-    const [ItemElement, setItemElement] = useState<'div' | 'li'>('li');
+    // when the container turns out not to be a list. That switch remounts
+    // the item’s subtree, so props.itemAs names the element up front and skips
+    // the check for consumers who’d rather not pay for it (or who need the
+    // server and client to render the same element).
+    const [detectedElement, setDetectedElement] = useState<'div' | 'li'>('li');
+    const ItemElement = itemAs ?? detectedElement;
     useLayoutEffect(() => {
+        if (itemAs) return;
         const parent = itemRef.current?.parentElement;
         if (parent && !parent.matches(LIST_CONTAINER_SELECTOR)) {
-            setItemElement('div');
+            setDetectedElement('div');
         }
-    }, []);
+    }, [itemAs]);
 
     // Registration rides the ref rather than an effect so it follows the
     // element itself: switching ItemElement remounts the item, and the ref’s
@@ -1680,19 +1715,14 @@ function SubmenuDropdown(props: Props & { parentDropdown: DropdownContextValue }
         });
     };
 
-    // Misuse feedback is unconditional, like the children-count error above
-    const warnedRef = useRef(false);
-    useEffect(() => {
-        if (warnedRef.current) return;
-        const inertProps = INERT_SUBMENU_PROPS.filter(
-            (propName) => props[propName] !== undefined,
-        );
-        if (!inertProps.length) return;
-        warnedRef.current = true;
-        console.error(
-            `@acusti/dropdown: ${inertProps.join(', ')} only apply to a top-level Dropdown and are ignored on a nested (submenu) Dropdown.`,
-        );
-    });
+    const inertProps = INERT_SUBMENU_PROPS.filter(
+        (propName) => props[propName] !== undefined,
+    );
+    useWarnOnce(
+        inertProps.length
+            ? `${inertProps.join(', ')} only apply to a top-level Dropdown and are ignored on a nested (submenu) Dropdown.`
+            : null,
+    );
 
     const childrenCount = Children.count(children);
     let labelContent: ReactNode = label;
