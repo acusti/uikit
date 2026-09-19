@@ -823,6 +823,9 @@ describe('@acusti/dropdown', () => {
 
             const trigger = screen.getByRole('button', { name: 'Menu' });
             expect((trigger as HTMLButtonElement).disabled).toBe(true);
+            expect(
+                trigger.closest('.uktdropdown')?.classList.contains('is-disabled'),
+            ).toBe(true);
         });
 
         it('does not open on Enter when disabled', async () => {
@@ -1917,6 +1920,26 @@ describe('@acusti/dropdown', () => {
     });
 
     describe('listbox and menu item roles', () => {
+        it('neutralizes a <menu> wrapper like a <ul>', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Edit
+                    <menu data-testid="list">
+                        <li data-testid="cut" data-ukt-value="cut">
+                            Cut
+                        </li>
+                        <li data-ukt-value="copy">Copy</li>
+                    </menu>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Edit' }));
+
+            expect(screen.getByTestId('list').getAttribute('role')).toBe('presentation');
+            expect(screen.getByTestId('cut').getAttribute('role')).toBe('menuitem');
+        });
+
         it('gives searchable dropdown items role=option and neutralizes the list', async () => {
             const user = userEvent.setup();
             render(
@@ -2437,6 +2460,228 @@ describe('@acusti/dropdown', () => {
             expect(parentItem.getAttribute('aria-controls')).toBe(submenu.id);
         });
 
+        it('renders the parent item as a <div> when the nested Dropdown isn’t inside a list', async () => {
+            const handleAlignSubmitItem = vi.fn<() => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <div>
+                        <div data-ukt-item>Bold</div>
+                        <div data-ukt-item>Italic</div>
+                        <Dropdown label="Align" onSubmitItem={handleAlignSubmitItem}>
+                            <div>
+                                <div data-ukt-value="left">Left</div>
+                                <div data-ukt-value="center">Center</div>
+                            </div>
+                        </Dropdown>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+
+            const parentItem = screen.getByText('Align').closest('[data-ukt-item]');
+            expect(parentItem?.tagName).toBe('DIV');
+            expect(parentItem?.closest('li')).toBeNull();
+            // the element that replaced the <li> is annotated like the
+            // <li> was, along with the submenu it re-rendered
+            expect(parentItem?.getAttribute('role')).toBe('menuitem');
+            expect(parentItem?.getAttribute('aria-haspopup')).toBe('menu');
+            expect(parentItem?.getAttribute('aria-expanded')).toBe('false');
+            const submenu = parentItem?.querySelector('[data-ukt-submenu]');
+            expect(submenu?.getAttribute('role')).toBe('menu');
+            expect(parentItem?.getAttribute('aria-controls')).toBe(submenu?.id);
+            expect(screen.getByText('Left').getAttribute('role')).toBe('menuitem');
+            // the parent item that ended up in the DOM is the one registered
+            // with the root, so scoped callbacks and the submenu still work
+            await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}{ArrowRight}');
+            expect(parentItem?.getAttribute('aria-expanded')).toBe('true');
+            await user.keyboard('{Enter}');
+            expect(handleAlignSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleAlignSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'left' }),
+            );
+        });
+
+        it.each(['menu', 'ol'] as const)(
+            'keeps the parent item an <li> inside a <%s>',
+            async (List) => {
+                const user = userEvent.setup();
+                render(
+                    <Dropdown>
+                        Format
+                        <List>
+                            <li data-ukt-item>Bold</li>
+                            <Dropdown label="Align">
+                                <ul>
+                                    <li data-ukt-value="left">Left</li>
+                                </ul>
+                            </Dropdown>
+                        </List>
+                    </Dropdown>,
+                );
+
+                await user.click(screen.getByRole('button', { name: 'Format' }));
+
+                expect(getParentItem().tagName).toBe('LI');
+            },
+        );
+
+        it('renders the parent item as an <li> inside a list', async () => {
+            const user = userEvent.setup();
+            renderFormatMenu();
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+
+            expect(getParentItem().tagName).toBe('LI');
+        });
+
+        it('renders the element props.as names and skips the container check', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        <Dropdown as="div" label="Align">
+                            <ul>
+                                <li data-ukt-value="left">Left</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+
+            // inside a <ul> detection would have kept the <li>; as wins
+            const parentItem = screen.getByText('Align').closest('[data-ukt-item]');
+            expect(parentItem?.tagName).toBe('DIV');
+            expect(parentItem?.getAttribute('role')).toBe('menuitem');
+        });
+
+        it('warns that props.as is ignored on a top-level Dropdown', () => {
+            const error = vi
+                .spyOn(console, 'error')
+                .mockImplementation(vi.fn<() => void>());
+
+            render(
+                <Dropdown as="div">
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            expect(error).toHaveBeenCalledWith(
+                expect.stringContaining('as only applies'),
+            );
+            error.mockRestore();
+        });
+
+        it('dispatches every scoped callback to the swapped-in parent item', async () => {
+            const handleActiveItem = vi.fn<(item: Item) => void>();
+            const handleClose = vi.fn<() => void>();
+            const handleOpen = vi.fn<() => void>();
+            const handleSubmitItem = vi.fn<(item: Item) => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <div>
+                        <div data-ukt-item>Bold</div>
+                        <Dropdown
+                            label="Align"
+                            onActiveItem={handleActiveItem}
+                            onClose={handleClose}
+                            onOpen={handleOpen}
+                            onSubmitItem={handleSubmitItem}
+                        >
+                            <div>
+                                <div data-ukt-value="left">Left</div>
+                            </div>
+                        </Dropdown>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            await user.keyboard('{ArrowDown}{ArrowDown}');
+            expect(handleActiveItem).toHaveBeenCalledTimes(1);
+            expect(handleActiveItem).toHaveBeenLastCalledWith(
+                expect.objectContaining({ value: 'Align' }),
+            );
+            await user.keyboard('{ArrowRight}');
+            expect(handleOpen).toHaveBeenCalledTimes(1);
+            await user.keyboard('{ArrowLeft}');
+            expect(handleClose).toHaveBeenCalledTimes(1);
+            await user.keyboard('{ArrowRight}{Enter}');
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'left' }),
+            );
+        });
+
+        it('falls back to detection when props.as is removed', async () => {
+            const user = userEvent.setup();
+            const renderMenu = (as?: 'div' | 'li') => (
+                <Dropdown>
+                    Format
+                    <div>
+                        <div data-ukt-item>Bold</div>
+                        <Dropdown as={as} label="Align">
+                            <div>
+                                <div data-ukt-value="left">Left</div>
+                            </div>
+                        </Dropdown>
+                    </div>
+                </Dropdown>
+            );
+            const { rerender } = render(renderMenu('li'));
+            const getAlignItem = () =>
+                screen.getByText('Align').closest('[data-ukt-item]');
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            // an explicit li wins even in a div body
+            expect(getAlignItem()?.tagName).toBe('LI');
+
+            rerender(renderMenu(undefined));
+            expect(getAlignItem()?.tagName).toBe('DIV');
+        });
+
+        it('annotates a nested Dropdown rendered into an already-open body', async () => {
+            const user = userEvent.setup();
+            const renderMenu = (withAlign: boolean) => (
+                <Dropdown>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        {withAlign ? (
+                            <Dropdown label="Align">
+                                <ul data-testid="align-submenu">
+                                    <li data-ukt-value="left">Left</li>
+                                </ul>
+                            </Dropdown>
+                        ) : null}
+                    </ul>
+                </Dropdown>
+            );
+            const { rerender } = render(renderMenu(false));
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+            // the once-per-open body pass has already run; the nested Dropdown
+            // arriving now has to bring its own ARIA
+            rerender(renderMenu(true));
+
+            const parentItem = screen.getByText('Align').closest('[data-ukt-item]');
+            expect(parentItem?.getAttribute('role')).toBe('menuitem');
+            expect(parentItem?.getAttribute('aria-haspopup')).toBe('menu');
+            expect(screen.getByTestId('align-submenu').getAttribute('role')).toBe('menu');
+            expect(screen.getByText('Left').getAttribute('role')).toBe('menuitem');
+        });
+
         it('dives into and surfaces out of a submenu with →/← while the parent item stays active', async () => {
             const user = userEvent.setup();
             renderFormatMenu();
@@ -2785,6 +3030,31 @@ describe('@acusti/dropdown', () => {
             expect(parentItem.getAttribute('aria-disabled')).toBe('true');
             expect(parentItem.hasAttribute('data-ukt-active')).toBe(false);
             expect(screen.getByText('Italic').hasAttribute('data-ukt-active')).toBe(true);
+        });
+
+        it('warns that the root-element event props are ignored on a nested Dropdown', async () => {
+            const error = vi
+                .spyOn(console, 'error')
+                .mockImplementation(vi.fn<() => void>());
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        <Dropdown label="Align" onClick={vi.fn<() => void>()}>
+                            <ul>
+                                <li data-ukt-value="left">Left</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Format' }));
+
+            expect(error).toHaveBeenCalledWith(expect.stringContaining('onClick'));
+            error.mockRestore();
         });
 
         it('warns about props that are ignored on a nested Dropdown', async () => {
