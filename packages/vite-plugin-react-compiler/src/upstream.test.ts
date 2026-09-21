@@ -214,4 +214,29 @@ export function Comp() {
             ),
         ).rejects.toThrow('Unexpected token');
     });
+
+    // oxc_codegen dropped the parentheses around a private-in expression
+    // used as the right operand of a higher-precedence relational
+    // operator, printing `#x in a instanceof b` (parsed as
+    // `(#x in a) instanceof b`, changing which value the private-field
+    // check runs against); fixed upstream in 0.150.0, completing the
+    // left-operand fix from 0.149.0
+    // (https://github.com/oxc-project/oxc/pull/26411)
+    it('parenthesizes private-in expressions used as the right operand of a relational operator', async () => {
+        const result = await transformCode(
+            `
+export function Comp({ o }: { o: object }) {
+    const Local = class {
+        #x = 1;
+        test(a: object, b: Function) {
+            return #x in (a instanceof b);
+        }
+    };
+    return <div>{new Local().test(o, Object)}</div>;
+}
+`,
+            '/src/Comp.tsx',
+        );
+        expect(result?.code).toContain('#x in (a instanceof b)');
+    });
 });
