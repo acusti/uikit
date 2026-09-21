@@ -220,8 +220,7 @@ export function Comp() {
     // `#x in a instanceof b`; `in` and `instanceof` share precedence and
     // associate left-to-right, so that parses as `(#x in a) instanceof b`,
     // changing which value the private-field check runs against; fixed
-    // upstream in 0.150.0, completing the left-operand fix from 0.149.0
-    // (https://github.com/oxc-project/oxc/pull/26411)
+    // upstream in 0.150.0 (https://github.com/oxc-project/oxc/pull/26411)
     it('parenthesizes relational right operands of private-in expressions', async () => {
         const result = await transformCode(
             `
