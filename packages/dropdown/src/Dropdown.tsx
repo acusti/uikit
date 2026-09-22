@@ -258,7 +258,7 @@ type MousePosition = { clientX: number; clientY: number };
 type TimeoutID = ReturnType<typeof setTimeout>;
 
 const CHILDREN_ERROR =
-    '@acusti/dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
+    'Dropdown requires either 1 child (the dropdown body) or 2 children: the dropdown trigger and the dropdown body.';
 const CLICKABLE_SELECTOR = 'button, a[href], input[type="button"], input[type="submit"]';
 // Any input that isn’t one of the non-text types, plus textarea. Derived from
 // the same list that drives use-keyboard-events’ isEventTargetUsingKeyEvent, so
@@ -294,14 +294,13 @@ const isTextInputElement = (element: ReactElement) => {
     return type == null || !NON_TEXT_INPUT_TYPES.includes(type);
 };
 
-// Misuse feedback is unconditional, like the children-count error in
-// Dropdown: the first render with a message logs it, once per mount.
+// Misuse feedback: the first render with a message logs it, once per mount.
 const useWarnOnce = (message: null | string) => {
     const warnedRef = useRef(false);
     useEffect(() => {
         if (warnedRef.current || message == null) return;
         warnedRef.current = true;
-        console.error(`@acusti/dropdown: ${message}`);
+        console.warn(`@acusti/dropdown: ${message}`);
     }, [message]);
 };
 
@@ -344,12 +343,14 @@ function RootDropdown({
     value,
 }: Props) {
     const childrenCount = Children.count(children);
-    if (childrenCount !== 1 && childrenCount !== 2) {
-        if (childrenCount === 0) {
-            throw new Error(CHILDREN_ERROR + ' Received no children.');
-        }
-        console.error(`${CHILDREN_ERROR} Received ${childrenCount} children.`);
+    if (childrenCount === 0) {
+        throw new Error(`@acusti/dropdown: ${CHILDREN_ERROR} Received no children.`);
     }
+    useWarnOnce(
+        childrenCount > 2
+            ? `${CHILDREN_ERROR} Received ${childrenCount} children.`
+            : null,
+    );
 
     let trigger: React.ReactNode;
     if (childrenCount > 1) {

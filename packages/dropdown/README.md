@@ -1062,9 +1062,9 @@ Props that only make sense at the top level (`allowCreate`, `allowEmpty`,
 `isOpenOnMount`, `isSearchable`, `keepOpenOnSubmit`, `name`, `openOnHover`,
 `placeholder`, `tabIndex`, `value`, and the root-element event props
 `onClick`, `onMouseDown`, `onMouseUp`) are ignored on a nested dropdown and
-warn (unconditionally, matching the children-count misuse error). A submenu
-already discloses on hover intent — see [Submenus](#submenus) — so
-`openOnHover` has nothing to add there.
+warn once per mount with `console.warn`, as the too-many-children message
+does. A submenu already discloses on hover intent — see
+[Submenus](#submenus) — so `openOnHover` has nothing to add there.
 
 ### Submenu placement and styling
 
