@@ -2619,8 +2619,8 @@ describe('@acusti/dropdown', () => {
         });
 
         it('warns that props.itemAs is ignored on a top-level Dropdown', () => {
-            const error = vi
-                .spyOn(console, 'error')
+            const warn = vi
+                .spyOn(console, 'warn')
                 .mockImplementation(vi.fn<() => void>());
 
             render(
@@ -2632,10 +2632,10 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            expect(error).toHaveBeenCalledWith(
+            expect(warn).toHaveBeenCalledWith(
                 expect.stringContaining('itemAs only applies'),
             );
-            error.mockRestore();
+            warn.mockRestore();
         });
 
         it('dispatches every scoped callback to the swapped-in parent item', async () => {
@@ -3090,8 +3090,8 @@ describe('@acusti/dropdown', () => {
         });
 
         it('warns that the root-element event props are ignored on a nested Dropdown', async () => {
-            const error = vi
-                .spyOn(console, 'error')
+            const warn = vi
+                .spyOn(console, 'warn')
                 .mockImplementation(vi.fn<() => void>());
             const user = userEvent.setup();
             render(
@@ -3110,14 +3110,14 @@ describe('@acusti/dropdown', () => {
 
             await user.click(screen.getByRole('button', { name: 'Format' }));
 
-            expect(error).toHaveBeenCalledWith(expect.stringContaining('onClick'));
-            error.mockRestore();
+            expect(warn).toHaveBeenCalledWith(expect.stringContaining('onClick'));
+            warn.mockRestore();
         });
 
         it('warns about props that are ignored on a nested Dropdown', async () => {
-            const consoleErrorSpy = vi
-                .spyOn(console, 'error')
-                .mockImplementation(() => undefined);
+            const warn = vi
+                .spyOn(console, 'warn')
+                .mockImplementation(vi.fn<() => void>());
             const user = userEvent.setup();
 
             render(
@@ -3136,10 +3136,10 @@ describe('@acusti/dropdown', () => {
 
             await user.click(screen.getByRole('button', { name: 'Format' }));
 
-            expect(consoleErrorSpy).toHaveBeenCalledWith(
+            expect(warn).toHaveBeenCalledWith(
                 expect.stringContaining('ignored on a nested (submenu) Dropdown'),
             );
-            consoleErrorSpy.mockRestore();
+            warn.mockRestore();
         });
     });
 
