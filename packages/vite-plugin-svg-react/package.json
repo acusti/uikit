@@ -44,7 +44,7 @@
         "tsc": "tsc --noEmit"
     },
     "devDependencies": {
-        "@oxvg/napi": "^0.0.7",
+        "@oxvg/napi": "^0.0.8",
         "@testing-library/react": "^16.3.2",
         "@types/node": "^26.1.0",
         "@types/react": "^19.2.17",
