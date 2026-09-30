@@ -32,6 +32,8 @@ export type Options = {
      * Options passed verbatim to React Compiler, using the same names as
      * babel-plugin-react-compiler (compilationMode, panicThreshold
      * (defaults to 'none'), target (defaults to '19'), environment, etc.).
+     * Set reportDiagnostics to true to have the compiler’s recoverable
+     * diagnostics (e.g. bail-outs) reported as build warnings.
      */
     compiler?: ReactCompilerOptions;
 };
@@ -52,6 +54,7 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
         options.exclude ?? defaultExclude,
     );
     const isMemoizing = options.memoize !== false;
+    const isReportingDiagnostics = options.compiler?.reportDiagnostics === true;
     // one entry per module id, replaced whenever the content hash changes;
     // holds the promise so overlapping transforms of identical content
     // (e.g. concurrent client + SSR environments) share a single run
@@ -77,8 +80,9 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
                     sourcemap: true,
                 });
 
-                // fatal means a parse failure or rejected options: no code
-                // was emitted, so break the build like a Babel syntax error
+                // fatal means a parse failure, rejected options, or a
+                // diagnostic escalated by panicThreshold: no code was
+                // emitted, so break the build like a Babel syntax error
                 // would, forwarding the first error’s position so vite can
                 // report the location alongside oxc’s own code frames
                 if (transformed.fatal) {
@@ -86,6 +90,18 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
                         transformed.errors.map(formatDiagnostic).join('\n'),
                         getPosition(Buffer.from(code, 'utf8'), transformed.errors[0]),
                     );
+                }
+
+                // recoverable diagnostics (bail-outs, rule suppressions)
+                // only show up once reportDiagnostics is on; oxc labels
+                // them severity 'Error' even though the code was emitted,
+                // so warn about each one at its own position rather than
+                // failing the build
+                if (isReportingDiagnostics && transformed.errors.length > 0) {
+                    const utf8Code = Buffer.from(code, 'utf8');
+                    for (const error of transformed.errors) {
+                        this.warn(formatDiagnostic(error), getPosition(utf8Code, error));
+                    }
                 }
 
                 return { code: transformed.code, map: transformed.map };
