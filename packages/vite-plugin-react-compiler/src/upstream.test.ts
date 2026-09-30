@@ -238,4 +238,29 @@ export function Comp({ o }: { o: object }) {
         );
         expect(result?.code).toContain('#x in (a instanceof b)');
     });
+
+    // oxc_parser accepted modifiers on an `import x = …` alias and ignored
+    // them (`public import a = b.c;` compiled to a plain `var a = b.c;`)
+    // instead of failing like TypeScript and Babel; rejected upstream since
+    // 0.151.0 (https://github.com/oxc-project/oxc/pull/26622)
+    it.each(['declare', 'public', 'abstract'])(
+        'rejects the %s modifier on an import alias',
+        async (modifier) => {
+            await expect(
+                transformCode(
+                    `
+namespace b {
+    export const c = 1;
+}
+${modifier} import a = b.c;
+
+export function Comp() {
+    return <div>{a}</div>;
+}
+`,
+                    '/src/Comp.tsx',
+                ),
+            ).rejects.toThrow(`'${modifier}' modifier`);
+        },
+    );
 });
