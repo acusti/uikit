@@ -2,6 +2,7 @@ import { Buffer } from 'node:buffer';
 import { createHash } from 'node:crypto';
 
 import {
+    type OxcError,
     type ReactCompilerOptions,
     type SourceMap,
     transform,
@@ -81,22 +82,9 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
                 // would, forwarding the first error’s position so vite can
                 // report the location alongside oxc’s own code frames
                 if (transformed.fatal) {
-                    // oxc label offsets are utf-8 byte offsets, but rollup’s
-                    // pos argument indexes the (utf-16) code string
-                    const byteStart = transformed.errors[0]?.labels[0]?.start;
                     this.error(
-                        transformed.errors
-                            .map((error) =>
-                                error.codeframe
-                                    ? `${error.message}\n${error.codeframe}`
-                                    : error.message,
-                            )
-                            .join('\n'),
-                        byteStart == null
-                            ? undefined
-                            : Buffer.from(code, 'utf8')
-                                  .subarray(0, byteStart)
-                                  .toString('utf8').length,
+                        transformed.errors.map(formatDiagnostic).join('\n'),
+                        getPosition(Buffer.from(code, 'utf8'), transformed.errors[0]),
                     );
                 }
 
@@ -118,4 +106,19 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
             return result;
         },
     };
+}
+
+// oxc’s message followed by its code frame (when it has one)
+function formatDiagnostic(error: OxcError): string {
+    return error.codeframe ? `${error.message}\n${error.codeframe}` : error.message;
+}
+
+// oxc label offsets are utf-8 byte offsets, but rollup’s pos argument
+// indexes the (utf-16) code string; takes the code already encoded as utf-8
+// so callers converting several positions encode it once
+function getPosition(utf8Code: Buffer, error: OxcError | undefined): number | undefined {
+    const byteStart = error?.labels[0]?.start;
+    return byteStart == null
+        ? undefined
+        : utf8Code.subarray(0, byteStart).toString('utf8').length;
 }
