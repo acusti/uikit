@@ -97,7 +97,8 @@ The plugin takes an optional options object with four properties:
   `enableTreatRefLikeIdentifiersAsRefs`, and so on. Callback-valued options
   (e.g. `logger`, function-valued `sources`) don’t cross the native
   boundary and aren’t supported; `sources` accepts an array of filename
-  substrings instead.
+  substrings instead, and `reportDiagnostics` (below) covers the common use
+  of `logger`, seeing what the compiler skipped.
 - **`memoize`**: cache transform results per module id, keyed by a content
   hash (bounded to one entry per file). Multi-environment builds (e.g.
   React Router apps building client + SSR environments) run every transform
@@ -113,11 +114,28 @@ reactCompiler({
 });
 ```
 
-If the compiler reports a fatal error (a parse failure or rejected
-options), the plugin fails the build via `this.error(...)`, just like a
-Babel syntax error would. Nonfatal compiler bail-outs behave as they do
-with the Babel plugin under `panicThreshold: 'none'`: the affected function
-is left uncompiled and the build continues.
+If the compiler reports a fatal error (a parse failure, rejected options,
+or a diagnostic escalated by `panicThreshold`), the plugin fails the build
+via `this.error(...)`, just like a Babel syntax error would. Nonfatal
+compiler bail-outs behave as they do with the Babel plugin under
+`panicThreshold: 'none'`: the affected function is left uncompiled and the
+build continues.
+
+Those bail-outs are silent by default. To see what the compiler skipped and
+why, set `compiler: { reportDiagnostics: true }`: each recoverable
+diagnostic (a bail-out, or a react-hooks lint suppression that opts a
+function out) is printed as a warning in your build or dev server output,
+with the compiler’s code frame and its position in the file, and the build
+continues.
+
+```ts
+reactCompiler({ compiler: { reportDiagnostics: true } });
+```
+
+With `memoize` on, a file’s diagnostics are reported once per distinct
+content, not once per environment. With `panicThreshold` set to
+`'critical_errors'` or `'all_errors'`, the diagnostic that escalates fails
+the build through `this.error(...)` as described above instead of warning.
 
 [compiler options]:
     https://react.dev/reference/react-compiler/configuration

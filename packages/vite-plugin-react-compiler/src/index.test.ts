@@ -10,15 +10,45 @@ export function Greeting({ name }: { name: string }) {
 }
 `;
 
+// two components the compiler can’t optimize (a ref read during render and
+// a conditional hook) followed by one it can; the multi-byte chars ahead of
+// them make oxc’s utf-8 byte offsets differ from utf-16 string indexes
+const BAILOUTS = `
+// héllo💜
+import { useRef, useState } from 'react';
+
+export function Clock() {
+    const ref = useRef(0);
+    return <div>{ref.current}</div>;
+}
+
+export function Toggle({ on }: { on: boolean }) {
+    if (on) {
+        const [label] = useState('on');
+        return <div>{label}</div>;
+    }
+    return null;
+}
+
+export function Greeting({ name }: { name: string }) {
+    return <div>Hello {name}</div>;
+}
+`;
+
 type TransformResult = null | { code: string; map?: SourceMap };
 
 function createTransformer(options?: Options) {
-    // record this.error calls to pin the plugin’s own build-failure path
-    // (as opposed to an upstream oxc-transform-react rejection)
+    // record this.error and this.warn calls to pin the plugin’s own
+    // build-failure and reporting paths (as opposed to an upstream
+    // oxc-transform-react rejection)
     const errorCalls: Array<{ message: string; pos?: number }> = [];
+    const warnCalls: Array<{ message: string; pos?: number }> = [];
     const plugin = vitePluginReactCompiler(options);
     const transform = plugin.transform as (
-        this: { error: (message: string, pos?: number) => never },
+        this: {
+            error: (message: string, pos?: number) => never;
+            warn: (message: string, pos?: number) => void;
+        },
         code: string,
         id: string,
     ) => null | Promise<TransformResult>;
@@ -28,10 +58,14 @@ function createTransformer(options?: Options) {
             errorCalls.push({ message, pos });
             throw new Error(message);
         },
+        warn(message: string, pos?: number): void {
+            warnCalls.push({ message, pos });
+        },
     };
     return {
         errorCalls,
         transformCode: (code: string, id: string) => transform.call(context, code, id),
+        warnCalls,
     };
 }
 
@@ -123,6 +157,71 @@ describe('vite-plugin-react-compiler', () => {
             'Unexpected token',
         );
         expect(errorCalls).toHaveLength(2);
+    });
+
+    it('warns about compiler bail-outs when reportDiagnostics is on', async () => {
+        const { errorCalls, transformCode, warnCalls } = createTransformer({
+            compiler: { reportDiagnostics: true },
+        });
+        const result = await transformCode(BAILOUTS, '/src/Bailouts.tsx');
+
+        // the bail-outs don’t fail the build, and the rest still compiles
+        expect(errorCalls).toHaveLength(0);
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('function Clock');
+
+        // each diagnostic is its own warning, positioned at the offending
+        // code as an index into the code string (not a utf-8 byte offset)
+        expect(warnCalls).toHaveLength(2);
+        expect(warnCalls[0].message).toContain('Cannot access refs during render');
+        // oxc’s code frame includes the file:line:column of the diagnostic
+        expect(warnCalls[0].message).toContain('/src/Bailouts.tsx:7:');
+        expect(warnCalls[0].pos).toBe(BAILOUTS.indexOf('ref.current'));
+        expect(warnCalls[1].message).toContain(
+            'Hooks must always be called in a consistent order',
+        );
+        expect(warnCalls[1].pos).toBe(BAILOUTS.indexOf("useState('on')"));
+    });
+
+    it('stays quiet about compiler bail-outs by default', async () => {
+        const { transformCode, warnCalls } = createTransformer();
+        const result = await transformCode(BAILOUTS, '/src/Bailouts.tsx');
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(warnCalls).toHaveLength(0);
+    });
+
+    it('reports a file’s diagnostics once per content when memoizing', async () => {
+        const { transformCode, warnCalls } = createTransformer({
+            compiler: { reportDiagnostics: true },
+        });
+        await transformCode(BAILOUTS, '/src/Bailouts.tsx');
+        await transformCode(BAILOUTS, '/src/Bailouts.tsx');
+        expect(warnCalls).toHaveLength(2);
+
+        // changed content runs the compiler again, so it reports again
+        await transformCode(BAILOUTS.replace('Hello', 'Bonjour'), '/src/Bailouts.tsx');
+        expect(warnCalls).toHaveLength(4);
+
+        const uncached = createTransformer({
+            compiler: { reportDiagnostics: true },
+            memoize: false,
+        });
+        await uncached.transformCode(BAILOUTS, '/src/Bailouts.tsx');
+        await uncached.transformCode(BAILOUTS, '/src/Bailouts.tsx');
+        expect(uncached.warnCalls).toHaveLength(4);
+    });
+
+    it('fails the build on fatal diagnostics instead of warning about them', async () => {
+        // panicThreshold escalates the first bail-out into a hard failure
+        const { errorCalls, transformCode, warnCalls } = createTransformer({
+            compiler: { panicThreshold: 'all_errors', reportDiagnostics: true },
+        });
+        await expect(transformCode(BAILOUTS, '/src/Bailouts.tsx')).rejects.toThrow(
+            'Cannot access refs during render',
+        );
+        expect(errorCalls).toHaveLength(1);
+        expect(errorCalls[0].pos).toBe(BAILOUTS.indexOf('ref.current'));
+        expect(warnCalls).toHaveLength(0);
     });
 
     it('memoizes repeat transforms of identical content', async () => {
