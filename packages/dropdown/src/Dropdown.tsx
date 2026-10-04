@@ -440,16 +440,21 @@ function RootDropdown({
     const hoverCloseTimerRef = useRef<null | TimeoutID>(null);
 
     // The four values that still need mirroring, for two distinct reasons:
-    // 1. isOpen/isOpening are read by the document-level listeners attached in
-    //    handleRef
+    // 1. isOpen/isOpening are read by this component’s pointer handlers and the
+    //    document-level listeners attached in handleRef
     // 2. onOpen/onClose are called from an effect keyed on [isOpen] alone, which
     //    is what makes it fire only on open/close transitions
+    // useLayoutEffect over useEffect so the refs change in the same commit as
+    // the DOM: a passive effect runs a task later whenever the close comes from
+    // a timer (the delayed close after a pick, the hover-close), and
+    // handleMouseDown and handleDropdownMouseEnter would ignore a press or a
+    // re-entry landing in that gap.
     const isOpenRef = useRef(isOpen);
     const isOpeningRef = useRef(isOpening);
     const onCloseRef = useRef(onClose);
     const onOpenRef = useRef(onOpen);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
         isOpenRef.current = isOpen;
         isOpeningRef.current = isOpening;
         onCloseRef.current = onClose;

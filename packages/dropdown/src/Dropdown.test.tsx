@@ -1149,6 +1149,69 @@ describe('@acusti/dropdown', () => {
         expect(screen.queryByTestId('dropdown-body')).toBe(null);
     });
 
+    it('opens on a press that lands as its menu leaves the page after a pick', async () => {
+        const { container } = render(
+            <Dropdown>
+                <button type="button">Menu</button>
+                <ul>
+                    <li data-ukt-value="a">Item A</li>
+                </ul>
+            </Dropdown>,
+        );
+        const trigger = screen.getByRole('button', { name: 'Menu' });
+        fireEvent.mouseDown(trigger);
+        fireEvent.mouseUp(trigger);
+        const item = screen.getByText('Item A');
+        fireEvent.mouseOver(item);
+        fireEvent.mouseDown(item);
+        fireEvent.mouseUp(item);
+
+        // A MutationObserver callback is a microtask, so it runs right after
+        // the (timer-driven) commit that takes the menu out and before that
+        // commit’s passive effects, which React runs as a separate task
+        let pressedInGap = false;
+        const observer = new MutationObserver(() => {
+            if (screen.queryByText('Item A')) return;
+            observer.disconnect();
+            pressedInGap = true;
+            fireEvent.mouseDown(trigger);
+        });
+        observer.observe(container, { childList: true, subtree: true });
+
+        await waitFor(() => expect(pressedInGap).toBe(true));
+        expect(screen.queryByText('Item A')).not.toBeNull();
+    });
+
+    it('reopens an openOnHover dropdown when the pointer returns as it closes', async () => {
+        const { container } = render(
+            <Dropdown openOnHover>
+                <button type="button">Menu</button>
+                <ul>
+                    <li data-ukt-value="a">Item A</li>
+                </ul>
+            </Dropdown>,
+        );
+        const trigger = screen.getByRole('button', { name: 'Menu' });
+        fireEvent.mouseEnter(trigger);
+        fireEvent.mouseLeave(trigger);
+
+        // Same technique as above, with the hover-close’s timer driving the
+        // commit and a re-entry in place of the press. The re-entry carries
+        // no relatedTarget: React ignores a mouseover whose relatedTarget it
+        // manages, expecting the matching mouseout to produce the enter.
+        let enteredInGap = false;
+        const observer = new MutationObserver(() => {
+            if (screen.queryByText('Item A')) return;
+            observer.disconnect();
+            enteredInGap = true;
+            fireEvent.mouseEnter(trigger);
+        });
+        observer.observe(container, { childList: true, subtree: true });
+
+        await waitFor(() => expect(enteredInGap).toBe(true));
+        expect(screen.queryByText('Item A')).not.toBeNull();
+    });
+
     describe('click delegation to buttons and links', () => {
         it('invokes click on a button when the item contains exactly one button', async () => {
             const handleButtonClick = vi.fn<() => void>();
