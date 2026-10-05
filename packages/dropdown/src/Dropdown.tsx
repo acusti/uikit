@@ -16,6 +16,7 @@ import {
     type SyntheticEvent,
     useContext,
     useEffect,
+    useEffectEvent,
     useId,
     useLayoutEffect,
     useMemo,
@@ -441,25 +442,19 @@ function RootDropdown({
     const wasInSafeAreaRef = useRef<boolean>(false);
     const hoverCloseTimerRef = useRef<null | TimeoutID>(null);
 
-    // The three values that still need mirroring, for two distinct reasons:
-    // 1. isOpen is read by this component’s pointer handlers and the
-    //    document-level listeners attached in handleRef
-    // 2. onOpen/onClose are called from an effect keyed on [isOpen] alone, which
-    //    is what makes it fire only on open/close transitions
-    // useLayoutEffect over useEffect so the refs change in the same commit as
-    // the DOM: a passive effect runs a task later whenever the close comes from
-    // a timer (the delayed close after a pick, the hover-close), and
-    // handleMouseDown and handleDropdownMouseEnter would ignore a press or a
-    // re-entry landing in that gap.
+    // isOpen is read outside render by this component’s pointer handlers, the
+    // document-level listeners attached in handleRef, the keydown handler
+    // useKeyboardEvents registers, and the menubar’s isOpen(). useLayoutEffect
+    // over useEffect so the ref changes in the same commit as the DOM: a
+    // passive effect runs a task later whenever the close comes from a timer
+    // (the delayed close after a pick, the hover-close), and handleMouseDown
+    // and handleDropdownMouseEnter would ignore a press or a re-entry landing
+    // in that gap.
     const isOpenRef = useRef(isOpen);
-    const onCloseRef = useRef(onClose);
-    const onOpenRef = useRef(onOpen);
 
     useLayoutEffect(() => {
         isOpenRef.current = isOpen;
-        onCloseRef.current = onClose;
-        onOpenRef.current = onOpen;
-    }, [isOpen, onClose, onOpen]);
+    }, [isOpen]);
 
     // A consumer filtering or async-loading the body can drop or shift the
     // highlighted item without us seeing the change. Deliberately dep-less:
@@ -477,6 +472,11 @@ function RootDropdown({
             : 'itemAs only applies to a submenu Dropdown (one nested in a dropdown where hasItems is true) and is ignored anywhere else.',
     );
 
+    const handleOpenChange = useEffectEvent((nextIsOpen: boolean) => {
+        if (nextIsOpen) onOpen?.();
+        else onClose?.();
+    });
+
     // Call onOpen/onClose on transitions only, counting a mount with
     // isOpenOnMount as an open. Comparing against the last state reported,
     // rather than tracking whether this is the mount, keeps an effect that
@@ -486,8 +486,7 @@ function RootDropdown({
     useEffect(() => {
         if (reportedIsOpenRef.current === isOpen) return;
         reportedIsOpenRef.current = isOpen;
-        if (isOpen) onOpenRef.current?.();
-        else onCloseRef.current?.();
+        handleOpenChange(isOpen);
     }, [isOpen]);
 
     // Nested (submenu) Dropdowns register here so their scoped callbacks
