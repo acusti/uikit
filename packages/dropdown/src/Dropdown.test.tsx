@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { type MouseEvent, useEffect } from 'react';
+import { Activity, type MouseEvent, StrictMode, useEffect } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
@@ -1147,6 +1147,53 @@ describe('@acusti/dropdown', () => {
         expect(closedCount).toBe(1);
         expect(openedCount).toBe(1);
         expect(screen.queryByTestId('dropdown-body')).toBe(null);
+    });
+
+    it('reports only real open/close transitions under StrictMode', () => {
+        const handleClosedClose = vi.fn<() => void>();
+        const handleClosedOpen = vi.fn<() => void>();
+        const handleOpenClose = vi.fn<() => void>();
+        const handleOpenOpen = vi.fn<() => void>();
+        render(
+            <StrictMode>
+                <Dropdown onClose={handleClosedClose} onOpen={handleClosedOpen}>
+                    <p>this is the dropdown contents</p>
+                </Dropdown>
+                <Dropdown isOpenOnMount onClose={handleOpenClose} onOpen={handleOpenOpen}>
+                    <p>this is the dropdown contents</p>
+                </Dropdown>
+            </StrictMode>,
+        );
+
+        // StrictMode re-runs each effect on mount: the closed dropdown must
+        // not report a close, nor the open one a second open
+        expect(handleClosedClose).not.toHaveBeenCalled();
+        expect(handleClosedOpen).not.toHaveBeenCalled();
+        expect(handleOpenClose).not.toHaveBeenCalled();
+        expect(handleOpenOpen).toHaveBeenCalledTimes(1);
+    });
+
+    it('reports no transition when Activity hides and re-shows it', () => {
+        const handleClosedClose = vi.fn<() => void>();
+        const handleOpenOpen = vi.fn<() => void>();
+        const renderInActivity = (mode: 'hidden' | 'visible') => (
+            <Activity mode={mode}>
+                <Dropdown onClose={handleClosedClose}>
+                    <p>this is the dropdown contents</p>
+                </Dropdown>
+                <Dropdown isOpenOnMount onOpen={handleOpenOpen}>
+                    <p>this is the dropdown contents</p>
+                </Dropdown>
+            </Activity>
+        );
+        const { rerender } = render(renderInActivity('visible'));
+        rerender(renderInActivity('hidden'));
+        rerender(renderInActivity('visible'));
+
+        // Re-showing re-runs each effect: the closed dropdown must not
+        // report a close, nor the open one a second open
+        expect(handleClosedClose).not.toHaveBeenCalled();
+        expect(handleOpenOpen).toHaveBeenCalledTimes(1);
     });
 
     it('opens on a press that lands as its menu leaves the page after a pick', async () => {

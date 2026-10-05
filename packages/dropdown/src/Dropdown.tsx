@@ -477,23 +477,17 @@ function RootDropdown({
             : 'itemAs only applies to a submenu Dropdown (one nested in a dropdown where hasItems is true) and is ignored anywhere else.',
     );
 
-    const isMountedRef = useRef(false);
+    // Call onOpen/onClose on transitions only, counting a mount with
+    // isOpenOnMount as an open. Comparing against the last state reported,
+    // rather than tracking whether this is the mount, keeps an effect that
+    // re-runs without a change (Activity, StrictMode) from reporting one.
+    const reportedIsOpenRef = useRef(false);
 
     useEffect(() => {
-        if (!isMountedRef.current) {
-            isMountedRef.current = true;
-            // If isOpenOnMount, trigger onOpen right away
-            if (isOpenRef.current && onOpenRef.current) {
-                onOpenRef.current();
-            }
-            return;
-        }
-
-        if (isOpen && onOpenRef.current) {
-            onOpenRef.current();
-        } else if (!isOpen && onCloseRef.current) {
-            onCloseRef.current();
-        }
+        if (reportedIsOpenRef.current === isOpen) return;
+        reportedIsOpenRef.current = isOpen;
+        if (isOpen) onOpenRef.current?.();
+        else onCloseRef.current?.();
     }, [isOpen]);
 
     // Nested (submenu) Dropdowns register here so their scoped callbacks
