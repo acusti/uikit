@@ -53,6 +53,9 @@ npm install @acusti/dropdown
 yarn add @acusti/dropdown
 ```
 
+Requires React 19.2 or later (`react` and `react-dom` are peer
+dependencies).
+
 ## Quick Start
 
 ```tsx
