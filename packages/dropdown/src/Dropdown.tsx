@@ -730,12 +730,23 @@ function RootDropdown({
     // oxlint-disable-next-line react/exhaustive-effect-dependencies
     useEffect(() => clearHoverCloseTimer, []);
 
+    // End the press that opened the dropdown along with its 1s timer. A timer
+    // left running would end a later open’s press partway through, and that
+    // press’s mouseup would then close the menu it had just opened.
+    const endOpeningPress = () => {
+        isOpeningRef.current = false;
+        if (isOpeningTimerRef.current != null) {
+            clearTimeout(isOpeningTimerRef.current);
+            isOpeningTimerRef.current = null;
+        }
+    };
+
     const closeDropdown = (options?: { keepMenubarEngaged?: boolean }) => {
         // the body (and its items) unmount on close, so the trigger would
         // otherwise keep pointing at an id that no longer exists
         getTriggerElement(dropdownElement)?.removeAttribute('aria-activedescendant');
         setIsOpen(false);
-        isOpeningRef.current = false;
+        endOpeningPress();
         mouseDownPositionRef.current = null;
         clearDisclosureTimer();
         clearSafeAreaTimer();
@@ -761,7 +772,7 @@ function RootDropdown({
         clearHoverCloseTimer();
         if (disabled || !openOnHover || isOpenRef.current) return;
         setIsOpen(true);
-        isOpeningRef.current = false;
+        endOpeningPress();
     };
 
     // The pointer left the trigger and body entirely: if open, arm the
@@ -952,7 +963,7 @@ function RootDropdown({
         ) {
             return;
         }
-        isOpeningRef.current = false;
+        endOpeningPress();
     };
 
     const handleMouseOver = (event: ReactMouseEvent<HTMLElement>) => {
@@ -1356,11 +1367,7 @@ function RootDropdown({
             // If the press that opened the dropdown is still in progress (its
             // timer ends it 1s after the open), this mouseup ends it
             if (isOpeningRef.current) {
-                isOpeningRef.current = false;
-                if (isOpeningTimerRef.current != null) {
-                    clearTimeout(isOpeningTimerRef.current);
-                    isOpeningTimerRef.current = null;
-                }
+                endOpeningPress();
                 return;
             }
 

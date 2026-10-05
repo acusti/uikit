@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import { userEvent } from '@testing-library/user-event';
 import { type MouseEvent, useEffect } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import Dropdown, { type Item, type Props } from './Dropdown.js';
 
@@ -1209,6 +1209,40 @@ describe('@acusti/dropdown', () => {
         observer.observe(container, { childList: true, subtree: true });
 
         await waitFor(() => expect(enteredInGap).toBe(true));
+        expect(screen.queryByText('Item A')).not.toBeNull();
+    });
+
+    it('keeps open a click on the trigger that spans an earlier open’s press timer', () => {
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        render(
+            <Dropdown>
+                <button type="button">Menu</button>
+                <ul>
+                    <li data-ukt-value="a">Item A</li>
+                </ul>
+            </Dropdown>,
+        );
+        const trigger = screen.getByRole('button', { name: 'Menu' });
+        // Press, drag onto an item, release: submits, and closes 90ms later
+        fireEvent.mouseDown(trigger, { clientX: 0, clientY: 0 });
+        const item = screen.getByText('Item A');
+        fireEvent.mouseMove(item, { clientX: 0, clientY: 40 });
+        fireEvent.mouseOver(item);
+        fireEvent.mouseUp(item);
+        act(() => {
+            vi.advanceTimersByTime(950);
+        });
+        expect(screen.queryByText('Item A')).toBeNull();
+
+        // A click whose press spans the moment the first open’s 1s timer fires
+        fireEvent.mouseDown(trigger, { clientX: 0, clientY: 0 });
+        act(() => {
+            vi.advanceTimersByTime(100);
+        });
+        fireEvent.mouseUp(trigger);
         expect(screen.queryByText('Item A')).not.toBeNull();
     });
 
