@@ -47,7 +47,7 @@
         "@oxvg/napi": "^0.0.7",
         "@testing-library/react": "^16.3.2",
         "@types/node": "^26.1.0",
-        "@types/react": "^19.2.17",
+        "@types/react": "^19.3",
         "happy-dom": "^20.4.0",
         "react": "^19.3",
         "react-dom": "^19.3",
