@@ -2474,6 +2474,42 @@ describe('@acusti/dropdown', () => {
             expect(handleSubmitItem).not.toHaveBeenCalled();
             expect(screen.getByText('One').hasAttribute('data-ukt-active')).toBe(true);
         });
+
+        it('submits the first item clicked after opening with the keyboard', async () => {
+            const handleSubmitItem = vi.fn<() => void>();
+            const user = userEvent.setup();
+            renderMenu(handleSubmitItem);
+
+            screen.getByRole('button', { name: 'Menu' }).focus();
+            await user.keyboard('{Enter}');
+            await user.click(screen.getByText('Two'));
+
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'two' }),
+            );
+        });
+
+        it('submits the first item clicked after a searchable dropdown opens on focus', async () => {
+            const handleSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown isSearchable onSubmitItem={handleSubmitItem}>
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                        <li data-ukt-value="two">Two</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.tab();
+            await user.click(screen.getByText('Two'));
+
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'two' }),
+            );
+        });
     });
 
     describe('submenus (nested Dropdowns)', () => {

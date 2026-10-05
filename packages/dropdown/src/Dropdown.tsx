@@ -383,7 +383,6 @@ function RootDropdown({
           : (getLabelFromChildren(body, value) ?? (allowCreate ? value : undefined));
 
     const [isOpen, setIsOpen] = useState<boolean>(isOpenOnMount ?? false);
-    const [isOpening, setIsOpening] = useState<boolean>(!isOpenOnMount);
     const [dropdownElement, setDropdownElement] = useState<MaybeHTMLElement>(null);
     const bodyId = useId();
     // Everything this component needs an id for hangs off the one useId, with
@@ -424,6 +423,9 @@ function RootDropdown({
     // handleBodyRef) and each nested Dropdown’s parent item (see registerSubmenu)
     const annotatedElementsRef = useRef<WeakSet<HTMLElement>>(new WeakSet());
     const closingTimerRef = useRef<null | TimeoutID>(null);
+    // Whether the press that opened the dropdown is still in progress, so its
+    // mouseup neither closes nor submits. Never rendered, so a ref, not state
+    const isOpeningRef = useRef(false);
     const isOpeningTimerRef = useRef<null | TimeoutID>(null);
     const currentInputMethodRef = useRef<'keyboard' | 'mouse'>('mouse');
     const clearEnteredCharactersTimerRef = useRef<null | TimeoutID>(null);
@@ -439,8 +441,8 @@ function RootDropdown({
     const wasInSafeAreaRef = useRef<boolean>(false);
     const hoverCloseTimerRef = useRef<null | TimeoutID>(null);
 
-    // The four values that still need mirroring, for two distinct reasons:
-    // 1. isOpen/isOpening are read by this component’s pointer handlers and the
+    // The three values that still need mirroring, for two distinct reasons:
+    // 1. isOpen is read by this component’s pointer handlers and the
     //    document-level listeners attached in handleRef
     // 2. onOpen/onClose are called from an effect keyed on [isOpen] alone, which
     //    is what makes it fire only on open/close transitions
@@ -450,16 +452,14 @@ function RootDropdown({
     // handleMouseDown and handleDropdownMouseEnter would ignore a press or a
     // re-entry landing in that gap.
     const isOpenRef = useRef(isOpen);
-    const isOpeningRef = useRef(isOpening);
     const onCloseRef = useRef(onClose);
     const onOpenRef = useRef(onOpen);
 
     useLayoutEffect(() => {
         isOpenRef.current = isOpen;
-        isOpeningRef.current = isOpening;
         onCloseRef.current = onClose;
         onOpenRef.current = onOpen;
-    }, [isOpen, isOpening, onClose, onOpen]);
+    }, [isOpen, onClose, onOpen]);
 
     // A consumer filtering or async-loading the body can drop or shift the
     // highlighted item without us seeing the change. Deliberately dep-less:
@@ -735,7 +735,7 @@ function RootDropdown({
         // otherwise keep pointing at an id that no longer exists
         getTriggerElement(dropdownElement)?.removeAttribute('aria-activedescendant');
         setIsOpen(false);
-        setIsOpening(false);
+        isOpeningRef.current = false;
         mouseDownPositionRef.current = null;
         clearDisclosureTimer();
         clearSafeAreaTimer();
@@ -761,7 +761,7 @@ function RootDropdown({
         clearHoverCloseTimer();
         if (disabled || !openOnHover || isOpenRef.current) return;
         setIsOpen(true);
-        setIsOpening(false);
+        isOpeningRef.current = false;
     };
 
     // The pointer left the trigger and body entirely: if open, arm the
@@ -952,7 +952,7 @@ function RootDropdown({
         ) {
             return;
         }
-        setIsOpening(false);
+        isOpeningRef.current = false;
     };
 
     const handleMouseOver = (event: ReactMouseEvent<HTMLElement>) => {
@@ -1021,13 +1021,13 @@ function RootDropdown({
         if (disabled || isOpenRef.current) return;
 
         setIsOpen(true);
-        setIsOpening(true);
+        isOpeningRef.current = true;
         mouseDownPositionRef.current = {
             clientX: event.clientX,
             clientY: event.clientY,
         };
         isOpeningTimerRef.current = setTimeout(() => {
-            setIsOpening(false);
+            isOpeningRef.current = false;
             isOpeningTimerRef.current = null;
         }, 1000);
     };
@@ -1064,11 +1064,8 @@ function RootDropdown({
         );
         // If click was outside dropdown body, don’t trigger submit
         if (!isInOwnBody) {
-            // Don’t close dropdown if isOpening or search input is focused
-            if (
-                !isOpeningRef.current &&
-                inputElementRef.current !== eventTarget.ownerDocument.activeElement
-            ) {
+            // Don’t close dropdown if search input is focused
+            if (inputElementRef.current !== eventTarget.ownerDocument.activeElement) {
                 closeDropdown();
             }
             return;
@@ -1356,9 +1353,10 @@ function RootDropdown({
         const handleGlobalMouseUp = ({ target }: MouseEvent) => {
             if (!isOpenRef.current || closingTimerRef.current != null) return;
 
-            // If still isOpening (gets set false 1s after open triggers), set it to false onMouseUp
+            // If the press that opened the dropdown is still in progress (its
+            // timer ends it 1s after the open), this mouseup ends it
             if (isOpeningRef.current) {
-                setIsOpening(false);
+                isOpeningRef.current = false;
                 if (isOpeningTimerRef.current != null) {
                     clearTimeout(isOpeningTimerRef.current);
                     isOpeningTimerRef.current = null;
