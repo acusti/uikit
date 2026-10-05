@@ -58,8 +58,8 @@
         "oxfmt": "^0.67.0",
         "oxlint": "^1.81.0",
         "oxlint-tsgolint": "^7",
-        "react": "^19.2.7",
-        "react-dom": "^19.2.7",
+        "react": "^19.3",
+        "react-dom": "^19.3",
         "typescript": "^7",
         "vite": "^8",
         "vitest": "^5"
