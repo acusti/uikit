@@ -190,6 +190,21 @@ describe('vite-plugin-react-compiler', () => {
         expect(warnCalls).toHaveLength(0);
     });
 
+    // oxc returns some non-fatal diagnostics of its own whether or not
+    // reportDiagnostics is on: it doesn’t fully support a namespace that
+    // exports a non-const, and plain vite fails the build on one, but this
+    // plugin strips the typescript before vite’s own oxc pass runs, so a
+    // warning is the only way that diagnostic gets seen
+    it('warns about oxc’s own non-fatal diagnostics by default', async () => {
+        const { errorCalls, transformCode, warnCalls } = createTransformer();
+        const source = 'export namespace N { export let x = 1; }\n';
+        await transformCode(source, '/src/namespace.ts');
+        expect(errorCalls).toHaveLength(0);
+        expect(warnCalls).toHaveLength(1);
+        expect(warnCalls[0].message).toContain('Namespaces exporting non-const');
+        expect(warnCalls[0].pos).toBe(source.indexOf('x = 1'));
+    });
+
     it('reports a file’s diagnostics once per content when memoizing', async () => {
         const { transformCode, warnCalls } = createTransformer({
             compiler: { reportDiagnostics: true },

@@ -54,7 +54,6 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
         options.exclude ?? defaultExclude,
     );
     const isMemoizing = options.memoize !== false;
-    const isReportingDiagnostics = options.compiler?.reportDiagnostics === true;
     // one entry per module id, replaced whenever the content hash changes;
     // holds the promise so overlapping transforms of identical content
     // (e.g. concurrent client + SSR environments) share a single run
@@ -92,12 +91,16 @@ export default function vitePluginReactCompiler(options: Options = {}): Plugin {
                     );
                 }
 
-                // recoverable diagnostics (bail-outs, rule suppressions)
-                // only show up once reportDiagnostics is on; oxc labels
-                // them severity 'Error' even though the code was emitted,
-                // so warn about each one at its own position rather than
-                // failing the build
-                if (isReportingDiagnostics && transformed.errors.length > 0) {
+                // anything left in errors is recoverable (the code was
+                // emitted): the compiler’s bail-outs and rule suppressions,
+                // present only once reportDiagnostics is on, and oxc’s own
+                // non-fatal diagnostics (e.g. a partially supported
+                // typescript namespace), which vite’s oxc pass never sees
+                // because the typescript is already stripped; oxc labels
+                // the compiler’s diagnostics severity 'Error', so warn
+                // about each one at its own position rather than failing
+                // the build
+                if (transformed.errors.length > 0) {
                     const utf8Code = Buffer.from(code, 'utf8');
                     for (const error of transformed.errors) {
                         this.warn(formatDiagnostic(error), getPosition(utf8Code, error));
