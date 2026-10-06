@@ -265,4 +265,33 @@ export function Comp() {
             ).rejects.toThrow(`'${modifier}' modifier`);
         },
     );
+
+    // oxc_parser accepted TypeScript-only class modifiers in JavaScript
+    // files and printed them back out (`public items;` stayed in the
+    // output, a syntax error for everything downstream) instead of failing
+    // like TypeScript (TS8009) and Babel; rejected upstream since 0.153.0
+    // (https://github.com/oxc-project/oxc/pull/27312). Every modifier gets
+    // the same diagnostic (`private`, `protected` and `override` too), so
+    // these three are a sample
+    it.each(['public', 'readonly', 'declare'])(
+        'rejects the %s class modifier in a JavaScript file',
+        async (modifier) => {
+            await expect(
+                transformCode(
+                    `
+export class Store {
+    ${modifier} items;
+}
+
+export function Comp() {
+    return <div />;
+}
+`,
+                    '/src/Comp.jsx',
+                ),
+            ).rejects.toThrow(
+                `'${modifier}' modifier can only be used in TypeScript files`,
+            );
+        },
+    );
 });
