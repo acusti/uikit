@@ -294,4 +294,25 @@ export function Comp() {
             );
         },
     );
+
+    // oxc_parser accepted type members with no separator between them
+    // (`label: string onClick(): void`) and silently erased the type;
+    // TypeScript (TS1005) and Babel both reject it; rejected upstream since
+    // 0.153.0 (https://github.com/oxc-project/oxc/pull/27222)
+    it('rejects type members without a separator', async () => {
+        await expect(
+            transformCode(
+                `
+export interface Props {
+    label: string onClick(): void;
+}
+
+export function Comp({ label }: Props) {
+    return <div>{label}</div>;
+}
+`,
+                '/src/Comp.tsx',
+            ),
+        ).rejects.toThrow('Expected a semicolon');
+    });
 });
