@@ -39,6 +39,7 @@
         "format:check": "oxfmt --check --ignore-path .gitignore --ignore-path .oxfmtignore .oxlintrc.json AGENTS.md package.json README.md tsconfig.base.json tsconfig.json ./.changeset/ ./packages/ ./packages/docs/.storybook/",
         "lint": "oxlint -c ./.oxlintrc.json --type-aware ./packages/*/src",
         "lintfix": "oxlint -c ./.oxlintrc.json --type-aware --fix-dangerously ./packages/*/src",
+        "lockfile:commits": "bun scripts/lockfile-commits.mjs",
         "test": "vitest",
         "tsc": "bun run --workspaces --parallel tsc"
     },

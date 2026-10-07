@@ -53,6 +53,35 @@ bun run format
   branch instead of merging it in (e.g. `git pull --rebase`,
   `git rebase origin/main`).
 
+## Dependency upgrades
+
+To pick up the latest in-range versions, regenerate `bun.lock` (delete it
+and run `bun install`), then split the result into one commit per direct
+dependency (plus the transitive entries only it pulls in):
+
+```bash
+bun run lockfile:commits            # dry run: prints the plan, changes nothing
+bun run lockfile:commits --commit   # creates the commits
+```
+
+- Review the plan first. Entries pulled in by several changed dependencies
+  (e.g. `ws`, `magic-string`) are listed under "Warnings" and go to the
+  owner with the largest commit; move one with
+  `--assign <key>=<dependency>`. Combine commits with `--merge <a>,<b>`.
+- `bun.lock` must be the only modified file. If its `workspaces` section
+  changed (`package.json` edits, workspace version bumps), commit that
+  separately first; the script refuses to run otherwise.
+- The script replays the groups on top of `HEAD` and aborts without
+  committing unless the result is byte-identical to the regenerated
+  lockfile. It also reorders commits to avoid intermediate dependency
+  mismatches and warns if it can't.
+- Afterwards run the full validation above. Major version jumps (e.g. a
+  `vitest` or `vite` major) deserve the full test run, not just
+  `bun install --frozen-lockfile`.
+- In a sandboxed agent shell, committing writes `.git`, so the script needs
+  an unsandboxed terminal. Use `git -c color.ui=never` when filtering diff
+  output with `grep`/`sed`, since color codes break line-prefix matches.
+
 ## Pull Request Reviews
 
 - Treat PR review comments as an issue tracker: reply on each actionable
