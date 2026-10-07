@@ -1,5 +1,5 @@
 import clsx from 'clsx';
-import { Fragment } from 'react';
+import { Fragment, useSyncExternalStore } from 'react';
 
 import styles from './styles/month-calendar.css?inline';
 import {
@@ -27,6 +27,16 @@ type DateRangeDays = [null | number, null | number, null | number];
 const DAYS = Array(7).fill(null);
 const ROOT_CLASS_NAME = 'uktmonthcalendar';
 
+// The current date is external state: reading it with useSyncExternalStore
+// keeps render pure and lets server and hydration renders agree (no “today”
+// until the client takes over) instead of mismatching on clock or timezone.
+const subscribeToNothing = () => () => undefined;
+const getTodayTime = () => {
+    const now = new Date();
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+};
+const getServerTodayTime = () => null;
+
 export default function MonthCalendar({
     className,
     dateEnd,
@@ -38,11 +48,18 @@ export default function MonthCalendar({
     onChangeEndPreview,
     title,
 }: Props) {
-    const today = new Date();
+    const todayTime = useSyncExternalStore(
+        subscribeToNothing,
+        getTodayTime,
+        getServerTodayTime,
+    );
+    const today = todayTime == null ? null : new Date(todayTime);
     // props.month must be a finite number within safe integer range
     const month = Number.isFinite(_month)
         ? Math.max(Number.MIN_SAFE_INTEGER, Math.min(Number.MAX_SAFE_INTEGER, _month))
-        : getMonthFromDate(today);
+        : today == null
+          ? 0
+          : getMonthFromDate(today);
     const year = getYearFromMonth(month);
     title = title ?? `${getMonthNameFromMonth(month)} ${year}`;
     const firstDate = getDateFromMonthAndDay(month, 1);
@@ -167,6 +184,7 @@ export default function MonthCalendar({
                                                         isBeforeDateRangeEnd,
                                                     'is-today':
                                                         !isEmpty &&
+                                                        today != null &&
                                                         month ===
                                                             getMonthFromDate(today) &&
                                                         dayNumber === today.getDate(),
