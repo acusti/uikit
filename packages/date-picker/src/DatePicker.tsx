@@ -60,27 +60,31 @@ export default function DatePicker({
     const [dateStart, setDateStart] = useState(defaultDateStartNormalized);
     const updatingDateEndRef = useRef(false);
 
-    if (initialMonth == null) {
-        // if no valid initial date, initially show present month as date end
-        const useDateEnd = dateStart == null || Boolean(showEndInitially && dateEnd);
-        // use date from props if set
-        const initialDate = useDateEnd ? dateEnd : dateStart;
-        initialMonth = getMonthFromDate(
-            initialDate == null ? new Date() : new Date(initialDate),
-        );
-        if (useDateEnd && isTwoUp) {
-            initialMonth -= 1;
+    // lazy initializer: the initial month is only read on mount, and reading the
+    // current date there (rather than during render) keeps render pure
+    const [month, setMonth] = useState<number>(() => {
+        let startMonth = initialMonth;
+        if (startMonth == null) {
+            // if no valid initial date, initially show present month as date end
+            const useDateEnd = dateStart == null || Boolean(showEndInitially && dateEnd);
+            // use date from props if set
+            const initialDate = useDateEnd ? dateEnd : dateStart;
+            startMonth = getMonthFromDate(
+                initialDate == null ? new Date() : new Date(initialDate),
+            );
+            if (useDateEnd && isTwoUp) {
+                startMonth -= 1;
+            }
         }
-    }
 
-    // clamp initial month to monthLimit bounds
-    const maxInitialMonth =
-        (monthLimitLast ?? Number.MAX_SAFE_INTEGER) + (isTwoUp ? -1 : 0);
-    initialMonth = Math.max(
-        Math.min(initialMonth, maxInitialMonth),
-        monthLimitFirst ?? Number.MIN_SAFE_INTEGER,
-    );
-    const [month, setMonth] = useState<number>(initialMonth);
+        // clamp initial month to monthLimit bounds
+        const maxInitialMonth =
+            (monthLimitLast ?? Number.MAX_SAFE_INTEGER) + (isTwoUp ? -1 : 0);
+        return Math.max(
+            Math.min(startMonth, maxInitialMonth),
+            monthLimitFirst ?? Number.MIN_SAFE_INTEGER,
+        );
+    });
     const [dateEndPreview, setDateEndPreview] = useState<null | string>(null);
 
     const delta = isTwoUp ? 2 : 1;
