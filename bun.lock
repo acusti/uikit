@@ -135,7 +135,7 @@
     },
     "packages/dropdown": {
       "name": "@acusti/dropdown",
-      "version": "1.0.0-rc.3",
+      "version": "1.0.0",
       "dependencies": {
         "@acusti/matchmaking": "^0.10.0",
         "@acusti/use-keyboard-events": "^0.13.0",
@@ -302,7 +302,7 @@
     },
     "packages/vite-plugin-react-compiler": {
       "name": "@acusti/vite-plugin-react-compiler",
-      "version": "0.6.0",
+      "version": "0.8.0",
       "dependencies": {
         "oxc-transform-react": "0.153.0",
       },
