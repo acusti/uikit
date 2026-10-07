@@ -1,5 +1,154 @@
 # @acusti/dropdown
 
+## 1.0.0
+
+### Major Changes
+
+- baed1c5: Rename the root’s `disabled` state class to `is-disabled`
+
+    The root element’s other state classes are `is-open` and
+    `is-searchable` (and the body’s `has-items`), but the disabled state
+    was a bare `disabled` class — the one class in the set that a
+    consumer’s global stylesheet is likely to define already. It now
+    follows the same convention.
+
+    **Migration:** replace `.uktdropdown.disabled` with
+    `.uktdropdown.is-disabled` in any selector that targets it.
+
+- 12e8d58: Name the padding tokens for logical sides, and space the label
+  with a gap
+
+    The placement tokens went logical in 1.0.0-alpha.4 so recipes stay
+    correct in RTL, but the content region’s padding was still four
+    physical-side tokens, and the label’s spacing was a `padding-right`
+    that landed on the wrong side of the label text in RTL.
+
+    - `--uktdd-body-pad-top`, `-right`, `-bottom`, `-left` are now
+      `--uktdd-body-pad-block-start`, `-inline-end`, `-block-end`,
+      `-inline-start`, applied with `padding-block`/`padding-inline`
+    - `--uktdd-label-pad-right` is now `--uktdd-label-gap`, applied as the
+      `gap` of the flex `.uktdropdown-label` rather than as padding on
+      `.uktdropdown-label-text`
+
+    The defaults are unchanged, so a dropdown that sets none of these
+    renders identically.
+
+    **Migration:** rename any of the five tokens you set. In a horizontal
+    LTR page, `--uktdd-body-pad-top` and `-bottom` become
+    `--uktdd-body-pad-block-start` and `-block-end`,
+    `--uktdd-body-pad-left` and `-right` become
+    `--uktdd-body-pad-inline-start` and `-inline-end`, and
+    `--uktdd-label-pad-right` becomes `--uktdd-label-gap`. A rule that
+    padded `.uktdropdown-label-text` directly should set
+    `--uktdd-label-gap` (or `gap` on `.uktdropdown-label`) instead.
+
+- 82fab6f: Render a nested Dropdown’s item element as a `<div>` outside a
+  list
+
+    A nested (submenu) `Dropdown` always rendered its item element as an
+    `<li>`, which is invalid HTML in a body built from
+    `<div data-ukt-item>` items rather than a `<ul>`. The item element is
+    now an `<li>` when its container is a `<ul>`, `<ol>`, or `<menu>` and a
+    `<div>` anywhere else, so once mounted it is valid HTML in either. The
+    container isn’t knowable until the item is in the DOM, so it mounts as
+    an `<li>` and switches before paint when the container turns out not to
+    be a list; a nested Dropdown inside a list renders exactly as before.
+    Server output still carries the `<li>`; pass `itemAs` when it must be
+    valid too.
+
+    A nested Dropdown now also fills in its own ARIA (its `menuitem` role
+    and disclosure attributes, and its submenu’s) when it registers with
+    the root, rather than relying only on the once-per-open pass — so one
+    rendered into an already-open body gets its own roles too (that pass
+    still doesn’t reach anything else added late, a list wrapper around it
+    included). A `<menu>` wrapper around items is now neutralized with
+    `role="presentation"` like `<ul>`/`<ol>`, so it no longer sits between
+    the menu and its items in the accessibility tree.
+
+    **Migration:** a nested Dropdown whose container isn’t a list now
+    renders a `<div>` item element instead of an `<li>`. Selectors or test
+    queries that assumed `li` for that case (`li[data-ukt-item]`,
+    `getByRole('listitem')`) should target `[data-ukt-item]` instead.
+    Inside a `<ul>`, `<ol>`, or `<menu>` nothing changes.
+
+- 990152e: Simplifies dropdown’s state management by using `useEffectEvent`
+  for the `onOpen` and `onClose` callbacks, which means it now requires
+  `react` and `react-dom` 19.2 or later.
+
+### Minor Changes
+
+- 1d3c6ca: Add an `itemAs` prop to name a nested Dropdown’s item element
+
+    A nested (submenu) Dropdown picks `<li>` or `<div>` for its item
+    element by checking its container once it’s in the DOM, and remounts as
+    a `<div>` when the container isn’t a list. `itemAs="div"` (or
+    `itemAs="li"`) names the element up front and skips that check, so the
+    item mounts once and server output matches the client — for submenu
+    bodies with mount effects of their own, or SSR-sensitive pages.
+    Detection stays the default; `itemAs` is nested-only and warns anywhere
+    else (a top-level Dropdown, or a nested `hasItems={false}` one).
+
+- 45d5287: Export `DropdownProps` and `StyleWithCustomProperties`, and let
+  `Menubar`’s style prop take custom properties
+
+    `Props` is now also exported as `DropdownProps`, the name that pairs
+    with `MenubarProps` (the existing `Props` export is unchanged). The
+    `style` prop’s type — `React.CSSProperties` extended to accept the
+    `--uktdd-*` custom properties — is exported as
+    `StyleWithCustomProperties` and is now the type of `Menubar`’s `style`
+    prop too, which previously rejected them.
+
+### Patch Changes
+
+- 8cf1ed1: Submit the first item clicked after a dropdown opens without a
+  press
+
+    If a dropdown first opened from the keyboard, or by focusing a
+    searchable dropdown’s input, before any click elsewhere on the page,
+    the first click on an item did nothing: the dropdown took its mouseup
+    for the end of the press that opened the menu, though no press had. It
+    now submits the item.
+
+- e938199: Warn that a nested Dropdown ignores `onClick`, `onMouseDown`,
+  and `onMouseUp`
+
+    A nested (submenu) Dropdown renders a parent item rather than a root
+    element, so the three root-element event props had nowhere to go and
+    were dropped silently. They now join the props a nested Dropdown warns
+    about ignoring, and their docs say so.
+
+    These ignored-prop warnings (including the one for `itemAs` outside a
+    submenu) are advisory, so they now go to `console.warn` rather than
+    `console.error`, as does the message for more than two children (logged
+    once per mount rather than on every render). Rendering a Dropdown with
+    no children still throws.
+
+- df0a27e: Call `onOpen` and `onClose` only when the dropdown opens or
+  closes
+
+    When re-shown by `<Activity>` (or re-run by StrictMode in development),
+    a dropdown that mounted closed called `onClose`, and one mounted open
+    with `isOpenOnMount` called `onOpen` again. Both callbacks now fire
+    only on a real open or close.
+
+- 8fe2cf6: Stop an earlier open’s press timer from closing a later open
+
+    When the press that opened a dropdown ended before its release (by
+    dragging, as in a press-drag-release pick, or by Escape), that press’s
+    one-second timer kept running. If the trigger was clicked again about a
+    second after that press began, the timer could go off while the mouse
+    button was held down, so the menu opened and then closed again on
+    release. The timer now ends whenever the press does, including when the
+    dropdown closes.
+
+- 0ef57f6: Reopen a dropdown pressed or hovered as a delayed close lands
+
+    For a moment after a delayed close (the short delay after an item pick,
+    or an `openOnHover` close), the dropdown still counted itself as open,
+    because the open state its handlers read lagged a task behind the page.
+    A press on the trigger, or the pointer returning to an `openOnHover`
+    trigger, landing in that moment didn’t reopen it. It now does.
+
 ## 1.0.0-rc.3
 
 ### Patch Changes
