@@ -20,7 +20,8 @@ bun run format:check
 
 ## Repo-specific facts
 
-- `bun run build` builds workspaces in dependency order and excludes `@acusti/uikit-docs`
+- `bun run build` builds workspaces in dependency order and excludes
+  `@acusti/uikit-docs`
 - `bun run buildall` includes the docs package
 - `bun run dev` starts Storybook for `@acusti/uikit-docs`
 - For a single workspace, use `bun run --filter '@acusti/<pkg>' <script>`
