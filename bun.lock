@@ -87,7 +87,7 @@
     },
     "packages/date-picker": {
       "name": "@acusti/date-picker",
-      "version": "0.16.2",
+      "version": "0.16.3",
       "dependencies": {
         "clsx": "^2",
       },
