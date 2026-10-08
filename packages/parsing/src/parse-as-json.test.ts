@@ -295,6 +295,33 @@ describe('@acusti/parsing', () => {
                 );
             });
 
+            it('reads a literal that follows a string in an array', () => {
+                expect(
+                    parseAsJSON(
+                        PAGE_START +
+                            '"tags":["a",true,"b",1,"c",null,"d"],"description":"Go',
+                    ),
+                ).toEqual(
+                    readTo({
+                        description: 'Go',
+                        tags: ['a', true, 'b', 1, 'c', null, 'd'],
+                    }),
+                );
+                expect(
+                    parseAsJSON(
+                        PAGE_START + '"tags": ["a", -2.5e3, "b", false ], "c": "d',
+                    ),
+                ).toEqual(readTo({ c: 'd', tags: ['a', -2500, 'b', false] }));
+                // as it reads an object or an array that follows one
+                expect(
+                    parseAsJSON(
+                        PAGE_START + '"tags":["a",{"b":null},"c",["d",1],"e"],"f":"g',
+                    ),
+                ).toEqual(
+                    readTo({ f: 'g', tags: ['a', { b: null }, 'c', ['d', 1], 'e'] }),
+                );
+            });
+
             it('drops an array item the text ends partway through', () => {
                 expect(parseAsJSON(PAGE_START + '"flags":[true, false, nu')).toEqual(
                     readTo({ flags: [true, false] }),
