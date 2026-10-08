@@ -105,20 +105,35 @@ const UNFINISHED_KEY_REGEXP = /([{,])\s*"(?:[^"\\]|\\.)*\\?$/;
 
 type GenericObject = Record<string, unknown>;
 
+// the last index at which the text has a quote mark, the separator, and then
+// (after no more than one space) another quote mark, no further back than minIndex
+function lastIndexOfSeparator(text: string, separator: string, minIndex: number) {
+    const start = '"' + separator;
+    let index = text.lastIndexOf(start);
+    while (index > -1 && index >= minIndex) {
+        const next = text[index + 2];
+        if (next === '"' || (next === ' ' && text[index + 3] === '"')) return index;
+        index = index === 0 ? -1 : text.lastIndexOf(start, index - 1);
+    }
+    return -1;
+}
+
+// whether the last string in the text is a key or a value, going by which ended
+// later: a string that a colon and another string follow, or a comma and one
 export function getPreviousStringType(text: string): 'KEY' | 'VALUE' | null {
-    const lastEndKeyIndexA = text.lastIndexOf('":"');
-    const lastEndKeyIndexB = text.lastIndexOf('": "');
-    const lastEndKeyIndex = Math.max(lastEndKeyIndexA, lastEndKeyIndexB);
-    const lastEndValueIndexA = text.lastIndexOf('","');
-    const lastEndValueIndexB = text.lastIndexOf('", "');
-    const lastEndValueIndex = Math.max(lastEndValueIndexA, lastEndValueIndexB);
+    const lastEndKeyIndex = lastIndexOfSeparator(text, ':', 0);
+    // the end of a value only matters if it is after the end of the last key, so
+    // look no further back than that (the whole text, at every comma, adds up)
+    const lastEndValueIndex = lastIndexOfSeparator(
+        text,
+        ',',
+        Math.max(lastEndKeyIndex, 0),
+    );
     // if cannot determine the type, return null
     if (lastEndKeyIndex <= 0 && lastEndValueIndex <= 0) return null;
     // if last token is an array
-    const lastEndArrayIndex = text.lastIndexOf(']');
-    if (lastEndArrayIndex > lastEndKeyIndex && lastEndArrayIndex > lastEndValueIndex) {
-        return null;
-    }
+    const lastEndIndex = Math.max(lastEndKeyIndex, lastEndValueIndex);
+    if (text.indexOf(']', lastEndIndex + 1) > -1) return null;
 
     return lastEndValueIndex > lastEndKeyIndex ? 'VALUE' : 'KEY';
 }

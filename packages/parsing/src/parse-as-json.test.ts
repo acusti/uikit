@@ -24,6 +24,29 @@ describe('@acusti/parsing', () => {
             expect(getPreviousStringType('{"foo": 42, "')).toBe(null);
             expect(getPreviousStringType('{"foo": ["one", "two"]')).toBe(null);
         });
+
+        it('goes by whichever ended later, a key or a value, each a string that another follows', () => {
+            // a value ended later
+            expect(getPreviousStringType('{"a":"b","c"')).toBe('VALUE');
+            expect(getPreviousStringType('{"a":"b","c":"d","e"')).toBe('VALUE');
+            // a key ended later, though a value ended before it
+            expect(getPreviousStringType('{"a":"b","c":"d"')).toBe('KEY');
+            expect(getPreviousStringType('{"a":"b","c","d":"e"')).toBe('KEY');
+            // an array closed after both
+            expect(getPreviousStringType('{"a":"b","c":["d"]')).toBe(null);
+            expect(getPreviousStringType('{"a":["b","c"],"d"')).toBe(null);
+            // an array closed before either
+            expect(getPreviousStringType('{"a":["b"],"c":"d"')).toBe('KEY');
+            expect(getPreviousStringType('{"a":["b"],"c":"d","e"')).toBe('VALUE');
+            // more than one space between the two strings does not count
+            expect(getPreviousStringType('{"a":  "b",  "c"')).toBe(null);
+            expect(getPreviousStringType('{"a":"b",\n"c"')).toBe('KEY');
+            // nor does an end at the very start of the text
+            expect(getPreviousStringType('":"a')).toBe(null);
+            expect(getPreviousStringType('x":"a')).toBe('KEY');
+            expect(getPreviousStringType('","a')).toBe(null);
+            expect(getPreviousStringType('x","a')).toBe('VALUE');
+        });
     });
 
     describe('parseAsJSON', () => {
