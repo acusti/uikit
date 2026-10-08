@@ -460,7 +460,12 @@ export function parseAsJSON(text: string): ParsedResult {
             } else if (char === ',' && stack.at(-1) === '}') {
                 // ensure comma follows a full key/value pair
                 // if not, convert current string into a key and add an empty value
-                if (getPreviousStringType(newText) === 'VALUE') {
+                // (only a string can be a key: after a number, object, or array,
+                // the previous string type is that of an earlier pair)
+                if (
+                    isPreceededBy({ char: '"', text: newText }) &&
+                    getPreviousStringType(newText) === 'VALUE'
+                ) {
                     char = ': "",';
                 }
             } else if (char === '\n') {
