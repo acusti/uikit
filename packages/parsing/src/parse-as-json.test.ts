@@ -2,6 +2,9 @@ import { describe, expect, it } from 'vitest';
 
 import { getPreviousStringType, parseAsJSON } from './parse-as-json.js';
 
+// an unfinished page, up to where the props of its first section are open
+const PAGE_START = '{"sections":[{"props":{"heading":"Hi",';
+
 describe('@acusti/parsing', () => {
     describe('getPreviousStringType', () => {
         it('returns KEY if the previous string token is an object key', () => {
@@ -93,6 +96,26 @@ describe('@acusti/parsing', () => {
             'cleanly dilineates between preamble and JSON results',
             extractPreambleTestCase,
         );
+        it('reads on past a number that follows a string value', () => {
+            expect(parseAsJSON(PAGE_START + '"rating":5,"description":"Go')).toEqual(
+                readTo({ description: 'Go', rating: 5 }),
+            );
+            expect(
+                parseAsJSON(
+                    PAGE_START + '"items":[{"heading":"One","rating":5},{"heading":"Tw',
+                ),
+            ).toEqual(
+                readTo({ items: [{ heading: 'One', rating: 5 }, { heading: 'Tw' }] }),
+            );
+        });
+        it('reads on past an object that holds no string and follows a string value', () => {
+            expect(
+                parseAsJSON(PAGE_START + '"layout":{"columns":3},"description":"Go'),
+            ).toEqual(readTo({ description: 'Go', layout: { columns: 3 } }));
+            expect(parseAsJSON(PAGE_START + '"layout":{},"description":"Go')).toEqual(
+                readTo({ description: 'Go', layout: {} }),
+            );
+        });
     });
 });
 
@@ -890,6 +913,16 @@ function preservesNewLinesTestCase() {
             ],
         },
     });
+}
+
+// what a text that starts with PAGE_START reads to, given the props it goes on
+// to hold: the page’s own root, with nothing left over
+function readTo(props: Record<string, unknown>) {
+    return {
+        postscript: '',
+        preamble: '',
+        value: { sections: [{ props: { heading: 'Hi', ...props } }] },
+    };
 }
 
 function restartsMidResponseTestCase() {
