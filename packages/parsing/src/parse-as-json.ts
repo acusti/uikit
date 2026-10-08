@@ -99,6 +99,9 @@ const UNFINISHED_LITERAL_REGEXP =
 // the key that a text ends on, with its colon and the comma that precedes it
 const LAST_KEY_REGEXP = /,?\s*"(?:[^"\\]|\\.)*"\s*:\s*$/;
 const LAST_COMMA_REGEXP = /,?\s*$/;
+// the key that a text ends partway through (on a backslash, if it ends on the
+// start of an escape sequence), with the brace or comma before it
+const UNFINISHED_KEY_REGEXP = /([{,])\s*"(?:[^"\\]|\\.)*\\?$/;
 
 type GenericObject = Record<string, unknown>;
 
@@ -628,8 +631,14 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
         newText += char;
     }
 
-    // if we’re still inside a string, close it
-    if (isInsideString) {
+    if (isInsideString && stack.at(-1) === '}' && UNFINISHED_KEY_REGEXP.test(newText)) {
+        // if the text ends partway through a key, the key it would become is not
+        // yet known: leave it out rather than close it as a key of another name
+        newText = newText.replace(UNFINISHED_KEY_REGEXP, (_match, opener: string) =>
+            opener === '{' ? opener : '',
+        );
+    } else if (isInsideString) {
+        // if we’re still inside a string, close it
         // if the text ends partway through an escape sequence, drop the sequence
         // (an even number of backslashes is escaped backslashes, which are whole)
         const escape = UNFINISHED_ESCAPE_REGEXP.exec(newText);

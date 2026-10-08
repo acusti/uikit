@@ -5,9 +5,10 @@ import { getPreviousStringType, parseAsJSON } from './parse-as-json.js';
 // an unfinished page, up to where the props of its first section are open
 const PAGE_START = '{"sections":[{"props":{"heading":"Hi",';
 
-// where a text stops on a key (if its innermost open structure is an object):
-// inside the key, after it, or after its colon
-const STOPS_ON_KEY_REGEXP = /[{,]\s*"(?:[^"\\]|\\.)*(?:"\s*:?\s*)?$/;
+// where a text stops on a key, if its innermost open structure is an object:
+// inside the key, or between the key and its value (after it or after its colon)
+const STOPS_IN_KEY_REGEXP = /[{,]\s*"(?:[^"\\]|\\.)*\\?$/;
+const STOPS_AFTER_KEY_REGEXP = /[{,]\s*"(?:[^"\\]|\\.)*"\s*:?\s*$/;
 
 describe('@acusti/parsing', () => {
     describe('getPreviousStringType', () => {
@@ -122,21 +123,21 @@ describe('@acusti/parsing', () => {
         });
         it('reads an unfinished object from its opening brace, before its first key is whole', () => {
             // as it reads one with no whitespace after the brace
-            expect(parseAsJSON('{"sec').value).toEqual({ sec: '' });
-            expect(parseAsJSON('{\n  "')).toEqual({
-                postscript: '',
-                preamble: '',
-                value: { '': '' },
-            });
-            expect(parseAsJSON('{\n  "sec')).toEqual({
-                postscript: '',
-                preamble: '',
-                value: { sec: '' },
-            });
+            expect(parseAsJSON('{"sections"').value).toEqual({ sections: '' });
             expect(parseAsJSON('{\n  "sections"')).toEqual({
                 postscript: '',
                 preamble: '',
                 value: { sections: '' },
+            });
+            expect(parseAsJSON('{\n  "sec')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: {},
+            });
+            expect(parseAsJSON('{\n  "')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: {},
             });
         });
         it('drops an escape sequence that the text ends partway through', () => {
@@ -162,6 +163,38 @@ describe('@acusti/parsing', () => {
             });
             // a whole escape of the backslash itself
             expect(parseAsJSON('{"path":"C:\\\\').value).toEqual({ path: 'C:\\' });
+        });
+        it('leaves out a key that the text ends partway through', () => {
+            expect(parseAsJSON(PAGE_START + '"descr')).toEqual(readTo({}));
+            expect(parseAsJSON(PAGE_START + '"')).toEqual(readTo({}));
+            expect(parseAsJSON(PAGE_START + '"a \\"quoted\\" ke')).toEqual(readTo({}));
+            // one that ends on a backslash, the start of an escape sequence
+            expect(parseAsJSON(PAGE_START + '"ke\\')).toEqual(readTo({}));
+            expect(parseAsJSON(PAGE_START + '"ke\\u00')).toEqual(readTo({}));
+            // as its object’s first key, which no comma precedes
+            expect(parseAsJSON(PAGE_START + '"buttonLink":{"ena')).toEqual(
+                readTo({ buttonLink: {} }),
+            );
+            // a key that spells an earlier one, as far as it goes, leaves that one be
+            expect(
+                parseAsJSON(
+                    PAGE_START + '"button":"Book","buttonLink":{"enabled":true},"button',
+                ),
+            ).toEqual(readTo({ button: 'Book', buttonLink: { enabled: true } }));
+            // once the key is whole, it holds '' until its value starts
+            expect(parseAsJSON(PAGE_START + '"description"')).toEqual(
+                readTo({ description: '' }),
+            );
+            expect(parseAsJSON(PAGE_START + '"description":')).toEqual(
+                readTo({ description: '' }),
+            );
+            // a string that is a value, or an item in an array, is read as far as it goes
+            expect(parseAsJSON(PAGE_START + '"description":"Go')).toEqual(
+                readTo({ description: 'Go' }),
+            );
+            expect(parseAsJSON(PAGE_START + '"tags":["a","b')).toEqual(
+                readTo({ tags: ['a', 'b'] }),
+            );
         });
 
         describe('with bare literals in an unfinished text', () => {
@@ -469,21 +502,15 @@ Here is the button:
                 for (const { prefix } of cuts) readings.push(parseAsJSON(prefix));
             });
 
-            it('reads every prefix of the text as a prefix of the page, unless it stops on a key', () => {
-                // A text that stops on a key (inside it, after it, or after its
-                // colon) is set aside: parseAsJSON reads that much of the key as
-                // holding '', which is not what the page holds there. The next
-                // test holds those texts to that reading.
-                const misread = cuts.filter(({ isOnKey }, index) => {
+            it('reads every prefix of the text as a prefix of the page', () => {
+                const misread = cuts.filter(({ isAwaitingValue }, index) => {
                     const { postscript, preamble, value } = readings[index];
                     if (postscript !== '' || preamble !== '') return true;
-                    return !isOnKey && !isPrefixOf({ partial: value, whole: page });
+                    return !isPrefixOf({ isAwaitingValue, partial: value, whole: page });
                 });
                 expect(
                     misread.slice(0, 3).map(({ prefix }) => prefix.slice(-60)),
                 ).toEqual([]);
-                const onKeyCount = cuts.filter(({ isOnKey }) => isOnKey).length;
-                expect(onKeyCount).toBeLessThan(cuts.length / 5);
             });
 
             it('reads all that every prefix of the text holds', () => {
@@ -508,13 +535,14 @@ Here is the button:
 });
 
 // How a well-formed JSON text that was cut short reads once what it leaves open
-// is closed: its string, then its objects and arrays, less a trailing comma. A
-// text that stops on an object key (inside it, after it, or after its colon) is
-// first given '' as that key’s value, which is how parseAsJSON has always read
-// one. `closed` is undefined where none of that makes valid JSON (the text stops
-// partway through a literal or an escape), and where the text stops on a number,
-// which more digits could still follow.
-function closeJSON(text: string): { closed: unknown; isOnKey: boolean } {
+// is closed: its string, then its objects and arrays, less a trailing comma. In
+// an object, a key that the text stops inside is left out first, and a key that
+// it stops after (with or without its colon) is given '' as its value, which is
+// how parseAsJSON reads a key whose value has yet to start. `closed` is undefined
+// where none of that makes valid JSON (the text stops partway through a literal
+// or an escape), and where the text stops on a number, which more digits could
+// still follow.
+function closeJSON(text: string): { closed: unknown; isAwaitingValue: boolean } {
     let closers = '';
     let isInString = false;
     for (let index = 0; index < text.length; index++) {
@@ -530,17 +558,23 @@ function closeJSON(text: string): { closed: unknown; isOnKey: boolean } {
             closers = closers.slice(1);
         }
     }
-    const isOnKey = closers.startsWith('}') && STOPS_ON_KEY_REGEXP.test(text);
-    let closedText = isInString ? text + '"' : text.replace(/,\s*$/, '');
-    if (isOnKey) {
-        closedText += (!isInString && /:\s*$/.test(text) ? '' : ':') + '""';
+    const isInObject = closers.startsWith('}');
+    const keyIndex = isInString && isInObject ? text.search(STOPS_IN_KEY_REGEXP) : -1;
+    const isAwaitingValue =
+        !isInString && isInObject && STOPS_AFTER_KEY_REGEXP.test(text);
+    let closedText = isInString ? text + '"' : text;
+    // keep the brace or comma that the key follows (a trailing comma goes next)
+    if (keyIndex > -1) closedText = text.slice(0, keyIndex + 1);
+    closedText = closedText.replace(/,\s*$/, '');
+    if (isAwaitingValue) {
+        closedText += (/:\s*$/.test(text) ? '' : ':') + '""';
     } else if (!isInString && /\d$/.test(text)) {
-        return { closed: undefined, isOnKey };
+        return { closed: undefined, isAwaitingValue };
     }
     try {
-        return { closed: JSON.parse(closedText + closers) as unknown, isOnKey };
+        return { closed: JSON.parse(closedText + closers) as unknown, isAwaitingValue };
     } catch {
-        return { closed: undefined, isOnKey };
+        return { closed: undefined, isAwaitingValue };
     }
 }
 
@@ -900,11 +934,16 @@ function getPageStreamPieces() {
 // everywhere but at its open end (the last value, and that value’s last value,
 // and so on down), where a string is a prefix of the whole one and an array or
 // object holds the first of the whole one’s items or keys, in order.
+//
+// `isAwaitingValue` is for a text that stops between a key and its value, which
+// parseAsJSON reads as that key holding '' whatever its value turns out to be.
 function isPrefixOf({
+    isAwaitingValue = false,
     isOpenEnd = true,
     partial,
     whole,
 }: {
+    isAwaitingValue?: boolean;
     isOpenEnd?: boolean;
     partial: unknown;
     whole: unknown;
@@ -921,15 +960,20 @@ function isPrefixOf({
     const wholeKeys = Object.keys(whole);
     if (keys.length > wholeKeys.length) return false;
     if (!isOpenEnd && keys.length < wholeKeys.length) return false;
-    return keys.every(
-        (key, index) =>
-            key === wholeKeys[index] &&
-            isPrefixOf({
-                isOpenEnd: isOpenEnd && index === keys.length - 1,
-                partial: (partial as Record<string, unknown>)[key],
-                whole: (whole as Record<string, unknown>)[key],
-            }),
-    );
+    return keys.every((key, index) => {
+        if (key !== wholeKeys[index]) return false;
+        const isLast = isOpenEnd && index === keys.length - 1;
+        const value = (partial as Record<string, unknown>)[key];
+        if (isLast && isAwaitingValue && value === '' && !Array.isArray(partial)) {
+            return true;
+        }
+        return isPrefixOf({
+            isAwaitingValue,
+            isOpenEnd: isLast,
+            partial: value,
+            whole: (whole as Record<string, unknown>)[key],
+        });
+    });
 }
 
 function markdownTableTestCase() {
@@ -1178,7 +1222,7 @@ Here are some of the services we offer:
         value: {
             bodyCopy:
                 'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.',
-            'Here are some of the services we offer': { contentLi: '' },
+            'Here are some of the services we offer': {},
         },
     });
 
@@ -1242,7 +1286,7 @@ Props:
     expect(parseAsJSON(response)).toEqual({
         postscript: '',
         preamble: '',
-        value: { '': '', heading: 'News' },
+        value: { heading: 'News' },
     });
 
     response = `\
