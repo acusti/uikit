@@ -1,9 +1,13 @@
-import { describe, expect, it } from 'vitest';
+import { beforeAll, describe, expect, it } from 'vitest';
 
 import { getPreviousStringType, parseAsJSON } from './parse-as-json.js';
 
 // an unfinished page, up to where the props of its first section are open
 const PAGE_START = '{"sections":[{"props":{"heading":"Hi",';
+
+// where a text stops on a key (if its innermost open structure is an object):
+// inside the key, after it, or after its colon
+const STOPS_ON_KEY_REGEXP = /[{,]\s*"(?:[^"\\]|\\.)*(?:"\s*:?\s*)?$/;
 
 describe('@acusti/parsing', () => {
     describe('getPreviousStringType', () => {
@@ -159,8 +163,359 @@ describe('@acusti/parsing', () => {
             // a whole escape of the backslash itself
             expect(parseAsJSON('{"path":"C:\\\\').value).toEqual({ path: 'C:\\' });
         });
+
+        describe('with bare literals in an unfinished text', () => {
+            it('reads on past true, false and null', () => {
+                expect(
+                    parseAsJSON(
+                        PAGE_START +
+                            '"buttonLink":{"enabled":true,"type":"internal","value":"#a',
+                    ),
+                ).toEqual(
+                    readTo({
+                        buttonLink: { enabled: true, type: 'internal', value: '#a' },
+                    }),
+                );
+                expect(
+                    parseAsJSON(
+                        PAGE_START +
+                            '"background":{"type":"image","image":null,"alt":"A ta',
+                    ),
+                ).toEqual(
+                    readTo({ background: { alt: 'A ta', image: null, type: 'image' } }),
+                );
+                expect(
+                    parseAsJSON(PAGE_START + '"isFeatured":false,"description":"Go'),
+                ).toEqual(readTo({ description: 'Go', isFeatured: false }));
+            });
+
+            it('reads on past a literal that is the last value in its object', () => {
+                expect(
+                    parseAsJSON(
+                        PAGE_START +
+                            '"buttonLink":{"type":"internal","enabled":true},"background":{"type":"image","image":null,"alt":"A ta',
+                    ),
+                ).toEqual(
+                    readTo({
+                        background: { alt: 'A ta', image: null, type: 'image' },
+                        buttonLink: { enabled: true, type: 'internal' },
+                    }),
+                );
+                expect(
+                    parseAsJSON(PAGE_START + '"media":{"image":null},"description":"Go'),
+                ).toEqual(readTo({ description: 'Go', media: { image: null } }));
+            });
+
+            it('keeps true, false or null when the text ends on it', () => {
+                expect(parseAsJSON(PAGE_START + '"buttonLink":{"enabled":true')).toEqual(
+                    readTo({ buttonLink: { enabled: true } }),
+                );
+                expect(parseAsJSON(PAGE_START + '"isFeatured":false')).toEqual(
+                    readTo({ isFeatured: false }),
+                );
+                expect(parseAsJSON(PAGE_START + '"image":null')).toEqual(
+                    readTo({ image: null }),
+                );
+            });
+
+            it('reads negative, decimal and exponent numbers as their values', () => {
+                expect(
+                    parseAsJSON(
+                        PAGE_START +
+                            '"offset":-12,"ratio":0.25,"scale":1.5e3,"delta":-2E-2,"count":0,"description":"Go',
+                    ),
+                ).toEqual(
+                    readTo({
+                        count: 0,
+                        delta: -0.02,
+                        description: 'Go',
+                        offset: -12,
+                        ratio: 0.25,
+                        scale: 1500,
+                    }),
+                );
+            });
+
+            it('drops a key whose literal the text ends partway through', () => {
+                for (const literal of ['true', 'false', 'null', '-12.5e+3']) {
+                    for (let end = 1; end < literal.length; end++) {
+                        const text =
+                            PAGE_START +
+                            '"buttonLink":{"type":"internal","enabled":' +
+                            literal.slice(0, end);
+                        expect(parseAsJSON(text), text).toEqual(
+                            readTo({ buttonLink: { type: 'internal' } }),
+                        );
+                    }
+                }
+                // as its object’s first key, which no comma precedes
+                expect(parseAsJSON(PAGE_START + '"buttonLink":{"enabled":tr')).toEqual(
+                    readTo({ buttonLink: {} }),
+                );
+                expect(parseAsJSON(PAGE_START + '"image": nul')).toEqual(readTo({}));
+            });
+
+            it('holds a number back until the text shows where it ends', () => {
+                // 4 so far, which 4.5 and 45 also start with
+                expect(parseAsJSON(PAGE_START + '"rating":4')).toEqual(readTo({}));
+                expect(parseAsJSON(PAGE_START + '"rating":4.')).toEqual(readTo({}));
+                expect(parseAsJSON(PAGE_START + '"rating":4.5')).toEqual(readTo({}));
+                expect(parseAsJSON(PAGE_START + '"rating":4.5,')).toEqual(
+                    readTo({ rating: 4.5 }),
+                );
+                expect(parseAsJSON(PAGE_START + '"rating":4.5}')).toEqual(
+                    readTo({ rating: 4.5 }),
+                );
+                // whitespace, a control token, or the end of a code block shows it too
+                expect(parseAsJSON(PAGE_START + '"rating":4.5\n')).toEqual(
+                    readTo({ rating: 4.5 }),
+                );
+                expect(parseAsJSON(PAGE_START + '"rating":4.5<|im_end|>')).toEqual(
+                    readTo({ rating: 4.5 }),
+                );
+                expect(
+                    parseAsJSON('```json\n' + PAGE_START + '"rating":4.5\n```'),
+                ).toEqual(readTo({ rating: 4.5 }));
+            });
+
+            it('reads literals as array items', () => {
+                expect(
+                    parseAsJSON(
+                        PAGE_START +
+                            '"flags":[true,false,null,0,-2.5e3],"description":"Go',
+                    ),
+                ).toEqual(
+                    readTo({ description: 'Go', flags: [true, false, null, 0, -2500] }),
+                );
+                expect(parseAsJSON(PAGE_START + '"flags":[true, false, null')).toEqual(
+                    readTo({ flags: [true, false, null] }),
+                );
+                expect(parseAsJSON(PAGE_START + '"flags":[true,')).toEqual(
+                    readTo({ flags: [true] }),
+                );
+            });
+
+            it('drops an array item the text ends partway through', () => {
+                expect(parseAsJSON(PAGE_START + '"flags":[true, false, nu')).toEqual(
+                    readTo({ flags: [true, false] }),
+                );
+                expect(parseAsJSON(PAGE_START + '"flags":[tr')).toEqual(
+                    readTo({ flags: [] }),
+                );
+                expect(parseAsJSON(PAGE_START + '"sizes":[1, 2, 3')).toEqual(
+                    readTo({ sizes: [1, 2] }),
+                );
+                expect(parseAsJSON(PAGE_START + '"sizes":[-')).toEqual(
+                    readTo({ sizes: [] }),
+                );
+            });
+
+            it('reads literals inside a nested array of objects', () => {
+                expect(
+                    parseAsJSON(
+                        PAGE_START +
+                            '"items":[{"heading":"One","rating":5,"isNew":true,"image":null},{"heading":"Two","rating":4.5,"isNew":fal',
+                    ),
+                ).toEqual(
+                    readTo({
+                        items: [
+                            { heading: 'One', image: null, isNew: true, rating: 5 },
+                            { heading: 'Two', rating: 4.5 },
+                        ],
+                    }),
+                );
+            });
+
+            it('leaves a string that holds the words true, false or null as it is', () => {
+                expect(
+                    parseAsJSON(
+                        PAGE_START +
+                            '"answer":"true","note":"false, or null: it depends","count":"12","description":"null and void, tru',
+                    ),
+                ).toEqual(
+                    readTo({
+                        answer: 'true',
+                        count: '12',
+                        description: 'null and void, tru',
+                        note: 'false, or null: it depends',
+                    }),
+                );
+            });
+
+            it('reads literals on lines of their own', () => {
+                const text = `\
+{
+  "sections": [
+    {
+      "props": {
+        "heading": "Hi",
+        "buttonLink": {
+          "enabled": true,
+          "type": "internal"
+        },
+        "rating": 4.5,
+        "flags": [
+          true,
+          null
+        ],
+        "background": {
+          "image": null,
+          "alt": "A ta`;
+                const page = readTo({
+                    background: { alt: 'A ta', image: null },
+                    buttonLink: { enabled: true, type: 'internal' },
+                    flags: [true, null],
+                    rating: 4.5,
+                });
+                expect(parseAsJSON(text)).toEqual(page);
+                // with no indentation, where a literal is the first thing on a line
+                expect(parseAsJSON(text.replace(/^ +/gm, ''))).toEqual(page);
+                expect(parseAsJSON('{\n"flags": [\ntrue,\nfal')).toEqual({
+                    postscript: '',
+                    preamble: '',
+                    value: { flags: [true] },
+                });
+            });
+
+            it('reads literals in text that was never valid JSON', () => {
+                // with a postscript
+                expect(
+                    parseAsJSON('{"enabled": true, "label": "Go"}\n\nHope this helps!'),
+                ).toEqual({
+                    postscript: 'Hope this helps!',
+                    preamble: '',
+                    value: { enabled: true, label: 'Go' },
+                });
+                // with commas missing after them
+                expect(
+                    parseAsJSON(`\
+Here is the button:
+{
+"enabled": true
+"label": "Go"
+"rating": 5
+"image": null
+}`),
+                ).toEqual({
+                    postscript: '',
+                    preamble: 'Here is the button:',
+                    value: { enabled: true, image: null, label: 'Go', rating: 5 },
+                });
+                // with the opening quote of the next key missing after one
+                expect(parseAsJSON('{"enabled": true\nlabel": "Go"}')).toEqual({
+                    postscript: '',
+                    preamble: '',
+                    value: { enabled: true, label: 'Go' },
+                });
+            });
+
+            it('reads a literal only where a value is due', () => {
+                // a postscript that starts with a number, or with a word that spells one
+                expect(
+                    parseAsJSON(
+                        '{"heading": "News"}\n\n3 things to note about this page',
+                    ),
+                ).toEqual({
+                    postscript: '3 things to note about this page',
+                    preamble: '',
+                    value: { heading: 'News' },
+                });
+                expect(parseAsJSON('{"heading": "News"} null and void')).toEqual({
+                    postscript: 'null and void',
+                    preamble: '',
+                    value: { heading: 'News' },
+                });
+            });
+        });
+
+        describe('on a page as its write stream delivered it', () => {
+            const text = getPageStreamPieces().join('');
+            const page = JSON.parse(text) as unknown;
+            // every prefix of the text, with how it reads once closed (closeJSON)
+            const cuts = Array.from({ length: text.length }, (_, index) => {
+                const prefix = text.slice(0, index + 1);
+                return { prefix, ...closeJSON(prefix.trimEnd()) };
+            });
+            const readings: Array<ReturnType<typeof parseAsJSON>> = [];
+
+            beforeAll(() => {
+                for (const { prefix } of cuts) readings.push(parseAsJSON(prefix));
+            });
+
+            it('reads every prefix of the text as a prefix of the page, unless it stops on a key', () => {
+                // A text that stops on a key (inside it, after it, or after its
+                // colon) is set aside: parseAsJSON reads that much of the key as
+                // holding '', which is not what the page holds there. The next
+                // test holds those texts to that reading.
+                const misread = cuts.filter(({ isOnKey }, index) => {
+                    const { postscript, preamble, value } = readings[index];
+                    if (postscript !== '' || preamble !== '') return true;
+                    return !isOnKey && !isPrefixOf({ partial: value, whole: page });
+                });
+                expect(
+                    misread.slice(0, 3).map(({ prefix }) => prefix.slice(-60)),
+                ).toEqual([]);
+                const onKeyCount = cuts.filter(({ isOnKey }) => isOnKey).length;
+                expect(onKeyCount).toBeLessThan(cuts.length / 5);
+            });
+
+            it('reads all that every prefix of the text holds', () => {
+                // …wherever closing what the prefix leaves open says how it reads,
+                // which is everywhere but partway through a literal or an escape,
+                // and on a number
+                const misread = cuts.filter(
+                    ({ closed }, index) =>
+                        closed !== undefined &&
+                        JSON.stringify(readings[index].value) !== JSON.stringify(closed),
+                );
+                expect(
+                    misread.slice(0, 3).map(({ prefix }) => prefix.slice(-60)),
+                ).toEqual([]);
+                const unclosedCount = cuts.filter(
+                    ({ closed }) => closed === undefined,
+                ).length;
+                expect(unclosedCount).toBeLessThan(cuts.length / 20);
+            });
+        });
     });
 });
+
+// How a well-formed JSON text that was cut short reads once what it leaves open
+// is closed: its string, then its objects and arrays, less a trailing comma. A
+// text that stops on an object key (inside it, after it, or after its colon) is
+// first given '' as that key’s value, which is how parseAsJSON has always read
+// one. `closed` is undefined where none of that makes valid JSON (the text stops
+// partway through a literal or an escape), and where the text stops on a number,
+// which more digits could still follow.
+function closeJSON(text: string): { closed: unknown; isOnKey: boolean } {
+    let closers = '';
+    let isInString = false;
+    for (let index = 0; index < text.length; index++) {
+        const char = text[index];
+        if (isInString) {
+            if (char === '\\') index++;
+            else if (char === '"') isInString = false;
+        } else if (char === '"') {
+            isInString = true;
+        } else if (char === '{' || char === '[') {
+            closers = (char === '{' ? '}' : ']') + closers;
+        } else if (char === '}' || char === ']') {
+            closers = closers.slice(1);
+        }
+    }
+    const isOnKey = closers.startsWith('}') && STOPS_ON_KEY_REGEXP.test(text);
+    let closedText = isInString ? text + '"' : text.replace(/,\s*$/, '');
+    if (isOnKey) {
+        closedText += (!isInString && /:\s*$/.test(text) ? '' : ':') + '""';
+    } else if (!isInString && /\d$/.test(text)) {
+        return { closed: undefined, isOnKey };
+    }
+    try {
+        return { closed: JSON.parse(closedText + closers) as unknown, isOnKey };
+    } catch {
+        return { closed: undefined, isOnKey };
+    }
+}
 
 function convertToJSONTestCase() {
     const response = `\
@@ -468,6 +823,86 @@ function fencedJSONWithPercentSignsTestCase() {
                 'Rooted in the earth and woven with intention, our achievements reflect a commitment to a kinder, more sustainable world.',
         },
     });
+}
+
+// A page as its write stream delivered it: a model’s JSON text in the pieces a
+// client received, so every prefix that ends where a piece does is a text that
+// was really parsed mid-stream. Trimmed to the page’s first three sections,
+// with the last piece cut where the third ends and closed as the page closes.
+function getPageStreamPieces() {
+    return [
+        '{\n  "sections": [\n    {\n      "category": "hero",\n      "variant": "variant-',
+        'e",\n      "props": {\n        "eyebrow": "Baltimore Private Dining",\n        "heading',
+        '": "Private Multi-Course Dining\\nfor Milestone Celebrations",\n        "subheading": "Custom chef tasting',
+        ' menus prepared, plated, and served in your Baltimore home for unforgettable birthdays and anniversaries.",\n        "button": "Check Availability',
+        '",\n        "buttonLink": {\n          "enabled": true,\n          "type": "internal",\n',
+        '          "value": "#calendar",\n          "label": "Check Availability"\n        },\n        "buttonMicro',
+        'copy": "Select your date on the calendar",\n        "foreground": {\n          "type": "image",\n',
+        '          "image": null,\n          "alt": "Private chef carefully garnishing an elegant multi-course dish in a',
+        ' residential kitchen",\n          "prompt": "A professional chef delicately garnishing a fine dining course with fresh herbs on a dark',
+        ' ceramic plate inside a stylish residential kitchen"\n        }\n      },\n      "layoutPropsOnOff": {\n        "ey',
+        'ebrow": true,\n        "buttonMicrocopy": true\n      }\n    },\n    {\n      ',
+        '"category": "social-proof",\n      "variant": "variant-b",\n      "props": {',
+        '\n        "items": [\n          {\n            "name": "Baltimore Event Host",\n            "rating": 5,\n',
+        '            "description": "People have raved about the professionalism and the taste of the food. I can not say enough',
+        ' about this business.",\n            "source": "Google Review",\n            "foreground": {\n              "type":',
+        ' "image",\n              "image": null,\n              "alt": "Table of dinner guests enjoying a shared private',
+        ' celebration meal",\n              "prompt": "An intimate dinner party table setting with smiling guests in soft warm lighting enjoying wine',
+        ' and plated food"\n            }\n          }\n        ]\n      },\n      "layoutItemPropsOnOff": {\n',
+        '        "source": true\n      }\n    },\n    {\n      "category": "services",\n      ',
+        '"variant": "variant-d",\n      "props": {\n        "heading": "Custom Multi-Course',
+        ' Menus for Your Special Occasions",\n        "items": [\n          {\n            "heading": "Mil',
+        'estone Birthdays",\n            "description": "Celebrate milestone birthdays with a tailored 5- to 7-course',
+        ' tasting menu centered on your favorite ingredients, presented at an easy, celebratory pace.",\n            "foreground": {\n              "type": "',
+        'image",\n              "image": null,\n              "alt": "Artistically plated birthday entrée course",\n              "prompt":',
+        ' "Close-up of a beautifully composed gourmet entrée on artisan stoneware with microgreens and reduction sauce"\n            }\n',
+        '          },\n          {\n            "heading": "Anniversary Dinners",\n            "description": "Experience fine',
+        '-dining intimacy at your own dining table. Enjoy personalized course-by-course presentation without crowded restaurant noise or rushed seat',
+        'ings.",\n            "foreground": {\n              "type": "image",\n              "image": null,\n              ',
+        '"alt": "Romantic candlelit private dinner place setting",\n              "prompt": "Candlelit dinner place setting with polished',
+        ' silverware, crystal glassware, and an elegant printed menu card"\n            }\n          },\n          {\n            "heading": "',
+        'Curated Tasting Menus",\n            "description": "Enjoy a seasonal culinary journey highlighting peak Mid-Atlantic ingredients and',
+        ' fresh local seafood, crafted from scratch in your home for close friends and family.",\n            "foreground": {\n              "type',
+        '": "image",\n              "image": null,\n              "alt": "Seasonal seafood course preparation",\n              "prompt": "',
+        'Delicate pan-seared scallops plated with seasonal purée and fresh herb oil garnish"\n            }\n          }\n        ]\n',
+        '      }\n    }\n  ]\n}',
+    ];
+}
+
+// Whether `partial` is `whole` as far as it had been written: equal to it
+// everywhere but at its open end (the last value, and that value’s last value,
+// and so on down), where a string is a prefix of the whole one and an array or
+// object holds the first of the whole one’s items or keys, in order.
+function isPrefixOf({
+    isOpenEnd = true,
+    partial,
+    whole,
+}: {
+    isOpenEnd?: boolean;
+    partial: unknown;
+    whole: unknown;
+}): boolean {
+    if (typeof partial === 'string') {
+        if (typeof whole !== 'string') return false;
+        return isOpenEnd ? whole.startsWith(partial) : whole === partial;
+    }
+    if (partial == null || typeof partial !== 'object') return partial === whole;
+    if (whole == null || typeof whole !== 'object') return false;
+    if (Array.isArray(partial) !== Array.isArray(whole)) return false;
+    // an array’s keys are its indices
+    const keys = Object.keys(partial);
+    const wholeKeys = Object.keys(whole);
+    if (keys.length > wholeKeys.length) return false;
+    if (!isOpenEnd && keys.length < wholeKeys.length) return false;
+    return keys.every(
+        (key, index) =>
+            key === wholeKeys[index] &&
+            isPrefixOf({
+                isOpenEnd: isOpenEnd && index === keys.length - 1,
+                partial: (partial as Record<string, unknown>)[key],
+                whole: (whole as Record<string, unknown>)[key],
+            }),
+    );
 }
 
 function markdownTableTestCase() {
@@ -1073,6 +1508,23 @@ function restartsMidResponseTestCase() {
             teamMemberName2: 'Jane Smith',
             teamMemberName3: 'Bob Johnson',
         },
+    });
+
+    // what is left of a text that something followed (here, a line break) was
+    // followed by it too, so a number that it ends on is whole
+    response =
+        'Here: {"heading": "A", "sub": "B"} oops\nHere is the full one: {"heading": "A", "sub": "B", "body": "C", "rating": 5\n';
+    expect(parseAsJSON(response).value).toEqual({
+        body: 'C',
+        heading: 'A',
+        rating: 5,
+        sub: 'B',
+    });
+    // with nothing after it, that number may not be whole
+    expect(parseAsJSON(response.trimEnd()).value).toEqual({
+        body: 'C',
+        heading: 'A',
+        sub: 'B',
     });
 }
 

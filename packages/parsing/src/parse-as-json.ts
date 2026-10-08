@@ -69,6 +69,31 @@ const VALUE_DELIMITER_CHARS = new Set([
 const VALUE_START_CHARS = VALUE_DELIMITER_CHARS.add('{').add('[');
 const VALUE_END_CHARS = VALUE_DELIMITER_CHARS.add('}').add(']');
 
+// a bare literal (true, false, null, or a number) starts with one of these…
+const LITERAL_START_CHARS = new Set('-0123456789fnt');
+// …and ends with one of these (outside of a string, nothing else has letters)
+const LITERAL_END_CHARS = new Set('0123456789el');
+// …and is over once one of these follows it
+const LITERAL_DELIMITER_CHARS = new Set([...WHITESPACE_CHARS, ',', ']', '}']);
+// …and, as an item in an array, follows one of these
+const ITEM_OPENING_CHARS = new Set('[,');
+
+// what a comma can come between: any of the values above, or a bare literal
+const ITEM_START_CHARS = new Set([...VALUE_START_CHARS, ...LITERAL_START_CHARS]);
+const ITEM_END_CHARS = new Set([...VALUE_END_CHARS, ...LITERAL_END_CHARS]);
+// the end of a string or of a bare literal
+const SCALAR_END_CHARS = new Set(['"', ...LITERAL_END_CHARS]);
+
+const LITERAL_PATTERN = 'true|false|null|-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?';
+const LITERAL_REGEXP = new RegExp(LITERAL_PATTERN, 'y');
+// the start of a bare literal that runs to the end of the text
+const UNFINISHED_LITERAL_REGEXP =
+    /(?:t(?:ru?)?|f(?:a(?:ls?)?)?|n(?:ul?)?|-?\d*(?:\.\d*)?(?:[eE][+-]?\d*)?)$/y;
+
+// the key that a text ends on, with its colon and the comma that precedes it
+const LAST_KEY_REGEXP = /,?\s*"(?:[^"\\]|\\.)*"\s*:\s*$/;
+const LAST_COMMA_REGEXP = /,?\s*$/;
+
 type GenericObject = Record<string, unknown>;
 
 export function getPreviousStringType(text: string): 'KEY' | 'VALUE' | null {
@@ -113,9 +138,9 @@ function isValidContext({
             // valid context for a comma in an array is in between array items
             if (controlChar === ']') {
                 return (
-                    isPreceededBy({ chars: VALUE_END_CHARS, index, text }) &&
+                    isPreceededBy({ chars: ITEM_END_CHARS, index, text }) &&
                     isFollowedBy({
-                        chars: VALUE_START_CHARS,
+                        chars: ITEM_START_CHARS,
                         index: originalIndex,
                         text: original,
                     })
@@ -124,7 +149,7 @@ function isValidContext({
             // valid context for a comma in an object is in between key/value pairs
             if (controlChar === '}') {
                 return (
-                    isPreceededBy({ chars: VALUE_END_CHARS, index, text }) &&
+                    isPreceededBy({ chars: ITEM_END_CHARS, index, text }) &&
                     isFollowedBy({
                         char: '"',
                         index: originalIndex,
@@ -164,6 +189,27 @@ function isValidContext({
     }
 }
 
+// a bare literal can only stand where a value is due: as an item in an array,
+// or after the colon that follows a key in an object
+function isValueDue({ controlChar, text }: { controlChar?: string; text: string }) {
+    if (controlChar === ']') return isPreceededBy({ chars: ITEM_OPENING_CHARS, text });
+    return controlChar === '}' && isPreceededBy({ char: ':', text });
+}
+
+// a sticky regular expression matches at its lastIndex only
+function matchAt({
+    index,
+    regexp,
+    text,
+}: {
+    index: number;
+    regexp: RegExp;
+    text: string;
+}) {
+    regexp.lastIndex = index;
+    return regexp.exec(text)?.[0];
+}
+
 // get the length of anything (vs JSON.stringify: https://jsperf.app/qisaso/2)
 function lengthOf(item: unknown): number {
     switch (typeof item) {
@@ -186,6 +232,34 @@ function lengthOf(item: unknown): number {
         default:
             return 0;
     }
+}
+
+// Reads the bare literal (true, false, null, or a number) that starts at index.
+// Returns it once the text shows it to be whole, an empty string if the text
+// ends partway through it, and null if what starts there is not a literal.
+function readLiteral({
+    index,
+    isEndDelimited,
+    text,
+}: {
+    index: number;
+    isEndDelimited: boolean; // whether anything followed the end of the text
+    text: string;
+}) {
+    const literal = matchAt({ index, regexp: LITERAL_REGEXP, text });
+    if (literal) {
+        const endIndex = index + literal.length;
+        if (endIndex < text.length) {
+            if (LITERAL_DELIMITER_CHARS.has(text[endIndex])) return literal;
+        } else if (isEndDelimited || /^[tfn]/.test(literal)) {
+            // true, false, and null are whole as soon as they are spelled out, but
+            // a number that the text ends on may have more digits still to come
+            return literal;
+        }
+    }
+    const isUnfinished =
+        matchAt({ index, regexp: UNFINISHED_LITERAL_REGEXP, text }) != null;
+    return isUnfinished ? '' : null;
 }
 
 const hasTextContent = (text: string) => /\w/.test(text);
@@ -220,11 +294,18 @@ type ParsedResult = {
 };
 
 export function parseAsJSON(text: string): ParsedResult {
+    return parseText(text, false);
+}
+
+// isEndDelimited is whether anything is known to have followed the text, as it
+// is from the outset for what is left of a text that something followed
+function parseText(text: string, isEndDelimited: boolean): ParsedResult {
     let preamble = '';
     let postscript = '';
     if (text == null) {
         text = '';
     } else {
+        const input = text;
         text = text.replace(CONTROL_TOKENS_REGEXP, '').trim();
         // if payload is entirely wrapped in a fenced code block, unwrap it first
         const fencedBlockMatch = text.match(FENCED_CODE_BLOCK_REGEXP);
@@ -232,6 +313,9 @@ export function parseAsJSON(text: string): ParsedResult {
         if (fencedContent) {
             text = fencedContent;
         }
+        // if anything followed the text (whitespace, a control token, or the end
+        // of a code block), then a number that the text ends on is a whole one
+        if (!input.endsWith(text)) isEndDelimited = true;
     }
     // if the input is empty, use value: null to indicate failure
     if (text === '') return { postscript, preamble, value: null };
@@ -403,9 +487,33 @@ export function parseAsJSON(text: string): ParsedResult {
                 }
             }
         } else {
+            const controlChar = stack.at(-1);
+            // read a bare literal (true, false, null, or a number) as a whole
+            if (
+                LITERAL_START_CHARS.has(char) &&
+                isValueDue({ controlChar, text: newText })
+            ) {
+                const literal = readLiteral({ index, isEndDelimited, text });
+                if (literal === '') {
+                    // the text ends partway through the literal, so its value is not
+                    // yet known: leave it out (with its key) rather than guess at it
+                    newText = newText.replace(
+                        controlChar === '}' ? LAST_KEY_REGEXP : LAST_COMMA_REGEXP,
+                        '',
+                    );
+                    index = text.length;
+                    break;
+                }
+                if (literal != null) {
+                    newText += literal;
+                    index += literal.length - 1;
+                    continue;
+                }
+            }
+
             const validContextPayload = {
                 char,
-                controlChar: stack.at(-1),
+                controlChar,
                 original: text,
                 originalIndex: index,
                 text: newText,
@@ -478,13 +586,20 @@ export function parseAsJSON(text: string): ParsedResult {
                 // treat new lines outside strings as separators
                 const remainingText = text.substring(index + 1);
                 // first, check if there is a missing opening quote mark in rest of text
-                if (/^[a-zA-Z]/.test(remainingText)) {
+                // (a bare literal where a value is due is not missing one)
+                if (
+                    /^[a-zA-Z]/.test(remainingText) &&
+                    !(
+                        isValueDue({ controlChar, text: newText }) &&
+                        readLiteral({ index: index + 1, isEndDelimited, text }) != null
+                    )
+                ) {
                     text = text.substring(0, index + 1) + '"' + remainingText;
                     textLengthDelta++;
                 }
                 // if a comma is missing but needed, add one now
                 if (
-                    (isPreceededBy({ char: '"', text: newText }) &&
+                    (isPreceededBy({ chars: SCALAR_END_CHARS, text: newText }) &&
                         isFollowedBy({ char: '"', index, text })) ||
                     (isPreceededBy({ char: '}', text: newText }) &&
                         isFollowedBy({ char: '{', index, text })) ||
@@ -544,8 +659,11 @@ export function parseAsJSON(text: string): ParsedResult {
     }
     // eslint-disable-next-line typescript/strict-boolean-expressions
     if (postscript.length > 5 && (!value || postscript.length > index)) {
-        const { postscript: remainingPostscript, value: remainingValue } =
-            parseAsJSON(postscript);
+        // (the rest runs to the end of the text, so what followed one followed both)
+        const { postscript: remainingPostscript, value: remainingValue } = parseText(
+            postscript,
+            isEndDelimited,
+        );
         // eslint-disable-next-line typescript/strict-boolean-expressions
         if (remainingValue) {
             // eslint-disable-next-line typescript/strict-boolean-expressions
