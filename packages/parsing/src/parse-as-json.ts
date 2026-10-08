@@ -86,6 +86,12 @@ const SCALAR_END_CHARS = new Set(['"', ...LITERAL_END_CHARS]);
 
 const LITERAL_PATTERN = 'true|false|null|-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?';
 const LITERAL_REGEXP = new RegExp(LITERAL_PATTERN, 'y');
+// a comma and the next array item, where that item is not a string: the start
+// of an object or array, or a whole bare literal
+const NEXT_ITEM_REGEXP = new RegExp(
+    `\\s*,\\s*(?:[{[]|(?:${LITERAL_PATTERN})\\s*[,\\]])`,
+    'y',
+);
 // the start of a bare literal that runs to the end of the text
 const UNFINISHED_LITERAL_REGEXP =
     /(?:t(?:ru?)?|f(?:a(?:ls?)?)?|n(?:ul?)?|-?\d*(?:\.\d*)?(?:[eE][+-]?\d*)?)$/y;
@@ -381,7 +387,14 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
                 // set state to not insideString (will set back to true if is unescaped quote mark)
                 isInsideString = false;
                 // if quote mark is followed by ':', ', "', or new line, treat it as a string terminus
-                if (!/^( ?:|, ?"|,?\n)/.test(text.substring(index + 1))) {
+                // (as it is in an array, if followed by a next item that is not a string)
+                if (
+                    !/^( ?:|, ?"|,?\n)/.test(text.substring(index + 1)) &&
+                    !(
+                        stack.at(-1) === ']' &&
+                        matchAt({ index: index + 1, regexp: NEXT_ITEM_REGEXP, text })
+                    )
+                ) {
                     const nextQuoteMarkIndex = text.indexOf('"', index + 1);
                     if (nextQuoteMarkIndex > index + 1) {
                         const lastControlChar = stack.at(-1);
