@@ -29,7 +29,7 @@ function indexOfClosestChar({
     text,
     index = step < 0 ? text.length : text.length - 1,
 }: IndexOfClosestCharPayload) {
-    const charsSet = chars ? new Set(chars) : null;
+    const charsSet = chars instanceof Set ? chars : chars ? new Set(chars) : null;
     for (index += step; index >= 0 && index < text.length; index += step) {
         const nextCharacter = text[index];
         // if this is a match, return true
