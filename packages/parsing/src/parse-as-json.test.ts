@@ -135,6 +135,30 @@ describe('@acusti/parsing', () => {
                 value: { sections: '' },
             });
         });
+        it('drops an escape sequence that the text ends partway through', () => {
+            expect(parseAsJSON('{"heading":"Private Dining\\')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: { heading: 'Private Dining' },
+            });
+            expect(parseAsJSON('{"heading":"Private Dining\\nfor')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: { heading: 'Private Dining\nfor' },
+            });
+            for (const escape of ['\\u', '\\u0', '\\u00', '\\u00e']) {
+                expect(parseAsJSON('{"heading":"Caf' + escape), escape).toEqual({
+                    postscript: '',
+                    preamble: '',
+                    value: { heading: 'Caf' },
+                });
+            }
+            expect(parseAsJSON('{"heading":"Caf\\u00e9').value).toEqual({
+                heading: 'Café',
+            });
+            // a whole escape of the backslash itself
+            expect(parseAsJSON('{"path":"C:\\\\').value).toEqual({ path: 'C:\\' });
+        });
     });
 });
 

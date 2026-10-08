@@ -207,6 +207,10 @@ const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
 
 const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
 
+// the backslashes that a text ends on, or that precede the unicode escape it
+// ends partway through
+const UNFINISHED_ESCAPE_REGEXP = /(\\+)(?:u[0-9a-fA-F]{0,3})?$/;
+
 type ParsedValue = Array<unknown> | boolean | GenericObject | number | string;
 // naming from https://www.oreilly.com/library/view/prompt-engineering-for/9781098156145/ch07.html
 type ParsedResult = {
@@ -498,6 +502,12 @@ export function parseAsJSON(text: string): ParsedResult {
 
     // if we’re still inside a string, close it
     if (isInsideString) {
+        // if the text ends partway through an escape sequence, drop the sequence
+        // (an even number of backslashes is escaped backslashes, which are whole)
+        const escape = UNFINISHED_ESCAPE_REGEXP.exec(newText);
+        if (escape && escape[1].length % 2 === 1) {
+            newText = newText.slice(0, escape.index + escape[1].length - 1);
+        }
         newText += '"';
     }
 
