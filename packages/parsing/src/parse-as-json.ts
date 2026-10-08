@@ -259,7 +259,9 @@ export function parseAsJSON(text: string): ParsedResult {
         }
         previousText = text;
         // if text starts with a control char, it didn’t pass the while condition
-        text = text.replace(/^[[{"]?[^[{"]+/, '');
+        // (unless it opens an object onto a key, which is where the JSON starts
+        // even when that key is as far as the text goes)
+        text = text.replace(/^(?!\{\s*")[[{"]?[^[{"]+/, '');
     } while (
         previousText !== text &&
         // if new start is [, ensure it’s an array & not part of preamble

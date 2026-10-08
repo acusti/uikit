@@ -116,6 +116,25 @@ describe('@acusti/parsing', () => {
                 readTo({ description: 'Go', layout: {} }),
             );
         });
+        it('reads an unfinished object from its opening brace, before its first key is whole', () => {
+            // as it reads one with no whitespace after the brace
+            expect(parseAsJSON('{"sec').value).toEqual({ sec: '' });
+            expect(parseAsJSON('{\n  "')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: { '': '' },
+            });
+            expect(parseAsJSON('{\n  "sec')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: { sec: '' },
+            });
+            expect(parseAsJSON('{\n  "sections"')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: { sections: '' },
+            });
+        });
     });
 });
 
