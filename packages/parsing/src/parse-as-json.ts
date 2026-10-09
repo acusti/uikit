@@ -294,18 +294,22 @@ function dropUnfinishedEscape(text: string) {
     return text.slice(0, escape.index + escape[1].length - 1);
 }
 
+// whether the character at index is escaped, which it is if it follows an odd
+// number of backslashes (an even number is escaped backslashes, which are whole)
+function isEscaped(text: string, index: number) {
+    let backslashIndex = index - 1;
+    while (text[backslashIndex] === '\\') backslashIndex--;
+    return (index - backslashIndex) % 2 === 0;
+}
+
 // the index of the quote mark that closes the string that opens at index, or -1
 // if the text ends first
 function indexOfStringEnd(text: string, index: number) {
     let endIndex = text.indexOf('"', index + 1);
-    while (endIndex > -1) {
-        // a quote mark that follows an odd number of backslashes is escaped
-        let backslashIndex = endIndex - 1;
-        while (text[backslashIndex] === '\\') backslashIndex--;
-        if ((endIndex - backslashIndex) % 2 === 1) return endIndex;
+    while (endIndex > -1 && isEscaped(text, endIndex)) {
         endIndex = text.indexOf('"', endIndex + 1);
     }
-    return -1;
+    return endIndex;
 }
 
 // Closes a text that is JSON as far as it goes, by the rules that the repairs in
@@ -561,7 +565,7 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
     for (; index < text.length; index++) {
         let char = text[index];
         if (isInsideString) {
-            if (char === '"' && newText.at(-1) !== '\\') {
+            if (char === '"' && !isEscaped(text, index)) {
                 // set state to not insideString (will set back to true if is unescaped quote mark)
                 isInsideString = false;
                 // if quote mark is followed by ':', ', "', or new line, treat it as a string terminus
@@ -684,7 +688,7 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
                     // if not escaped, escape the newline character now
                     char = '\\n';
                     // check if there is already an extraneous escape character
-                    if (newText.at(-1) === '\\') {
+                    if (isEscaped(text, index)) {
                         newText = newText.slice(0, -1);
                     }
                 }
