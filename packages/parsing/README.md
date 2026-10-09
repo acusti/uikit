@@ -12,9 +12,10 @@ attempts to parse it as JSON. It returns `{ preamble, value, postscript }`:
 attempts at parsing it, and `preamble` and `postscript` are the text that
 came before and after the JSON (each an empty string if there was none).
 This is especially useful for generative AI when you prompt an LLM to
-generate a response in JSON, because most models are unable to consistently
-generate valid JSON, and even when they do, will often have a pre- or
-post-amble as a part of the response.
+generate a response in JSON: `parseAsJSON` identifies any preamble and
+postscript and separates them from the JSON data, and it can successfully
+and usefully parse an incomplete response as it streams in (see
+[Reading a response as it streams in](#reading-a-response-as-it-streams-in)).
 
 The [unit tests][] show the kinds of LLM responses and syntax errors that
 the package can fix and convert into a valid result.
