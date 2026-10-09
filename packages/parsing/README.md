@@ -137,6 +137,54 @@ parseAsJSON(
 */
 ````
 
+## Reading a response as it streams in
+
+You can call `parseAsJSON` repeatedly on text as it streams in to support
+UIs that show the response incrementally as it builds out. A text that is
+JSON as far as it goes is read as far as it goes, and each reading is a
+prefix of the finished value: what the text can’t yet be sure of is left
+out, so a reading holds nothing that the finished one won’t. A text that
+needs repairs is read as well as the repairs allow, which need not be a
+prefix of what it goes on to read as.
+
+- A string is read up to where it stops (less an escape sequence that the
+  text ends partway through).
+- A key, or a `true`, `false`, `null` or number, that the text ends partway
+  through is left out until it is whole.
+- A number that the text ends on is left out too, because more of it may be
+  coming: `"rating": 4` could become `4.5` or `45`. It is read once a
+  comma, a closing bracket or whitespace follows it.
+
+The one placeholder is for a key that is whole but has no value yet, which
+holds `''` until its value starts.
+
+```js
+parseAsJSON('{"heading": "Our Story", "rating": 4').value;
+// { heading: 'Our Story' }
+
+parseAsJSON('{"heading": "Our Story", "rating": 4.5, "isLive": tr').value;
+// { heading: 'Our Story', rating: 4.5 }
+
+parseAsJSON('{"heading": "Our Story", "items": [{"name": "A ta').value;
+// { heading: 'Our Story', items: [{ name: 'A ta' }] }
+
+parseAsJSON('{"heading": "Our Story", "subheading":').value;
+// { heading: 'Our Story', subheading: '' }
+```
+
+`parseAsJSON` can’t tell a text that is still arriving from one that
+finished without its closing brackets. If you know that a text is complete,
+with nothing cut off its end, add a line break to it (any whitespace will
+do) to say so, and a number that it ends on is read:
+
+```js
+parseAsJSON('{"count": 12').value;
+// {}
+
+parseAsJSON('{"count": 12' + '\n').value;
+// { count: 12 }
+```
+
 Again, there are more examples of the kinds of things that the parser can
 handle in the [unit tests][].
 
