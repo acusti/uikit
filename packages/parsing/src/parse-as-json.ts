@@ -286,6 +286,144 @@ function readLiteral({
     return isUnfinished ? '' : null;
 }
 
+// drops the escape sequence that a string ends partway through, if it does
+// (an even number of backslashes is escaped backslashes, which are whole)
+function dropUnfinishedEscape(text: string) {
+    const escape = UNFINISHED_ESCAPE_REGEXP.exec(text);
+    if (escape == null || escape[1].length % 2 === 0) return text;
+    return text.slice(0, escape.index + escape[1].length - 1);
+}
+
+// the index of the quote mark that closes the string that opens at index, or -1
+// if the text ends first
+function indexOfStringEnd(text: string, index: number) {
+    let endIndex = text.indexOf('"', index + 1);
+    while (endIndex > -1) {
+        // a quote mark that follows an odd number of backslashes is escaped
+        let backslashIndex = endIndex - 1;
+        while (text[backslashIndex] === '\\') backslashIndex--;
+        if ((endIndex - backslashIndex) % 2 === 1) return endIndex;
+        endIndex = text.indexOf('"', endIndex + 1);
+    }
+    return -1;
+}
+
+// Closes a text that is JSON as far as it goes, by the rules that the repairs in
+// parseAsJSON follow: a string is closed where it stops (less an escape sequence
+// that it ends partway through); a key, or a bare literal, that the text ends
+// partway through is left out; and a key with no value yet is given ''.
+//
+// Only strings and brackets are followed, so what is returned may not be valid
+// JSON. Returns null for a text that leaves nothing open, for one that does not
+// start with an object or array, and for one where what is left out is not the
+// start of a member (since nothing else would catch that).
+function closeJSON({ isEndDelimited, text }: { isEndDelimited: boolean; text: string }) {
+    if (text[0] !== '{' && text[0] !== '[') return null;
+    // the brackets that are open, as the characters that close them
+    const stack: Array<string> = [];
+    // how far the last member of an object, or item in an array, has got…
+    let progress: 'colon' | 'key' | 'none' | 'value' = 'none';
+    // …and where it starts, which is at a comma or an opening bracket
+    let memberIndex = 0;
+    // where the bare literal that the text ends on starts
+    let literalIndex = -1;
+    // where the text is to be cut, and what is to follow it there
+    let endIndex = text.length;
+    let ending = '';
+    // what would make valid JSON of a member that is left out
+    let memberEnding = '';
+
+    for (let index = 0; index < text.length; index++) {
+        const char = text[index];
+        if (char === '"') {
+            const isKey: boolean = progress === 'none' && stack.at(-1) === '}';
+            const stringEndIndex = indexOfStringEnd(text, index);
+            if (stringEndIndex === -1) {
+                // the text ends inside this string
+                endIndex = index + dropUnfinishedEscape(text.slice(index)).length;
+                if (isKey) {
+                    memberEnding = '": 0';
+                } else {
+                    ending = '"';
+                    progress = 'value';
+                }
+                break;
+            }
+            index = stringEndIndex;
+            progress = isKey ? 'key' : 'value';
+        } else if (char === '{' || char === '[') {
+            stack.push(char === '{' ? '}' : ']');
+            progress = 'none';
+            memberIndex = index;
+        } else if (char === '}' || char === ']') {
+            stack.pop();
+            // whether this is where the text ends or not, nothing is left open
+            if (stack.length === 0) return null;
+            progress = 'value';
+        } else if (char === ',') {
+            progress = 'none';
+            memberIndex = index;
+        } else if (char === ':') {
+            progress = 'colon';
+        } else if (!WHITESPACE_CHARS.has(char)) {
+            if (literalIndex === -1) literalIndex = index;
+            continue;
+        }
+        literalIndex = -1;
+    }
+
+    const controlChar = stack.at(-1);
+    if (literalIndex > -1) {
+        const literal = readLiteral({ index: literalIndex, isEndDelimited, text });
+        if (literal == null) return null;
+        if (literal === '') {
+            // the text ends partway through the literal, so the member that it is
+            // the value of is left out
+            progress = 'none';
+            endIndex = literalIndex;
+            memberEnding = '0';
+        } else {
+            progress = 'value';
+        }
+    }
+    if (progress === 'none') {
+        // leave out what there is of the member, and the comma that it follows,
+        // as long as it would be a member had the text gone on
+        if (memberEnding !== '') {
+            const member = text.slice(memberIndex + 1, endIndex) + memberEnding;
+            if (!isJSON(controlChar === '}' ? `{${member}}` : `[${member}]`)) return null;
+        }
+        endIndex = text[memberIndex] === ',' ? memberIndex : memberIndex + 1;
+    } else if (progress === 'key') {
+        ending = ': ""';
+    } else if (progress === 'colon') {
+        ending = '""';
+    }
+
+    return text.slice(0, endIndex) + ending + stack.reverse().join('');
+}
+
+function isJSON(text: string) {
+    try {
+        JSON.parse(text);
+        return true;
+    } catch (error) {
+        return false;
+    }
+}
+
+// the value of a text that is JSON as far as it goes, or undefined if it isn’t
+// (exported for its tests; the package’s own export is parseAsJSON)
+export function parseUnfinishedJSON(payload: { isEndDelimited: boolean; text: string }) {
+    const closedText = closeJSON(payload);
+    if (closedText == null) return undefined;
+    try {
+        return JSON.parse(closedText) as ParsedValue;
+    } catch (error) {
+        return undefined;
+    }
+}
+
 const hasTextContent = (text: string) => /\w/.test(text);
 
 // LLMs often demarcate the JSON part of the response with ``` or ```json
@@ -344,11 +482,23 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
     // if the input is empty, use value: null to indicate failure
     if (text === '') return { postscript, preamble, value: null };
 
-    // attempt to parse the string as-is (minus control tokens)
-    try {
-        return { postscript, preamble, value: JSON.parse(text) as ParsedValue };
-    } catch (error) {
-        // let’s try to fix it
+    // attempt to parse the string as-is (minus control tokens), unless it opens
+    // an object or array and does not end by closing one, in which case it can’t
+    // be whole (and is likely to be a response that is still streaming in)
+    const lastChar = text.at(-1);
+    if ((text[0] !== '{' && text[0] !== '[') || lastChar === '}' || lastChar === ']') {
+        try {
+            return { postscript, preamble, value: JSON.parse(text) as ParsedValue };
+        } catch (error) {
+            // let’s try to fix it
+        }
+    }
+
+    // if it is JSON as far as it goes, closing what it leaves open is all it needs
+    const firstText = text;
+    const unfinishedValue = parseUnfinishedJSON({ isEndDelimited, text });
+    if (unfinishedValue !== undefined) {
+        return { postscript, preamble, value: unfinishedValue };
     }
 
     // if this is a two-column markdown table, convert it to JSON key/value pairs
@@ -392,6 +542,16 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
     // if the first character is a key, add opening curly brace
     if (OBJECT_KEY_REGEXP.test(text)) {
         text = '{' + text;
+    }
+
+    // if the text has changed since closing it was first tried (rows of a table
+    // were converted, a preamble or the opening of a code block was taken off,
+    // or a missing first brace was added), it may now be JSON as far as it goes
+    if (text !== firstText) {
+        const remainingValue = parseUnfinishedJSON({ isEndDelimited, text });
+        if (remainingValue !== undefined) {
+            return { postscript, preamble, value: remainingValue };
+        }
     }
 
     const originalText = text;
@@ -654,13 +814,7 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
         );
     } else if (isInsideString) {
         // if we’re still inside a string, close it
-        // if the text ends partway through an escape sequence, drop the sequence
-        // (an even number of backslashes is escaped backslashes, which are whole)
-        const escape = UNFINISHED_ESCAPE_REGEXP.exec(newText);
-        if (escape && escape[1].length % 2 === 1) {
-            newText = newText.slice(0, escape.index + escape[1].length - 1);
-        }
-        newText += '"';
+        newText = dropUnfinishedEscape(newText) + '"';
     }
 
     if (stack.at(-1) === '}') {
