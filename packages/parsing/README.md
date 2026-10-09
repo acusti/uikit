@@ -7,12 +7,14 @@
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/parsing)](https://npmx.dev/package/@acusti/parsing)
 
 `@acusti/parsing` exports `parseAsJSON`, a function that takes a string and
-attempts to parse it as JSON, returning the resulting JS value, or `null`
-if the string defeated all attempts at parsing it. This is especially
-useful for generative AI when you prompt an LLM to generate a response in
-JSON, because most models are unable to consistently generate valid JSON,
-and even when they do, will often have a pre- or post-amble as a part of
-the response.
+attempts to parse it as JSON. It returns `{ preamble, value, postscript }`:
+`value` is the resulting JS value, or `null` if the string defeated all
+attempts at parsing it, and `preamble` and `postscript` are the text that
+came before and after the JSON (each an empty string if there was none).
+This is especially useful for generative AI when you prompt an LLM to
+generate a response in JSON, because most models are unable to consistently
+generate valid JSON, and even when they do, will often have a pre- or
+post-amble as a part of the response.
 
 The [unit tests][] show the kinds of LLM responses and syntax errors that
 the package can fix and convert into a valid result.
@@ -31,7 +33,8 @@ Import `parseAsJSON` (it’s a named export) and pass a string to it:
 import { parseAsJSON } from '@acusti/parsing';
 
 // it might neglect to close the outer curly braces
-parseAsJSON(`  Sure, here's an example of a JSON response for the "Contact Form" page:
+const { preamble, value } =
+    parseAsJSON(`  Sure, here's an example of a JSON response for the "Contact Form" page:
 {
     "heading": "Get in Touch",
     "form": {
@@ -39,7 +42,7 @@ parseAsJSON(`  Sure, here's an example of a JSON response for the "Contact Form"
         "message": "Please enter your message or inquiry below"
     }
 `);
-/* results in:
+/* value is:
 {
     heading: 'Get in Touch',
     form: {
@@ -47,6 +50,8 @@ parseAsJSON(`  Sure, here's an example of a JSON response for the "Contact Form"
         message: 'Please enter your message or inquiry below',
     },
 }
+and preamble is:
+'Sure, here\'s an example of a JSON response for the "Contact Form" page:'
 */
 
 // you might get a "key": "value" list with no syntax around it
@@ -64,7 +69,7 @@ Props:
 "blogPostSubheading3": "Sourdough 101",
 "blogPostHeading3": "Learn the Basics of Artisanal Bread Making",
 "blogPostLede3": "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
-`);
+`).value;
 /* results in:
 {
     blogPostImage1: '/images/blog-post-image1.jpg',
@@ -93,7 +98,8 @@ Props:
 | blogPostImage2 | /vytas-yoga-community-background.jpg |
 | shortBlogPostCaption2 | "Join a supportive community of like-minded individuals and deepen your practice with Vytas" |
 | blogPostHeading2 | "Community and Connection" |
-| miniBlogPostLede2 | "Vytas' Hatha Yoga classes offer a sense of community and connection" | |`);
+| miniBlogPostLede2 | "Vytas' Hatha Yoga classes offer a sense of community and connection" | |`)
+    .value;
 /* results in:
 {
     'Prop Name': 'Value',
@@ -111,7 +117,7 @@ Props:
 // it might prematurely close the outer JSON object even though the content continues
 parseAsJSON(
     '```json\n{"heading":"Organic Produce","subheading":"The Benefits of Going Organic","description":"Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers."},"items":[{"heading":"Organic Fruits","subheading":"Nature\'s Sweet Treats"},{"heading":"Organic Vegetables","subheading":"Fresh from the Garden"}]}\n```',
-);
+).value;
 /* results in:
 {
     heading: 'Organic Produce',
