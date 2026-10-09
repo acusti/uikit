@@ -190,7 +190,7 @@
     },
     "packages/parsing": {
       "name": "@acusti/parsing",
-      "version": "0.20.2",
+      "version": "0.21.0",
       "devDependencies": {
         "typescript": "^7",
         "vite": "^8.0.0-0",
