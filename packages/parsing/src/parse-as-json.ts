@@ -665,7 +665,9 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
 
     if (stack.at(-1) === '}') {
         // if we are in the key of a key/value pair, append ': ""' to close the pair
-        if (/[{,][^:"]*"[^"]*"\s*?$/.test(newText)) {
+        // (a key follows a brace or a comma, and may hold escaped quote marks, as
+        // may a value, in which a comma and a quote mark are not the start of one)
+        if (/[{,]\s*"(?:[^"\\]|\\.)*"\s*$/.test(newText)) {
             newText += ': ""';
         } else if (/": ?$/.test(newText)) {
             // if we are in between a key/value pair, append '""' to close the pair
