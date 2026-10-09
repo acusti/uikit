@@ -1,9 +1,24 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import { getPreviousStringType, parseAsJSON } from './parse-as-json.js';
+import {
+    getPreviousStringType,
+    parseAsJSON,
+    parseUnfinishedJSON,
+} from './parse-as-json.js';
 
 // an unfinished page, up to where the props of its first section are open
-const PAGE_START = '{"sections":[{"props":{"heading":"Hi",';
+const PAGE_STARTS = [
+    {
+        reading: 'closing',
+        start: '{"sections":[{"props":{"heading":"Hi",',
+        startProps: { heading: 'Hi' },
+    },
+    {
+        reading: 'repairing',
+        start: '{"sections":[{"props":{"heading":"Hi"\n"lede":"Yo",',
+        startProps: { heading: 'Hi', lede: 'Yo' },
+    },
+];
 
 // where a text stops on a key, if its innermost open structure is an object:
 // inside the key, or between the key and its value (after it or after its colon)
@@ -46,6 +61,38 @@ describe('@acusti/parsing', () => {
             expect(getPreviousStringType('x":"a')).toBe('KEY');
             expect(getPreviousStringType('","a')).toBe(null);
             expect(getPreviousStringType('x","a')).toBe('VALUE');
+        });
+    });
+
+    // parseAsJSON’s readings can’t show whether closing a text or repairing it
+    // read it, since both are held to the same readings, so these ask the closer
+    describe('parseUnfinishedJSON', () => {
+        it('reads every unfinished prefix of a page without the repairs', () => {
+            const text = getPageStreamPieces().join('');
+            const unclosed: Array<string> = [];
+            for (let endIndex = 1; endIndex < text.length; endIndex++) {
+                const prefix = text.slice(0, endIndex);
+                const trimmedPrefix = prefix.trim();
+                const value = parseUnfinishedJSON({
+                    isEndDelimited: !prefix.endsWith(trimmedPrefix),
+                    text: trimmedPrefix,
+                });
+                if (value === undefined) unclosed.push(prefix.slice(-60));
+            }
+            expect(unclosed).toEqual([]);
+        });
+
+        it('leaves a text that is whole, or that needs a repair, to parseAsJSON', () => {
+            for (const text of [
+                '{"a": "b"}',
+                '{"a": "b"\n"c": "d',
+                '{"a": "b"} and then {"c": "d',
+                'Here it is: {"a": "b',
+            ]) {
+                expect(parseUnfinishedJSON({ isEndDelimited: false, text }), text).toBe(
+                    undefined,
+                );
+            }
         });
     });
 
@@ -124,26 +171,6 @@ describe('@acusti/parsing', () => {
             'cleanly dilineates between preamble and JSON results',
             extractPreambleTestCase,
         );
-        it('reads on past a number that follows a string value', () => {
-            expect(parseAsJSON(PAGE_START + '"rating":5,"description":"Go')).toEqual(
-                readTo({ description: 'Go', rating: 5 }),
-            );
-            expect(
-                parseAsJSON(
-                    PAGE_START + '"items":[{"heading":"One","rating":5},{"heading":"Tw',
-                ),
-            ).toEqual(
-                readTo({ items: [{ heading: 'One', rating: 5 }, { heading: 'Tw' }] }),
-            );
-        });
-        it('reads on past an object that holds no string and follows a string value', () => {
-            expect(
-                parseAsJSON(PAGE_START + '"layout":{"columns":3},"description":"Go'),
-            ).toEqual(readTo({ description: 'Go', layout: { columns: 3 } }));
-            expect(parseAsJSON(PAGE_START + '"layout":{},"description":"Go')).toEqual(
-                readTo({ description: 'Go', layout: {} }),
-            );
-        });
         it('reads an unfinished object from its opening brace, before its first key is whole', () => {
             // as it reads one with no whitespace after the brace
             expect(parseAsJSON('{"sections"').value).toEqual({ sections: '' });
@@ -162,283 +189,415 @@ describe('@acusti/parsing', () => {
                 preamble: '',
                 value: {},
             });
+            // and when what follows the key is not JSON, which is left to the repairs
+            expect(parseAsJSON('{ "a b" x')).toEqual({
+                postscript: 'x',
+                preamble: '',
+                value: { 'a b': '' },
+            });
         });
-        it('drops an escape sequence that the text ends partway through', () => {
-            expect(parseAsJSON('{"heading":"Private Dining\\')).toEqual({
-                postscript: '',
-                preamble: '',
-                value: { heading: 'Private Dining' },
+
+        describe('with a text that is JSON as far as it goes', () => {
+            it('reads it whatever its spacing', () => {
+                // as it does a text that is whole
+                expect(parseAsJSON('{"a": "b" , "c": "d"}').value).toEqual({
+                    a: 'b',
+                    c: 'd',
+                });
+                for (const text of [
+                    '{"a": "b" , "c": "d',
+                    '{"a":"b",  "c":"d',
+                    '{"a":\t"b",\t"c":\t"d',
+                    '{ "a" : "b" , "c" : "d',
+                    '{\r\n  "a": "b",\r\n  "c": "d',
+                ]) {
+                    expect(parseAsJSON(text), text).toEqual({
+                        postscript: '',
+                        preamble: '',
+                        value: { a: 'b', c: 'd' },
+                    });
+                }
             });
-            expect(parseAsJSON('{"heading":"Private Dining\\nfor')).toEqual({
-                postscript: '',
-                preamble: '',
-                value: { heading: 'Private Dining\nfor' },
-            });
-            for (const escape of ['\\u', '\\u0', '\\u00', '\\u00e']) {
-                expect(parseAsJSON('{"heading":"Caf' + escape), escape).toEqual({
+
+            it('reads an array at its root', () => {
+                expect(parseAsJSON('[1, 2, 3').value).toEqual([1, 2]);
+                expect(parseAsJSON('[true, fal').value).toEqual([true]);
+                expect(parseAsJSON('[\n  "a",\n  "b').value).toEqual(['a', 'b']);
+                expect(parseAsJSON('[\n  {"a": true},\n  {"a": fal')).toEqual({
                     postscript: '',
                     preamble: '',
-                    value: { heading: 'Caf' },
+                    value: [{ a: true }, {}],
                 });
-            }
-            expect(parseAsJSON('{"heading":"Caf\\u00e9').value).toEqual({
-                heading: 'Café',
             });
-            // a whole escape of the backslash itself
-            expect(parseAsJSON('{"path":"C:\\\\').value).toEqual({ path: 'C:\\' });
-        });
-        it('leaves out a key that the text ends partway through', () => {
-            expect(parseAsJSON(PAGE_START + '"descr')).toEqual(readTo({}));
-            expect(parseAsJSON(PAGE_START + '"')).toEqual(readTo({}));
-            expect(parseAsJSON(PAGE_START + '"a \\"quoted\\" ke')).toEqual(readTo({}));
-            // one that ends on a backslash, the start of an escape sequence
-            expect(parseAsJSON(PAGE_START + '"ke\\')).toEqual(readTo({}));
-            expect(parseAsJSON(PAGE_START + '"ke\\u00')).toEqual(readTo({}));
-            // as its object’s first key, which no comma precedes
-            expect(parseAsJSON(PAGE_START + '"buttonLink":{"ena')).toEqual(
-                readTo({ buttonLink: {} }),
-            );
-            // a key that spells an earlier one, as far as it goes, leaves that one be
-            expect(
-                parseAsJSON(
-                    PAGE_START + '"button":"Book","buttonLink":{"enabled":true},"button',
-                ),
-            ).toEqual(readTo({ button: 'Book', buttonLink: { enabled: true } }));
-            // once the key is whole, it holds '' until its value starts
-            expect(parseAsJSON(PAGE_START + '"description"')).toEqual(
-                readTo({ description: '' }),
-            );
-            expect(parseAsJSON(PAGE_START + '"description":')).toEqual(
-                readTo({ description: '' }),
-            );
-            // a string that is a value, or an item in an array, is read as far as it goes
-            expect(parseAsJSON(PAGE_START + '"description":"Go')).toEqual(
-                readTo({ description: 'Go' }),
-            );
-            expect(parseAsJSON(PAGE_START + '"tags":["a","b')).toEqual(
-                readTo({ tags: ['a', 'b'] }),
-            );
-        });
-        it('tells a key with no value yet from a string that holds an escaped quote mark', () => {
-            // a value that, once closed, has a comma and then a quote mark in it
-            expect(parseAsJSON(PAGE_START + '"quote":"Honestly, \\"the best')).toEqual(
-                readTo({ quote: 'Honestly, "the best' }),
-            );
-            expect(
-                parseAsJSON(
-                    PAGE_START + '"quote":"Honestly, \\"the best\\" in town, \\"and',
-                ),
-            ).toEqual(readTo({ quote: 'Honestly, "the best" in town, "and' }));
-            // a key that holds one, which is whole and has no value yet
-            expect(parseAsJSON(PAGE_START + '"q\\"k"')).toEqual(readTo({ 'q"k': '' }));
-            expect(parseAsJSON(PAGE_START + '"q\\"k":')).toEqual(readTo({ 'q"k': '' }));
+
+            it('reads it after a preamble, or after the opening of a code block', () => {
+                expect(parseAsJSON('Here it is:\n{"a": "b" , "c": "d')).toEqual({
+                    postscript: '',
+                    preamble: 'Here it is:',
+                    value: { a: 'b', c: 'd' },
+                });
+                expect(parseAsJSON('```json\n{"a": "b" , "c": "d')).toEqual({
+                    postscript: '',
+                    preamble: '',
+                    value: { a: 'b', c: 'd' },
+                });
+            });
+
+            it('reads a key that holds an escaped quote mark', () => {
+                expect(parseAsJSON('{"a \\"b\\""').value).toEqual({ 'a "b"': '' });
+                expect(parseAsJSON('{"a \\"b\\"": "c').value).toEqual({ 'a "b"': 'c' });
+                expect(parseAsJSON('{"a": "b", "c \\"d').value).toEqual({ a: 'b' });
+            });
+
+            it('reads a string that ends in an escaped backslash', () => {
+                expect(parseAsJSON('{"path": "C:\\\\", "name": "x').value).toEqual({
+                    name: 'x',
+                    path: 'C:\\',
+                });
+                expect(parseAsJSON('["C:\\\\", "x').value).toEqual(['C:\\', 'x']);
+            });
+
+            it('leaves a text that is not to the repairs', () => {
+                // a comma is missing, which closing the text does not add
+                expect(parseAsJSON('{"a": "b"\n"c": "d').value).toEqual({
+                    a: 'b',
+                    c: 'd',
+                });
+                // the object is closed, and more follows it
+                expect(parseAsJSON('{"a": "b"} and then {"c": "d')).toEqual({
+                    postscript: 'and then {"c": "d',
+                    preamble: '',
+                    value: { a: 'b' },
+                });
+                // what the text ends partway through is not the start of a member
+                expect(parseAsJSON('{"a": "b", "c\n{').value).toEqual({ a: 'b', c: {} });
+                expect(parseAsJSON('{"a": ["b", x tr')).toEqual({
+                    postscript: ', x tr',
+                    preamble: '',
+                    value: { a: ['b'] },
+                });
+            });
         });
 
-        describe('with bare literals in an unfinished text', () => {
-            it('reads on past true, false and null', () => {
-                expect(
-                    parseAsJSON(
-                        PAGE_START +
-                            '"buttonLink":{"enabled":true,"type":"internal","value":"#a',
-                    ),
-                ).toEqual(
-                    readTo({
-                        buttonLink: { enabled: true, type: 'internal', value: '#a' },
-                    }),
-                );
-                expect(
-                    parseAsJSON(
-                        PAGE_START +
-                            '"background":{"type":"image","image":null,"alt":"A ta',
-                    ),
-                ).toEqual(
-                    readTo({ background: { alt: 'A ta', image: null, type: 'image' } }),
-                );
-                expect(
-                    parseAsJSON(PAGE_START + '"isFeatured":false,"description":"Go'),
-                ).toEqual(readTo({ description: 'Go', isFeatured: false }));
-            });
+        // Each of these is read twice: by closing a text that is JSON as far as it
+        // goes, and by repairing one that is not (it is missing a comma near its
+        // start). Past that comma, both have to read the same text alike.
+        describe.each(PAGE_STARTS)(
+            'with an unfinished text, read by $reading it',
+            ({ start, startProps }) => {
+                const readTo = (props: Record<string, unknown>) =>
+                    readPage({ ...startProps, ...props });
 
-            it('reads on past a literal that is the last value in its object', () => {
-                expect(
-                    parseAsJSON(
-                        PAGE_START +
-                            '"buttonLink":{"type":"internal","enabled":true},"background":{"type":"image","image":null,"alt":"A ta',
-                    ),
-                ).toEqual(
-                    readTo({
-                        background: { alt: 'A ta', image: null, type: 'image' },
-                        buttonLink: { enabled: true, type: 'internal' },
-                    }),
-                );
-                expect(
-                    parseAsJSON(PAGE_START + '"media":{"image":null},"description":"Go'),
-                ).toEqual(readTo({ description: 'Go', media: { image: null } }));
-            });
+                it('reads on past a number that follows a string value', () => {
+                    expect(parseAsJSON(start + '"rating":5,"description":"Go')).toEqual(
+                        readTo({ description: 'Go', rating: 5 }),
+                    );
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"items":[{"heading":"One","rating":5},{"heading":"Tw',
+                        ),
+                    ).toEqual(
+                        readTo({
+                            items: [{ heading: 'One', rating: 5 }, { heading: 'Tw' }],
+                        }),
+                    );
+                });
 
-            it('keeps true, false or null when the text ends on it', () => {
-                expect(parseAsJSON(PAGE_START + '"buttonLink":{"enabled":true')).toEqual(
-                    readTo({ buttonLink: { enabled: true } }),
-                );
-                expect(parseAsJSON(PAGE_START + '"isFeatured":false')).toEqual(
-                    readTo({ isFeatured: false }),
-                );
-                expect(parseAsJSON(PAGE_START + '"image":null')).toEqual(
-                    readTo({ image: null }),
-                );
-            });
+                it('reads on past an object that holds no string and follows a string value', () => {
+                    expect(
+                        parseAsJSON(start + '"layout":{"columns":3},"description":"Go'),
+                    ).toEqual(readTo({ description: 'Go', layout: { columns: 3 } }));
+                    expect(parseAsJSON(start + '"layout":{},"description":"Go')).toEqual(
+                        readTo({ description: 'Go', layout: {} }),
+                    );
+                });
 
-            it('reads negative, decimal and exponent numbers as their values', () => {
-                expect(
-                    parseAsJSON(
-                        PAGE_START +
-                            '"offset":-12,"ratio":0.25,"scale":1.5e3,"delta":-2E-2,"count":0,"description":"Go',
-                    ),
-                ).toEqual(
-                    readTo({
-                        count: 0,
-                        delta: -0.02,
-                        description: 'Go',
-                        offset: -12,
-                        ratio: 0.25,
-                        scale: 1500,
-                    }),
-                );
-            });
+                it('leaves out a key that the text ends partway through', () => {
+                    expect(parseAsJSON(start + '"descr')).toEqual(readTo({}));
+                    expect(parseAsJSON(start + '"')).toEqual(readTo({}));
+                    expect(parseAsJSON(start + '"a \\"quoted\\" ke')).toEqual(readTo({}));
+                    // one that ends on a backslash, the start of an escape sequence
+                    expect(parseAsJSON(start + '"ke\\')).toEqual(readTo({}));
+                    expect(parseAsJSON(start + '"ke\\u00')).toEqual(readTo({}));
+                    // as its object’s first key, which no comma precedes
+                    expect(parseAsJSON(start + '"buttonLink":{"ena')).toEqual(
+                        readTo({ buttonLink: {} }),
+                    );
+                    // a key that spells an earlier one, as far as it goes, leaves that one be
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"button":"Book","buttonLink":{"enabled":true},"button',
+                        ),
+                    ).toEqual(readTo({ button: 'Book', buttonLink: { enabled: true } }));
+                    // once the key is whole, it holds '' until its value starts
+                    expect(parseAsJSON(start + '"description"')).toEqual(
+                        readTo({ description: '' }),
+                    );
+                    expect(parseAsJSON(start + '"description":')).toEqual(
+                        readTo({ description: '' }),
+                    );
+                    // a string that is a value, or an item in an array, is read as far as it goes
+                    expect(parseAsJSON(start + '"description":"Go')).toEqual(
+                        readTo({ description: 'Go' }),
+                    );
+                    expect(parseAsJSON(start + '"tags":["a","b')).toEqual(
+                        readTo({ tags: ['a', 'b'] }),
+                    );
+                });
 
-            it('drops a key whose literal the text ends partway through', () => {
-                for (const literal of ['true', 'false', 'null', '-12.5e+3']) {
-                    for (let end = 1; end < literal.length; end++) {
-                        const text =
-                            PAGE_START +
-                            '"buttonLink":{"type":"internal","enabled":' +
-                            literal.slice(0, end);
-                        expect(parseAsJSON(text), text).toEqual(
-                            readTo({ buttonLink: { type: 'internal' } }),
-                        );
+                it('tells a key with no value yet from a string that holds an escaped quote mark', () => {
+                    // a value that, once closed, has a comma and then a quote mark in it
+                    expect(parseAsJSON(start + '"quote":"Honestly, \\"the best')).toEqual(
+                        readTo({ quote: 'Honestly, "the best' }),
+                    );
+                    expect(
+                        parseAsJSON(
+                            start + '"quote":"Honestly, \\"the best\\" in town, \\"and',
+                        ),
+                    ).toEqual(readTo({ quote: 'Honestly, "the best" in town, "and' }));
+                    // a key that holds one, which is whole and has no value yet
+                    expect(parseAsJSON(start + '"q\\"k"')).toEqual(readTo({ 'q"k': '' }));
+                    expect(parseAsJSON(start + '"q\\"k":')).toEqual(
+                        readTo({ 'q"k': '' }),
+                    );
+                });
+
+                it('drops an escape sequence that the text ends partway through', () => {
+                    expect(
+                        parseAsJSON(start + '"description":"Private Dining\\'),
+                    ).toEqual(readTo({ description: 'Private Dining' }));
+                    expect(
+                        parseAsJSON(start + '"description":"Private Dining\\nfor'),
+                    ).toEqual(readTo({ description: 'Private Dining\nfor' }));
+                    for (const escape of ['\\u', '\\u0', '\\u00', '\\u00e']) {
+                        expect(
+                            parseAsJSON(start + '"description":"Caf' + escape),
+                            escape,
+                        ).toEqual(readTo({ description: 'Caf' }));
                     }
-                }
-                // as its object’s first key, which no comma precedes
-                expect(parseAsJSON(PAGE_START + '"buttonLink":{"enabled":tr')).toEqual(
-                    readTo({ buttonLink: {} }),
-                );
-                expect(parseAsJSON(PAGE_START + '"image": nul')).toEqual(readTo({}));
-            });
+                    expect(parseAsJSON(start + '"description":"Caf\\u00e9')).toEqual(
+                        readTo({ description: 'Café' }),
+                    );
+                    // a whole escape of the backslash itself
+                    expect(parseAsJSON(start + '"path":"C:\\\\')).toEqual(
+                        readTo({ path: 'C:\\' }),
+                    );
+                });
 
-            it('holds a number back until the text shows where it ends', () => {
-                // 4 so far, which 4.5 and 45 also start with
-                expect(parseAsJSON(PAGE_START + '"rating":4')).toEqual(readTo({}));
-                expect(parseAsJSON(PAGE_START + '"rating":4.')).toEqual(readTo({}));
-                expect(parseAsJSON(PAGE_START + '"rating":4.5')).toEqual(readTo({}));
-                expect(parseAsJSON(PAGE_START + '"rating":4.5,')).toEqual(
-                    readTo({ rating: 4.5 }),
-                );
-                expect(parseAsJSON(PAGE_START + '"rating":4.5}')).toEqual(
-                    readTo({ rating: 4.5 }),
-                );
-                // whitespace, a control token, or the end of a code block shows it too
-                expect(parseAsJSON(PAGE_START + '"rating":4.5\n')).toEqual(
-                    readTo({ rating: 4.5 }),
-                );
-                expect(parseAsJSON(PAGE_START + '"rating":4.5<|im_end|>')).toEqual(
-                    readTo({ rating: 4.5 }),
-                );
-                expect(
-                    parseAsJSON('```json\n' + PAGE_START + '"rating":4.5\n```'),
-                ).toEqual(readTo({ rating: 4.5 }));
-            });
+                it('reads on past true, false and null', () => {
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"buttonLink":{"enabled":true,"type":"internal","value":"#a',
+                        ),
+                    ).toEqual(
+                        readTo({
+                            buttonLink: { enabled: true, type: 'internal', value: '#a' },
+                        }),
+                    );
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"background":{"type":"image","image":null,"alt":"A ta',
+                        ),
+                    ).toEqual(
+                        readTo({
+                            background: { alt: 'A ta', image: null, type: 'image' },
+                        }),
+                    );
+                    expect(
+                        parseAsJSON(start + '"isFeatured":false,"description":"Go'),
+                    ).toEqual(readTo({ description: 'Go', isFeatured: false }));
+                });
 
-            it('reads literals as array items', () => {
-                expect(
-                    parseAsJSON(
-                        PAGE_START +
-                            '"flags":[true,false,null,0,-2.5e3],"description":"Go',
-                    ),
-                ).toEqual(
-                    readTo({ description: 'Go', flags: [true, false, null, 0, -2500] }),
-                );
-                expect(parseAsJSON(PAGE_START + '"flags":[true, false, null')).toEqual(
-                    readTo({ flags: [true, false, null] }),
-                );
-                expect(parseAsJSON(PAGE_START + '"flags":[true,')).toEqual(
-                    readTo({ flags: [true] }),
-                );
-            });
+                it('reads on past a literal that is the last value in its object', () => {
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"buttonLink":{"type":"internal","enabled":true},"background":{"type":"image","image":null,"alt":"A ta',
+                        ),
+                    ).toEqual(
+                        readTo({
+                            background: { alt: 'A ta', image: null, type: 'image' },
+                            buttonLink: { enabled: true, type: 'internal' },
+                        }),
+                    );
+                    expect(
+                        parseAsJSON(start + '"media":{"image":null},"description":"Go'),
+                    ).toEqual(readTo({ description: 'Go', media: { image: null } }));
+                });
 
-            it('reads a literal that follows a string in an array', () => {
-                expect(
-                    parseAsJSON(
-                        PAGE_START +
-                            '"tags":["a",true,"b",1,"c",null,"d"],"description":"Go',
-                    ),
-                ).toEqual(
-                    readTo({
-                        description: 'Go',
-                        tags: ['a', true, 'b', 1, 'c', null, 'd'],
-                    }),
-                );
-                expect(
-                    parseAsJSON(
-                        PAGE_START + '"tags": ["a", -2.5e3, "b", false ], "c": "d',
-                    ),
-                ).toEqual(readTo({ c: 'd', tags: ['a', -2500, 'b', false] }));
-                // as it reads an object or an array that follows one
-                expect(
-                    parseAsJSON(
-                        PAGE_START + '"tags":["a",{"b":null},"c",["d",1],"e"],"f":"g',
-                    ),
-                ).toEqual(
-                    readTo({ f: 'g', tags: ['a', { b: null }, 'c', ['d', 1], 'e'] }),
-                );
-            });
+                it('keeps true, false or null when the text ends on it', () => {
+                    expect(parseAsJSON(start + '"buttonLink":{"enabled":true')).toEqual(
+                        readTo({ buttonLink: { enabled: true } }),
+                    );
+                    expect(parseAsJSON(start + '"isFeatured":false')).toEqual(
+                        readTo({ isFeatured: false }),
+                    );
+                    expect(parseAsJSON(start + '"image":null')).toEqual(
+                        readTo({ image: null }),
+                    );
+                });
 
-            it('drops an array item the text ends partway through', () => {
-                expect(parseAsJSON(PAGE_START + '"flags":[true, false, nu')).toEqual(
-                    readTo({ flags: [true, false] }),
-                );
-                expect(parseAsJSON(PAGE_START + '"flags":[tr')).toEqual(
-                    readTo({ flags: [] }),
-                );
-                expect(parseAsJSON(PAGE_START + '"sizes":[1, 2, 3')).toEqual(
-                    readTo({ sizes: [1, 2] }),
-                );
-                expect(parseAsJSON(PAGE_START + '"sizes":[-')).toEqual(
-                    readTo({ sizes: [] }),
-                );
-            });
+                it('reads negative, decimal and exponent numbers as their values', () => {
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"offset":-12,"ratio":0.25,"scale":1.5e3,"delta":-2E-2,"count":0,"description":"Go',
+                        ),
+                    ).toEqual(
+                        readTo({
+                            count: 0,
+                            delta: -0.02,
+                            description: 'Go',
+                            offset: -12,
+                            ratio: 0.25,
+                            scale: 1500,
+                        }),
+                    );
+                });
 
-            it('reads literals inside a nested array of objects', () => {
-                expect(
-                    parseAsJSON(
-                        PAGE_START +
-                            '"items":[{"heading":"One","rating":5,"isNew":true,"image":null},{"heading":"Two","rating":4.5,"isNew":fal',
-                    ),
-                ).toEqual(
-                    readTo({
-                        items: [
-                            { heading: 'One', image: null, isNew: true, rating: 5 },
-                            { heading: 'Two', rating: 4.5 },
-                        ],
-                    }),
-                );
-            });
+                it('drops a key whose literal the text ends partway through', () => {
+                    for (const literal of ['true', 'false', 'null', '-12.5e+3']) {
+                        for (let end = 1; end < literal.length; end++) {
+                            const text =
+                                start +
+                                '"buttonLink":{"type":"internal","enabled":' +
+                                literal.slice(0, end);
+                            expect(parseAsJSON(text), text).toEqual(
+                                readTo({ buttonLink: { type: 'internal' } }),
+                            );
+                        }
+                    }
+                    // as its object’s first key, which no comma precedes
+                    expect(parseAsJSON(start + '"buttonLink":{"enabled":tr')).toEqual(
+                        readTo({ buttonLink: {} }),
+                    );
+                    expect(parseAsJSON(start + '"image": nul')).toEqual(readTo({}));
+                });
 
-            it('leaves a string that holds the words true, false or null as it is', () => {
-                expect(
-                    parseAsJSON(
-                        PAGE_START +
-                            '"answer":"true","note":"false, or null: it depends","count":"12","description":"null and void, tru',
-                    ),
-                ).toEqual(
-                    readTo({
-                        answer: 'true',
-                        count: '12',
-                        description: 'null and void, tru',
-                        note: 'false, or null: it depends',
-                    }),
-                );
-            });
+                it('holds a number back until the text shows where it ends', () => {
+                    // 4 so far, which 4.5 and 45 also start with
+                    expect(parseAsJSON(start + '"rating":4')).toEqual(readTo({}));
+                    expect(parseAsJSON(start + '"rating":4.')).toEqual(readTo({}));
+                    expect(parseAsJSON(start + '"rating":4.5')).toEqual(readTo({}));
+                    expect(parseAsJSON(start + '"rating":4.5,')).toEqual(
+                        readTo({ rating: 4.5 }),
+                    );
+                    expect(parseAsJSON(start + '"rating":4.5}')).toEqual(
+                        readTo({ rating: 4.5 }),
+                    );
+                    // whitespace, a control token, or the end of a code block shows it too
+                    expect(parseAsJSON(start + '"rating":4.5\n')).toEqual(
+                        readTo({ rating: 4.5 }),
+                    );
+                    expect(parseAsJSON(start + '"rating":4.5<|im_end|>')).toEqual(
+                        readTo({ rating: 4.5 }),
+                    );
+                    expect(
+                        parseAsJSON('```json\n' + start + '"rating":4.5\n```'),
+                    ).toEqual(readTo({ rating: 4.5 }));
+                });
 
+                it('reads literals as array items', () => {
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"flags":[true,false,null,0,-2.5e3],"description":"Go',
+                        ),
+                    ).toEqual(
+                        readTo({
+                            description: 'Go',
+                            flags: [true, false, null, 0, -2500],
+                        }),
+                    );
+                    expect(parseAsJSON(start + '"flags":[true, false, null')).toEqual(
+                        readTo({ flags: [true, false, null] }),
+                    );
+                    expect(parseAsJSON(start + '"flags":[true,')).toEqual(
+                        readTo({ flags: [true] }),
+                    );
+                });
+
+                it('reads a literal that follows a string in an array', () => {
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"tags":["a",true,"b",1,"c",null,"d"],"description":"Go',
+                        ),
+                    ).toEqual(
+                        readTo({
+                            description: 'Go',
+                            tags: ['a', true, 'b', 1, 'c', null, 'd'],
+                        }),
+                    );
+                    expect(
+                        parseAsJSON(
+                            start + '"tags": ["a", -2.5e3, "b", false ], "c": "d',
+                        ),
+                    ).toEqual(readTo({ c: 'd', tags: ['a', -2500, 'b', false] }));
+                    // as it reads an object or an array that follows one
+                    expect(
+                        parseAsJSON(
+                            start + '"tags":["a",{"b":null},"c",["d",1],"e"],"f":"g',
+                        ),
+                    ).toEqual(
+                        readTo({ f: 'g', tags: ['a', { b: null }, 'c', ['d', 1], 'e'] }),
+                    );
+                });
+
+                it('drops an array item the text ends partway through', () => {
+                    expect(parseAsJSON(start + '"flags":[true, false, nu')).toEqual(
+                        readTo({ flags: [true, false] }),
+                    );
+                    expect(parseAsJSON(start + '"flags":[tr')).toEqual(
+                        readTo({ flags: [] }),
+                    );
+                    expect(parseAsJSON(start + '"sizes":[1, 2, 3')).toEqual(
+                        readTo({ sizes: [1, 2] }),
+                    );
+                    expect(parseAsJSON(start + '"sizes":[-')).toEqual(
+                        readTo({ sizes: [] }),
+                    );
+                });
+
+                it('reads literals inside a nested array of objects', () => {
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"items":[{"heading":"One","rating":5,"isNew":true,"image":null},{"heading":"Two","rating":4.5,"isNew":fal',
+                        ),
+                    ).toEqual(
+                        readTo({
+                            items: [
+                                { heading: 'One', image: null, isNew: true, rating: 5 },
+                                { heading: 'Two', rating: 4.5 },
+                            ],
+                        }),
+                    );
+                });
+
+                it('leaves a string that holds the words true, false or null as it is', () => {
+                    expect(
+                        parseAsJSON(
+                            start +
+                                '"answer":"true","note":"false, or null: it depends","count":"12","description":"null and void, tru',
+                        ),
+                    ).toEqual(
+                        readTo({
+                            answer: 'true',
+                            count: '12',
+                            description: 'null and void, tru',
+                            note: 'false, or null: it depends',
+                        }),
+                    );
+                });
+            },
+        );
+
+        describe('with bare literals', () => {
             it('reads literals on lines of their own', () => {
                 const text = `\
 {
@@ -458,19 +617,26 @@ describe('@acusti/parsing', () => {
         "background": {
           "image": null,
           "alt": "A ta`;
-                const page = readTo({
+                const page = readPage({
                     background: { alt: 'A ta', image: null },
                     buttonLink: { enabled: true, type: 'internal' },
                     flags: [true, null],
+                    heading: 'Hi',
                     rating: 4.5,
                 });
                 expect(parseAsJSON(text)).toEqual(page);
                 // with no indentation, where a literal is the first thing on a line
-                expect(parseAsJSON(text.replace(/^ +/gm, ''))).toEqual(page);
-                expect(parseAsJSON('{\n"flags": [\ntrue,\nfal')).toEqual({
-                    postscript: '',
-                    preamble: '',
-                    value: { flags: [true] },
+                const flushText = text.replace(/^ +/gm, '');
+                expect(parseAsJSON(flushText)).toEqual(page);
+                // and with a comma missing, which leaves each to the repairs
+                expect(parseAsJSON(text.replace('"Hi",', '"Hi"'))).toEqual(page);
+                expect(parseAsJSON(flushText.replace('"Hi",', '"Hi"'))).toEqual(page);
+                expect(parseAsJSON('{\n"flags": [\ntrue,\nfal').value).toEqual({
+                    flags: [true],
+                });
+                expect(parseAsJSON('{\n"a": "b"\n"flags": [\ntrue,\nfal').value).toEqual({
+                    a: 'b',
+                    flags: [true],
                 });
             });
 
@@ -525,49 +691,73 @@ Here is the button:
             });
         });
 
-        describe('on a page as its write stream delivered it', () => {
-            const text = getPageStreamPieces().join('');
-            const page = JSON.parse(text) as unknown;
-            // every prefix of the text, with how it reads once closed (closeJSON)
-            const cuts = Array.from({ length: text.length }, (_, index) => {
-                const prefix = text.slice(0, index + 1);
-                return { prefix, ...closeJSON(prefix.trimEnd()) };
-            });
-            const readings: Array<ReturnType<typeof parseAsJSON>> = [];
-
-            beforeAll(() => {
-                for (const { prefix } of cuts) readings.push(parseAsJSON(prefix));
-            });
-
-            it('reads every prefix of the text as a prefix of the page', () => {
-                const misread = cuts.filter(({ isAwaitingValue }, index) => {
-                    const { postscript, preamble, value } = readings[index];
-                    if (postscript !== '' || preamble !== '') return true;
-                    return !isPrefixOf({ isAwaitingValue, partial: value, whole: page });
+        // …and so is this: as it was written, and with its first comma left out,
+        // which leaves every prefix that reaches past there to the repairs
+        describe.each(['closing', 'repairing'])(
+            'on a page as its write stream delivered it, read by %s it',
+            (reading) => {
+                const pageText = getPageStreamPieces().join('');
+                const page = JSON.parse(pageText) as unknown;
+                const commaIndex = reading === 'repairing' ? pageText.indexOf(',') : -1;
+                const text =
+                    commaIndex > -1
+                        ? pageText.slice(0, commaIndex) + pageText.slice(commaIndex + 1)
+                        : pageText;
+                // every prefix of the text, with how the page’s text reads once closed
+                // (closeCutText) where it is cut at the same place
+                const cuts = Array.from({ length: text.length }, (_, index) => {
+                    const endIndex = index + 1;
+                    const hasComma = commaIndex > -1 && endIndex > commaIndex;
+                    const pagePrefix = pageText.slice(
+                        0,
+                        hasComma ? endIndex + 1 : endIndex,
+                    );
+                    return {
+                        prefix: text.slice(0, endIndex),
+                        ...closeCutText(pagePrefix.trimEnd()),
+                    };
                 });
-                expect(
-                    misread.slice(0, 3).map(({ prefix }) => prefix.slice(-60)),
-                ).toEqual([]);
-            });
+                const readings: Array<ReturnType<typeof parseAsJSON>> = [];
 
-            it('reads all that every prefix of the text holds', () => {
-                // …wherever closing what the prefix leaves open says how it reads,
-                // which is everywhere but partway through a literal or an escape,
-                // and on a number
-                const misread = cuts.filter(
-                    ({ closed }, index) =>
-                        closed !== undefined &&
-                        JSON.stringify(readings[index].value) !== JSON.stringify(closed),
-                );
-                expect(
-                    misread.slice(0, 3).map(({ prefix }) => prefix.slice(-60)),
-                ).toEqual([]);
-                const unclosedCount = cuts.filter(
-                    ({ closed }) => closed === undefined,
-                ).length;
-                expect(unclosedCount).toBeLessThan(cuts.length / 20);
-            });
-        });
+                beforeAll(() => {
+                    for (const { prefix } of cuts) readings.push(parseAsJSON(prefix));
+                });
+
+                it('reads every prefix of the text as a prefix of the page', () => {
+                    const misread = cuts.filter(({ isAwaitingValue }, index) => {
+                        const { postscript, preamble, value } = readings[index];
+                        if (postscript !== '' || preamble !== '') return true;
+                        return !isPrefixOf({
+                            isAwaitingValue,
+                            partial: value,
+                            whole: page,
+                        });
+                    });
+                    expect(
+                        misread.slice(0, 3).map(({ prefix }) => prefix.slice(-60)),
+                    ).toEqual([]);
+                });
+
+                it('reads all that every prefix of the text holds', () => {
+                    // …wherever closing what the prefix leaves open says how it reads,
+                    // which is everywhere but partway through a literal or an escape,
+                    // and on a number
+                    const misread = cuts.filter(
+                        ({ closed }, index) =>
+                            closed !== undefined &&
+                            JSON.stringify(readings[index].value) !==
+                                JSON.stringify(closed),
+                    );
+                    expect(
+                        misread.slice(0, 3).map(({ prefix }) => prefix.slice(-60)),
+                    ).toEqual([]);
+                    const unclosedCount = cuts.filter(
+                        ({ closed }) => closed === undefined,
+                    ).length;
+                    expect(unclosedCount).toBeLessThan(cuts.length / 20);
+                });
+            },
+        );
     });
 });
 
@@ -579,7 +769,7 @@ Here is the button:
 // where none of that makes valid JSON (the text stops partway through a literal
 // or an escape), and where the text stops on a number, which more digits could
 // still follow.
-function closeJSON(text: string): { closed: unknown; isAwaitingValue: boolean } {
+function closeCutText(text: string): { closed: unknown; isAwaitingValue: boolean } {
     let closers = '';
     let isInString = false;
     for (let index = 0; index < text.length; index++) {
@@ -1501,13 +1691,13 @@ function preservesNewLinesTestCase() {
     });
 }
 
-// what a text that starts with PAGE_START reads to, given the props it goes on
-// to hold: the page’s own root, with nothing left over
-function readTo(props: Record<string, unknown>) {
+// what an unfinished page reads to, given the props of its first section: the
+// page’s own root, with nothing left over
+function readPage(props: Record<string, unknown>) {
     return {
         postscript: '',
         preamble: '',
-        value: { sections: [{ props: { heading: 'Hi', ...props } }] },
+        value: { sections: [{ props }] },
     };
 }
 
