@@ -82,6 +82,22 @@ describe('@acusti/parsing', () => {
             expect(unclosed).toEqual([]);
         });
 
+        it('tells an escaped quote mark from one that closes a string', () => {
+            expect(
+                parseUnfinishedJSON({
+                    isEndDelimited: false,
+                    text: '{"quote": "the \\"best\\"", "a": "b',
+                }),
+            ).toEqual({ a: 'b', quote: 'the "best"' });
+            // an even number of backslashes is escaped backslashes, which escape nothing
+            expect(
+                parseUnfinishedJSON({
+                    isEndDelimited: false,
+                    text: '["C:\\\\", "a \\\\\\"b\\\\\\\\", "c',
+                }),
+            ).toEqual(['C:\\', 'a \\"b\\\\', 'c']);
+        });
+
         it('leaves a text that is whole, or that needs a repair, to parseAsJSON', () => {
             for (const text of [
                 '{"a": "b"}',
@@ -223,6 +239,7 @@ describe('@acusti/parsing', () => {
                 expect(parseAsJSON('[1, 2, 3').value).toEqual([1, 2]);
                 expect(parseAsJSON('[true, fal').value).toEqual([true]);
                 expect(parseAsJSON('[\n  "a",\n  "b').value).toEqual(['a', 'b']);
+                expect(parseAsJSON('["C:\\\\", "x').value).toEqual(['C:\\', 'x']);
                 expect(parseAsJSON('[\n  {"a": true},\n  {"a": fal')).toEqual({
                     postscript: '',
                     preamble: '',
@@ -247,14 +264,6 @@ describe('@acusti/parsing', () => {
                 expect(parseAsJSON('{"a \\"b\\""').value).toEqual({ 'a "b"': '' });
                 expect(parseAsJSON('{"a \\"b\\"": "c').value).toEqual({ 'a "b"': 'c' });
                 expect(parseAsJSON('{"a": "b", "c \\"d').value).toEqual({ a: 'b' });
-            });
-
-            it('reads a string that ends in an escaped backslash', () => {
-                expect(parseAsJSON('{"path": "C:\\\\", "name": "x').value).toEqual({
-                    name: 'x',
-                    path: 'C:\\',
-                });
-                expect(parseAsJSON('["C:\\\\", "x').value).toEqual(['C:\\', 'x']);
             });
 
             it('leaves a text that is not to the repairs', () => {
@@ -384,6 +393,32 @@ describe('@acusti/parsing', () => {
                     expect(parseAsJSON(start + '"path":"C:\\\\')).toEqual(
                         readTo({ path: 'C:\\' }),
                     );
+                });
+
+                it('reads a string that ends in an escaped backslash', () => {
+                    expect(parseAsJSON(start + '"path":"C:\\\\","name":"x')).toEqual(
+                        readTo({ name: 'x', path: 'C:\\' }),
+                    );
+                    expect(parseAsJSON(start + '"path": "C:\\\\", "name": "x')).toEqual(
+                        readTo({ name: 'x', path: 'C:\\' }),
+                    );
+                    // as a key, and as an item in an array
+                    expect(
+                        parseAsJSON(
+                            start + '"C:\\\\":"a","paths":["C:\\\\","D:\\\\"],"b":"c',
+                        ),
+                    ).toEqual(readTo({ b: 'c', 'C:\\': 'a', paths: ['C:\\', 'D:\\'] }));
+                    // where it is the last thing in its object, and in the text
+                    expect(
+                        parseAsJSON(start + '"link":{"path":"C:\\\\"},"b":"c'),
+                    ).toEqual(readTo({ b: 'c', link: { path: 'C:\\' } }));
+                    expect(parseAsJSON(start + '"path":"C:\\\\"')).toEqual(
+                        readTo({ path: 'C:\\' }),
+                    );
+                    // a quote mark is escaped only by an odd number of backslashes
+                    expect(
+                        parseAsJSON(start + '"a":"b\\\\\\"c","d":"e\\\\\\\\","f":"g'),
+                    ).toEqual(readTo({ a: 'b\\"c', d: 'e\\\\', f: 'g' }));
                 });
 
                 it('reads on past true, false and null', () => {
@@ -912,6 +947,11 @@ function extraneousEscapeCharactersTestCase() {
                 '\nAt Cinco Design, we believe that print design is not just about creating visually appealing materials, but also about effectively communicating your message to your target audience. Our team of experienced designers works closely with you to understand your brand, your audience, and your goals, and then crafts a unique print design solution that captures your essence and resonates with your audience.\n\nOur print design services include:\n\n- Branding and identity design: We create a cohesive visual identity for your brand, including logos, business cards, letterheads, and more.\n- Marketing collateral: We design brochures, flyers, posters, and other marketing materials that effectively promote your products or services.\n- Packaging design: We design packaging that not only protects your products but also enhances their appeal and makes them stand out on the shelf.\n- Publication design: We design magazines, newspapers, books, and other publications that are visually engaging and easy to navigate.\n\nLet us help you make a lasting impression with our print design services. Contact us today to discuss your project and see how we can bring your vision to life.',
             heading: 'Print Design',
         },
+    });
+
+    // an escaped backslash before a raw line break is whole: only a lone one is extraneous
+    expect(parseAsJSON('{"path": "C:\\\\\nD:\\\\"}').value).toEqual({
+        path: 'C:\\\nD:\\',
     });
 }
 
@@ -2007,10 +2047,11 @@ Here are some of the services we offer:
     });
 
     // the line is made a key however the string was repaired before it: with no
-    // line break, or with several
+    // line break, with several, or with an escaped backslash before one
     for (const [body, value] of [
         ['We care. ', 'We care.'],
         ['We care.\n\nWe heal.\n', 'We care.\n\nWe heal.'],
+        ['In C:\\\\\nWe care.\n', 'In C:\\\nWe care.'],
     ]) {
         expect(
             parseAsJSON(
