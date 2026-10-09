@@ -219,6 +219,20 @@ describe('@acusti/parsing', () => {
                 readTo({ tags: ['a', 'b'] }),
             );
         });
+        it('tells a key with no value yet from a string that holds an escaped quote mark', () => {
+            // a value that, once closed, has a comma and then a quote mark in it
+            expect(parseAsJSON(PAGE_START + '"quote":"Honestly, \\"the best')).toEqual(
+                readTo({ quote: 'Honestly, "the best' }),
+            );
+            expect(
+                parseAsJSON(
+                    PAGE_START + '"quote":"Honestly, \\"the best\\" in town, \\"and',
+                ),
+            ).toEqual(readTo({ quote: 'Honestly, "the best" in town, "and' }));
+            // a key that holds one, which is whole and has no value yet
+            expect(parseAsJSON(PAGE_START + '"q\\"k"')).toEqual(readTo({ 'q"k': '' }));
+            expect(parseAsJSON(PAGE_START + '"q\\"k":')).toEqual(readTo({ 'q"k': '' }));
+        });
 
         describe('with bare literals in an unfinished text', () => {
             it('reads on past true, false and null', () => {
