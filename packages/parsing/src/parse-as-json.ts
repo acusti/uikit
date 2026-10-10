@@ -631,8 +631,20 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
                             step: -1,
                             text,
                         });
+                        if (
+                            lastColonIndex > -1 &&
+                            stack.at(-1) === '}' &&
+                            UNFINISHED_KEY_REGEXP.test(newText)
+                        ) {
+                            // the string is a key: end the read inside it, as where
+                            // the text stops inside any key
+                            isInsideString = true;
+                            break;
+                        }
                         if (lastColonIndex > -1) {
-                            // convert last bit of text into a key
+                            // convert last bit of text into a key (its colon is the
+                            // last one in newText, since only whitespace follows it)
+                            const colonIndex = newText.lastIndexOf(':');
                             const minimumStartIndex = newText.lastIndexOf('"') + 1;
                             const lastLineStartIndex = newText.lastIndexOf('\\n') + 2;
                             const lastSentenceStartIndex = newText.lastIndexOf('. ') + 2;
@@ -650,9 +662,9 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
                                     .substring(0, keyStartIndex)
                                     .replace(/(\\n|\s)+$/, '') +
                                 '", "' +
-                                newText.substring(keyStartIndex, lastColonIndex + 1) +
+                                newText.substring(keyStartIndex, colonIndex) +
                                 '"' +
-                                newText.substring(lastColonIndex + 1);
+                                newText.substring(colonIndex);
                         } else if (getPreviousStringType(newText) === 'VALUE') {
                             // if previous string is a value, convert current string into a key
                             char = '":';

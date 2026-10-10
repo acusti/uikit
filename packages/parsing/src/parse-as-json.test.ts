@@ -2005,4 +2005,35 @@ Here are some of the services we offer:
             },
         },
     });
+
+    // the line is made a key however the string was repaired before it: with no
+    // line break, or with several
+    for (const [body, value] of [
+        ['We care. ', 'We care.'],
+        ['We care.\n\nWe heal.\n', 'We care.\n\nWe heal.'],
+    ]) {
+        expect(
+            parseAsJSON(
+                `{"a": "b",\n"body": "${body}Here is what we offer:\n{\n"c": "d"\n}}`,
+            ),
+        ).toEqual({
+            postscript: '',
+            preamble: '',
+            value: { a: 'b', body: value, 'Here is what we offer': { c: 'd' } },
+        });
+    }
+
+    // a string that is itself a key is not cut there: the read ends inside it, as
+    // it does wherever a text stops inside a key
+    expect(
+        parseAsJSON(
+            'Here is the JSON output for the "Benefits{" page:\n{\n"teamMemberName1": "John Doe"\n}',
+        ).value,
+    ).toEqual({ teamMemberName1: 'John Doe' });
+    // …which keeps what was read before that key, and leaves the rest unread
+    expect(parseAsJSON('{"a": "b",\n"Options:\n{\n"c": "d"\n}}')).toEqual({
+        postscript: '{\n"c": "d"\n}}',
+        preamble: '',
+        value: { a: 'b' },
+    });
 }
