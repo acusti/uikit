@@ -48,6 +48,7 @@ import {
     getParentItem,
     getSubmenuOfItem,
     getTriggerElement,
+    isInOwnBody,
     isItemExpanded,
     isPointInTriangle,
     LIST_CONTAINER_SELECTOR,
@@ -1059,15 +1060,8 @@ function RootDropdown({
             return;
         }
 
-        // A click only counts as inside the body if the closest body element
-        // belongs to this dropdown (a nested dropdown’s trigger sits inside
-        // the outer body, but the outer body isn’t the nested one’s own)
-        const targetBody = eventTarget.closest(BODY_SELECTOR);
-        const isInOwnBody = Boolean(
-            targetBody && targetBody.closest('.uktdropdown') === dropdownElement,
-        );
         // If click was outside dropdown body, don’t trigger submit
-        if (!isInOwnBody) {
+        if (!isInOwnBody(dropdownElement, eventTarget)) {
             // Don’t close dropdown if search input is focused
             if (inputElementRef.current !== eventTarget.ownerDocument.activeElement) {
                 closeDropdown();

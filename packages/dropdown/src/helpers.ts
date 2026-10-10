@@ -19,6 +19,14 @@ type MaybeHTMLElement = HTMLElement | null;
 const getBodyElement = (dropdownElement: MaybeHTMLElement) =>
     (dropdownElement?.querySelector(BODY_SELECTOR) ?? null) as MaybeHTMLElement;
 
+// Whether an element is inside this dropdown’s own body: the closest body
+// element has to belong to this dropdown (a nested dropdown’s trigger sits
+// inside the outer body, but the outer body isn’t the nested one’s own)
+export const isInOwnBody = (dropdownElement: MaybeHTMLElement, element: Element) => {
+    const bodyElement = element.closest(BODY_SELECTOR);
+    return bodyElement != null && bodyElement.closest('.uktdropdown') === dropdownElement;
+};
+
 // The level root that owns an item: the closest [data-ukt-submenu] ancestor,
 // or null for items at the top level of the dropdown body
 export const getLevelRoot = (element: HTMLElement) =>
