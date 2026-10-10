@@ -66,8 +66,11 @@ const VALUE_DELIMITER_CHARS = new Set([
     '9',
 ]);
 
-const VALUE_START_CHARS = VALUE_DELIMITER_CHARS.add('{').add('[');
-const VALUE_END_CHARS = VALUE_DELIMITER_CHARS.add('}').add(']');
+const VALUE_START_CHARS = new Set([...VALUE_DELIMITER_CHARS, '{', '[']);
+const VALUE_END_CHARS = new Set([...VALUE_DELIMITER_CHARS, '}', ']']);
+// what a [ has to be followed by to be taken for the start of an array rather
+// than part of the preamble: a quote mark, a digit, or a bracket of either kind
+const ARRAY_BODY_START_CHARS = new Set([...VALUE_START_CHARS, ']', '}']);
 
 // a bare literal (true, false, null, or a number) starts with one of these…
 const LITERAL_START_CHARS = new Set('-0123456789fnt');
@@ -99,6 +102,10 @@ const UNFINISHED_LITERAL_REGEXP =
 // the key that a text ends on, with its colon and the comma that precedes it
 const LAST_KEY_REGEXP = /,?\s*"(?:[^"\\]|\\.)*"\s*:\s*$/;
 const LAST_COMMA_REGEXP = /,?\s*$/;
+// the key that a text ends on, if it has no colon or value yet (a key follows a
+// brace or a comma, and may hold escaped quote marks, as may a value, in which
+// a comma and a quote mark are not the start of one)
+const LAST_KEY_WITHOUT_VALUE_REGEXP = /[{,]\s*"(?:[^"\\]|\\.)*"\s*$/;
 // the key that a text ends partway through (on a backslash, if it ends on the
 // start of an escape sequence), with the brace or comma before it
 const UNFINISHED_KEY_REGEXP = /([{,])\s*"(?:[^"\\]|\\.)*\\?$/;
@@ -294,18 +301,22 @@ function dropUnfinishedEscape(text: string) {
     return text.slice(0, escape.index + escape[1].length - 1);
 }
 
+// whether the character at index is escaped, which it is if it follows an odd
+// number of backslashes (an even number is escaped backslashes, which are whole)
+function isEscaped(text: string, index: number) {
+    let backslashIndex = index - 1;
+    while (text[backslashIndex] === '\\') backslashIndex--;
+    return (index - backslashIndex) % 2 === 0;
+}
+
 // the index of the quote mark that closes the string that opens at index, or -1
 // if the text ends first
 function indexOfStringEnd(text: string, index: number) {
     let endIndex = text.indexOf('"', index + 1);
-    while (endIndex > -1) {
-        // a quote mark that follows an odd number of backslashes is escaped
-        let backslashIndex = endIndex - 1;
-        while (text[backslashIndex] === '\\') backslashIndex--;
-        if ((endIndex - backslashIndex) % 2 === 1) return endIndex;
+    while (endIndex > -1 && isEscaped(text, endIndex)) {
         endIndex = text.indexOf('"', endIndex + 1);
     }
-    return -1;
+    return endIndex;
 }
 
 // Closes a text that is JSON as far as it goes, by the rules that the repairs in
@@ -528,7 +539,7 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
         previousText !== text &&
         // if new start is [, ensure it’s an array & not part of preamble
         ((text[0] === '[' &&
-            !isFollowedBy({ chars: VALUE_START_CHARS, index: 0, text })) ||
+            !isFollowedBy({ chars: ARRAY_BODY_START_CHARS, index: 0, text })) ||
             // if new start is ", ensure it’s a JSON string & not part of preamble
             (text[0] === '"' && !OBJECT_KEY_REGEXP.test(text)))
     );
@@ -561,7 +572,7 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
     for (; index < text.length; index++) {
         let char = text[index];
         if (isInsideString) {
-            if (char === '"' && newText.at(-1) !== '\\') {
+            if (char === '"' && !isEscaped(text, index)) {
                 // set state to not insideString (will set back to true if is unescaped quote mark)
                 isInsideString = false;
                 // if quote mark is followed by ':', ', "', or new line, treat it as a string terminus
@@ -631,8 +642,20 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
                             step: -1,
                             text,
                         });
+                        if (
+                            lastColonIndex > -1 &&
+                            stack.at(-1) === '}' &&
+                            UNFINISHED_KEY_REGEXP.test(newText)
+                        ) {
+                            // the string is a key: end the read inside it, as where
+                            // the text stops inside any key
+                            isInsideString = true;
+                            break;
+                        }
                         if (lastColonIndex > -1) {
-                            // convert last bit of text into a key
+                            // convert last bit of text into a key (its colon is the
+                            // last one in newText, since only whitespace follows it)
+                            const colonIndex = newText.lastIndexOf(':');
                             const minimumStartIndex = newText.lastIndexOf('"') + 1;
                             const lastLineStartIndex = newText.lastIndexOf('\\n') + 2;
                             const lastSentenceStartIndex = newText.lastIndexOf('. ') + 2;
@@ -650,9 +673,9 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
                                     .substring(0, keyStartIndex)
                                     .replace(/(\\n|\s)+$/, '') +
                                 '", "' +
-                                newText.substring(keyStartIndex, lastColonIndex + 1) +
+                                newText.substring(keyStartIndex, colonIndex) +
                                 '"' +
-                                newText.substring(lastColonIndex + 1);
+                                newText.substring(colonIndex);
                         } else if (getPreviousStringType(newText) === 'VALUE') {
                             // if previous string is a value, convert current string into a key
                             char = '":';
@@ -672,7 +695,7 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
                     // if not escaped, escape the newline character now
                     char = '\\n';
                     // check if there is already an extraneous escape character
-                    if (newText.at(-1) === '\\') {
+                    if (isEscaped(text, index)) {
                         newText = newText.slice(0, -1);
                     }
                 }
@@ -711,6 +734,19 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
             };
             // handle invalid characters outside of a string value
             if (!isValidContext(validContextPayload)) {
+                // a trailing comma (one that the end of its array or object
+                // follows) is left out, and the text is read on from there, unless
+                // in an object it follows a key with no value yet (given '' below)
+                if (
+                    char === ',' &&
+                    controlChar != null &&
+                    isFollowedBy({ char: controlChar, index, text }) &&
+                    (controlChar === ']' ||
+                        (isPreceededBy({ chars: ITEM_END_CHARS, text: newText }) &&
+                            !LAST_KEY_WITHOUT_VALUE_REGEXP.test(newText)))
+                ) {
+                    continue;
+                }
                 // if previous character was a comma, remove it
                 const trailingPayload = { char: ',', step: -1, text: newText };
                 const trailingCommaIndex = indexOfClosestChar(trailingPayload);
@@ -819,15 +855,17 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
 
     if (stack.at(-1) === '}') {
         // if we are in the key of a key/value pair, append ': ""' to close the pair
-        // (a key follows a brace or a comma, and may hold escaped quote marks, as
-        // may a value, in which a comma and a quote mark are not the start of one)
-        if (/[{,]\s*"(?:[^"\\]|\\.)*"\s*$/.test(newText)) {
+        if (LAST_KEY_WITHOUT_VALUE_REGEXP.test(newText)) {
             newText += ': ""';
         } else if (/": ?$/.test(newText)) {
             // if we are in between a key/value pair, append '""' to close the pair
             newText += '""';
         }
     }
+
+    // a comma that the text ends on separates nothing, so it is left out (the
+    // walk only keeps one there after the end of the root value)
+    newText = newText.replace(LAST_COMMA_REGEXP, '');
 
     // close any remaining open structures in the reverse order that they were opened
     for (let stackIndex = stack.length - 1; stackIndex >= 0; stackIndex--) {

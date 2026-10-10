@@ -82,6 +82,22 @@ describe('@acusti/parsing', () => {
             expect(unclosed).toEqual([]);
         });
 
+        it('tells an escaped quote mark from one that closes a string', () => {
+            expect(
+                parseUnfinishedJSON({
+                    isEndDelimited: false,
+                    text: '{"quote": "the \\"best\\"", "a": "b',
+                }),
+            ).toEqual({ a: 'b', quote: 'the "best"' });
+            // an even number of backslashes is escaped backslashes, which escape nothing
+            expect(
+                parseUnfinishedJSON({
+                    isEndDelimited: false,
+                    text: '["C:\\\\", "a \\\\\\"b\\\\\\\\", "c',
+                }),
+            ).toEqual(['C:\\', 'a \\"b\\\\', 'c']);
+        });
+
         it('leaves a text that is whole, or that needs a repair, to parseAsJSON', () => {
             for (const text of [
                 '{"a": "b"}',
@@ -223,6 +239,7 @@ describe('@acusti/parsing', () => {
                 expect(parseAsJSON('[1, 2, 3').value).toEqual([1, 2]);
                 expect(parseAsJSON('[true, fal').value).toEqual([true]);
                 expect(parseAsJSON('[\n  "a",\n  "b').value).toEqual(['a', 'b']);
+                expect(parseAsJSON('["C:\\\\", "x').value).toEqual(['C:\\', 'x']);
                 expect(parseAsJSON('[\n  {"a": true},\n  {"a": fal')).toEqual({
                     postscript: '',
                     preamble: '',
@@ -247,14 +264,6 @@ describe('@acusti/parsing', () => {
                 expect(parseAsJSON('{"a \\"b\\""').value).toEqual({ 'a "b"': '' });
                 expect(parseAsJSON('{"a \\"b\\"": "c').value).toEqual({ 'a "b"': 'c' });
                 expect(parseAsJSON('{"a": "b", "c \\"d').value).toEqual({ a: 'b' });
-            });
-
-            it('reads a string that ends in an escaped backslash', () => {
-                expect(parseAsJSON('{"path": "C:\\\\", "name": "x').value).toEqual({
-                    name: 'x',
-                    path: 'C:\\',
-                });
-                expect(parseAsJSON('["C:\\\\", "x').value).toEqual(['C:\\', 'x']);
             });
 
             it('leaves a text that is not to the repairs', () => {
@@ -384,6 +393,32 @@ describe('@acusti/parsing', () => {
                     expect(parseAsJSON(start + '"path":"C:\\\\')).toEqual(
                         readTo({ path: 'C:\\' }),
                     );
+                });
+
+                it('reads a string that ends in an escaped backslash', () => {
+                    expect(parseAsJSON(start + '"path":"C:\\\\","name":"x')).toEqual(
+                        readTo({ name: 'x', path: 'C:\\' }),
+                    );
+                    expect(parseAsJSON(start + '"path": "C:\\\\", "name": "x')).toEqual(
+                        readTo({ name: 'x', path: 'C:\\' }),
+                    );
+                    // as a key, and as an item in an array
+                    expect(
+                        parseAsJSON(
+                            start + '"C:\\\\":"a","paths":["C:\\\\","D:\\\\"],"b":"c',
+                        ),
+                    ).toEqual(readTo({ b: 'c', 'C:\\': 'a', paths: ['C:\\', 'D:\\'] }));
+                    // where it is the last thing in its object, and in the text
+                    expect(
+                        parseAsJSON(start + '"link":{"path":"C:\\\\"},"b":"c'),
+                    ).toEqual(readTo({ b: 'c', link: { path: 'C:\\' } }));
+                    expect(parseAsJSON(start + '"path":"C:\\\\"')).toEqual(
+                        readTo({ path: 'C:\\' }),
+                    );
+                    // a quote mark is escaped only by an odd number of backslashes
+                    expect(
+                        parseAsJSON(start + '"a":"b\\\\\\"c","d":"e\\\\\\\\","f":"g'),
+                    ).toEqual(readTo({ a: 'b\\"c', d: 'e\\\\', f: 'g' }));
                 });
 
                 it('reads on past true, false and null', () => {
@@ -912,6 +947,11 @@ function extraneousEscapeCharactersTestCase() {
                 '\nAt Cinco Design, we believe that print design is not just about creating visually appealing materials, but also about effectively communicating your message to your target audience. Our team of experienced designers works closely with you to understand your brand, your audience, and your goals, and then crafts a unique print design solution that captures your essence and resonates with your audience.\n\nOur print design services include:\n\n- Branding and identity design: We create a cohesive visual identity for your brand, including logos, business cards, letterheads, and more.\n- Marketing collateral: We design brochures, flyers, posters, and other marketing materials that effectively promote your products or services.\n- Packaging design: We design packaging that not only protects your products but also enhances their appeal and makes them stand out on the shelf.\n- Publication design: We design magazines, newspapers, books, and other publications that are visually engaging and easy to navigate.\n\nLet us help you make a lasting impression with our print design services. Contact us today to discuss your project and see how we can bring your vision to life.',
             heading: 'Print Design',
         },
+    });
+
+    // an escaped backslash before a raw line break is whole: only a lone one is extraneous
+    expect(parseAsJSON('{"path": "C:\\\\\nD:\\\\"}').value).toEqual({
+        path: 'C:\\\nD:\\',
     });
 }
 
@@ -1610,6 +1650,24 @@ ${postscript}`;
             sectionTitle: 'Lessons Offered',
         },
     });
+
+    // before an array, which may be empty
+    expect(parseAsJSON('Here are the tags: ["a", "b"]')).toEqual({
+        postscript: '',
+        preamble: 'Here are the tags:',
+        value: ['a', 'b'],
+    });
+    expect(parseAsJSON('Here are the tags: []')).toEqual({
+        postscript: '',
+        preamble: 'Here are the tags:',
+        value: [],
+    });
+    // as is one that the wrong bracket closes, which is as far as it is read
+    expect(parseAsJSON('Here are the tags: [}')).toEqual({
+        postscript: '',
+        preamble: 'Here are the tags:',
+        value: [],
+    });
 }
 
 function prematureClosingCurliesTestCase() {
@@ -1855,6 +1913,19 @@ function stripInvalidJSONTestCase() {
         subheading:
             'Our bakery is built on the foundation of passionate individuals who are dedicated to creating the best sourdough bread in North Lake Tahoe. Meet the team behind Masa Madre.',
     });
+
+    // a comma that follows an opening bracket is not between two items or two
+    // key/value pairs, so the text is read up to it
+    expect(parseAsJSON('{"heading": "Hi", "tags": [, "a"]}')).toEqual({
+        postscript: ', "a"]}',
+        preamble: '',
+        value: { heading: 'Hi', tags: [] },
+    });
+    expect(parseAsJSON('{"heading": "Hi", "link": {, "a": "b"}}')).toEqual({
+        postscript: ', "a": "b"}}',
+        preamble: '',
+        value: { heading: 'Hi', link: {} },
+    });
 }
 
 function trailingCommasTestCase() {
@@ -1884,6 +1955,121 @@ function trailingCommasTestCase() {
             item2Content: 'Sarah Johnson - Wine Educator',
             sectionTitle: 'Meet the Team',
         },
+    });
+
+    // in an array, the comma is left out and what follows the array is read
+    expect(parseAsJSON('{"tags":["a","b",],"x":"y"}')).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { tags: ['a', 'b'], x: 'y' },
+    });
+    // after an item of any kind, with or without whitespace before the bracket
+    expect(
+        parseAsJSON(`\
+{
+  "tags": [
+    "a",
+    "b",
+  ],
+  "sizes": [1, 2, ],
+  "flags": [true, null,],
+  "items": [
+    { "name": "A" },
+    ["b"],
+  ]
+}`),
+    ).toEqual({
+        postscript: '',
+        preamble: '',
+        value: {
+            flags: [true, null],
+            items: [{ name: 'A' }, ['b']],
+            sizes: [1, 2],
+            tags: ['a', 'b'],
+        },
+    });
+    // in an array at the root, and in one inside it
+    expect(parseAsJSON('["a", ["b", "c",], ]')).toEqual({
+        postscript: '',
+        preamble: '',
+        value: ['a', ['b', 'c']],
+    });
+    // in a text that is unfinished
+    expect(parseAsJSON('{"tags":["a","b",],"x":"y')).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { tags: ['a', 'b'], x: 'y' },
+    });
+    expect(parseAsJSON('{"tags":["a","b",]').value).toEqual({ tags: ['a', 'b'] });
+
+    // in an object inside another, or inside an array, what follows it is read
+    expect(parseAsJSON('{"a":{"b":"c",},"x":"y"}')).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { a: { b: 'c' }, x: 'y' },
+    });
+    expect(parseAsJSON('{"a": [{"b": "c",},], "d": "e"}')).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { a: [{ b: 'c' }], d: 'e' },
+    });
+    // after every item and every pair, as a model that writes them does
+    expect(
+        parseAsJSON(`\
+{
+  "items": [
+    {
+      "name": "A",
+      "tags": ["x", "y",],
+    },
+    {
+      "name": "B",
+    },
+  ],
+  "total": 2,
+}`),
+    ).toEqual({
+        postscript: '',
+        preamble: '',
+        value: {
+            items: [{ name: 'A', tags: ['x', 'y'] }, { name: 'B' }],
+            total: 2,
+        },
+    });
+    // in an object at the root, the postscript starts after its closing brace
+    expect(parseAsJSON('{"a":"b","c":"d",}\n\nHope this helps!')).toEqual({
+        postscript: 'Hope this helps!',
+        preamble: '',
+        value: { a: 'b', c: 'd' },
+    });
+    // after the end of the root value, where the text ends on it
+    expect(parseAsJSON('{"a": "b"},').value).toEqual({ a: 'b' });
+    expect(parseAsJSON('{"a": true,},\n').value).toEqual({ a: true });
+    expect(parseAsJSON('["a", "b",],').value).toEqual(['a', 'b']);
+    // a comma that follows a key with no value yet is not a trailing one: that
+    // key is given '', as it is where the text ends on it
+    expect(parseAsJSON('{"c",}').value).toEqual({ c: '' });
+    expect(parseAsJSON('{"a": 1, "c",}').value).toEqual({ a: 1, c: '' });
+    expect(parseAsJSON('{"a": "b", "c",}').value).toEqual({ a: 'b', c: '' });
+    expect(parseAsJSON('{"a": "b", "c":,}').value).toEqual({ a: 'b', c: '' });
+    expect(parseAsJSON('{"a": ,}').value).toEqual({ a: '' });
+
+    // only a comma is left out, and only where the bracket that closes its array
+    // or object follows it: the text is read up to anything else that is not JSON
+    expect(parseAsJSON('{"tags": ["a" x], "b": "c"}')).toEqual({
+        postscript: 'x], "b": "c"}',
+        preamble: '',
+        value: { tags: ['a'] },
+    });
+    expect(parseAsJSON('{"tags": ["a", } and more')).toEqual({
+        postscript: ', } and more',
+        preamble: '',
+        value: { tags: ['a'] },
+    });
+    expect(parseAsJSON('{"a": "b", ] and more')).toEqual({
+        postscript: ', ] and more',
+        preamble: '',
+        value: { a: 'b' },
     });
 }
 
@@ -2004,5 +2190,37 @@ Here are some of the services we offer:
                 ],
             },
         },
+    });
+
+    // the line is made a key however the string was repaired before it: with no
+    // line break, with several, or with an escaped backslash before one
+    for (const [body, value] of [
+        ['We care. ', 'We care.'],
+        ['We care.\n\nWe heal.\n', 'We care.\n\nWe heal.'],
+        ['In C:\\\\\nWe care.\n', 'In C:\\\nWe care.'],
+    ]) {
+        expect(
+            parseAsJSON(
+                `{"a": "b",\n"body": "${body}Here is what we offer:\n{\n"c": "d"\n}}`,
+            ),
+        ).toEqual({
+            postscript: '',
+            preamble: '',
+            value: { a: 'b', body: value, 'Here is what we offer': { c: 'd' } },
+        });
+    }
+
+    // a string that is itself a key is not cut there: the read ends inside it, as
+    // it does wherever a text stops inside a key
+    expect(
+        parseAsJSON(
+            'Here is the JSON output for the "Benefits{" page:\n{\n"teamMemberName1": "John Doe"\n}',
+        ).value,
+    ).toEqual({ teamMemberName1: 'John Doe' });
+    // …which keeps what was read before that key, and leaves the rest unread
+    expect(parseAsJSON('{"a": "b",\n"Options:\n{\n"c": "d"\n}}')).toEqual({
+        postscript: '{\n"c": "d"\n}}',
+        preamble: '',
+        value: { a: 'b' },
     });
 }
