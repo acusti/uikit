@@ -315,6 +315,49 @@ export const DropdownWithInteractiveContents: Story = {
     },
 };
 
+export const DropdownWithForm: Story = {
+    args: {
+        children: [
+            'Field settings',
+            <form
+                onSubmit={(event) => event.preventDefault()}
+                style={{ display: 'grid', gap: '0.5rem' }}
+            >
+                <label style={{ display: 'grid' }}>
+                    Label
+                    <input name="label" placeholder="What the field asks" type="text" />
+                </label>
+                <label style={{ display: 'grid' }}>
+                    Choices
+                    <textarea name="choices" placeholder="One to a line" rows={3} />
+                </label>
+                <label style={{ display: 'grid' }}>
+                    Type
+                    <select name="type">
+                        <option value="select">Choices</option>
+                        <option value="text">Text</option>
+                        <option value="number">Number</option>
+                    </select>
+                </label>
+                <label>
+                    <input name="required" style={{ width: 'auto' }} type="checkbox" />{' '}
+                    Required
+                </label>
+                <button type="submit">Save</button>
+            </form>,
+        ],
+        className: 'dropdown-without-items',
+        hasItems: false,
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'With `hasItems={false}`, Space and Enter pressed in the body belong to the body’s own controls: they type a space and a line break into the text boxes, toggle the checkbox & press the button. Escape closes the dropdown unless focus is in a text box.',
+            },
+        },
+    },
+};
+
 export const SearchableWithLabel: Story = {
     args: {
         children: (

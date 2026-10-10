@@ -1,7 +1,13 @@
 // @vitest-environment happy-dom
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { Activity, type MouseEvent, StrictMode, useEffect } from 'react';
+import {
+    Activity,
+    type MouseEvent,
+    StrictMode,
+    type SubmitEvent,
+    useEffect,
+} from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
@@ -3418,6 +3424,390 @@ describe('@acusti/dropdown', () => {
         await user.keyboard('{Escape}');
         expect(screen.queryByRole('listbox')).toBe(null);
         expect(document.activeElement).toBe(input);
+    });
+
+    describe('Space and Enter in interactive content (hasItems={false})', () => {
+        it('leaves Space and Enter to a text input and a textarea in the body', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <div>
+                        <label>
+                            Label <input type="text" />
+                        </label>
+                        <label>
+                            Choices <textarea />
+                        </label>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+
+            for (const name of ['Label', 'Choices']) {
+                const textbox = screen.getByRole('textbox', { name });
+                // fireEvent returns false when the event’s default was prevented
+                expect(fireEvent.keyDown(textbox, { key: ' ' })).toBe(true);
+                expect(fireEvent.keyDown(textbox, { key: 'Enter' })).toBe(true);
+            }
+        });
+
+        it('types spaces and line breaks into a textarea in the body', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <label>
+                        Choices <textarea />
+                    </label>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            const textarea = screen.getByRole('textbox', { name: 'Choices' });
+            await user.click(textarea);
+            await user.keyboard('By phone{Enter}By text message');
+
+            expect((textarea as HTMLTextAreaElement).value).toBe(
+                'By phone\nBy text message',
+            );
+        });
+
+        it('submits a form in the body on Enter in one of its inputs', async () => {
+            const handleSubmit = vi.fn<(event: SubmitEvent) => void>((event) =>
+                event.preventDefault(),
+            );
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <form onSubmit={handleSubmit}>
+                        <label>
+                            Full name <input name="name" type="text" />
+                        </label>
+                        <button type="submit">Save</button>
+                    </form>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            const input = screen.getByRole('textbox', { name: 'Full name' });
+            await user.click(input);
+            await user.keyboard('Sally Ride{Enter}');
+
+            expect((input as HTMLInputElement).value).toBe('Sally Ride');
+            expect(handleSubmit).toHaveBeenCalledTimes(1);
+        });
+
+        it('toggles a checkbox in the body on Space', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <label>
+                        <input type="checkbox" /> Required
+                    </label>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            const checkbox = screen.getByRole('checkbox', { name: 'Required' });
+            act(() => checkbox.focus());
+            await user.keyboard(' ');
+
+            expect((checkbox as HTMLInputElement).checked).toBe(true);
+            expect(fireEvent.keyDown(checkbox, { key: 'Enter' })).toBe(true);
+        });
+
+        it('leaves Space and Enter to a contenteditable element in the body', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <div aria-label="Notes" contentEditable role="textbox" tabIndex={0} />
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            const notes = screen.getByRole('textbox', { name: 'Notes' });
+
+            expect(fireEvent.keyDown(notes, { key: ' ' })).toBe(true);
+            expect(fireEvent.keyDown(notes, { key: 'Enter' })).toBe(true);
+        });
+
+        it('activates a button in the body on Enter and on Space', async () => {
+            const handleClick = vi.fn<() => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <button onClick={handleClick} type="button">
+                        Save
+                    </button>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            const saveButton = screen.getByRole('button', { name: 'Save' });
+            act(() => saveButton.focus());
+
+            await user.keyboard('{Enter}');
+            expect(handleClick).toHaveBeenCalledTimes(1);
+
+            await user.keyboard(' ');
+            expect(handleClick).toHaveBeenCalledTimes(2);
+
+            // pressing a button in the body doesn’t close the dropdown
+            expect(screen.getByRole('button', { name: 'Save' })).toBeTruthy();
+        });
+
+        it('leaves Space and Enter to a select and a link in the body', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <div>
+                        <select aria-label="Type">
+                            <option>Text</option>
+                            <option>Number</option>
+                        </select>
+                        <a href="#help">Help</a>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+
+            for (const control of [
+                screen.getByRole('combobox', { name: 'Type' }),
+                screen.getByRole('link', { name: 'Help' }),
+            ]) {
+                expect(fireEvent.keyDown(control, { key: ' ' })).toBe(true);
+                expect(fireEvent.keyDown(control, { key: 'Enter' })).toBe(true);
+            }
+        });
+
+        it('leaves Space and Enter to an input beside a nested popover opened on hover', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <div>
+                        <label>
+                            Full name <input type="text" />
+                        </label>
+                        <Dropdown hasItems={false} openOnHover>
+                            <button aria-label="About full name" type="button">
+                                ℹ️
+                            </button>
+                            <p data-testid="info-popover">Used for your profile.</p>
+                        </Dropdown>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            const input = screen.getByRole('textbox', { name: 'Full name' });
+            await user.click(input);
+            // hovering opens the popover with the keyboard still in the input
+            await user.hover(screen.getByRole('button', { name: 'About full name' }));
+            expect(screen.getByTestId('info-popover')).toBeTruthy();
+            expect(document.activeElement).toBe(input);
+
+            expect(fireEvent.keyDown(input, { key: ' ' })).toBe(true);
+            expect(fireEvent.keyDown(input, { key: 'Enter' })).toBe(true);
+        });
+
+        it('still takes Space and Enter pressed on its trigger', async () => {
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <label>
+                        Label <input type="text" />
+                    </label>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Settings' });
+            // closed, either key opens the dropdown
+            expect(fireEvent.keyDown(trigger, { key: 'Enter' })).toBe(false);
+            expect(screen.getByRole('textbox')).toBeTruthy();
+
+            // open, they’re still the dropdown’s, which stays open
+            expect(fireEvent.keyDown(trigger, { key: ' ' })).toBe(false);
+            expect(fireEvent.keyDown(trigger, { key: 'Enter' })).toBe(false);
+            // as they are with nothing focused
+            expect(fireEvent.keyDown(document.body, { key: ' ' })).toBe(false);
+            expect(fireEvent.keyDown(document.body, { key: 'Enter' })).toBe(false);
+            expect(screen.getByRole('textbox')).toBeTruthy();
+        });
+
+        it('still takes Space and Enter pressed on the trigger of a nested popover', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <div>
+                        <label>
+                            Full name <input type="text" />
+                        </label>
+                        <Dropdown hasItems={false}>
+                            <button aria-label="About full name" type="button">
+                                ℹ️
+                            </button>
+                            <p data-testid="info-popover">Used for your profile.</p>
+                        </Dropdown>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            const infoTrigger = screen.getByRole('button', { name: 'About full name' });
+            // closed, Enter on its trigger opens the popover
+            expect(fireEvent.keyDown(infoTrigger, { key: 'Enter' })).toBe(false);
+            expect(screen.getByTestId('info-popover')).toBeTruthy();
+
+            // open, they’re still the popover’s: its trigger sits in the
+            // outer body, which isn’t the popover’s own
+            expect(fireEvent.keyDown(infoTrigger, { key: ' ' })).toBe(false);
+            expect(fireEvent.keyDown(infoTrigger, { key: 'Enter' })).toBe(false);
+            expect(screen.getByTestId('info-popover')).toBeTruthy();
+        });
+
+        it('still closes on Enter pressed on its trigger when keepOpenOnSubmit is false', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                    <button type="button">Settings</button>
+                    <label>
+                        Label <input type="text" />
+                    </label>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Settings' });
+            await user.click(trigger);
+            expect(screen.getByRole('textbox')).toBeTruthy();
+
+            await user.keyboard('{Enter}');
+            await waitFor(() => expect(screen.queryByRole('textbox')).toBeNull());
+        });
+
+        it('stays open on Enter pressed in the body when keepOpenOnSubmit is false', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                    <button type="button">Settings</button>
+                    <label>
+                        Label <input type="text" />
+                    </label>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            await user.click(screen.getByRole('textbox', { name: 'Label' }));
+            await user.keyboard('{Enter}');
+            // longer than the delay before a submit closes the dropdown
+            await new Promise((resolve) => setTimeout(resolve, 150));
+
+            expect(screen.getByRole('textbox', { name: 'Label' })).toBeTruthy();
+        });
+
+        it('still takes Enter pressed in a text input trigger', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <input aria-label="Link" type="text" />
+                    <p data-testid="link-preview">Preview</p>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('textbox', { name: 'Link' });
+            await user.click(input);
+            expect(screen.getByTestId('link-preview')).toBeTruthy();
+
+            expect(fireEvent.keyDown(input, { key: 'Enter' })).toBe(false);
+            // Space was already the input’s own
+            expect(fireEvent.keyDown(input, { key: ' ' })).toBe(true);
+        });
+
+        it('leaves Space to a button in the body when the trigger is a text input', async () => {
+            const handleClick = vi.fn<() => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <input aria-label="Link" type="text" />
+                    <button onClick={handleClick} type="button">
+                        Open link
+                    </button>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox', { name: 'Link' }));
+            act(() => screen.getByRole('button', { name: 'Open link' }).focus());
+            await user.keyboard(' ');
+
+            expect(handleClick).toHaveBeenCalledTimes(1);
+            expect(screen.getByRole('button', { name: 'Open link' })).toBeTruthy();
+        });
+
+        it('still leaves Escape to a text input in the body and closes on it from a checkbox', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <div>
+                        <label>
+                            Label <input type="text" />
+                        </label>
+                        <label>
+                            <input type="checkbox" /> Required
+                        </label>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            await user.click(screen.getByRole('textbox', { name: 'Label' }));
+            await user.keyboard('{Escape}');
+            expect(screen.getByRole('textbox', { name: 'Label' })).toBeTruthy();
+
+            act(() => screen.getByRole('checkbox', { name: 'Required' }).focus());
+            await user.keyboard('{Escape}');
+            expect(screen.queryByRole('textbox', { name: 'Label' })).toBeNull();
+        });
+
+        it('still takes Space and Enter from the body of a dropdown with items', async () => {
+            const handleSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown onSubmitItem={handleSubmitItem}>
+                    Columns
+                    <ul>
+                        <li data-ukt-value="name">
+                            <label>
+                                <input type="checkbox" /> Name
+                            </label>
+                        </li>
+                        <li data-ukt-value="email">
+                            <label>
+                                <input type="checkbox" /> Email
+                            </label>
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Columns' }));
+            await user.keyboard('{ArrowDown}');
+            const checkbox = screen.getByRole('checkbox', { name: 'Name' });
+
+            expect(fireEvent.keyDown(checkbox, { key: ' ' })).toBe(false);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'name' }),
+            );
+        });
     });
 
     describe('nested non-menu dropdowns (hasItems={false})', () => {
