@@ -127,8 +127,9 @@ export type Props = {
      * Whether the body is a list of selectable items (the default) or
      * arbitrary interactive content such as a form. hasItems={false} turns
      * off item selection and item keyboard navigation, gives the popup
-     * role="dialog" (unless isSearchable), and keeps it open on clicks
-     * inside the body. Defaults to true and isn’t inferred from the children.
+     * role="dialog" (unless isSearchable), keeps it open on clicks inside
+     * the body, and leaves Space and Enter pressed in the body to the
+     * controls there. Defaults to true and isn’t inferred from the children.
      */
     hasItems?: boolean;
     /**
@@ -1188,6 +1189,19 @@ function RootDropdown({
 
                 return;
             }
+        }
+
+        // A hasItems={false} dropdown has no item for Enter and Space to
+        // submit, so in its body they belong to whatever has focus there: a
+        // text input types them, and they activate a checkbox, a button, or a
+        // link. Outside the dropdown they belong to a target that uses key
+        // events (an input beside a nested popover opened on hover, say). On
+        // the trigger they stay the dropdown’s own
+        if (!hasItems && (key === 'Enter' || key === ' ')) {
+            const isKeyForTarget = isEventTargetingDropdown
+                ? isInOwnBody(dropdownElement, eventTarget)
+                : isTargetUsingKeyEvents;
+            if (isKeyForTarget) return;
         }
 
         // If dropdown isOpen, handle submitting the value
