@@ -474,10 +474,11 @@ const OBJECT_START_PATTERN =
     '\\{\\s*(?:\\}|$|"(?:[^"\\\\\\n]|\\\\.|\\n(?!\\s*[{[]))*(?:"|$)|\\n[a-zA-Z][^"\\n]*"\\s*:)';
 const OBJECT_START_REGEXP = new RegExp(`^${OBJECT_START_PATTERN}`);
 // what is not where the JSON starts: a brace that the text starts with (unless
-// it opens an object), or a bracket or quote mark that it starts with if
-// neither of those follows it, and then all that is not one of the three
+// it opens an object), or a bracket that it starts with unless a quote mark or
+// another bracket follows it directly, and then all that is not a brace or a
+// bracket
 const NOT_START_REGEXP = new RegExp(
-    `^(?!${OBJECT_START_PATTERN})(?:\\{[^[{"]*|[["]?[^[{"]+)`,
+    `^(?!${OBJECT_START_PATTERN})(?:\\{[^[{]*|(?:\\[(?!["[{]))?[^[{]+)`,
 );
 
 const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
@@ -550,9 +551,7 @@ export function parseAsJSON(text: string): ParsedResult {
         ((text[0] === '[' &&
             !isFollowedBy({ chars: ARRAY_BODY_START_CHARS, index: 0, text })) ||
             // if new start is {, ensure it’s an object & not part of preamble
-            (text[0] === '{' && !OBJECT_START_REGEXP.test(text)) ||
-            // if new start is ", ensure it’s a JSON string & not part of preamble
-            (text[0] === '"' && !OBJECT_KEY_REGEXP.test(text)))
+            (text[0] === '{' && !OBJECT_START_REGEXP.test(text)))
     );
 
     const extraPreamble = previousText.substring(0, previousText.length - text.length);
@@ -560,11 +559,6 @@ export function parseAsJSON(text: string): ParsedResult {
         preamble += extraPreamble;
     }
     preamble = cleanThinkingText(preamble);
-
-    // if the first character is a key, add opening curly brace
-    if (OBJECT_KEY_REGEXP.test(text)) {
-        text = '{' + text;
-    }
 
     const rootEndIndex = indexOfRootEnd(text);
     if (rootEndIndex > -1) {
@@ -586,8 +580,8 @@ export function parseAsJSON(text: string): ParsedResult {
         }
     } else if (text !== firstText) {
         // if the text has changed since it was first tried (a preamble or the
-        // opening of a code block was taken off, or a missing first brace was
-        // added), it may now be JSON as far as it goes
+        // opening of a code block was taken off), it may now be JSON as far as
+        // it goes
         const remainingValue = parseUnfinishedJSON({ isEndDelimited, text });
         if (remainingValue !== undefined) {
             return { postscript, preamble, value: remainingValue };

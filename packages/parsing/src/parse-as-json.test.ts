@@ -146,10 +146,7 @@ describe('@acusti/parsing', () => {
             partialResponsesTestCase,
         );
         it('detects and strips detailed pre- and post-amble text', preambleTestCase);
-        it(
-            'infers if content looks like an object and add missing curly braces if so',
-            missingCurliesTestCase,
-        );
+        it('starts the JSON at a bracket, never at a quote mark', quoteMarkStartTestCase);
         it(
             'returns the first value in the text, with what follows it as the postscript',
             restartsMidResponseTestCase,
@@ -1435,46 +1432,6 @@ function missingCommasTestCase() {
     });
 }
 
-function missingCurliesTestCase() {
-    const response = `\
-  Here are the props for the "Blog" page:
-Props:
-"blogPostImage1": "/images/blog-post-image1.jpg",
-"blogPostSubheading1": "Exploring the Art of Sourdough Baking",
-"blogPostHeading1": "The Magic of Sourdough",
-"blogPostLede1": "At Masa Madre, we're passionate about creating the perfect sourdough bread. Learn more about the art and craft of this ancient tradition.",
-"blogPostImage2": "/images/blog-post-image2.jpg",
-"blogPostSubheading2": "From Seed to Loaf",
-"blogPostHeading2": "Our Journey to Your Table",
-"blogPostLede2": "Discover the journey of our sourdough bread, from the seed to the loaf.",
-"blogPostImage3": "/images/blog-post-image3.jpg",
-"blogPostSubheading3": "Sourdough 101",
-"blogPostHeading3": "Learn the Basics of Artisanal Bread Making",
-"blogPostLede3": "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
-`;
-    expect(parseAsJSON(response)).toEqual({
-        postscript: '',
-        preamble: 'Here are the props for the "Blog" page:\nProps:',
-        value: {
-            blogPostHeading1: 'The Magic of Sourdough',
-            blogPostHeading2: 'Our Journey to Your Table',
-            blogPostHeading3: 'Learn the Basics of Artisanal Bread Making',
-            blogPostImage1: '/images/blog-post-image1.jpg',
-            blogPostImage2: '/images/blog-post-image2.jpg',
-            blogPostImage3: '/images/blog-post-image3.jpg',
-            blogPostLede1:
-                "At Masa Madre, we're passionate about creating the perfect sourdough bread. Learn more about the art and craft of this ancient tradition.",
-            blogPostLede2:
-                'Discover the journey of our sourdough bread, from the seed to the loaf.',
-            blogPostLede3:
-                "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
-            blogPostSubheading1: 'Exploring the Art of Sourdough Baking',
-            blogPostSubheading2: 'From Seed to Loaf',
-            blogPostSubheading3: 'Sourdough 101',
-        },
-    });
-}
-
 function missingOpeningQuoteTestCase() {
     const response =
         '{"heading":"The Unbreakable Bond"\ndescription":"In a world ravaged by chaos and despair, the heartwarming relationship between Big Man and Sweet Tooth stands as a beacon of hope and love. As Big Man takes the young hybrid under his wing, nurturing him with unwavering devotion, the two forge an unbreakable bond that transcends the boundaries of blood and biology."}<|im_end|>';
@@ -1619,8 +1576,8 @@ Here are some of the services we offer:
     response = '  Here is a sample JSON output for the "Branding Portfolio"';
     expect(parseAsJSON(response)).toEqual({
         postscript: '',
-        preamble: 'Here is a sample JSON output for the "Branding Portfolio',
-        value: '',
+        preamble: 'Here is a sample JSON output for the "Branding Portfolio"',
+        value: null,
     });
 
     response = `\
@@ -1638,20 +1595,6 @@ Here are some of the services we offer:
         heading: 'Meet the Team',
         subheading:
             'Our bakery is built on the foundation of passionate individuals who are dedicated to creating the best sourdough bread in North Lake Tahoe. Meet the team behind Masa Madre.',
-    });
-
-    response = `\
-  Here are the props for the News Archive page based on the provided description and previous conversations:
-Props:
-
-"subheading1": "Explore Our News Archive",
-"heading1": "News",
-"subheading2":`;
-
-    expect(parseAsJSON(response).value).toEqual({
-        heading1: 'News',
-        subheading1: 'Explore Our News Archive',
-        subheading2: '',
     });
 
     response = `\
@@ -1892,6 +1835,43 @@ function preservesNewLinesTestCase() {
             ],
         },
     });
+}
+
+function quoteMarkStartTestCase() {
+    // a quoted word in the preamble is part of the preamble
+    expect(parseAsJSON('I went with "warm" for the tone.\n{"tone": "warm"}')).toEqual({
+        postscript: '',
+        preamble: 'I went with "warm" for the tone.',
+        value: { tone: 'warm' },
+    });
+    // …also where a colon follows it, as it does a key
+    expect(
+        parseAsJSON(
+            'The "title": field was too long, so I shortened it.\n{"title": "Short"}',
+        ),
+    ).toEqual({
+        postscript: '',
+        preamble: 'The "title": field was too long, so I shortened it.',
+        value: { title: 'Short' },
+    });
+    // a text with no JSON in it is all preamble
+    expect(parseAsJSON('I think the answer is "yes".')).toEqual({
+        postscript: '',
+        preamble: 'I think the answer is "yes".',
+        value: null,
+    });
+    // as is a list of keys and values that no brace opens
+    expect(
+        parseAsJSON('Props:\n"heading": "Our Story",\n"subheading": "Est. 1999",'),
+    ).toEqual({
+        postscript: '',
+        preamble: 'Props:\n"heading": "Our Story",\n"subheading": "Est. 1999",',
+        value: null,
+    });
+    // and an object whose brace something other than its first key follows
+    expect(parseAsJSON('{\n  // the heading\n  "heading": "Our Story"\n}').value).toBe(
+        null,
+    );
 }
 
 // what an unfinished page reads to, given the props of its first section: the
