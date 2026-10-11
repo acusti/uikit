@@ -294,8 +294,9 @@ type Props = {
      * Whether the body is a list of selectable items (the default) or
      * arbitrary interactive content such as a form. hasItems={false} turns
      * off item selection and item keyboard navigation, gives the popup
-     * role="dialog" (unless isSearchable), and keeps it open on clicks
-     * inside the body. Defaults to true and isn’t inferred from the children.
+     * role="dialog" (unless isSearchable), keeps it open on clicks inside
+     * the body, and leaves Space and Enter pressed in the body to the
+     * controls there. Defaults to true and isn’t inferred from the children.
      */
     hasItems?: boolean;
     /**
@@ -713,6 +714,15 @@ function InteractiveDropdown() {
     );
 }
 ```
+
+The body’s controls keep their own keys while the dropdown is open: Space
+and Enter go to whatever has focus there. Space types a space into a text
+field, toggles a checkbox, and presses a button; Enter adds a line break to
+a textarea, submits the form around a text input, presses a button, and
+follows a link. The same goes for whatever keeps focus outside the dropdown
+while it’s open, as when it opened on hover. Escape closes the dropdown
+unless focus is in a text field (a text input, a textarea, or an editable
+element). On the trigger, Space and Enter open the dropdown as usual.
 
 ### Placement Customization with CSS Variables
 
@@ -1262,7 +1272,9 @@ intent delay while the highlight stays on the parent, and only → moves the
 highlight into it.
 
 - **Enter/Space**: Open the dropdown; with an item highlighted, select it
-  (leaf items) or open its submenu (parent items)
+  (leaf items) or open its submenu (parent items). In the body of a
+  `hasItems={false}` dropdown, they go to
+  [the control that has focus](#dropdown-with-interactive-content) instead
 - **Escape**: Close the dropdown entirely — including any open submenus —
   and return focus to the trigger (macOS-style; use ← to back out one level
   at a time)
