@@ -119,8 +119,10 @@ ChevronDownIcon.displayName = 'ChevronDownIcon';
 
 const meta: Meta<typeof Dropdown> = {
     // storybook names these spies after their arg keys, and only a named spy
-    // is logged to the Actions panel; a spy created inline in a story’s JSX
-    // is out of its reach, so it needs an explicit .mockName() to be logged
+    // is logged to the Actions panel, so a story with its own render function
+    // reads onSubmitItem from its args. This also makes the docs “Show code”
+    // panel print that story’s rendered JSX: for a render function with no
+    // parameters it prints the story object’s source, description and all
     args: {
         onClose: fn(),
         onOpen: fn(),
@@ -719,17 +721,14 @@ export const TransformedAncestor: Story = {
             },
         },
     },
-    render() {
+    render({ onSubmitItem }) {
         return (
             <div className="transformed-ancestor-panel">
                 <p className="transformed-ancestor-note">
                     This card has <code>transform: rotate(-3deg) scale(0.94)</code>. The
                     menu below still anchors correctly.
                 </p>
-                <Dropdown
-                    className="transformed-ancestor"
-                    onSubmitItem={fn().mockName('onSubmitItem')}
-                >
+                <Dropdown className="transformed-ancestor" onSubmitItem={onSubmitItem}>
                     Edit
                     <ul>
                         <li data-ukt-value="cut">Cut</li>
@@ -752,12 +751,9 @@ export const CenteredMenu: Story = {
             },
         },
     },
-    render() {
+    render({ onSubmitItem }) {
         return (
-            <Dropdown
-                className="centered-menu"
-                onSubmitItem={fn().mockName('onSubmitItem')}
-            >
+            <Dropdown className="centered-menu" onSubmitItem={onSubmitItem}>
                 Insert
                 <ul>
                     <li data-ukt-value="image">Image…</li>
@@ -828,7 +824,7 @@ export const DirectionRecipes: Story = {
             },
         },
     },
-    render() {
+    render({ onSubmitItem }) {
         return (
             <div className="direction-recipes">
                 {DIRECTION_RECIPE_ROWS.map((row) => (
@@ -837,7 +833,7 @@ export const DirectionRecipes: Story = {
                             <Dropdown
                                 className={className}
                                 key={className}
-                                onSubmitItem={fn().mockName('onSubmitItem')}
+                                onSubmitItem={onSubmitItem}
                                 style={style}
                             >
                                 {label}
@@ -877,22 +873,16 @@ export const FillsWhenTooTall: Story = {
             story: { height: '420px', inline: false },
         },
     },
-    render() {
+    render({ onSubmitItem }) {
         return (
             <div className="too-tall-demo">
-                <Dropdown
-                    className="too-tall"
-                    onSubmitItem={fn().mockName('onSubmitItem')}
-                >
+                <Dropdown className="too-tall" onSubmitItem={onSubmitItem}>
                     Near left corner
                     <ul>
                         <TallMenuItems />
                     </ul>
                 </Dropdown>
-                <Dropdown
-                    className="too-tall"
-                    onSubmitItem={fn().mockName('onSubmitItem')}
-                >
+                <Dropdown className="too-tall" onSubmitItem={onSubmitItem}>
                     Center (with submenu)
                     <ul>
                         <Dropdown label="Jump to">
@@ -903,10 +893,7 @@ export const FillsWhenTooTall: Story = {
                         <TallMenuItems />
                     </ul>
                 </Dropdown>
-                <Dropdown
-                    className="too-tall"
-                    onSubmitItem={fn().mockName('onSubmitItem')}
-                >
+                <Dropdown className="too-tall" onSubmitItem={onSubmitItem}>
                     Near right corner
                     <ul>
                         <TallMenuItems />
@@ -914,7 +901,7 @@ export const FillsWhenTooTall: Story = {
                 </Dropdown>
                 <Dropdown
                     className="too-tall too-tall-center-min"
-                    onSubmitItem={fn().mockName('onSubmitItem')}
+                    onSubmitItem={onSubmitItem}
                     style={{ '--uktdd-body-min-height': '300px' }}
                 >
                     Centered, 300px min-height
@@ -947,12 +934,12 @@ export const CoverFillRecipe: Story = {
             story: { height: '420px', inline: false },
         },
     },
-    render() {
+    render({ onSubmitItem }) {
         return (
             <div className="cover-fill-demo">
                 <Dropdown
                     className="cover-fill"
-                    onSubmitItem={fn().mockName('onSubmitItem')}
+                    onSubmitItem={onSubmitItem}
                     style={COVER_FILL_STYLE}
                 >
                     Mid-height, start edge
@@ -962,7 +949,7 @@ export const CoverFillRecipe: Story = {
                 </Dropdown>
                 <Dropdown
                     className="cover-fill"
-                    onSubmitItem={fn().mockName('onSubmitItem')}
+                    onSubmitItem={onSubmitItem}
                     style={COVER_FILL_STYLE}
                 >
                     Near right corner
@@ -984,10 +971,10 @@ export const SubmenuFillsBesideParent: Story = {
             story: { height: '420px', inline: false },
         },
     },
-    render() {
+    render({ onSubmitItem }) {
         return (
             <div className="submenu-beside-demo">
-                <Dropdown onSubmitItem={fn().mockName('onSubmitItem')}>
+                <Dropdown onSubmitItem={onSubmitItem}>
                     Bottom-pinned menu
                     <ul>
                         <li data-ukt-item>An item</li>
@@ -1053,12 +1040,9 @@ export const WithGaps: Story = {
             },
         },
     },
-    render() {
+    render({ onSubmitItem }) {
         return (
-            <Dropdown
-                className="gap-example"
-                onSubmitItem={fn().mockName('onSubmitItem')}
-            >
+            <Dropdown className="gap-example" onSubmitItem={onSubmitItem}>
                 Format
                 <ul>
                     <li data-ukt-item>Bold</li>
@@ -1086,11 +1070,11 @@ export const OpenOnHover: Story = {
             },
         },
     },
-    render() {
+    render({ onSubmitItem }) {
         return (
             <Dropdown
                 className="open-on-hover-example"
-                onSubmitItem={fn().mockName('onSubmitItem')}
+                onSubmitItem={onSubmitItem}
                 openOnHover
             >
                 <button
@@ -1125,10 +1109,10 @@ export const MenubarAppMenu: Story = {
             },
         },
     },
-    render() {
+    render({ onSubmitItem }) {
         return (
             <Menubar>
-                <Dropdown onSubmitItem={fn().mockName('onSubmitItem')}>
+                <Dropdown onSubmitItem={onSubmitItem}>
                     File
                     <ul>
                         <li data-ukt-item>New Window</li>
@@ -1143,7 +1127,7 @@ export const MenubarAppMenu: Story = {
                         <li data-ukt-item>Close Window</li>
                     </ul>
                 </Dropdown>
-                <Dropdown onSubmitItem={fn().mockName('onSubmitItem')}>
+                <Dropdown onSubmitItem={onSubmitItem}>
                     Edit
                     <ul>
                         <li data-ukt-item>Undo</li>
@@ -1157,7 +1141,7 @@ export const MenubarAppMenu: Story = {
                         </Dropdown>
                     </ul>
                 </Dropdown>
-                <Dropdown onSubmitItem={fn().mockName('onSubmitItem')}>
+                <Dropdown onSubmitItem={onSubmitItem}>
                     View
                     <ul>
                         <li data-ukt-item>Zoom In</li>
