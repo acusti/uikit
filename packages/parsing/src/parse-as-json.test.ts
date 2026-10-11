@@ -213,6 +213,74 @@ describe('@acusti/parsing', () => {
             });
         });
 
+        it('takes a brace for the start of the JSON only where it opens an object', () => {
+            // a brace in the preamble is part of it, in prose or in code
+            expect(parseAsJSON('Use {placeholders} like this: {"a": "b"}')).toEqual({
+                postscript: '',
+                preamble: 'Use {placeholders} like this:',
+                value: { a: 'b' },
+            });
+            expect(
+                parseAsJSON(
+                    'Call it like so:\nfunction f() {\n  return 1;\n}\nand the config is {"a": "b"}',
+                ),
+            ).toEqual({
+                postscript: '',
+                preamble:
+                    'Call it like so:\nfunction f() {\n  return 1;\n}\nand the config is',
+                value: { a: 'b' },
+            });
+            // …as it is where no JSON follows it
+            expect(parseAsJSON('Set {name} to your name.')).toEqual({
+                postscript: '',
+                preamble: 'Set {name} to your name.',
+                value: null,
+            });
+            // a brace that another follows is not the start, but the other may be
+            expect(parseAsJSON('{{"a": "b"}}')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: { a: 'b' },
+            });
+            // an object that is empty, or that the text has only just opened, starts
+            // at its brace
+            expect(parseAsJSON('{} and more')).toEqual({
+                postscript: 'and more',
+                preamble: '',
+                value: {},
+            });
+            expect(parseAsJSON('Here it is:\n{\n  ')).toEqual({
+                postscript: '',
+                preamble: 'Here it is:',
+                value: {},
+            });
+            // a quote mark after the brace has to open a key, which a string that a
+            // line break and a bracket cut short is not
+            expect(
+                parseAsJSON('Here is the "Benefits{" page:\n{\n"name": "John"\n}'),
+            ).toEqual({
+                postscript: '',
+                preamble: 'Here is the "Benefits{" page:',
+                value: { name: 'John' },
+            });
+            expect(parseAsJSON('Here is the "Benefits{" page:\n{')).toEqual({
+                postscript: '',
+                preamble: 'Here is the "Benefits{" page:',
+                value: {},
+            });
+            // (a key with a line break in it is one, and the line break is repaired)
+            expect(
+                parseAsJSON('Here it is:\n{"first\nname": "Ann",\n"age": "40"}').value,
+            ).toEqual({ age: '40', 'first\nname': 'Ann' });
+            // as does one whose first key has lost its opening quote mark, which is
+            // restored where it follows a line break
+            expect(parseAsJSON('{\nheading": "Hi",\n"sub": "Yo"\n}')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: { heading: 'Hi', sub: 'Yo' },
+            });
+        });
+
         describe('with a text that is JSON as far as it goes', () => {
             it('reads it whatever its spacing', () => {
                 // as it does a text that is whole
@@ -1724,6 +1792,15 @@ function prematureClosingCurliesTestCase() {
             ],
         },
     });
+
+    // an object that is closed before its first key has nothing yet for a comma
+    // to separate that key from
+    expect(parseAsJSON('Here it is: {}"a": "b"}')).toEqual({
+        postscript: '',
+        preamble: 'Here it is:',
+        value: { a: 'b' },
+    });
+    expect(parseAsJSON('{},\n"a": "b", "c": "d"}').value).toEqual({ a: 'b', c: 'd' });
 }
 
 function preservesNewLinesTestCase() {

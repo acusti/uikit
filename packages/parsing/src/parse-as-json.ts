@@ -467,6 +467,21 @@ const getObjectKeyFromIndex = (index: number) =>
 
 const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
 
+// what the brace that opens an object is followed by: the brace that closes it,
+// the end of the text, a key (as far as the text goes, and not past a line
+// break that a bracket follows, where the walk would cut the string short), or
+// a key that has lost its opening quote mark (which the walk restores where the
+// key follows a line break)
+const OBJECT_START_PATTERN =
+    '\\{\\s*(?:\\}|$|"(?:[^"\\\\\\n]|\\\\.|\\n(?!\\s*[{[]))*(?:"|$)|\\n[a-zA-Z][^"\\n]*"\\s*:)';
+const OBJECT_START_REGEXP = new RegExp(`^${OBJECT_START_PATTERN}`);
+// what is not where the JSON starts: a brace that the text starts with (unless
+// it opens an object), or a bracket or quote mark that it starts with if
+// neither of those follows it, and then all that is not one of the three
+const NOT_START_REGEXP = new RegExp(
+    `^(?!${OBJECT_START_PATTERN})(?:\\{[^[{"]*|[["]?[^[{"]+)`,
+);
+
 const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
 
 // the backslashes that a text ends on, or that precede the unicode escape it
@@ -539,14 +554,16 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
         }
         previousText = text;
         // if text starts with a control char, it didn’t pass the while condition
-        // (unless it opens an object onto a key, which is where the JSON starts
-        // even when that key is as far as the text goes)
-        text = text.replace(/^(?!\{\s*")[[{"]?[^[{"]+/, '');
+        // (unless it opens an object, which is where the JSON starts even when
+        // that brace is as far as the text goes)
+        text = text.replace(NOT_START_REGEXP, '');
     } while (
         previousText !== text &&
         // if new start is [, ensure it’s an array & not part of preamble
         ((text[0] === '[' &&
             !isFollowedBy({ chars: ARRAY_BODY_START_CHARS, index: 0, text })) ||
+            // if new start is {, ensure it’s an object & not part of preamble
+            (text[0] === '{' && !OBJECT_START_REGEXP.test(text)) ||
             // if new start is ", ensure it’s a JSON string & not part of preamble
             (text[0] === '"' && !OBJECT_KEY_REGEXP.test(text)))
     );
@@ -789,12 +806,16 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
                         });
                         const maybeKey = quoteIndex > index ? text.slice(quoteIndex) : '';
                         if (OBJECT_KEY_REGEXP.test(maybeKey)) {
-                            // if missing a comma, add it here
+                            // if missing a comma, add it here (or skip the one
+                            // that is there, if the object has nothing in it yet)
+                            const isEmpty = isPreceededBy({ char: '{', text: newText });
                             if (
                                 quoteIndex > startIndex &&
                                 !text.slice(startIndex, quoteIndex).includes(',')
                             ) {
-                                newText += ',';
+                                if (!isEmpty) newText += ',';
+                            } else if (isEmpty) {
+                                index = startIndex;
                             }
                             continue;
                         }
