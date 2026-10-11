@@ -278,6 +278,62 @@ describe('@acusti/parsing', () => {
             });
         });
 
+        it('reads a value that is whole as it is, whatever follows it', () => {
+            // a postscript, after spacing that the repairs do not expect
+            expect(parseAsJSON('{"a": "b" , "c": "d"}\n\nHope this helps!')).toEqual({
+                postscript: 'Hope this helps!',
+                preamble: '',
+                value: { a: 'b', c: 'd' },
+            });
+            // the end of a code block that a preamble comes before
+            expect(
+                parseAsJSON(
+                    'Here you go:\n```json\n{"a":\t"b",\t"c":\t"d"}\n```\nLet me know!',
+                ),
+            ).toEqual({
+                postscript: 'Let me know!',
+                preamble: 'Here you go:',
+                value: { a: 'b', c: 'd' },
+            });
+            // another value, which is left in the postscript
+            expect(parseAsJSON('["a" , "b"] and then ["c"]')).toEqual({
+                postscript: 'and then ["c"]',
+                preamble: '',
+                value: ['a', 'b'],
+            });
+            // a bracket that closes nothing
+            expect(parseAsJSON('{"a": "b" , "c": {"d": []}}}')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: { a: 'b', c: { d: [] } },
+            });
+            // a comma, which the postscript is given without
+            expect(parseAsJSON('{"a": "b" , "c": "d"}, and more')).toEqual({
+                postscript: 'and more',
+                preamble: '',
+                value: { a: 'b', c: 'd' },
+            });
+            // …and whatever brackets the strings in it hold
+            expect(parseAsJSON('{"a": "b]}" , "c": "d"} done')).toEqual({
+                postscript: 'done',
+                preamble: '',
+                value: { a: 'b]}', c: 'd' },
+            });
+            // but not a key after an object: it was closed too early, which is
+            // repaired
+            expect(parseAsJSON('{"a": "b"}, "c": "d"} done')).toEqual({
+                postscript: 'done',
+                preamble: '',
+                value: { a: 'b', c: 'd' },
+            });
+            // (after an array a key is one more thing that follows it)
+            expect(parseAsJSON('["a" , "b"], "c": "d"')).toEqual({
+                postscript: '"c": "d"',
+                preamble: '',
+                value: ['a', 'b'],
+            });
+        });
+
         describe('with a text that is JSON as far as it goes', () => {
             it('reads it whatever its spacing', () => {
                 // as it does a text that is whole

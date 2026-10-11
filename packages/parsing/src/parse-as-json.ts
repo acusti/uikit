@@ -295,6 +295,25 @@ function indexOfStringEnd(text: string, index: number) {
     return endIndex;
 }
 
+// the index of the bracket that closes the object or array that the text opens
+// with, or -1 if the text ends first (only strings and brackets are followed)
+function indexOfRootEnd(text: string) {
+    let depth = 0;
+    for (let index = 0; index < text.length; index++) {
+        const char = text[index];
+        if (char === '"') {
+            index = indexOfStringEnd(text, index);
+            if (index === -1) return -1;
+        } else if (char === '{' || char === '[') {
+            depth++;
+        } else if (char === '}' || char === ']') {
+            depth--;
+            if (depth === 0) return index;
+        }
+    }
+    return -1;
+}
+
 // Closes a text that is JSON as far as it goes, by the rules that the repairs in
 // parseAsJSON follow: a string is closed where it stops (less an escape sequence
 // that it ends partway through); a key, or a bare literal, that the text ends
@@ -442,6 +461,9 @@ const getObjectKeyFromIndex = (index: number) =>
     `"key${index === 1 ? '' : '-' + index}":`;
 
 const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
+// what follows the brace that closes an object too early: a key, after a comma
+// or without one
+const NEXT_KEY_REGEXP = /^\s*,?\s*"[^"]+":/;
 
 // what the brace that opens an object is followed by: the brace that closes it,
 // the end of the text, a key (as far as the text goes, and not past a line
@@ -544,12 +566,29 @@ export function parseAsJSON(text: string): ParsedResult {
         text = '{' + text;
     }
 
-    // if the text has changed since it was first tried (a preamble or the opening
-    // of a code block was taken off, or a missing first brace was added), it may
-    // now be whole, or JSON as far as it goes
-    if (text !== firstText) {
-        const remainingValue =
-            parseWholeJSON(text) ?? parseUnfinishedJSON({ isEndDelimited, text });
+    const rootEndIndex = indexOfRootEnd(text);
+    if (rootEndIndex > -1) {
+        // if the object or array that the JSON starts with is whole, it is the
+        // value, and what follows it is the postscript, less a comma that it starts
+        // with (unless a key follows an object: it was closed too early, which
+        // is for the walk to repair)
+        const rest = text.slice(rootEndIndex + 1);
+        if (text[0] !== '{' || !NEXT_KEY_REGEXP.test(rest)) {
+            const rootValue = parseWholeJSON(text.slice(0, rootEndIndex + 1));
+            if (rootValue !== undefined) {
+                postscript = hasTextContent(rest) ? rest.replace(/^\s*,/, '').trim() : '';
+                return {
+                    postscript: cleanThinkingText(postscript),
+                    preamble,
+                    value: rootValue,
+                };
+            }
+        }
+    } else if (text !== firstText) {
+        // if the text has changed since it was first tried (a preamble or the
+        // opening of a code block was taken off, or a missing first brace was
+        // added), it may now be JSON as far as it goes
+        const remainingValue = parseUnfinishedJSON({ isEndDelimited, text });
         if (remainingValue !== undefined) {
             return { postscript, preamble, value: remainingValue };
         }
