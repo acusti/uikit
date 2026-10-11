@@ -4205,6 +4205,77 @@ describe('@acusti/dropdown', () => {
 
             expect(handleSubmitItem).not.toHaveBeenCalled();
         });
+
+        it('returns focus to the trigger when a submit closes it with the focus in its body', async () => {
+            const user = userEvent.setup();
+            renderForm({ keepOpenOnSubmit: false });
+
+            const trigger = screen.getByRole('button', { name: 'Settings' });
+            await user.click(trigger);
+            await user.click(screen.getByRole('textbox', { name: 'Full name' }));
+            await user.keyboard('Sally Ride{Enter}');
+            await waitFor(() => expect(screen.queryByRole('textbox')).toBeNull());
+
+            expect(document.activeElement).toBe(trigger);
+        });
+
+        it('leaves the focus where it is when a submit closes it from outside its body', async () => {
+            const user = userEvent.setup();
+            render(
+                <div>
+                    <label>
+                        Search <input type="text" />
+                    </label>
+                    <Dropdown hasItems={false} keepOpenOnSubmit={false} openOnHover>
+                        <button type="button">Settings</button>
+                        <form onSubmit={preventDefault}>
+                            <button type="submit">Reset</button>
+                        </form>
+                    </Dropdown>
+                </div>,
+            );
+
+            // hovering opens the dropdown with the keyboard still in the input
+            const search = screen.getByRole('textbox', { name: 'Search' });
+            await user.click(search);
+            await user.hover(screen.getByRole('button', { name: 'Settings' }));
+            fireEvent.submit(
+                screen.getByRole('button', { name: 'Reset' }).closest('form')!,
+            );
+            await waitFor(() =>
+                expect(screen.queryByRole('button', { name: 'Reset' })).toBeNull(),
+            );
+
+            expect(document.activeElement).toBe(search);
+        });
+
+        it('does not move the focus to the trigger when a submit closes a dropdown with items', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Insert
+                    <ul>
+                        <li data-ukt-value="table">
+                            <button type="button">Table</button>
+                        </li>
+                        <li data-ukt-value="image">
+                            <button type="button">Image</button>
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Insert' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}');
+            const tableButton = screen.getByText('Table', { selector: 'button' });
+            act(() => tableButton.focus());
+            expect(document.activeElement).toBe(tableButton);
+            await user.keyboard('{Enter}');
+            await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+
+            expect(document.activeElement).not.toBe(trigger);
+        });
     });
 
     describe('nested non-menu dropdowns (hasItems={false})', () => {
