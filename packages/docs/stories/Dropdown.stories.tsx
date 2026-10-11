@@ -473,6 +473,33 @@ export const OpensToCurrentValue: Story = {
             description: {
                 story: 'A controlled dropdown opens with the item matching `props.value` marked `aria-selected`, made the active item (so keyboard navigation starts there), and scrolled into view. Here the value sits far down a long list, so opening jumps straight to it rather than the top. Theme the persistent selection tint with the `--uktdd-body-bg-color-selected` custom property.',
             },
+            // written out because the rendered JSX would print all 40 items,
+            // and they can’t move into a component the way TallMenuItems
+            // does: the label is derived from the body’s own elements
+            source: {
+                code: `
+// items: [{ label: 'Item 1', value: '1' }, …, { label: 'Item 40', value: '40' }]
+const [value, setValue] = useState('31');
+
+return (
+  <Dropdown
+    isSearchable
+    label="Item"
+    onSubmitItem={({ value: submitted }) => setValue(submitted)}
+    placeholder="Search items…"
+    value={value}
+  >
+    <ul>
+      {items.map(({ label, value: itemValue }) => (
+        <li data-ukt-value={itemValue} key={itemValue}>
+          {label}
+        </li>
+      ))}
+    </ul>
+  </Dropdown>
+);
+`,
+            },
         },
     },
     render() {
