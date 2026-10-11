@@ -534,13 +534,6 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
         return { postscript, preamble, value: unfinishedValue };
     }
 
-    // if this is a two-column markdown table, convert it to JSON key/value pairs
-    text = text.replace(
-        /^\| (.+?) \| (.+?)(?: \|)+$/gm,
-        (_match, key: string, value: string) =>
-            `"${key.replace(/(^"|"$)/g, '')}": "${value.replace(/(^"|"$)/g, '')}",`,
-    );
-
     // initialize variables
     const stack: Array<string> = [];
     let isInsideString = false;
@@ -579,10 +572,9 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
         text = '{' + text;
     }
 
-    // if the text has changed since it was first tried (rows of a table were
-    // converted, a preamble or the opening of a code block was taken off, or a
-    // missing first brace was added), it may now be whole, or JSON as far as it
-    // goes
+    // if the text has changed since it was first tried (a preamble or the opening
+    // of a code block was taken off, or a missing first brace was added), it may
+    // now be whole, or JSON as far as it goes
     if (text !== firstText) {
         const remainingValue =
             parseWholeJSON(text) ?? parseUnfinishedJSON({ isEndDelimited, text });
