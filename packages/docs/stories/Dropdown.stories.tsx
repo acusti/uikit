@@ -855,12 +855,18 @@ export const DirectionRecipes: Story = {
     },
 };
 
-const renderTallMenuItems = () =>
-    Array.from({ length: 30 }, (_, index) => (
+// a component, not an array built in each render function, so that the docs
+// “Show code” panel prints one <TallMenuItems /> line per list in place of
+// all 30 items when it prints a story’s rendered JSX; it sets a displayName
+// for the same reason ChevronDownIcon does
+function TallMenuItems() {
+    return Array.from({ length: 30 }, (_, index) => (
         <li data-ukt-value={`item-${index + 1}`} key={index}>
             Menu item {index + 1}
         </li>
     ));
+}
+TallMenuItems.displayName = 'TallMenuItems';
 
 export const FillsWhenTooTall: Story = {
     parameters: {
@@ -872,7 +878,6 @@ export const FillsWhenTooTall: Story = {
         },
     },
     render() {
-        const items = renderTallMenuItems();
         return (
             <div className="too-tall-demo">
                 <Dropdown
@@ -880,7 +885,9 @@ export const FillsWhenTooTall: Story = {
                     onSubmitItem={fn().mockName('onSubmitItem')}
                 >
                     Near left corner
-                    <ul>{items}</ul>
+                    <ul>
+                        <TallMenuItems />
+                    </ul>
                 </Dropdown>
                 <Dropdown
                     className="too-tall"
@@ -889,9 +896,11 @@ export const FillsWhenTooTall: Story = {
                     Center (with submenu)
                     <ul>
                         <Dropdown label="Jump to">
-                            <ul>{items}</ul>
+                            <ul>
+                                <TallMenuItems />
+                            </ul>
                         </Dropdown>
-                        {items}
+                        <TallMenuItems />
                     </ul>
                 </Dropdown>
                 <Dropdown
@@ -899,7 +908,9 @@ export const FillsWhenTooTall: Story = {
                     onSubmitItem={fn().mockName('onSubmitItem')}
                 >
                     Near right corner
-                    <ul>{items}</ul>
+                    <ul>
+                        <TallMenuItems />
+                    </ul>
                 </Dropdown>
                 <Dropdown
                     className="too-tall too-tall-center-min"
@@ -907,7 +918,9 @@ export const FillsWhenTooTall: Story = {
                     style={{ '--uktdd-body-min-height': '300px' }}
                 >
                     Centered, 300px min-height
-                    <ul>{items}</ul>
+                    <ul>
+                        <TallMenuItems />
+                    </ul>
                 </Dropdown>
             </div>
         );
@@ -935,7 +948,6 @@ export const CoverFillRecipe: Story = {
         },
     },
     render() {
-        const items = renderTallMenuItems();
         return (
             <div className="cover-fill-demo">
                 <Dropdown
@@ -944,7 +956,9 @@ export const CoverFillRecipe: Story = {
                     style={COVER_FILL_STYLE}
                 >
                     Mid-height, start edge
-                    <ul>{items}</ul>
+                    <ul>
+                        <TallMenuItems />
+                    </ul>
                 </Dropdown>
                 <Dropdown
                     className="cover-fill"
@@ -952,7 +966,9 @@ export const CoverFillRecipe: Story = {
                     style={COVER_FILL_STYLE}
                 >
                     Near right corner
-                    <ul>{items}</ul>
+                    <ul>
+                        <TallMenuItems />
+                    </ul>
                 </Dropdown>
             </div>
         );
@@ -976,7 +992,9 @@ export const SubmenuFillsBesideParent: Story = {
                     <ul>
                         <li data-ukt-item>An item</li>
                         <Dropdown label="Tall submenu">
-                            <ul>{renderTallMenuItems()}</ul>
+                            <ul>
+                                <TallMenuItems />
+                            </ul>
                         </Dropdown>
                     </ul>
                 </Dropdown>
