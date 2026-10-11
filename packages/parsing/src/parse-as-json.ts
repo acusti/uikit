@@ -435,6 +435,21 @@ export function parseUnfinishedJSON(payload: { isEndDelimited: boolean; text: st
     }
 }
 
+// the value of a text that is JSON as it is, or undefined if it isn’t. A text
+// that opens an object or array and does not end by closing one can’t be whole
+// (and is likely to be a response that is still streaming in), so it isn’t tried.
+function parseWholeJSON(text: string) {
+    const lastChar = text.at(-1);
+    if ((text[0] === '{' || text[0] === '[') && lastChar !== '}' && lastChar !== ']') {
+        return undefined;
+    }
+    try {
+        return JSON.parse(text) as ParsedValue;
+    } catch (error) {
+        return undefined;
+    }
+}
+
 const hasTextContent = (text: string) => /\w/.test(text);
 
 // LLMs often demarcate the JSON part of the response with ``` or ```json
@@ -493,17 +508,9 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
     // if the input is empty, use value: null to indicate failure
     if (text === '') return { postscript, preamble, value: null };
 
-    // attempt to parse the string as-is (minus control tokens), unless it opens
-    // an object or array and does not end by closing one, in which case it can’t
-    // be whole (and is likely to be a response that is still streaming in)
-    const lastChar = text.at(-1);
-    if ((text[0] !== '{' && text[0] !== '[') || lastChar === '}' || lastChar === ']') {
-        try {
-            return { postscript, preamble, value: JSON.parse(text) as ParsedValue };
-        } catch (error) {
-            // let’s try to fix it
-        }
-    }
+    // attempt to parse the string as-is (minus control tokens)
+    const wholeValue = parseWholeJSON(text);
+    if (wholeValue !== undefined) return { postscript, preamble, value: wholeValue };
 
     // if it is JSON as far as it goes, closing what it leaves open is all it needs
     const firstText = text;
@@ -555,11 +562,13 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
         text = '{' + text;
     }
 
-    // if the text has changed since closing it was first tried (rows of a table
-    // were converted, a preamble or the opening of a code block was taken off,
-    // or a missing first brace was added), it may now be JSON as far as it goes
+    // if the text has changed since it was first tried (rows of a table were
+    // converted, a preamble or the opening of a code block was taken off, or a
+    // missing first brace was added), it may now be whole, or JSON as far as it
+    // goes
     if (text !== firstText) {
-        const remainingValue = parseUnfinishedJSON({ isEndDelimited, text });
+        const remainingValue =
+            parseWholeJSON(text) ?? parseUnfinishedJSON({ isEndDelimited, text });
         if (remainingValue !== undefined) {
             return { postscript, preamble, value: remainingValue };
         }

@@ -1668,6 +1668,19 @@ ${postscript}`;
         preamble: 'Here are the tags:',
         value: [],
     });
+
+    // what follows a preamble is parsed as it is where it is whole, so its
+    // spacing is of no account
+    expect(parseAsJSON('Here it is: {"a": "b" , "c": "d"}')).toEqual({
+        postscript: '',
+        preamble: 'Here it is:',
+        value: { a: 'b', c: 'd' },
+    });
+    expect(parseAsJSON('Here are the tags:\n["a" , "b",\t"c"]')).toEqual({
+        postscript: '',
+        preamble: 'Here are the tags:',
+        value: ['a', 'b', 'c'],
+    });
 }
 
 function prematureClosingCurliesTestCase() {
