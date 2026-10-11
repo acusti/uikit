@@ -627,7 +627,7 @@ const FIXED_HEADER_PROPS = {
 
 export const FixedHeader: Story = {
     args: FIXED_HEADER_PROPS,
-    render() {
+    render(args) {
         // const [dateStart, setDateStart] = useState(
         //     FIXED_HEADER_PROPS.dateStart,
         // );
@@ -661,7 +661,7 @@ export const FixedHeader: Story = {
                         <a className="btn-text" href="/projects">
                             Projects
                         </a>
-                        <Dropdown {...FIXED_HEADER_PROPS} />
+                        <Dropdown {...args} />
                     </nav>
                 </header>
                 <h1>Lorem ipsum</h1>
