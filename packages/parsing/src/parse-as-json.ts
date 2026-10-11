@@ -292,23 +292,86 @@ function indexOfStringEnd(text: string, index: number) {
     return endIndex;
 }
 
-// the index of the bracket that closes the object or array that the text opens
-// with, or -1 if the text ends first (only strings and brackets are followed)
-function indexOfRootEnd(text: string) {
+// a comment, which JSON has none of: the rest of a line from `//`, or all from
+// `/*` to `*/` (or to the end of the text, while it is not closed)
+const COMMENT_REGEXP = /\/(?:\/[^\n]*|\*[^]*?(?:\*\/|$))/y;
+// What a comment comes after: a line break, a comma or a bracket, or, with a
+// space between, a colon or a value. Anything else is not one (text that only
+// seems to be outside a string, because of an unescaped quote mark before it).
+const BEFORE_COMMENT_REGEXP = /[\n,{}[\]]$/;
+const BEFORE_SPACED_COMMENT_REGEXP = /(?:[\n,{}[\]:"\d]|true|false|null)$/;
+
+// Reads the object or array that the text opens with, following only its
+// strings, its brackets and its comments. Gives the index of the bracket that
+// closes it (-1 if the text ends first) and where its comments are, each from
+// the spaces before it to its end.
+function readRoot(text: string) {
+    const comments: Array<[number, number]> = [];
     let depth = 0;
+    let fromIndex = 0;
     for (let index = 0; index < text.length; index++) {
         const char = text[index];
         if (char === '"') {
             index = indexOfStringEnd(text, index);
-            if (index === -1) return -1;
+            if (index === -1) break;
         } else if (char === '{' || char === '[') {
             depth++;
         } else if (char === '}' || char === ']') {
             depth--;
-            if (depth === 0) return index;
+            if (depth === 0) return { comments, endIndex: index };
+        } else if (char === '/') {
+            let startIndex = index;
+            while (text[startIndex - 1] === ' ' || text[startIndex - 1] === '\t') {
+                startIndex--;
+            }
+            const precedingText = text.slice(
+                Math.max(fromIndex, startIndex - 5),
+                startIndex,
+            );
+            const isAfterComment = fromIndex > 0 && startIndex <= fromIndex;
+            const regexp =
+                startIndex < index ? BEFORE_SPACED_COMMENT_REGEXP : BEFORE_COMMENT_REGEXP;
+            COMMENT_REGEXP.lastIndex = index;
+            const comment =
+                isAfterComment || regexp.test(precedingText)
+                    ? COMMENT_REGEXP.exec(text)
+                    : null;
+            if (comment) {
+                comments.push([
+                    Math.max(fromIndex, startIndex),
+                    index + comment[0].length,
+                ]);
+                fromIndex = index + comment[0].length;
+                index = fromIndex - 1;
+            }
         }
     }
-    return -1;
+    return { comments, endIndex: -1 };
+}
+
+// the index of the bracket that closes the object or array that the text opens
+// with, or -1 if the text ends first
+function indexOfRootEnd(text: string) {
+    return readRoot(text).endIndex;
+}
+
+// Takes the comments out of the object or array that the text opens with, each
+// with the spaces before it; what follows the end of the object or array is left
+// as it is. Where the text ends on a comment, what precedes the comment is known
+// to be whole (isEndDelimited).
+function stripComments(text: string) {
+    const { comments } = readRoot(text);
+    let newText = '';
+    let fromIndex = 0;
+    for (const [startIndex, endIndex] of comments) {
+        newText += text.slice(fromIndex, startIndex);
+        fromIndex = endIndex;
+    }
+    const isEndDelimited = fromIndex > 0 && fromIndex === text.length;
+    return {
+        isEndDelimited,
+        text: isEndDelimited ? newText.trimEnd() : newText + text.slice(fromIndex),
+    };
 }
 
 // Closes a text that is JSON as far as it goes, by the rules that the repairs in
@@ -475,19 +538,29 @@ const LITERAL_START_PATTERN =
 // goes), or a key that has lost its opening quote mark (which the walk restores
 // where the key follows a line break); after a bracket, a string, an object or
 // an array.
-const START_REGEXP = new RegExp(
-    `^(?:\\{\\s*(?:${STRING_START_PATTERN}(?:"\\s*(?::|$)|$)|\\n[a-zA-Z][^"\\n]*"\\s*:)|\\[\\s*["[{])`,
+const KEY_AFTER_BRACE_REGEXP = new RegExp(
+    `^\\s*(?:${STRING_START_PATTERN}(?:"\\s*(?::|$)|$)|\\n[a-zA-Z][^"\\n]*"\\s*:)`,
 );
+const ITEM_AFTER_BRACKET_REGEXP = /^\s*["[{]/;
 // Only where a value would stand (isValuePosition), since prose has these too:
 // after a brace, the brace that closes it, the end of the text, or a string
 // that no colon follows; after a bracket, a closing bracket, the end of the
-// text, or a bare literal (a whole one, or as much of one as the text has).
-const START_OF_SCALARS_REGEXP = new RegExp(
-    `^(?:\\{\\s*(?:\\}|$|${STRING_START_PATTERN}")|\\[\\s*(?:[\\]}]|$|(?:${LITERAL_PATTERN})\\s*[,\\]]|(?:${LITERAL_START_PATTERN})$))`,
+// text, or a bare literal (a whole one, which a comma, a closing bracket or a
+// comment follows, or as much of one as the text has).
+const SCALAR_AFTER_BRACE_REGEXP = new RegExp(`^\\s*(?:\\}|$|${STRING_START_PATTERN}")`);
+const SCALAR_AFTER_BRACKET_REGEXP = new RegExp(
+    `^\\s*(?:[\\]}]|$|(?:${LITERAL_PATTERN})\\s*(?:[,\\]]|\\/(?:[/*]|$))|(?:${LITERAL_START_PATTERN})$)`,
 );
 // the text after a value that is not in the middle of a line of prose: nothing
-// on its line but a full stop, comma or semicolon
-const END_OF_LINE_REGEXP = /^[ \t]*[.,;]?[ \t]*(?:\r?\n|$)/;
+// on its line but a full stop, comma or semicolon, and a comment (a block
+// comment as far as its own `*/`, so that nothing can follow it on the line)
+const END_OF_LINE_REGEXP =
+    /^[ \t]*[.,;]?[ \t]*(?:\/\/[^\n]*|\/\*(?:[^*]|\*(?!\/))*(?:\*\/[ \t]*|$)|\/$)?(?:\r?\n|$)/;
+// a comment where the text has got to, and the whitespace before it: all of one
+// that runs to the end of its line, as far as the `/*` of one that does not,
+// and the `/` that the text ends on. (Not `//]:`, which is how markdown writes
+// a comment, in a bracket that it closes.)
+const COMMENT_START_REGEXP = /\s*\/(?:\/(?!\]:)[^\n]*|\*|$)/y;
 // what is not where the JSON starts: a brace or bracket that the text starts
 // with (isStartOfJSON has ruled it out), and all that is not one of the two
 const NOT_START_REGEXP = /^(?:[[{][^[{]*|[^[{]+)/;
@@ -515,11 +588,52 @@ function isValuePosition(text: string, precedingText: string) {
     );
 }
 
+// What the search for the start of the JSON has found out about the text, kept
+// so that it is not found out again for each bracket: whether there is no `*/`
+// from where the search has got to.
+type Search = { hasNoBlockCommentEnd?: boolean };
+
+// The index of what follows the bracket that the text starts with, past the
+// comments after it. Only the comments are read, since this is asked of every
+// bracket in a preamble.
+function indexOfBody(text: string, search: Search) {
+    let index = 1;
+    for (;;) {
+        COMMENT_START_REGEXP.lastIndex = index;
+        const comment = COMMENT_START_REGEXP.exec(text)?.[0];
+        if (!comment) return index;
+        index += comment.length;
+        if (comment.endsWith('/*')) {
+            const endIndex = search.hasNoBlockCommentEnd ? -1 : text.indexOf('*/', index);
+            if (endIndex === -1) {
+                search.hasNoBlockCommentEnd = true;
+                return text.length;
+            }
+            index = endIndex + 2;
+        }
+    }
+}
+
 // whether the JSON starts where the text does, given the text that precedes it
-function isStartOfJSON(text: string, precedingText: string) {
+// (a bracket is taken by what follows the comments after it)
+function isStartOfJSON({
+    precedingText,
+    search,
+    text,
+}: {
+    precedingText: string;
+    search: Search;
+    text: string;
+}) {
+    if (text[0] !== '{' && text[0] !== '[') return false;
+    const isObject = text[0] === '{';
+    const body = text.slice(indexOfBody(text, search));
     return (
-        START_REGEXP.test(text) ||
-        (START_OF_SCALARS_REGEXP.test(text) && isValuePosition(text, precedingText))
+        (isObject ? KEY_AFTER_BRACE_REGEXP : ITEM_AFTER_BRACKET_REGEXP).test(body) ||
+        ((isObject ? SCALAR_AFTER_BRACE_REGEXP : SCALAR_AFTER_BRACKET_REGEXP).test(
+            body,
+        ) &&
+            isValuePosition(text, precedingText))
     );
 }
 
@@ -580,17 +694,23 @@ export function parseAsJSON(text: string): ParsedResult {
     // that opens an array. Any other is part of the preamble, with all that
     // follows it up to the next one (the last part taken off only joins the
     // preamble if it has a word in it).
+    const search: Search = {};
     let lastPart = '';
-    while (
-        text !== '' &&
-        !isStartOfJSON(text, firstText.slice(0, firstText.length - text.length))
-    ) {
+    while (text !== '') {
+        const precedingText = firstText.slice(0, firstText.length - text.length);
+        if (isStartOfJSON({ precedingText, search, text })) break;
         preamble += lastPart;
         lastPart = text.match(NOT_START_REGEXP)?.[0] ?? text;
         text = text.slice(lastPart.length);
     }
     if (hasTextContent(lastPart)) preamble += lastPart;
     preamble = cleanThinkingText(preamble);
+
+    // comments are no part of the JSON: read it without them (a number that a
+    // comment follows is whole, as it is before anything else)
+    const withoutComments = stripComments(text);
+    text = withoutComments.text;
+    isEndDelimited ||= withoutComments.isEndDelimited;
 
     const rootEndIndex = indexOfRootEnd(text);
     if (rootEndIndex > -1) {

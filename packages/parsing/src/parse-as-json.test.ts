@@ -147,6 +147,7 @@ describe('@acusti/parsing', () => {
         );
         it('detects and strips detailed pre- and post-amble text', preambleTestCase);
         it('starts the JSON at a bracket, never at a quote mark', quoteMarkStartTestCase);
+        it('reads JSON that has comments in it', commentsTestCase);
         it(
             'returns the first value in the text, with what follows it as the postscript',
             restartsMidResponseTestCase,
@@ -1073,6 +1074,149 @@ function closeCutText(text: string): { closed: unknown; isAwaitingValue: boolean
     }
 }
 
+function commentsTestCase() {
+    const read = (value: unknown) => ({ postscript: '', preamble: '', value });
+    // a comment on a line of its own, after the opening brace or between members
+    expect(
+        parseAsJSON(
+            '{\n  // the heading\n  "heading": "Our Story",\n  // and its size\n  "props": {"size": 2}\n}',
+        ),
+    ).toEqual(read({ heading: 'Our Story', props: { size: 2 } }));
+    // one that follows a member on its line, with a comma before it or without
+    expect(
+        parseAsJSON('{\n  "retries": 3, // at most\n  "isLive": true // for now\n}'),
+    ).toEqual(read({ isLive: true, retries: 3 }));
+    expect(
+        parseAsJSON('{\n  "name": "Ann", // first\n  "city": "Oslo" // last\n}'),
+    ).toEqual(read({ city: 'Oslo', name: 'Ann' }));
+    // a block comment, over several lines or within one
+    expect(
+        parseAsJSON(
+            '{\n  /* the heading,\n     as given */\n  "heading": "Our Story", /* size */ "size": 2\n}',
+        ),
+    ).toEqual(read({ heading: 'Our Story', size: 2 }));
+    // with no space before it after a bracket, a comma or a line break, and with
+    // one after a colon or another comment
+    expect(
+        parseAsJSON(
+            '{// zero\n  "a": 1,// one\n// and\n  "b": // two\n    2, /* three */ /* four */\n}',
+        ),
+    ).toEqual(read({ a: 1, b: 2 }));
+    // in an array, after a preamble and in a code block
+    expect(
+        parseAsJSON(
+            'Here you go:\n```json\n[\n  // first\n  {"a": 1},\n  {"a": 2} // second\n]\n```\nDone.',
+        ),
+    ).toEqual({
+        postscript: 'Done.',
+        preamble: 'Here you go:',
+        value: [{ a: 1 }, { a: 2 }],
+    });
+    // (an array of numbers is found by what follows the comment after its
+    // bracket, and with a comment after its first item or after the array)
+    expect(parseAsJSON('Sizes:\n[ // two of them\n  1,\n  2,\n]')).toEqual({
+        postscript: '',
+        preamble: 'Sizes:',
+        value: [1, 2],
+    });
+    expect(parseAsJSON('[\n  1 // one\n]')).toEqual(read([1]));
+    expect(parseAsJSON('[ 1 /* one */, 2 ]')).toEqual(read([1, 2]));
+    expect(parseAsJSON('[\n  true // yes\n  , false\n]')).toEqual(read([true, false]));
+    expect(parseAsJSON('[1, 2, 3] // sizes')).toEqual({
+        postscript: '// sizes',
+        preamble: '',
+        value: [1, 2, 3],
+    });
+    expect(parseAsJSON('Here:\n[1, 2, 3] /* inches */\nDone')).toEqual({
+        postscript: '/* inches */\nDone',
+        preamble: 'Here:',
+        value: [1, 2, 3],
+    });
+    expect(parseAsJSON('[1, 2] /* 2 * 1 */').value).toEqual([1, 2]);
+    // (the comment has to end the line: with prose after it, the array is in
+    // the middle of a line of it)
+    expect(parseAsJSON('Sizes:\n[1, 2] /* in */ inches').value).toBe(null);
+    expect(parseAsJSON('Sizes:\n[1, 2] /* in */ \nDone').value).toEqual([1, 2]);
+    expect(
+        parseAsJSON(
+            'The sizes are:\n[1, 2] /* a */ and the rest\nNext line /* b */\n{"a": 1}',
+        ).value,
+    ).toEqual({ a: 1 });
+    // …and with whatever else needs repairing (a comment goes with the spaces
+    // before it, so what it stood between is spaced as it would be without it)
+    expect(
+        parseAsJSON('{\n  // config\n  "a": "b", // one\n  "c": "d", // two\n}'),
+    ).toEqual(read({ a: 'b', c: 'd' }));
+    expect(parseAsJSON('{\n  "a": "b", /* one */ "c": "d",\n}')).toEqual(
+        read({ a: 'b', c: 'd' }),
+    );
+
+    // as the text streams in, a comment that it ends on is left out as any other
+    expect(parseAsJSON('{\n  /')).toEqual(read({}));
+    expect(parseAsJSON('{\n  // the head')).toEqual(read({}));
+    const streamed = read({ heading: 'Our Story' });
+    expect(parseAsJSON('{\n  "heading": "Our Story", /')).toEqual(streamed);
+    expect(parseAsJSON('{\n  "heading": "Our Story", // and its si')).toEqual(streamed);
+    expect(parseAsJSON('{\n  "heading": "Our Story", /* and its si')).toEqual(streamed);
+    expect(parseAsJSON('{\n  /* the hea')).toEqual(read({}));
+    expect(parseAsJSON('[ 1 /')).toEqual(read([1]));
+    expect(parseAsJSON('[1, 2] /')).toEqual(read([1, 2]));
+    expect(parseAsJSON('[1, 2] /* in inc')).toEqual({
+        postscript: '/* in inc',
+        preamble: '',
+        value: [1, 2],
+    });
+    // …and a number or literal before it is whole, as it is before a space
+    expect(parseAsJSON('{\n  "retries": 3 // at mo')).toEqual(read({ retries: 3 }));
+    expect(parseAsJSON('{"flags": [true,\nnull\n// tw')).toEqual(
+        read({ flags: [true, null] }),
+    );
+
+    // what is in a string is not a comment
+    expect(
+        parseAsJSON(
+            '{\n  "url": "https://example.com/a", // the link\n  "steps": "1, // 2, /* 3 */"\n}',
+        ),
+    ).toEqual(read({ steps: '1, // 2, /* 3 */', url: 'https://example.com/a' }));
+    // …also where an unescaped quote mark before that string leaves it unclear
+    // where the strings are: a comment follows a bracket, a comma, a colon or a
+    // value, or starts a line, and these follow a word
+    expect(
+        parseAsJSON('{"size": "5" tall", "note": "see a // b", "code": "f(x) /* y */"}'),
+    ).toEqual(read({ code: 'f(x) /* y */', note: 'see a // b', size: '5" tall' }));
+    // (nor do these, which have no space before them and follow a quote mark or
+    // a colon)
+    expect(
+        parseAsJSON(
+            '{"size": "5" tall", "src": "//cdn.example.com/a.js", "url": "https://example.com"}',
+        ),
+    ).toEqual(
+        read({
+            size: '5" tall',
+            src: '//cdn.example.com/a.js',
+            url: 'https://example.com',
+        }),
+    );
+    // nor is the comment that markdown has, which holds the bracket’s closer
+    expect(parseAsJSON('[//]: # (hidden note)\n{"a": 1}')).toEqual({
+        postscript: '',
+        preamble: '[//]: # (hidden note)',
+        value: { a: 1 },
+    });
+    // nor is what is outside the value: the preamble and postscript keep theirs
+    expect(parseAsJSON('// the result\n{"a": 1} // that is all')).toEqual({
+        postscript: '// that is all',
+        preamble: '// the result',
+        value: { a: 1 },
+    });
+    // and a brace is not where the JSON starts for the comment after it
+    expect(parseAsJSON('function f() { // note\n  return 1;\n}\n{"a": 1}')).toEqual({
+        postscript: '',
+        preamble: 'function f() { // note\n  return 1;\n}',
+        value: { a: 1 },
+    });
+}
+
 function convertToJSONTestCase() {
     const response = `\
   Here is the JSON output for the "About Us" page based on the provided props:
@@ -1984,9 +2128,7 @@ function quoteMarkStartTestCase() {
         value: null,
     });
     // and an object whose brace something other than its first key follows
-    expect(parseAsJSON('{\n  // the heading\n  "heading": "Our Story"\n}').value).toBe(
-        null,
-    );
+    expect(parseAsJSON('{\n  ...\n  "heading": "Our Story"\n}').value).toBe(null);
 }
 
 // what an unfinished page reads to, given the props of its first section: the

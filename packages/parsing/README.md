@@ -76,6 +76,17 @@ parseAsJSON(
     ],
 }
 */
+
+// it might annotate the JSON with comments, which are left out
+parseAsJSON(
+    '{\n  // in seconds\n  "timeout": 30, // the default\n  "url": "https://example.com" /* the link */\n}',
+).value;
+/* results in:
+{
+    timeout: 30,
+    url: 'https://example.com',
+}
+*/
 ````
 
 ## Where the JSON is in the text
@@ -90,7 +101,7 @@ before it is the `preamble`, and what follows it is the `postscript`.
 - Prose has empty objects and arrays too, and arrays that open on a number
   or on `true`, `false` or `null`. One of those is only taken for the JSON
   if it starts a line or follows a colon, and nothing follows it on its
-  line but a full stop, a comma or a semicolon.
+  line but a full stop, a comma or a semicolon, and a comment.
 - If the value is valid JSON it is parsed as it is, unless a key follows an
   object’s closing brace (the object was closed too early, as above, and is
   repaired). Otherwise only a value that is unfinished or malformed is
