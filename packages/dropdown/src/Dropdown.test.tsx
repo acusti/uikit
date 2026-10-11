@@ -3772,26 +3772,6 @@ describe('@acusti/dropdown', () => {
             await waitFor(() => expect(screen.queryByRole('textbox')).toBeNull());
         });
 
-        it('stays open on Enter pressed in the body when keepOpenOnSubmit is false', async () => {
-            const user = userEvent.setup();
-            render(
-                <Dropdown hasItems={false} keepOpenOnSubmit={false}>
-                    <button type="button">Settings</button>
-                    <label>
-                        Label <input type="text" />
-                    </label>
-                </Dropdown>,
-            );
-
-            await user.click(screen.getByRole('button', { name: 'Settings' }));
-            await user.click(screen.getByRole('textbox', { name: 'Label' }));
-            await user.keyboard('{Enter}');
-            // longer than the delay before a submit closes the dropdown
-            await new Promise((resolve) => setTimeout(resolve, 150));
-
-            expect(screen.getByRole('textbox', { name: 'Label' })).toBeTruthy();
-        });
-
         it('still takes Enter pressed in a text input trigger', async () => {
             const user = userEvent.setup();
             render(
@@ -3899,6 +3879,331 @@ describe('@acusti/dropdown', () => {
                     expect.objectContaining({ value: 'name' }),
                 );
             }
+        });
+    });
+
+    describe('closing interactive content on submit (hasItems={false})', () => {
+        // longer than the delay before a submit closes the dropdown
+        const waitPastCloseDelay = () =>
+            new Promise((resolve) => setTimeout(resolve, 150));
+
+        const preventDefault = (event: SubmitEvent) => event.preventDefault();
+
+        const renderForm = ({
+            onSubmit = preventDefault,
+            required,
+            ...props
+        }: Partial<Props> & {
+            onSubmit?: (event: SubmitEvent) => void;
+            required?: boolean;
+        } = {}) =>
+            render(
+                <Dropdown hasItems={false} {...props}>
+                    <button type="button">Settings</button>
+                    <form onSubmit={onSubmit}>
+                        <label>
+                            Full name{' '}
+                            <input name="name" required={required} type="text" />
+                        </label>
+                        <button type="submit">Save</button>
+                    </form>
+                </Dropdown>,
+            );
+
+        it('stays open when a form in the body is submitted, by default', async () => {
+            const handleSubmit = vi.fn<(event: SubmitEvent) => void>(preventDefault);
+            const user = userEvent.setup();
+            renderForm({ onSubmit: handleSubmit });
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            await user.click(screen.getByRole('button', { name: 'Save' }));
+            await waitPastCloseDelay();
+
+            expect(handleSubmit).toHaveBeenCalledTimes(1);
+            expect(screen.getByRole('textbox', { name: 'Full name' })).toBeTruthy();
+        });
+
+        it('closes when a form in the body is submitted with Enter and keepOpenOnSubmit is false', async () => {
+            const handleSubmit = vi.fn<(event: SubmitEvent) => void>(preventDefault);
+            const user = userEvent.setup();
+            renderForm({ keepOpenOnSubmit: false, onSubmit: handleSubmit });
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            await user.click(screen.getByRole('textbox', { name: 'Full name' }));
+            await user.keyboard('Sally Ride{Enter}');
+
+            expect(handleSubmit).toHaveBeenCalledTimes(1);
+            await waitFor(() => expect(screen.queryByRole('textbox')).toBeNull());
+        });
+
+        it('closes when a form in the body is submitted with its button and keepOpenOnSubmit is false', async () => {
+            const handleSubmit = vi.fn<(event: SubmitEvent) => void>(preventDefault);
+            const user = userEvent.setup();
+            renderForm({ keepOpenOnSubmit: false, onSubmit: handleSubmit });
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            await user.click(screen.getByRole('button', { name: 'Save' }));
+
+            expect(handleSubmit).toHaveBeenCalledTimes(1);
+            await waitFor(() => expect(screen.queryByRole('textbox')).toBeNull());
+        });
+
+        it('stays open while the form’s own validation blocks the submit', async () => {
+            const handleSubmit = vi.fn<(event: SubmitEvent) => void>(preventDefault);
+            const user = userEvent.setup();
+            renderForm({
+                keepOpenOnSubmit: false,
+                onSubmit: handleSubmit,
+                required: true,
+            });
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            await user.click(screen.getByRole('textbox', { name: 'Full name' }));
+            await user.keyboard('{Enter}');
+            await waitPastCloseDelay();
+
+            expect(handleSubmit).not.toHaveBeenCalled();
+            expect(screen.getByRole('textbox', { name: 'Full name' })).toBeTruthy();
+
+            await user.keyboard('Sally Ride{Enter}');
+            expect(handleSubmit).toHaveBeenCalledTimes(1);
+            await waitFor(() => expect(screen.queryByRole('textbox')).toBeNull());
+        });
+
+        it('stays open when the form’s submit handler stops the event from propagating', async () => {
+            const handleSubmit = vi.fn<(event: SubmitEvent) => void>((event) => {
+                event.preventDefault();
+                // the name is taken, say, and the form has to say so
+                event.stopPropagation();
+            });
+            const user = userEvent.setup();
+            renderForm({ keepOpenOnSubmit: false, onSubmit: handleSubmit });
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            await user.click(screen.getByRole('button', { name: 'Save' }));
+            await waitPastCloseDelay();
+
+            expect(handleSubmit).toHaveBeenCalledTimes(1);
+            expect(screen.getByRole('textbox', { name: 'Full name' })).toBeTruthy();
+        });
+
+        it('closes on Enter in a single-line input that no form owns when keepOpenOnSubmit is false', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                    <button type="button">Link</button>
+                    <label>
+                        Address <input type="url" />
+                    </label>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Link' }));
+            const input = screen.getByRole('textbox', { name: 'Address' });
+            await user.click(input);
+            // Space is typed, and is no submit
+            await user.keyboard('a b');
+            await waitPastCloseDelay();
+            expect(screen.getByRole('textbox', { name: 'Address' })).toBe(input);
+            expect((input as HTMLInputElement).value).toBe('a b');
+
+            // Enter is the submit, and stays the input’s own key
+            expect(fireEvent.keyDown(input, { key: 'Enter' })).toBe(true);
+            await waitFor(() => expect(screen.queryByRole('textbox')).toBeNull());
+        });
+
+        it('stays open on Enter in a textarea, on a checkbox or button, and in an input outside the dropdown', async () => {
+            const handleClick = vi.fn<() => void>();
+            const user = userEvent.setup();
+            render(
+                <div>
+                    <label>
+                        Search <input type="text" />
+                    </label>
+                    <Dropdown hasItems={false} keepOpenOnSubmit={false} openOnHover>
+                        <button type="button">Settings</button>
+                        <div>
+                            <label>
+                                Choices <textarea />
+                            </label>
+                            <label>
+                                <input type="checkbox" /> Required
+                            </label>
+                            <button onClick={handleClick} type="button">
+                                Add a choice
+                            </button>
+                        </div>
+                    </Dropdown>
+                </div>,
+            );
+
+            // hovering opens the dropdown with the keyboard still in the input
+            await user.click(screen.getByRole('textbox', { name: 'Search' }));
+            await user.hover(screen.getByRole('button', { name: 'Settings' }));
+            await user.keyboard('{Enter}');
+
+            const textarea = screen.getByRole('textbox', { name: 'Choices' });
+            await user.click(textarea);
+            await user.keyboard('By phone{Enter}');
+            expect((textarea as HTMLTextAreaElement).value).toBe('By phone\n');
+
+            act(() => screen.getByRole('checkbox', { name: 'Required' }).focus());
+            await user.keyboard('{Enter}');
+
+            act(() => screen.getByRole('button', { name: 'Add a choice' }).focus());
+            await user.keyboard('{Enter}');
+            expect(handleClick).toHaveBeenCalledTimes(1);
+
+            await waitPastCloseDelay();
+            expect(screen.getByRole('textbox', { name: 'Choices' })).toBeTruthy();
+        });
+
+        it('stays open on an Enter that a handler has prevented', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                    <button type="button">Link</button>
+                    <label>
+                        Address{' '}
+                        <input
+                            // a combobox picking its highlighted option, say
+                            onKeyDown={(event) => {
+                                if (event.key === 'Enter') event.preventDefault();
+                            }}
+                            type="url"
+                        />
+                    </label>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Link' }));
+            await user.click(screen.getByRole('textbox', { name: 'Address' }));
+            await user.keyboard('{Enter}');
+            await waitPastCloseDelay();
+
+            expect(screen.getByRole('textbox', { name: 'Address' })).toBeTruthy();
+        });
+
+        it('stays open on the Enter that commits an IME composition', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                    <button type="button">Link</button>
+                    <label>
+                        Title <input type="text" />
+                    </label>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Link' }));
+            const input = screen.getByRole('textbox', { name: 'Title' });
+            await user.click(input);
+            // as the composition is being committed…
+            fireEvent.keyDown(input, { isComposing: true, key: 'Enter' });
+            // …and where it has already ended by the time of the keydown,
+            // which only its keyCode gives away
+            fireEvent.keyDown(input, { key: 'Enter', keyCode: 229 });
+            await waitPastCloseDelay();
+            expect(screen.getByRole('textbox', { name: 'Title' })).toBeTruthy();
+
+            // Enter once more is the submit
+            fireEvent.keyDown(input, { key: 'Enter', keyCode: 13 });
+            await waitFor(() => expect(screen.queryByRole('textbox')).toBeNull());
+        });
+
+        it('leaves Enter in a nested dropdown’s text input trigger to that dropdown', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                    <button type="button">Settings</button>
+                    <div>
+                        <label>
+                            Label <input type="text" />
+                        </label>
+                        <Dropdown isSearchable placeholder="Country">
+                            <ul>
+                                <li>Canada</li>
+                                <li>Mexico</li>
+                            </ul>
+                        </Dropdown>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            // focusing the combobox opens it; Escape closes it and keeps the
+            // focus in its input
+            await user.click(screen.getByRole('combobox'));
+            await user.keyboard('{Escape}');
+            expect(screen.queryByText('Canada')).toBeNull();
+
+            // Enter opens it again, and is no submit of the outer dropdown
+            await user.keyboard('{Enter}');
+            await waitPastCloseDelay();
+            expect(screen.getByText('Canada')).toBeTruthy();
+            expect(screen.getByRole('textbox', { name: 'Label' })).toBeTruthy();
+        });
+
+        it('leaves a form submitted in a nested dropdown’s body to that dropdown', async () => {
+            const handleSubmit = vi.fn<(event: SubmitEvent) => void>(preventDefault);
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                    <button type="button">Settings</button>
+                    <div>
+                        <label>
+                            Label <input type="text" />
+                        </label>
+                        <Dropdown hasItems={false}>
+                            <button type="button">Rename</button>
+                            <form onSubmit={handleSubmit}>
+                                <label>
+                                    New name <input name="name" type="text" />
+                                </label>
+                                <button type="submit">Save</button>
+                            </form>
+                        </Dropdown>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            await user.click(screen.getByRole('button', { name: 'Rename' }));
+            await user.click(screen.getByRole('button', { name: 'Save' }));
+            await waitPastCloseDelay();
+
+            expect(handleSubmit).toHaveBeenCalledTimes(1);
+            // the nested dropdown keeps its default and stays open, and the
+            // submit was not the outer dropdown’s to close on
+            expect(screen.getByRole('textbox', { name: 'New name' })).toBeTruthy();
+            expect(screen.getByRole('textbox', { name: 'Label' })).toBeTruthy();
+        });
+
+        it('does not take a form submitted in a dropdown with items for an item', async () => {
+            const handleSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown keepOpenOnSubmit onSubmitItem={handleSubmitItem}>
+                    Columns
+                    <div>
+                        <form onSubmit={preventDefault}>
+                            <button type="submit">Reset</button>
+                        </form>
+                        <ul>
+                            <li data-ukt-value="name">Name</li>
+                            <li data-ukt-value="email">Email</li>
+                        </ul>
+                    </div>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('button', { name: 'Columns' }));
+            await user.keyboard('{ArrowDown}');
+            fireEvent.submit(
+                screen.getByRole('button', { name: 'Reset' }).closest('form')!,
+            );
+
+            expect(handleSubmitItem).not.toHaveBeenCalled();
         });
     });
 
