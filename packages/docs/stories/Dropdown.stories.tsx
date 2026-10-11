@@ -115,6 +115,9 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
 }
 
 const meta: Meta<typeof Dropdown> = {
+    // storybook names these spies after their arg keys, and only a named spy
+    // is logged to the Actions panel; a spy created inline in a story’s JSX
+    // is out of its reach, so it needs an explicit .mockName() to be logged
     args: {
         onClose: fn(),
         onOpen: fn(),
@@ -720,7 +723,10 @@ export const TransformedAncestor: Story = {
                     This card has <code>transform: rotate(-3deg) scale(0.94)</code>. The
                     menu below still anchors correctly.
                 </p>
-                <Dropdown className="transformed-ancestor" onSubmitItem={fn()}>
+                <Dropdown
+                    className="transformed-ancestor"
+                    onSubmitItem={fn().mockName('onSubmitItem')}
+                >
                     Edit
                     <ul>
                         <li data-ukt-value="cut">Cut</li>
@@ -745,7 +751,10 @@ export const CenteredMenu: Story = {
     },
     render() {
         return (
-            <Dropdown className="centered-menu" onSubmitItem={fn()}>
+            <Dropdown
+                className="centered-menu"
+                onSubmitItem={fn().mockName('onSubmitItem')}
+            >
                 Insert
                 <ul>
                     <li data-ukt-value="image">Image…</li>
@@ -825,7 +834,7 @@ export const DirectionRecipes: Story = {
                             <Dropdown
                                 className={className}
                                 key={className}
-                                onSubmitItem={fn()}
+                                onSubmitItem={fn().mockName('onSubmitItem')}
                                 style={style}
                             >
                                 {label}
@@ -863,11 +872,17 @@ export const FillsWhenTooTall: Story = {
         const items = renderTallMenuItems();
         return (
             <div className="too-tall-demo">
-                <Dropdown className="too-tall" onSubmitItem={fn()}>
+                <Dropdown
+                    className="too-tall"
+                    onSubmitItem={fn().mockName('onSubmitItem')}
+                >
                     Near left corner
                     <ul>{items}</ul>
                 </Dropdown>
-                <Dropdown className="too-tall" onSubmitItem={fn()}>
+                <Dropdown
+                    className="too-tall"
+                    onSubmitItem={fn().mockName('onSubmitItem')}
+                >
                     Center (with submenu)
                     <ul>
                         <Dropdown label="Jump to">
@@ -876,13 +891,16 @@ export const FillsWhenTooTall: Story = {
                         {items}
                     </ul>
                 </Dropdown>
-                <Dropdown className="too-tall" onSubmitItem={fn()}>
+                <Dropdown
+                    className="too-tall"
+                    onSubmitItem={fn().mockName('onSubmitItem')}
+                >
                     Near right corner
                     <ul>{items}</ul>
                 </Dropdown>
                 <Dropdown
                     className="too-tall too-tall-center-min"
-                    onSubmitItem={fn()}
+                    onSubmitItem={fn().mockName('onSubmitItem')}
                     style={{ '--uktdd-body-min-height': '300px' }}
                 >
                     Centered, 300px min-height
@@ -919,7 +937,7 @@ export const CoverFillRecipe: Story = {
             <div className="cover-fill-demo">
                 <Dropdown
                     className="cover-fill"
-                    onSubmitItem={fn()}
+                    onSubmitItem={fn().mockName('onSubmitItem')}
                     style={COVER_FILL_STYLE}
                 >
                     Mid-height, start edge
@@ -927,7 +945,7 @@ export const CoverFillRecipe: Story = {
                 </Dropdown>
                 <Dropdown
                     className="cover-fill"
-                    onSubmitItem={fn()}
+                    onSubmitItem={fn().mockName('onSubmitItem')}
                     style={COVER_FILL_STYLE}
                 >
                     Near right corner
@@ -950,7 +968,7 @@ export const SubmenuFillsBesideParent: Story = {
     render() {
         return (
             <div className="submenu-beside-demo">
-                <Dropdown onSubmitItem={fn()}>
+                <Dropdown onSubmitItem={fn().mockName('onSubmitItem')}>
                     Bottom-pinned menu
                     <ul>
                         <li data-ukt-item>An item</li>
@@ -1016,7 +1034,10 @@ export const WithGaps: Story = {
     },
     render() {
         return (
-            <Dropdown className="gap-example" onSubmitItem={fn()}>
+            <Dropdown
+                className="gap-example"
+                onSubmitItem={fn().mockName('onSubmitItem')}
+            >
                 Format
                 <ul>
                     <li data-ukt-item>Bold</li>
@@ -1046,7 +1067,11 @@ export const OpenOnHover: Story = {
     },
     render() {
         return (
-            <Dropdown className="open-on-hover-example" onSubmitItem={fn()} openOnHover>
+            <Dropdown
+                className="open-on-hover-example"
+                onSubmitItem={fn().mockName('onSubmitItem')}
+                openOnHover
+            >
                 <button
                     className="uktdropdown-trigger"
                     style={{
@@ -1082,7 +1107,7 @@ export const MenubarAppMenu: Story = {
     render() {
         return (
             <Menubar>
-                <Dropdown onSubmitItem={fn()}>
+                <Dropdown onSubmitItem={fn().mockName('onSubmitItem')}>
                     File
                     <ul>
                         <li data-ukt-item>New Window</li>
@@ -1097,7 +1122,7 @@ export const MenubarAppMenu: Story = {
                         <li data-ukt-item>Close Window</li>
                     </ul>
                 </Dropdown>
-                <Dropdown onSubmitItem={fn()}>
+                <Dropdown onSubmitItem={fn().mockName('onSubmitItem')}>
                     Edit
                     <ul>
                         <li data-ukt-item>Undo</li>
@@ -1111,7 +1136,7 @@ export const MenubarAppMenu: Story = {
                         </Dropdown>
                     </ul>
                 </Dropdown>
-                <Dropdown onSubmitItem={fn()}>
+                <Dropdown onSubmitItem={fn().mockName('onSubmitItem')}>
                     View
                     <ul>
                         <li data-ukt-item>Zoom In</li>
