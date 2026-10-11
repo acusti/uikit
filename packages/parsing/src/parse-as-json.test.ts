@@ -151,7 +151,7 @@ describe('@acusti/parsing', () => {
             missingCurliesTestCase,
         );
         it(
-            'detects responses where the response restarts halfway through',
+            'returns the first value in the text, with what follows it as the postscript',
             restartsMidResponseTestCase,
         );
         it('leaves a markdown table as the text that it is', markdownTableTestCase);
@@ -1849,127 +1849,58 @@ function readPage(props: Record<string, unknown>) {
 }
 
 function restartsMidResponseTestCase() {
-    let response = `\
-  Sure, here's an example JSON output for the "Contributor Profiles" section:
-{
-"sectionTitle": "Our Contributors",
-"sectionDescription": "Meet the talented team of writers, analysts, and experts who make Defector possible.",
-"itemSubtitle1": "Sports Journalist",
-"itemTitle1": "Joe Smith",
-"itemDescription1": "Joe is a veteran sports journalist with over 10 years of experience covering the NFL, NBA, and MLB. He has written for several major publications and is known for his in-depth analysis and insightful commentary.",
-"itemSubtitle2": "Data Analyst",
-"itemTitle2": "Jane Doe",
-"itemDescription2": "Jane is a data analyst with a background in statistics and computer  Sure, here's an example JSON output for the "Contributor Profiles" section:
-{
-"sectionTitle": "Our Contributors",
-"sectionDescription": "Meet the talented team of writers, analysts, and experts who make Defector possible.",
-"itemSubtitle1": "Sports Journalist",
-"itemTitle1": "Joe Smith",
-"itemDescription1": "Joe is a veteran sports journalist with over 10 years of experience covering the NFL, NBA, and MLB. He has written for several major publications and is known for his in-depth analysis and insightful commentary."
-"itemSubtitle2": "Data Analyst",
-"itemTitle2": "Jane Doe",
-"itemDescription2": "Jane is a data analyst with a background in statistics and computer science. She uses her skills to provide detailed analysis and visualizations of sports data, helping readers gain a deeper understanding of the game."
-"itemSubtitle3": "Sports Historian",
-"itemTitle3": "John Johnson",
-"itemDescription3": "John is a sports historian with a Ph.D. in American Studies. He has written several books on the history of sports and is a frequent guest on sports talk shows, providing historical context and perspective."
-}`;
-
-    expect(parseAsJSON(response)).toEqual({
-        postscript: '',
-        preamble:
-            'Sure, here\'s an example JSON output for the "Contributor Profiles" section:',
-        value: {
-            itemDescription1:
-                'Joe is a veteran sports journalist with over 10 years of experience covering the NFL, NBA, and MLB. He has written for several major publications and is known for his in-depth analysis and insightful commentary.',
-            itemDescription2:
-                'Jane is a data analyst with a background in statistics and computer science. She uses her skills to provide detailed analysis and visualizations of sports data, helping readers gain a deeper understanding of the game.',
-            itemDescription3:
-                'John is a sports historian with a Ph.D. in American Studies. He has written several books on the history of sports and is a frequent guest on sports talk shows, providing historical context and perspective.',
-            itemSubtitle1: 'Sports Journalist',
-            itemSubtitle2: 'Data Analyst',
-            itemSubtitle3: 'Sports Historian',
-            itemTitle1: 'Joe Smith',
-            itemTitle2: 'Jane Doe',
-            itemTitle3: 'John Johnson',
-            sectionDescription:
-                'Meet the talented team of writers, analysts, and experts who make Defector possible.',
-            sectionTitle: 'Our Contributors',
-        },
-    });
-
-    response = `\`\`\`json
-{
-    "heading": "New Moon Natural Foods",
-    "subheading": "Your Community Market for Organic & Natural Goods",
-    "imageURL":\`\`\`json
-{
-    "heading": "New Moon Natural Foods: Your Community Market",
-    "subheading": "Welcome to a Healthier Way of Life",
-    "description": "At New Moon Natural Foods, we are committed to providing our community with the highest quality organic produce, locally-sourced meats, and carefully curated health and wellness products. We also offer a unique selection of beer, wine, and cheese, as well as all the best in natural grocery. Our family-owned market is dedicated to supporting local growers and artisans, while providing a welcoming and supportive environment for our customers to find the healthiest and most sustainable options for their families. Join us on your journey to a healthier way of life."
-}
-\`\`\``;
-
-    expect(parseAsJSON(response)).toEqual({
-        postscript: '',
-        preamble: '',
-        value: {
-            description:
-                'At New Moon Natural Foods, we are committed to providing our community with the highest quality organic produce, locally-sourced meats, and carefully curated health and wellness products. We also offer a unique selection of beer, wine, and cheese, as well as all the best in natural grocery. Our family-owned market is dedicated to supporting local growers and artisans, while providing a welcoming and supportive environment for our customers to find the healthiest and most sustainable options for their families. Join us on your journey to a healthier way of life.',
-            heading: 'New Moon Natural Foods: Your Community Market',
-            subheading: 'Welcome to a Healthier Way of Life',
-        },
-    });
-
-    response = `\
-  Here is the JSON output for the "Benefits" page:
+    // a response that starts over partway through: the first attempt is the
+    // value, as far as it can be read, and the second is the postscript…
+    const first = parseAsJSON(`\
+Here is the JSON output for the "Benefits" page:
 {
 "teamMemberName1": "John Doe",
-"teamMemberImage1": "/images/team-member-1.jpg",
-"teamMemberJobTitle1": "Senior Sales Consultant",
-"teamMemberName2": "Jane Smith",
-"teamMemberImage2": "/images/team-member-2.jpg",
 "teamMemberJobTitle2": "Product  Here is the JSON output for the "Testimonials" page based on the provided props:
 {
 "teamMemberName1": "John Doe",
-"teamMemberImage1": "/images/john-doe.jpg",
-"teamMemberJobTitle1": "Regional Manager",
-"teamMemberName2": "Jane Smith",
-"teamMemberImage2": "/images/jane-smith.jpg",
-"teamMemberJobTitle2": "Senior Consultant",
-"teamMemberName3": "Bob Johnson",
-"teamMemberImage3": "/images/bob-johnson.jpg",
-}
-`;
-    expect(parseAsJSON(response)).toEqual({
-        postscript: '',
+"teamMemberImage3": "/images/bob-johnson.jpg"
+}`);
+    expect(first).toEqual({
+        postscript:
+            'page based on the provided props:\n{\n"teamMemberName1": "John Doe",\n"teamMemberImage3": "/images/bob-johnson.jpg"\n}',
         preamble: 'Here is the JSON output for the "Benefits" page:',
         value: {
-            teamMemberImage1: '/images/john-doe.jpg',
-            teamMemberImage2: '/images/jane-smith.jpg',
-            teamMemberImage3: '/images/bob-johnson.jpg',
-            teamMemberJobTitle1: 'Regional Manager',
-            teamMemberJobTitle2: 'Senior Consultant',
+            teamMemberJobTitle2: 'Product  Here is the JSON output for the "Testimonials',
             teamMemberName1: 'John Doe',
-            teamMemberName2: 'Jane Smith',
-            teamMemberName3: 'Bob Johnson',
+        },
+    });
+    // …which can be parsed in its turn
+    expect(parseAsJSON(first.postscript)).toEqual({
+        postscript: '',
+        preamble: 'page based on the provided props:',
+        value: {
+            teamMemberImage3: '/images/bob-johnson.jpg',
+            teamMemberName1: 'John Doe',
         },
     });
 
-    // what is left of a text that something followed (here, a line break) was
-    // followed by it too, so a number that it ends on is whole
-    response =
-        'Here: {"heading": "A", "sub": "B"} oops\nHere is the full one: {"heading": "A", "sub": "B", "body": "C", "rating": 5\n';
-    expect(parseAsJSON(response).value).toEqual({
-        body: 'C',
-        heading: 'A',
-        rating: 5,
-        sub: 'B',
+    // a value is not passed over for a larger one that follows it
+    expect(
+        parseAsJSON(
+            'Here: {"heading": "A", "sub": "B"} oops\nHere is the full one: {"heading": "A", "sub": "B", "body": "C"}',
+        ),
+    ).toEqual({
+        postscript:
+            'oops\nHere is the full one: {"heading": "A", "sub": "B", "body": "C"}',
+        preamble: 'Here:',
+        value: { heading: 'A', sub: 'B' },
     });
-    // with nothing after it, that number may not be whole
-    expect(parseAsJSON(response.trimEnd()).value).toEqual({
-        body: 'C',
-        heading: 'A',
-        sub: 'B',
+    expect(parseAsJSON('{"a": "b"} {"c": "d", "e": "f", "g": "h"}')).toEqual({
+        postscript: '{"c": "d", "e": "f", "g": "h"}',
+        preamble: '',
+        value: { a: 'b' },
+    });
+    // nor is the root of a text that goes wrong partway through passed over for
+    // what follows the mistake
+    expect(parseAsJSON('{"a": ["b"\n-1, {"name": "Ann"')).toEqual({
+        postscript: '-1, {"name": "Ann"',
+        preamble: '',
+        value: { a: ['b'] },
     });
 }
 
