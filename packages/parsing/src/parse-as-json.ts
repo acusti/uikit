@@ -241,30 +241,6 @@ function matchAt({
     return regexp.exec(text)?.[0];
 }
 
-// get the length of anything (vs JSON.stringify: https://jsperf.app/qisaso/2)
-function lengthOf(item: unknown): number {
-    switch (typeof item) {
-        case 'number':
-            return 1;
-        case 'object':
-            if (!item) return 0;
-            if (Array.isArray(item)) {
-                return item.reduce(
-                    (acc: number, _item) => acc + lengthOf(_item),
-                    0,
-                ) as number;
-            }
-            return Object.keys(item).reduce(
-                (acc, key) => acc + key.length + lengthOf((item as GenericObject)[key]),
-                0,
-            );
-        case 'string':
-            return item.length;
-        default:
-            return 0;
-    }
-}
-
 // Reads the bare literal (true, false, null, or a number) that starts at index.
 // Returns it once the text shows it to be whole, an empty string if the text
 // ends partway through it, and null if what starts there is not a literal.
@@ -497,14 +473,10 @@ type ParsedResult = {
 };
 
 export function parseAsJSON(text: string): ParsedResult {
-    return parseText(text, false);
-}
-
-// isEndDelimited is whether anything is known to have followed the text, as it
-// is from the outset for what is left of a text that something followed
-function parseText(text: string, isEndDelimited: boolean): ParsedResult {
     let preamble = '';
     let postscript = '';
+    // whether anything is known to have followed the text
+    let isEndDelimited = false;
     if (text == null) {
         text = '';
     } else {
@@ -902,59 +874,10 @@ function parseText(text: string, isEndDelimited: boolean): ParsedResult {
         // in case of error, check remainder of text, else return value: null
     }
 
-    // if there’s still unparsed text and parsing failed or its more than ½
-    // what we already parsed, the model might’ve restarted partway through.
-    // try parsing the rest to see if we get a larger result and use it if so.
+    // what the walk did not read is the postscript, unless it has no content
     postscript = originalText.substring(index - textLengthDelta).trim();
-    // if postscript doesn’t have any actual content, empty it
     if (!hasTextContent(postscript)) {
         postscript = '';
-    }
-    // eslint-disable-next-line typescript/strict-boolean-expressions
-    if (postscript.length > 5 && (!value || postscript.length > index)) {
-        // (the rest runs to the end of the text, so what followed one followed both)
-        const { postscript: remainingPostscript, value: remainingValue } = parseText(
-            postscript,
-            isEndDelimited,
-        );
-        // eslint-disable-next-line typescript/strict-boolean-expressions
-        if (remainingValue) {
-            // eslint-disable-next-line typescript/strict-boolean-expressions
-            if (!value)
-                return {
-                    postscript: cleanThinkingText(remainingPostscript),
-                    preamble,
-                    value: remainingValue,
-                };
-            // choose whichever has more keys (or, if equal, more characters)
-            if (
-                typeof value === 'object' &&
-                typeof remainingValue === 'object' &&
-                !Array.isArray(value) &&
-                !Array.isArray(remainingValue)
-            ) {
-                const keysLength = Object.keys(value).length;
-                const remainingKeysLength = Object.keys(remainingValue).length;
-                if (keysLength > remainingKeysLength) {
-                    return { postscript: cleanThinkingText(postscript), preamble, value };
-                }
-                if (remainingKeysLength > keysLength) {
-                    return {
-                        postscript: cleanThinkingText(remainingPostscript),
-                        preamble,
-                        value: remainingValue,
-                    };
-                }
-            }
-            // if not objects or same number of keys, choose longer item
-            if (lengthOf(remainingValue) > lengthOf(value)) {
-                return {
-                    postscript: cleanThinkingText(remainingPostscript),
-                    preamble,
-                    value: remainingValue,
-                };
-            }
-        }
     }
 
     return { postscript: cleanThinkingText(postscript), preamble, value };
