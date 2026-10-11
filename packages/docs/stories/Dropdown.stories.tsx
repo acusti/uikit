@@ -113,6 +113,9 @@ function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
         </svg>
     );
 }
+// the docs “Show code” panel prints a component under its displayName, and
+// falls back to the function’s name, which a production build minifies
+ChevronDownIcon.displayName = 'ChevronDownIcon';
 
 const meta: Meta<typeof Dropdown> = {
     // storybook names these spies after their arg keys, and only a named spy
