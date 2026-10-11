@@ -68,9 +68,6 @@ const VALUE_DELIMITER_CHARS = new Set([
 
 const VALUE_START_CHARS = new Set([...VALUE_DELIMITER_CHARS, '{', '[']);
 const VALUE_END_CHARS = new Set([...VALUE_DELIMITER_CHARS, '}', ']']);
-// what a [ has to be followed by to be taken for the start of an array rather
-// than part of the preamble: a quote mark, a digit, or a bracket of either kind
-const ARRAY_BODY_START_CHARS = new Set([...VALUE_START_CHARS, ']', '}']);
 
 // a bare literal (true, false, null, or a number) starts with one of these…
 const LITERAL_START_CHARS = new Set('-0123456789fnt');
@@ -465,21 +462,66 @@ const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
 // or without one
 const NEXT_KEY_REGEXP = /^\s*,?\s*"[^"]+":/;
 
-// what the brace that opens an object is followed by: the brace that closes it,
-// the end of the text, a key (as far as the text goes, and not past a line
-// break that a bracket follows, where the walk would cut the string short), or
-// a key that has lost its opening quote mark (which the walk restores where the
-// key follows a line break)
-const OBJECT_START_PATTERN =
-    '\\{\\s*(?:\\}|$|"(?:[^"\\\\\\n]|\\\\.|\\n(?!\\s*[{[]))*(?:"|$)|\\n[a-zA-Z][^"\\n]*"\\s*:)';
-const OBJECT_START_REGEXP = new RegExp(`^${OBJECT_START_PATTERN}`);
-// what is not where the JSON starts: a brace that the text starts with (unless
-// it opens an object), or a bracket that it starts with unless a quote mark or
-// another bracket follows it directly, and then all that is not a brace or a
-// bracket
-const NOT_START_REGEXP = new RegExp(
-    `^(?!${OBJECT_START_PATTERN})(?:\\{[^[{]*|(?:\\[(?!["[{]))?[^[{]+)`,
+// What a brace or bracket has to be followed by to be taken for the start of
+// the JSON and not for part of the preamble.
+//
+// a string from its opening quote mark, as far as the text goes and not past a
+// line break that a bracket follows (where the walk would cut the string short)
+const STRING_START_PATTERN = '"(?:[^"\\\\\\n]|\\\\.|\\n(?!\\s*[{[]))*';
+// a bare literal as far as it goes, where the text ends on it or partway through
+const LITERAL_START_PATTERN =
+    't(?:r(?:ue?)?)?|f(?:a(?:l(?:se?)?)?)?|n(?:u(?:ll?)?)?|-?\\d[\\d.eE+-]*|-';
+// Wherever it stands: after a brace, a key and its colon (as far as the text
+// goes), or a key that has lost its opening quote mark (which the walk restores
+// where the key follows a line break); after a bracket, a string, an object or
+// an array.
+const START_REGEXP = new RegExp(
+    `^(?:\\{\\s*(?:${STRING_START_PATTERN}(?:"\\s*(?::|$)|$)|\\n[a-zA-Z][^"\\n]*"\\s*:)|\\[\\s*["[{])`,
 );
+// Only where a value would stand (isValuePosition), since prose has these too:
+// after a brace, the brace that closes it, the end of the text, or a string
+// that no colon follows; after a bracket, a closing bracket, the end of the
+// text, or a bare literal (a whole one, or as much of one as the text has).
+const START_OF_SCALARS_REGEXP = new RegExp(
+    `^(?:\\{\\s*(?:\\}|$|${STRING_START_PATTERN}")|\\[\\s*(?:[\\]}]|$|(?:${LITERAL_PATTERN})\\s*[,\\]]|(?:${LITERAL_START_PATTERN})$))`,
+);
+// the text after a value that is not in the middle of a line of prose: nothing
+// on its line but a full stop, comma or semicolon
+const END_OF_LINE_REGEXP = /^[ \t]*[.,;]?[ \t]*(?:\r?\n|$)/;
+// what is not where the JSON starts: a brace or bracket that the text starts
+// with (isStartOfJSON has ruled it out), and all that is not one of the two
+const NOT_START_REGEXP = /^(?:[[{][^[{]*|[^[{]+)/;
+
+// Whether the text before a value leaves it out of the middle of a line of
+// prose: a colon comes before it, or it starts a line (or the text). Only the
+// end of that text is read, since it is all of the text up to each bracket.
+function isBeforeValue(precedingText: string) {
+    let index = precedingText.length - 1;
+    while (precedingText[index] === ' ' || precedingText[index] === '\t') index--;
+    return index === -1 || precedingText[index] === '\n' || precedingText[index] === ':';
+}
+
+// Whether a value could stand where the text starts, going by the text around
+// it. It has to start a line or follow a colon, and once it is closed it has to
+// end its line, unless it is an object that a key follows (one that was closed
+// too early).
+function isValuePosition(text: string, precedingText: string) {
+    if (!isBeforeValue(precedingText)) return false;
+    const endIndex = indexOfRootEnd(text);
+    if (endIndex === -1) return true;
+    const rest = text.slice(endIndex + 1);
+    return (
+        END_OF_LINE_REGEXP.test(rest) || (text[0] === '{' && NEXT_KEY_REGEXP.test(rest))
+    );
+}
+
+// whether the JSON starts where the text does, given the text that precedes it
+function isStartOfJSON(text: string, precedingText: string) {
+    return (
+        START_REGEXP.test(text) ||
+        (START_OF_SCALARS_REGEXP.test(text) && isValuePosition(text, precedingText))
+    );
+}
 
 const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
 
@@ -534,30 +576,20 @@ export function parseAsJSON(text: string): ParsedResult {
     let isInsideString = false;
     let newText = '';
 
-    // identify start of JSON
-    let previousText;
-    do {
-        if (previousText) {
-            preamble += previousText.substring(0, previousText.length - text.length);
-        }
-        previousText = text;
-        // if text starts with a control char, it didn’t pass the while condition
-        // (unless it opens an object, which is where the JSON starts even when
-        // that brace is as far as the text goes)
-        text = text.replace(NOT_START_REGEXP, '');
-    } while (
-        previousText !== text &&
-        // if new start is [, ensure it’s an array & not part of preamble
-        ((text[0] === '[' &&
-            !isFollowedBy({ chars: ARRAY_BODY_START_CHARS, index: 0, text })) ||
-            // if new start is {, ensure it’s an object & not part of preamble
-            (text[0] === '{' && !OBJECT_START_REGEXP.test(text)))
-    );
-
-    const extraPreamble = previousText.substring(0, previousText.length - text.length);
-    if (hasTextContent(extraPreamble)) {
-        preamble += extraPreamble;
+    // identify start of JSON: the first brace that opens an object or bracket
+    // that opens an array. Any other is part of the preamble, with all that
+    // follows it up to the next one (the last part taken off only joins the
+    // preamble if it has a word in it).
+    let lastPart = '';
+    while (
+        text !== '' &&
+        !isStartOfJSON(text, firstText.slice(0, firstText.length - text.length))
+    ) {
+        preamble += lastPart;
+        lastPart = text.match(NOT_START_REGEXP)?.[0] ?? text;
+        text = text.slice(lastPart.length);
     }
+    if (hasTextContent(lastPart)) preamble += lastPart;
     preamble = cleanThinkingText(preamble);
 
     const rootEndIndex = indexOfRootEnd(text);

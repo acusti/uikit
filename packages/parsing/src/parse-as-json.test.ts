@@ -238,7 +238,7 @@ describe('@acusti/parsing', () => {
             });
             // an object that is empty, or that the text has only just opened, starts
             // at its brace
-            expect(parseAsJSON('{} and more')).toEqual({
+            expect(parseAsJSON('{}\nand more')).toEqual({
                 postscript: 'and more',
                 preamble: '',
                 value: {},
@@ -247,6 +247,12 @@ describe('@acusti/parsing', () => {
                 postscript: '',
                 preamble: 'Here it is:',
                 value: {},
+            });
+            // …and so does one whose first key is as far as the text has got, in the
+            // middle of a line too
+            expect(parseAsJSON('The result is {"sec').value).toEqual({});
+            expect(parseAsJSON('The result is {"sections"').value).toEqual({
+                sections: '',
             });
             // a quote mark after the brace has to open a key, which a string that a
             // line break and a bracket cut short is not
@@ -272,6 +278,115 @@ describe('@acusti/parsing', () => {
                 postscript: '',
                 preamble: '',
                 value: { heading: 'Hi', sub: 'Yo' },
+            });
+        });
+
+        it('takes a bracket for the start of the JSON by what follows it and where it stands', () => {
+            // an array that opens on a number or a literal, at the start of the text
+            // or after a colon
+            expect(parseAsJSON('[1, 2]\nand more')).toEqual({
+                postscript: 'and more',
+                preamble: '',
+                value: [1, 2],
+            });
+            expect(parseAsJSON('Here they are: [true, "a"]\nDone.')).toEqual({
+                postscript: 'Done.',
+                preamble: 'Here they are:',
+                value: [true, 'a'],
+            });
+            expect(parseAsJSON('Here it is: [-1,').value).toEqual([-1]);
+            // (a number that the text ends on is held back, as it is anywhere, and
+            // so is a literal that it ends partway through)
+            expect(parseAsJSON('Here are the sizes: [12').value).toEqual([]);
+            expect(parseAsJSON('Here they are: [tr').value).toEqual([]);
+            expect(parseAsJSON('Here they are: [fal').value).toEqual([]);
+            expect(parseAsJSON('Here they are: [nu').value).toEqual([]);
+            expect(parseAsJSON('Here they are: [true').value).toEqual([true]);
+            // …and where a full stop ends the line after it
+            expect(parseAsJSON('The sizes are: [1, 2].')).toEqual({
+                postscript: '',
+                preamble: 'The sizes are:',
+                value: [1, 2],
+            });
+            // …or a line break of either kind
+            expect(parseAsJSON('Here:\r\n[1, 2]\r\nDone.')).toEqual({
+                postscript: 'Done.',
+                preamble: 'Here:',
+                value: [1, 2],
+            });
+            // …and one that a line break follows, whatever needs repairing in it
+            expect(parseAsJSON('[\n  {"a": 1}\n  {"a": 2}\n]').value).toEqual([
+                { a: 1 },
+                { a: 2 },
+            ]);
+            expect(parseAsJSON('[\n  {"a": 1,},\n  {"a": 2,},\n]')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: [{ a: 1 }, { a: 2 }],
+            });
+            // an empty array or object, or one that the text ends on, at the start of
+            // a line
+            expect(parseAsJSON('Here are the tags:\n[')).toEqual({
+                postscript: '',
+                preamble: 'Here are the tags:',
+                value: [],
+            });
+            expect(parseAsJSON('Here it is:\n  {}\nand that is all')).toEqual({
+                postscript: 'and that is all',
+                preamble: 'Here it is:',
+                value: {},
+            });
+            expect(parseAsJSON('Here are the sizes:\n\t[1, 2]').value).toEqual([1, 2]);
+
+            // none of those in the middle of a line of prose (a citation, a task
+            // list, a link, an empty object written out), nor at the start of a
+            // line or after a colon where the line goes on after it (a list of
+            // references, a score), nor a bracket that no item follows
+            const preambles = [
+                'As in [1], the result is:',
+                '- [ ] check this\n- [x] done',
+                'See the [2024 report](https://example.com):',
+                'Notes:\n[2024 report](https://example.com) has more. Here it is:',
+                'It returns {} when there is nothing, or [] for a list. Here it is',
+                'References\n[1] Smith 2020\n[2] Doe 2021',
+                'Sources:\n[1]: https://example.com\nHere is the JSON:',
+                'Score: [0.5] and the JSON',
+                'Use this: {} or that:',
+                '[ ] check this',
+                // …and a brace that a string follows, unless it is a key
+                'In Python, {"a", "b"} is a set. Here:',
+                'I like {"quoted"} things.',
+            ];
+            for (const preamble of preambles) {
+                expect(parseAsJSON(preamble + '\n{"a": "b"}'), preamble).toEqual({
+                    postscript: '',
+                    preamble,
+                    value: { a: 'b' },
+                });
+            }
+            // (a number is an item where a comma or a closing bracket follows it)
+            expect(parseAsJSON('Notes:\n[2024 report]').value).toBe(null);
+            // which leaves an array of numbers unread where a sentence runs on into
+            // it, or on from it
+            expect(parseAsJSON('The answer is [1, 2, 3].')).toEqual({
+                postscript: '',
+                preamble: 'The answer is [1, 2, 3].',
+                value: null,
+            });
+            expect(parseAsJSON('[1, 2] and more')).toEqual({
+                postscript: '',
+                preamble: '[1, 2] and more',
+                value: null,
+            });
+            // (a key after it is no exception, as it is after an object)
+            expect(parseAsJSON('Here: [1, 2], "c": "d"').value).toBe(null);
+            // an array that opens on a string, an object or an array is taken anywhere
+            expect(parseAsJSON('The tags are ["a", "b"].').value).toEqual(['a', 'b']);
+            // a text with no bracket in it and no word has no preamble either
+            expect(parseAsJSON('``')).toEqual({
+                postscript: '',
+                preamble: '',
+                value: null,
             });
         });
 
