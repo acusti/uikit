@@ -323,7 +323,9 @@ type Props = {
     /**
      * Whether the dropdown stays open after an item is submitted, e.g. for a
      * multi-select. Defaults to !hasItems: a menu closes on submit, while a
-     * hasItems={false} dialog stays open.
+     * hasItems={false} dialog stays open. In a hasItems={false} dropdown, a
+     * submit is a form in the body being submitted, or Enter in a
+     * single-line input there that no form owns.
      */
     keepOpenOnSubmit?: boolean;
     /**
@@ -723,6 +725,35 @@ follows a link. The same goes for whatever keeps focus outside the dropdown
 while it’s open, as when it opened on hover. Escape closes the dropdown
 unless focus is in a text field (a text input, a textarea, or an editable
 element). On the trigger, Space and Enter open the dropdown as usual.
+
+A `hasItems={false}` dropdown stays open until it is dismissed. Pass
+`keepOpenOnSubmit={false}` to close it when its content is submitted. A
+submit is a form in the body being submitted, by Enter in one of its inputs
+or by its submit button, or Enter in a single-line input that no form owns:
+
+```tsx
+<Dropdown hasItems={false} keepOpenOnSubmit={false}>
+    Rename
+    <form onSubmit={handleSubmit}>
+        <label>
+            Name <input name="name" required />
+        </label>
+        <button type="submit">Save</button>
+    </form>
+</Dropdown>
+```
+
+Unless the form opts out of validation (`noValidate`, or a submit button
+with `formNoValidate`), its `submit` event doesn’t fire until the browser’s
+validation passes, so the dropdown stays open while a required field is
+empty. To keep it open after a submit that your own checks reject, call
+`event.stopPropagation()` in the form’s `onSubmit` before it returns. A
+check that finishes later, such as a server round trip or a form library
+that validates asynchronously, can’t keep it open.
+
+Enter in an input that no form owns counts the way a form would count it:
+not when a handler has prevented the key, as a combobox does to pick an
+option, and not when it commits an IME composition.
 
 ### Placement Customization with CSS Variables
 

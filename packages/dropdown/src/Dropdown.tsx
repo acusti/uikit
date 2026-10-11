@@ -48,9 +48,11 @@ import {
     getParentItem,
     getSubmenuOfItem,
     getTriggerElement,
+    isFormlessTextInput,
     isInOwnBody,
     isItemExpanded,
     isPointInTriangle,
+    isSubmitKey,
     LIST_CONTAINER_SELECTOR,
     type Point,
     setActiveItem,
@@ -156,7 +158,9 @@ export type Props = {
     /**
      * Whether the dropdown stays open after an item is submitted, e.g. for a
      * multi-select. Defaults to !hasItems: a menu closes on submit, while a
-     * hasItems={false} dialog stays open.
+     * hasItems={false} dialog stays open. In a hasItems={false} dropdown, a
+     * submit is a form in the body being submitted, or Enter in a
+     * single-line input there that no form owns.
      */
     keepOpenOnSubmit?: boolean;
     /**
@@ -1199,10 +1203,25 @@ function RootDropdown({
         // when the target is an ancestor of the dropdown (the document body)
         // and not an editable element that the dropdown sits in
         if (!hasItems && (key === 'Enter' || key === ' ')) {
-            const isKeyForTarget = isEventTargetingDropdown
-                ? isInOwnBody(dropdownElement, eventTarget)
-                : isTargetUsingKeyEvents || !eventTarget.contains(dropdownElement);
-            if (isKeyForTarget) return;
+            if (isEventTargetingDropdown) {
+                if (isInOwnBody(dropdownElement, eventTarget)) {
+                    // The key stays the target’s, but Enter in a body input
+                    // with no form to submit is itself the submit
+                    // (handleBodySubmit answers a form’s). The input has to be
+                    // this dropdown’s own: a nested dropdown’s trigger sits in
+                    // this body too, and Enter there is that dropdown’s
+                    if (
+                        isSubmitKey(event) &&
+                        eventTarget.closest('.uktdropdown') === dropdownElement &&
+                        isFormlessTextInput(eventTarget)
+                    ) {
+                        handleSubmitItem(event);
+                    }
+                    return;
+                }
+            } else if (isTargetUsingKeyEvents || !eventTarget.contains(dropdownElement)) {
+                return;
+            }
         }
 
         // If dropdown isOpen, handle submitting the value
@@ -1338,6 +1357,16 @@ function RootDropdown({
     };
 
     useKeyboardEvents({ ignoreUsedKeyboardEvents: false, onKeyDown: handleKeyDown });
+
+    // A form submitted in a hasItems={false} body is that dropdown’s submit,
+    // however it came about: Enter in one of its inputs, or its submit button
+    // pressed or clicked. The event only fires once the form’s own validation
+    // passes, so the dropdown stays open over a form that still has to be
+    // fixed. A form in a nested dropdown’s body is that dropdown’s to answer
+    const handleBodySubmit = (event: SyntheticEvent<HTMLElement>) => {
+        if (hasItems || !isInOwnBody(dropdownElement, event.target as Element)) return;
+        handleSubmitItem(event);
+    };
 
     const handleRef = (ref: HTMLDivElement | null): (() => void) | undefined => {
         setDropdownElement(ref);
@@ -1654,6 +1683,7 @@ function RootDropdown({
                             'has-items': hasItems,
                         })}
                         id={bodyId}
+                        onSubmit={handleBodySubmit}
                         popover="manual"
                         ref={handleBodyRef}
                         role={popupRole}

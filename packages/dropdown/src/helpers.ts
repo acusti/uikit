@@ -1,4 +1,5 @@
 import { getBestMatch } from '@acusti/matchmaking';
+import { NON_TEXT_INPUT_TYPES } from '@acusti/use-keyboard-events';
 import { Children, isValidElement, type ReactNode, type SyntheticEvent } from 'react';
 
 import { type Item } from './Dropdown.js';
@@ -26,6 +27,25 @@ export const isInOwnBody = (dropdownElement: MaybeHTMLElement, element: Element)
     const bodyElement = element.closest(BODY_SELECTOR);
     return bodyElement != null && bodyElement.closest('.uktdropdown') === dropdownElement;
 };
+
+// Whether an element is a single-line text input that no form owns. Enter in
+// one has no form to submit, so the key is the only sign of a submit there is
+export const isFormlessTextInput = (element: Element) => {
+    if (element.tagName !== 'INPUT') return false;
+    const { form, type } = element as HTMLInputElement;
+    return form == null && !NON_TEXT_INPUT_TYPES.includes(type);
+};
+
+// Whether a keydown is an Enter that a form would submit on: one that no
+// handler has prevented (as a combobox does to pick its highlighted option)
+// and that isn’t committing an IME composition. A composition can end before
+// the keydown that commits it, when only keyCode 229 still gives it away
+export const isSubmitKey = (event: KeyboardEvent) =>
+    event.key === 'Enter' &&
+    !event.defaultPrevented &&
+    !event.isComposing &&
+    // eslint-disable-next-line typescript/no-deprecated
+    event.keyCode !== 229;
 
 // The level root that owns an item: the closest [data-ukt-submenu] ancestor,
 // or null for items at the top level of the dropdown body
