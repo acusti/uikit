@@ -154,10 +154,7 @@ describe('@acusti/parsing', () => {
             'detects responses where the response restarts halfway through',
             restartsMidResponseTestCase,
         );
-        it(
-            'parses a markdown table of two columns into key/value pairs',
-            markdownTableTestCase,
-        );
+        it('leaves a markdown table as the text that it is', markdownTableTestCase);
         it('preserves escaped new lines within strings', preservesNewLinesTestCase);
         it('handles extraneous escape characters', extraneousEscapeCharactersTestCase);
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
@@ -1312,37 +1309,39 @@ function isPrefixOf({
 }
 
 function markdownTableTestCase() {
-    const response = `\
-  Here are the props for Vytas' Hatha Yoga classes:
-Props:
-| Prop Name | Value |
-| blogPostImage1 | /vytas-yoga-class-background.jpg |
-| shortBlogPostCaption1 | "Find inner peace and balance through physical postures and breathing techniques" |
-| blogPostHeading1 | "Hatha Yoga Classes with Vytas" |
-| miniBlogPostLede1 | "Discover the transformative power of Hatha Yoga with Vytas, a seasoned yoga teacher" |
-| blogPostImage2 | /vytas-yoga-community-background.jpg |
-| shortBlogPostCaption2 | "Join a supportive community of like-minded individuals and deepen your practice with Vytas" |
-| blogPostHeading2 | "Community and Connection" |
-| miniBlogPostLede2 | "Vytas' Hatha Yoga classes offer a sense of community and connection, fostering a supportive environment for all practitioners" | |`;
+    // a table in the preamble is part of the preamble
+    expect(
+        parseAsJSON(`\
+Here is what changed:
 
-    expect(parseAsJSON(response)).toEqual({
+| Field | Value |
+| --- | --- |
+| heading | Hello |
+
+\`\`\`json
+{"heading": "Hello", "sub": "World"}
+\`\`\``),
+    ).toEqual({
         postscript: '',
-        preamble: "Here are the props for Vytas' Hatha Yoga classes:\nProps:",
-        value: {
-            blogPostHeading1: 'Hatha Yoga Classes with Vytas',
-            blogPostHeading2: 'Community and Connection',
-            blogPostImage1: '/vytas-yoga-class-background.jpg',
-            blogPostImage2: '/vytas-yoga-community-background.jpg',
-            miniBlogPostLede1:
-                'Discover the transformative power of Hatha Yoga with Vytas, a seasoned yoga teacher',
-            miniBlogPostLede2:
-                "Vytas' Hatha Yoga classes offer a sense of community and connection, fostering a supportive environment for all practitioners",
-            'Prop Name': 'Value',
-            shortBlogPostCaption1:
-                'Find inner peace and balance through physical postures and breathing techniques',
-            shortBlogPostCaption2:
-                'Join a supportive community of like-minded individuals and deepen your practice with Vytas',
-        },
+        preamble:
+            'Here is what changed:\n\n| Field | Value |\n| --- | --- |\n| heading | Hello |',
+        value: { heading: 'Hello', sub: 'World' },
+    });
+    // one after the JSON is the postscript
+    expect(
+        parseAsJSON(
+            '{"heading": "Hello", "sub": "World"}\n\n| Field | Value |\n| heading | Hello |',
+        ),
+    ).toEqual({
+        postscript: '| Field | Value |\n| heading | Hello |',
+        preamble: '',
+        value: { heading: 'Hello', sub: 'World' },
+    });
+    // and one on its own is not JSON
+    expect(parseAsJSON('| Field | Value |\n| heading | Hello |')).toEqual({
+        postscript: '',
+        preamble: '| Field | Value |\n| heading | Hello |',
+        value: null,
     });
 }
 

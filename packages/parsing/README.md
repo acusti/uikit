@@ -88,33 +88,6 @@ Props:
 }
 */
 
-// in case llama 2 decides to give you a markdown table to represent the JSON
-parseAsJSON(`Here are the props for Vytas' Hatha Yoga classes:
-Props:
-| Prop Name | Value |
-| blogPostImage1 | /vytas-yoga-class-background.jpg |
-| shortBlogPostCaption1 | "Find inner peace and balance through physical postures and breathing techniques" |
-| blogPostHeading1 | "Hatha Yoga Classes with Vytas" |
-| miniBlogPostLede1 | "Discover the transformative power of Hatha Yoga with Vytas, a seasoned yoga teacher" |
-| blogPostImage2 | /vytas-yoga-community-background.jpg |
-| shortBlogPostCaption2 | "Join a supportive community of like-minded individuals and deepen your practice with Vytas" |
-| blogPostHeading2 | "Community and Connection" |
-| miniBlogPostLede2 | "Vytas' Hatha Yoga classes offer a sense of community and connection" | |`)
-    .value;
-/* results in:
-{
-    'Prop Name': 'Value',
-    blogPostImage1: '/vytas-yoga-class-background.jpg',
-    shortBlogPostCaption1: 'Find inner peace and balance through physical postures and breathing techniques',
-    blogPostHeading1: 'Hatha Yoga Classes with Vytas',
-    miniBlogPostLede1: 'Discover the transformative power of Hatha Yoga with Vytas, a seasoned yoga teacher',
-    blogPostImage2: '/vytas-yoga-community-background.jpg',
-    shortBlogPostCaption2: 'Join a supportive community of like-minded individuals and deepen your practice with Vytas',
-    blogPostHeading2: 'Community and Connection',
-    miniBlogPostLede2: "Vytas' Hatha Yoga classes offer a sense of community and connection",
-}
-*/
-
 // it might prematurely close the outer JSON object even though the content continues
 parseAsJSON(
     '```json\n{"heading":"Organic Produce","subheading":"The Benefits of Going Organic","description":"Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers."},"items":[{"heading":"Organic Fruits","subheading":"Nature\'s Sweet Treats"},{"heading":"Organic Vegetables","subheading":"Fresh from the Garden"}]}\n```',
