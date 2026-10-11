@@ -358,6 +358,98 @@ export const DropdownWithForm: Story = {
     },
 };
 
+export const DropdownClosingOnSubmit: Story = {
+    args: {
+        children: [
+            'Rename',
+            <form
+                onSubmit={fn((event) => event.preventDefault()).mockName('onSubmit')}
+                style={{ display: 'grid', gap: '0.5rem' }}
+            >
+                <label style={{ display: 'grid' }}>
+                    Name
+                    <input name="name" required type="text" />
+                </label>
+                <button type="submit">Save</button>
+            </form>,
+        ],
+        className: 'dropdown-without-items',
+        hasItems: false,
+        keepOpenOnSubmit: false,
+    },
+    parameters: {
+        docs: {
+            description: {
+                story: 'With `keepOpenOnSubmit={false}`, a `hasItems={false}` dropdown closes when the form in its body is submitted, by Enter in the input or by the Save button (see the Actions panel), and focus returns to the trigger. Name is required, so the dropdown stays open on the browser’s validation message until it has a value.',
+            },
+        },
+    },
+};
+
+export const DropdownClosingOnEnter: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'With `keepOpenOnSubmit={false}`, Enter in a single-line input that no form owns is the submit: it closes the dropdown and focus returns to the trigger. The input’s own `onKeyDown` adds the tag to the list below, so each submit shows. Space is typed as usual. Enter on an empty Tag is prevented by that handler, which keeps the dropdown open, and the Enter that commits an IME composition (try a Japanese, Chinese, or Korean input source) neither adds a tag nor closes it.',
+            },
+        },
+    },
+    render() {
+        const [tags, setTags] = React.useState<Array<string>>([]);
+        return (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+                <Dropdown
+                    className="dropdown-without-items"
+                    hasItems={false}
+                    keepOpenOnSubmit={false}
+                >
+                    Add a tag
+                    <label style={{ display: 'grid' }}>
+                        Tag
+                        <input
+                            name="tag"
+                            onKeyDown={(event) => {
+                                // The dropdown has no callback for this submit,
+                                // so the input decides for itself, by the same
+                                // checks: Enter, and not the one that commits
+                                // an IME composition
+                                if (
+                                    event.key !== 'Enter' ||
+                                    event.nativeEvent.isComposing ||
+                                    event.keyCode === 229
+                                ) {
+                                    return;
+                                }
+                                const tag = event.currentTarget.value.trim();
+                                if (tag) {
+                                    setTags((current) => [...current, tag]);
+                                } else {
+                                    // Nothing to add: preventing the key keeps
+                                    // the dropdown open
+                                    event.preventDefault();
+                                }
+                            }}
+                            placeholder="Type a tag, then Enter"
+                            type="text"
+                        />
+                    </label>
+                </Dropdown>
+                <p style={{ margin: 0 }}>
+                    Tags:{' '}
+                    {tags.length
+                        ? tags.map((tag, index) => (
+                              <Fragment key={index}>
+                                  {index ? ', ' : null}
+                                  <code>{tag}</code>
+                              </Fragment>
+                          ))
+                        : 'none yet'}
+                </p>
+            </div>
+        );
+    },
+};
+
 export const SearchableWithLabel: Story = {
     args: {
         children: (
