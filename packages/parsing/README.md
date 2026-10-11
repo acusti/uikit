@@ -78,6 +78,51 @@ parseAsJSON(
 */
 ````
 
+## Where the JSON is in the text
+
+`parseAsJSON` reads the first JSON object or array in the text. What comes
+before it is the `preamble`, and what follows it is the `postscript`.
+
+- The JSON starts at the first `{` that opens an object or `[` that opens
+  an array. A bracket in the preamble that is not JSON is passed over, such
+  as `{placeholders}`, a citation (`[1]`), a task list (`- [ ]`) or a set
+  (`{"a", "b"}`).
+- Prose has empty objects and arrays too, and arrays that open on a number
+  or on `true`, `false` or `null`. One of those is only taken for the JSON
+  if it starts a line or follows a colon, and nothing follows it on its
+  line but a full stop, a comma or a semicolon.
+- If the value is valid JSON it is parsed as it is, unless a key follows an
+  object’s closing brace (the object was closed too early, as above, and is
+  repaired). Otherwise only a value that is unfinished or malformed is
+  repaired.
+- A second value in the text is left in the `postscript`. To read it, call
+  `parseAsJSON` on the `postscript`.
+
+```js
+parseAsJSON(
+    'As in [1], use {placeholders}: {"a": "b"} and then {"c": "d"}',
+);
+/* results in:
+{
+    preamble: 'As in [1], use {placeholders}:',
+    value: { a: 'b' },
+    postscript: 'and then {"c": "d"}',
+}
+*/
+
+parseAsJSON('The sizes are: [1, 2]').value;
+// [1, 2]
+
+parseAsJSON('The sizes are [1, 2].').value;
+// null
+
+parseAsJSON('The sizes are: [1, 2] in inches').value;
+// null
+```
+
+A markdown table, and a list of `"key": "value"` lines with no braces
+around it, are not JSON and are not read.
+
 ## Reading a response as it streams in
 
 You can call `parseAsJSON` repeatedly on text as it streams in to support
