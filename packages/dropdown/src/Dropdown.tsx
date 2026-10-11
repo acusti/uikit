@@ -847,7 +847,21 @@ function RootDropdown({
         if (isOpenRef.current && !keepOpenOnSubmit) {
             // A short timeout before closing is better UX when user selects an item so dropdown
             // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
-            closingTimerRef.current = setTimeout(closeDropdown, 90);
+            closingTimerRef.current = setTimeout(() => {
+                // The body of a hasItems={false} dropdown can hold the focus
+                // (the input Enter was pressed in, the form’s Save button),
+                // which would be lost along with the body. Hand it to the
+                // trigger first, as Escape does
+                const activeElement = dropdownElement?.ownerDocument.activeElement;
+                if (
+                    !hasItems &&
+                    activeElement &&
+                    isInOwnBody(dropdownElement, activeElement)
+                ) {
+                    focusTrigger();
+                }
+                closeDropdown();
+            }, 90);
         }
 
         if (!hasItems) return;

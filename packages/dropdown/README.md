@@ -755,6 +755,9 @@ Enter in an input that no form owns counts the way a form would count it:
 not when a handler has prevented the key, as a combobox does to pick an
 option, and not when it commits an IME composition.
 
+When a submit closes the dropdown while focus is in its body, focus returns
+to the trigger, as it does on Escape.
+
 ### Placement Customization with CSS Variables
 
 Placement is best customized in CSS instead of props. The component exposes
