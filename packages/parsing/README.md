@@ -55,39 +55,6 @@ and preamble is:
 'Sure, here\'s an example of a JSON response for the "Contact Form" page:'
 */
 
-// you might get a "key": "value" list with no syntax around it
-parseAsJSON(` Here are the props for the "Blog" page:
-Props:
-"blogPostImage1": "/images/blog-post-image1.jpg",
-"blogPostSubheading1": "Exploring the Art of Sourdough Baking",
-"blogPostHeading1": "The Magic of Sourdough",
-"blogPostLede1": "At Masa Madre, we're passionate about creating the perfect sourdough bread. Learn more about the art and craft of this ancient tradition.",
-"blogPostImage2": "/images/blog-post-image2.jpg",
-"blogPostSubheading2": "From Seed to Loaf",
-"blogPostHeading2": "Our Journey to Your Table",
-"blogPostLede2": "Discover the journey of our sourdough bread, from the seed to the loaf.",
-"blogPostImage3": "/images/blog-post-image3.jpg",
-"blogPostSubheading3": "Sourdough 101",
-"blogPostHeading3": "Learn the Basics of Artisanal Bread Making",
-"blogPostLede3": "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
-`).value;
-/* results in:
-{
-    blogPostImage1: '/images/blog-post-image1.jpg',
-    blogPostSubheading1: 'Exploring the Art of Sourdough Baking',
-    blogPostHeading1: 'The Magic of Sourdough',
-    blogPostLede1: "At Masa Madre, we're passionate about creating the perfect sourdough bread. Learn more about the art and craft of this ancient tradition.",
-    blogPostImage2: '/images/blog-post-image2.jpg',
-    blogPostSubheading2: 'From Seed to Loaf',
-    blogPostHeading2: 'Our Journey to Your Table',
-    blogPostLede2: 'Discover the journey of our sourdough bread, from the seed to the loaf.',
-    blogPostImage3: '/images/blog-post-image3.jpg',
-    blogPostSubheading3: 'Sourdough 101',
-    blogPostHeading3: 'Learn the Basics of Artisanal Bread Making',
-    blogPostLede3: "Get started on your sourdough journey with our beginner's guide to artisanal bread making.",
-}
-*/
-
 // it might prematurely close the outer JSON object even though the content continues
 parseAsJSON(
     '```json\n{"heading":"Organic Produce","subheading":"The Benefits of Going Organic","description":"Organic produce is grown without the use of synthetic pesticides, herbicides, or fertilizers."},"items":[{"heading":"Organic Fruits","subheading":"Nature\'s Sweet Treats"},{"heading":"Organic Vegetables","subheading":"Fresh from the Garden"}]}\n```',
