@@ -1,6 +1,6 @@
 {
     "name": "@acusti/parsing",
-    "version": "0.21.0",
+    "version": "0.21.1",
     "description": "Loosely parse a string as JSON with numerous affordances for syntax errors",
     "keywords": [
         "genai",

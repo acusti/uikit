@@ -1,5 +1,34 @@
 # @acusti/parsing
 
+## 0.21.1
+
+### Patch Changes
+
+- 8544247: Repair a string cut short before a nested object or array more
+  reliably
+
+    When a string is cut short by a line break and an object or array opens
+    on the next line, the string’s last line (`Here is what we offer:`)
+    becomes the key for it. That only worked with exactly one raw line
+    break earlier in the text; otherwise the key had no value or the
+    `value` was `null`.
+
+- a88add3: Read a string that ends in an escaped backslash in text that
+  needs repairs
+
+    In a text that needs a repair, such as a missing comma, a string that
+    ends in an escaped backslash (`"path": "C:\\"`) left `parseAsJSON`
+    returning a `value` of `null`. Such a string is now read, and an
+    escaped backslash before a raw line break is read correctly too.
+
+- 7c66096: Read past trailing commas in arrays and objects
+
+    A trailing comma in an array (`{"tags": ["a", "b",], "x": "y"}`) left
+    `parseAsJSON` returning a `value` of `null`, and one in a nested object
+    (`{"link": {"url": "/",}, "x": "y"}`) lost everything after it. Both
+    are now read in full, as is a text with a comma after the end of its
+    value (`{"a": "b"},`).
+
 ## 0.21.0
 
 ### Minor Changes
