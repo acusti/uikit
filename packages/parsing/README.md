@@ -91,9 +91,27 @@ parseAsJSON(
 
 ## Where the JSON is in the text
 
-`parseAsJSON` reads the first JSON object or array in the text. What comes
+`parseAsJSON` reads the first JSON object or array in the text, or the one
+in a code block if the text has a code block with JSON in it. What comes
 before it is the `preamble`, and what follows it is the `postscript`.
 
+- The JSON in a code block is the value, whatever comes before the block:
+  prose, code, or another object or array.
+    - A code block is what follows a fence: a line of ` ``` ` and an
+      optional language. It counts if its fence has no language, or the
+      language is `json`, `jsonc`, `json5` or `jsonl`, and if JSON is what
+      it starts with, after any comments. A block in another language is
+      code, and never takes the place of a value before it.
+    - It does not have to be closed, so this holds while the text streams
+      in.
+    - Fences are not counted to tell one that opens a block from one that
+      closes one, so JSON right after the fence that closes a block of code
+      is taken for JSON in a block.
+    - If the JSON in a block with one of those languages can’t be read (see
+      below), what comes before the block is not returned in its place.
+      After a fence with no language, only JSON that can be read counts.
+    - A code block inside one of the JSON’s own strings is part of the
+      string, and is not taken for it.
 - The JSON starts at the first `{` that opens an object or `[` that opens
   an array. A bracket in the preamble that is not JSON is passed over, such
   as `{placeholders}`, a citation (`[1]`), a task list (`- [ ]`) or a set
@@ -116,7 +134,7 @@ before it is the `preamble`, and what follows it is the `postscript`.
 - A second value in the text is left in the `postscript`. To read it, call
   `parseAsJSON` on the `postscript`.
 
-```js
+````js
 parseAsJSON(
     'As in [1], use {placeholders}: {"a": "b"} and then {"c": "d"}',
 );
@@ -139,7 +157,18 @@ parseAsJSON('The sizes are: [1, 2] in inches').value;
 
 parseAsJSON('{ name: "Ann", "address": {"city": "Oslo"} }').value;
 // null
-```
+
+parseAsJSON('Call go({"y": 1}) first:\n```json\n{"a": 1}\n```').value;
+// { a: 1 }
+
+parseAsJSON('Use {"y": 1} like so:\n```json\n{ a: "b" }\n```').value;
+// null
+
+parseAsJSON(
+    '{"name": "Ann"}\nOr in Python:\n```python\n{"name": "Bo"}\n```',
+).value;
+// { name: 'Ann' }
+````
 
 A markdown table, and a list of `"key": "value"` lines with no braces
 around it, are not JSON and are not read.
