@@ -98,6 +98,13 @@ before it is the `preamble`, and what follows it is the `postscript`.
   an array. A bracket in the preamble that is not JSON is passed over, such
   as `{placeholders}`, a citation (`[1]`), a task list (`- [ ]`) or a set
   (`{"a", "b"}`).
+- An object or array that can’t be read is not read from one of its
+  members. That is a `{` or `[` that starts a line or follows a colon, with
+  a first member that JSON does not allow: a key with no quote marks or
+  with single ones, or a comma. The `value` is `null`, also while the text
+  streams in. What follows its closing bracket is still read, and so is a
+  code block that starts before it is closed (at a line that starts with
+  ` ``` `).
 - Prose has empty objects and arrays too, and arrays that open on a number
   or on `true`, `false` or `null`. One of those is only taken for the JSON
   if it starts a line or follows a colon, and nothing follows it on its
@@ -128,6 +135,9 @@ parseAsJSON('The sizes are [1, 2].').value;
 // null
 
 parseAsJSON('The sizes are: [1, 2] in inches').value;
+// null
+
+parseAsJSON('{ name: "Ann", "address": {"city": "Oslo"} }').value;
 // null
 ```
 
