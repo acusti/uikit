@@ -1213,9 +1213,10 @@ function RootDropdown({
         // submit, so they belong to whatever has focus: a control in its body
         // or one outside it (beside a nested popover that opened on hover,
         // say), where a text field types them and a button is pressed. They
-        // stay the dropdown’s own on its trigger, and with nothing focused,
-        // when the target is an ancestor of the dropdown (the document body)
-        // and not an editable element that the dropdown sits in
+        // are the dropdown’s own on its trigger, where they close it, and
+        // with nothing focused, when the target is an ancestor of the
+        // dropdown (the document body) and not an editable element that the
+        // dropdown sits in
         if (!hasItems && (key === 'Enter' || key === ' ')) {
             if (isEventTargetingDropdown) {
                 if (isInOwnBody(dropdownElement, eventTarget)) {
@@ -1233,6 +1234,17 @@ function RootDropdown({
                     }
                     return;
                 }
+                // On the trigger, the keys that opened the dropdown close it,
+                // as a press there does. A control in the trigger that uses
+                // them itself keeps Space (a text field types it, a checkbox
+                // is toggled by it), and its Enter goes to the submit below.
+                // A button input uses both keys too, but as a button does
+                if (!isTargetUsingKeyEvents || eventTarget.matches(CLICKABLE_SELECTOR)) {
+                    onEventHandled();
+                    closeDropdown();
+                    return;
+                }
+                if (key === ' ') return;
             } else if (isTargetUsingKeyEvents || !eventTarget.contains(dropdownElement)) {
                 return;
             }
@@ -1245,8 +1257,8 @@ function RootDropdown({
             return;
         }
 
-        // If dropdown isOpen, handle closing it on escape or spacebar if !hasItems
-        if (key === 'Escape' || (isEventTargetingDropdown && key === ' ' && !hasItems)) {
+        // If dropdown isOpen, handle closing it on escape
+        if (key === 'Escape') {
             // Close dropdown if hasItems or event target not using key events
             if (hasItems || !isTargetUsingKeyEvents) {
                 // Escape closes the whole menu — submenus included — and

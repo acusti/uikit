@@ -3697,7 +3697,46 @@ describe('@acusti/dropdown', () => {
             expect(fireEvent.keyDown(notes, { key: 'Enter' })).toBe(true);
         });
 
-        it('still takes Space and Enter pressed on its trigger', async () => {
+        it.each([
+            ['a button', () => <button type="button">Settings</button>],
+            ['an input button', () => <input type="button" value="Settings" />],
+            [
+                'an element with a button role',
+                () => (
+                    <div role="button" tabIndex={0}>
+                        Settings
+                    </div>
+                ),
+            ],
+        ])(
+            'opens and closes on Enter and on Space pressed on a trigger that is %s',
+            (_, renderTrigger) => {
+                render(
+                    <Dropdown hasItems={false}>
+                        {renderTrigger()}
+                        <label>
+                            Label <input type="text" />
+                        </label>
+                    </Dropdown>,
+                );
+
+                const trigger = screen.getByRole('button', { name: 'Settings' });
+                for (const key of ['Enter', ' ']) {
+                    // closed, the key opens the dropdown…
+                    expect(fireEvent.keyDown(trigger, { key })).toBe(false);
+                    expect(screen.getByRole('textbox')).toBeTruthy();
+                    expect(trigger.getAttribute('aria-expanded')).toBe('true');
+
+                    // …and open, it closes it, as a press on the trigger does
+                    expect(fireEvent.keyDown(trigger, { key })).toBe(false);
+                    expect(screen.queryByRole('textbox')).toBeNull();
+                    expect(trigger.getAttribute('aria-expanded')).toBe('false');
+                }
+            },
+        );
+
+        it('still takes Space and Enter with nothing focused, and stays open', async () => {
+            const user = userEvent.setup();
             render(
                 <Dropdown hasItems={false}>
                     <button type="button">Settings</button>
@@ -3707,21 +3746,65 @@ describe('@acusti/dropdown', () => {
                 </Dropdown>,
             );
 
-            const trigger = screen.getByRole('button', { name: 'Settings' });
-            // closed, either key opens the dropdown
-            expect(fireEvent.keyDown(trigger, { key: 'Enter' })).toBe(false);
-            expect(screen.getByRole('textbox')).toBeTruthy();
-
-            // open, they’re still the dropdown’s, which stays open
-            expect(fireEvent.keyDown(trigger, { key: ' ' })).toBe(false);
-            expect(fireEvent.keyDown(trigger, { key: 'Enter' })).toBe(false);
-            // as they are with nothing focused
+            await user.click(screen.getByRole('button', { name: 'Settings' }));
+            // with nothing focused, a keydown’s target is the document body
             expect(fireEvent.keyDown(document.body, { key: ' ' })).toBe(false);
             expect(fireEvent.keyDown(document.body, { key: 'Enter' })).toBe(false);
             expect(screen.getByRole('textbox')).toBeTruthy();
         });
 
-        it('still takes Space and Enter pressed on the trigger of a nested popover', async () => {
+        it('closes on Enter and on Space pressed on a button in a trigger that also holds a text input', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <div>
+                        <input aria-label="Date" type="text" />
+                        <button aria-label="Toggle calendar" type="button">
+                            📅
+                        </button>
+                    </div>
+                    <p data-testid="calendar">Calendar</p>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('textbox', { name: 'Date' });
+            const toggle = screen.getByRole('button', { name: 'Toggle calendar' });
+            for (const key of ['Enter', ' ']) {
+                await user.click(input);
+                expect(screen.getByTestId('calendar')).toBeTruthy();
+                // Space in the trigger’s input is typed
+                expect(fireEvent.keyDown(input, { key: ' ' })).toBe(true);
+                expect(screen.getByTestId('calendar')).toBeTruthy();
+
+                expect(fireEvent.keyDown(toggle, { key })).toBe(false);
+                expect(screen.queryByTestId('calendar')).toBeNull();
+            }
+        });
+
+        it('leaves Space to a checkbox in a trigger that also holds a text input', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <div>
+                        <input aria-label="Search" type="text" />
+                        <label>
+                            <input type="checkbox" /> Match case
+                        </label>
+                    </div>
+                    <p data-testid="results">Results</p>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox', { name: 'Search' }));
+            const checkbox = screen.getByRole('checkbox', { name: 'Match case' });
+            act(() => checkbox.focus());
+            await user.keyboard(' ');
+
+            expect((checkbox as HTMLInputElement).checked).toBe(true);
+            expect(screen.getByTestId('results')).toBeTruthy();
+        });
+
+        it('opens and closes a nested popover from its trigger, leaving the outer dropdown open', async () => {
             const user = userEvent.setup();
             render(
                 <Dropdown hasItems={false}>
@@ -3746,14 +3829,17 @@ describe('@acusti/dropdown', () => {
             expect(fireEvent.keyDown(infoTrigger, { key: 'Enter' })).toBe(false);
             expect(screen.getByTestId('info-popover')).toBeTruthy();
 
-            // open, they’re still the popover’s: its trigger sits in the
-            // outer body, which isn’t the popover’s own
+            // open, Space closes it. The key is the popover’s and not its
+            // content’s: its trigger sits in the outer body, which isn’t the
+            // popover’s own
             expect(fireEvent.keyDown(infoTrigger, { key: ' ' })).toBe(false);
-            expect(fireEvent.keyDown(infoTrigger, { key: 'Enter' })).toBe(false);
-            expect(screen.getByTestId('info-popover')).toBeTruthy();
+            expect(screen.queryByTestId('info-popover')).toBeNull();
+
+            // the outer dropdown stays open through both
+            expect(screen.getByRole('textbox', { name: 'Full name' })).toBeTruthy();
         });
 
-        it('still closes on Enter pressed on its trigger when keepOpenOnSubmit is false', async () => {
+        it('closes at once on Enter pressed on its trigger when keepOpenOnSubmit is false', async () => {
             const user = userEvent.setup();
             render(
                 <Dropdown hasItems={false} keepOpenOnSubmit={false}>
@@ -3768,8 +3854,9 @@ describe('@acusti/dropdown', () => {
             await user.click(trigger);
             expect(screen.getByRole('textbox')).toBeTruthy();
 
+            // not after the delay that follows a submit
             await user.keyboard('{Enter}');
-            await waitFor(() => expect(screen.queryByRole('textbox')).toBeNull());
+            expect(screen.queryByRole('textbox')).toBeNull();
         });
 
         it('still takes Enter pressed in a text input trigger', async () => {
@@ -3788,7 +3875,40 @@ describe('@acusti/dropdown', () => {
             expect(fireEvent.keyDown(input, { key: 'Enter' })).toBe(false);
             // Space was already the input’s own
             expect(fireEvent.keyDown(input, { key: ' ' })).toBe(true);
+            // neither closes the dropdown, as a press on the focused input doesn’t
+            expect(screen.getByTestId('link-preview')).toBeTruthy();
         });
+
+        it.each([
+            ['a textarea', () => <textarea aria-label="Notes" />],
+            [
+                'an editable element',
+                () => (
+                    <div aria-label="Notes" contentEditable role="textbox" tabIndex={0} />
+                ),
+            ],
+        ])(
+            'stays open on Enter and types Space in a trigger that is %s',
+            async (_, renderTrigger) => {
+                const user = userEvent.setup();
+                render(
+                    <Dropdown hasItems={false}>
+                        {renderTrigger()}
+                        <p data-testid="notes-help">Markdown is supported.</p>
+                    </Dropdown>,
+                );
+
+                const notes = screen.getByRole('textbox', { name: 'Notes' });
+                await user.click(notes);
+                expect(screen.getByTestId('notes-help')).toBeTruthy();
+
+                // Enter is the dropdown’s, and Space is the text field’s
+                expect(fireEvent.keyDown(notes, { key: 'Enter' })).toBe(false);
+                expect(screen.getByTestId('notes-help')).toBeTruthy();
+                expect(fireEvent.keyDown(notes, { key: ' ' })).toBe(true);
+                expect(screen.getByTestId('notes-help')).toBeTruthy();
+            },
+        );
 
         it('leaves Space to a button in the body when the trigger is a text input', async () => {
             const handleClick = vi.fn<() => void>();
