@@ -301,12 +301,27 @@ const COMMENT_REGEXP = /\/(?:\/[^\n]*|\*[^]*?(?:\*\/|$))/y;
 const BEFORE_COMMENT_REGEXP = /[\n,{}[\]]$/;
 const BEFORE_SPACED_COMMENT_REGEXP = /(?:[\n,{}[\]:"\d]|true|false|null)$/;
 
+// whether the line that follows the line break at index opens a code block or
+// closes one
+function isBeforeCodeFence(text: string, index: number) {
+    index++;
+    while (text[index] === ' ' || text[index] === '\t') index++;
+    return text.startsWith('```', index);
+}
+
 // Reads the object or array that the text opens with, following only its
 // strings, its brackets and its comments. Gives the index of the bracket that
 // closes it (-1 if the text ends first) and where its comments are, each from
 // the spaces before it to its end.
-function readRoot(text: string) {
+//
+// With isEndedByFence, the read can also end at a code block. It is asked of
+// the line break before each code fence that is not in a string or a comment
+// (which is part of the object or array), and where it says so the read ends,
+// with that index as fenceIndex. The bracket that closes the object or array
+// then has to be of its own kind: after any other, only a code block ends it.
+function readRoot(text: string, isEndedByFence?: (index: number) => boolean) {
     const comments: Array<[number, number]> = [];
+    const closingBracket = text[0] === '{' ? '}' : ']';
     let depth = 0;
     let fromIndex = 0;
     for (let index = 0; index < text.length; index++) {
@@ -318,7 +333,16 @@ function readRoot(text: string) {
             depth++;
         } else if (char === '}' || char === ']') {
             depth--;
-            if (depth === 0) return { comments, endIndex: index };
+            if (depth === 0) {
+                if (!isEndedByFence || char === closingBracket) {
+                    return { comments, endIndex: index, fenceIndex: -1 };
+                }
+                depth = Infinity;
+            }
+        } else if (char === '\n' && isEndedByFence) {
+            if (isBeforeCodeFence(text, index) && isEndedByFence(index)) {
+                return { comments, endIndex: -1, fenceIndex: index };
+            }
         } else if (char === '/') {
             let startIndex = index;
             while (text[startIndex - 1] === ' ' || text[startIndex - 1] === '\t') {
@@ -346,7 +370,7 @@ function readRoot(text: string) {
             }
         }
     }
-    return { comments, endIndex: -1 };
+    return { comments, endIndex: -1, fenceIndex: -1 };
 }
 
 // the index of the bracket that closes the object or array that the text opens
@@ -593,7 +617,7 @@ function isValuePosition(text: string, precedingText: string) {
 // so that it is not found out again for each bracket: where the next code fence
 // is, by index in the whole text (-1 if there is none), and whether there is no
 // `*/` from where the search has got to.
-type Search = { fenceIndex?: number; hasNoBlockCommentEnd?: boolean };
+type Search = { hasNoBlockCommentEnd?: boolean };
 
 // The index of what follows the bracket that the text starts with, past the
 // comments after it. Only the comments are read, since this is asked of every
@@ -622,8 +646,6 @@ function indexOfBody(text: string, search: Search) {
 // single quote marks or a comma.
 const UNREADABLE_AFTER_BRACE_REGEXP = /^\s*(?:[a-zA-Z_$][\w$]*"?\s*:|['\],])/;
 const UNREADABLE_AFTER_BRACKET_REGEXP = /^\s*[',]/;
-// the line that opens a code block or closes one
-const CODE_FENCE_REGEXP = /\n[ \t]*```/;
 const BRACKETS_REGEXP = /[[\]{}]/g;
 
 // The index of the bracket that closes the one that the text starts with, going
@@ -652,7 +674,8 @@ function indexOfLineRootEnd(text: string) {
 // is a bracket where a value would stand with a first member after it that JSON
 // does not allow. It is passed over with all that is inside it, so that none of
 // its members is taken for the JSON: up to the bracket that closes it, or to
-// the end of the text while it is not closed. A code block is not inside it.
+// the end of the text while it is not closed. A code block is not inside it,
+// unless it is in one of its strings.
 function getNotStart({
     precedingText,
     search,
@@ -673,22 +696,16 @@ function getNotStart({
         : UNREADABLE_AFTER_BRACKET_REGEXP;
     if (!regexp.test(text.slice(indexOfBody(text, search)))) return nextPart;
 
-    const offset = precedingText.length;
-    if (
-        search.fenceIndex == null ||
-        (search.fenceIndex > -1 && search.fenceIndex < offset)
-    ) {
-        const fenceIndex = text.search(CODE_FENCE_REGEXP);
-        search.fenceIndex = fenceIndex === -1 ? -1 : offset + fenceIndex;
-    }
-    const rootText =
-        search.fenceIndex === -1 ? text : text.slice(0, search.fenceIndex - offset);
+    // (read once, as far as the bracket that closes it or the code block that
+    // it is not closed before, whichever comes first)
+    const { endIndex, fenceIndex } = readRoot(text, () => true);
+    if (endIndex > -1) return text.slice(0, endIndex + 1);
+
+    const rootText = fenceIndex === -1 ? text : text.slice(0, fenceIndex);
     // (a stray quote mark on its first line can hide where it is closed)
-    const closingBracket = isObject ? '}' : ']';
-    let endIndex = indexOfRootEnd(rootText);
-    if (rootText[endIndex] !== closingBracket) endIndex = indexOfLineRootEnd(rootText);
-    return rootText[endIndex] === closingBracket
-        ? rootText.slice(0, endIndex + 1)
+    const lineEndIndex = indexOfLineRootEnd(rootText);
+    return rootText[lineEndIndex] === (isObject ? '}' : ']')
+        ? rootText.slice(0, lineEndIndex + 1)
         : rootText;
 }
 
