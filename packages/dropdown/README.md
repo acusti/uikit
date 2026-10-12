@@ -724,7 +724,9 @@ a textarea, submits the form around a text input, presses a button, and
 follows a link. The same goes for whatever keeps focus outside the dropdown
 while it’s open, as when it opened on hover. Escape closes the dropdown
 unless focus is in a text field (a text input, a textarea, or an editable
-element). On the trigger, Space and Enter open the dropdown as usual.
+element). On the trigger, Space and Enter open the dropdown and, unless
+focus is in a text field or a checkbox there, close it again, as a click
+there does.
 
 A `hasItems={false}` dropdown stays open until it is dismissed. Pass
 `keepOpenOnSubmit={false}` to close it when its content is submitted. A
@@ -1308,7 +1310,9 @@ highlight into it.
 - **Enter/Space**: Open the dropdown; with an item highlighted, select it
   (leaf items) or open its submenu (parent items). In the body of a
   `hasItems={false}` dropdown, they go to
-  [the control that has focus](#dropdown-with-interactive-content) instead
+  [the control that has focus](#dropdown-with-interactive-content) instead,
+  and on its open trigger, outside a text field or a checkbox, they close
+  it
 - **Escape**: Close the dropdown entirely — including any open submenus —
   and return focus to the trigger (macOS-style; use ← to back out one level
   at a time)
