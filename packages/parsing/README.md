@@ -104,7 +104,7 @@ before it is the `preamble`, and what follows it is the `postscript`.
   with single ones, or a comma. The `value` is `null`, also while the text
   streams in. What follows its closing bracket is still read, and so is a
   code block that starts before it is closed (at a line that starts with
-  ` ``` `).
+  ` ``` `), unless that block is in one of its strings.
 - Prose has empty objects and arrays too, and arrays that open on a number
   or on `true`, `false` or `null`. One of those is only taken for the JSON
   if it starts a line or follows a colon, and nothing follows it on its

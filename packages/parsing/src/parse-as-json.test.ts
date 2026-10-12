@@ -413,6 +413,7 @@ describe('@acusti/parsing', () => {
                 '{,"a": "b", "c": {"d": 1}}',
                 '{]"a": "b", "tags": ["x", "y"]}',
                 '{]"a": "b,\n"tags": ["x", "y"]}',
+                '{]"a": {"d": 1}, "tags": ["x", "y"]}',
                 "['a', 'b', {\"d\": 1}]",
                 '[, {"d": 1}]',
                 // (a bracket in one of its strings does not close it, and a
@@ -465,6 +466,15 @@ describe('@acusti/parsing', () => {
             );
             expect(twoBlocks.value).toEqual({ foo: 1 });
             expect(twoBlocks.postscript).toBe('That is all of it, as asked.');
+            // (not a code block in one of its strings, which is inside it, nor
+            // a line that starts with code written in a line of prose)
+            for (const text of [
+                '{ content: "see:\n```json\n{"inner": 1}\n```\n", b: 2 }',
+                '{ content: "see:\n```json\n{"inner": 1',
+                '{ a: 1,\n``b`` is code\n{"foo": 1}',
+            ]) {
+                expect(parseAsJSON(text).value, text).toBe(null);
+            }
 
             // any other bracket has nothing inside it, closed or not, so the JSON
             // after it or within it is read: a bracketed word or phrase…
@@ -510,6 +520,19 @@ describe('@acusti/parsing', () => {
             // …and a bracket that another follows
             expect(parseAsJSON('{{"a": 1,').value).toEqual({ a: 1 });
             expect(parseAsJSON('Here it is:\n{\n  {"a": 1}\n}').value).toEqual({ a: 1 });
+        });
+
+        it('gets through a long text with code blocks in it in good time', () => {
+            const time = (text: string) => {
+                const start = performance.now();
+                parseAsJSON(text);
+                return performance.now() - start;
+            };
+            // (each takes a few milliseconds when the time grows with the length
+            // of the text, and several seconds when it grows with its square)
+            // roots that cannot be read, each of them cut short by a code block
+            expect(time('Note:\n{ a: 1\n```\n'.repeat(16_000))).toBeLessThan(1000);
+            expect(time("['a'\n```\n".repeat(16_000))).toBeLessThan(1000);
         });
 
         it('reads a value that is whole as it is, whatever follows it', () => {
