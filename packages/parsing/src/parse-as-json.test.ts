@@ -250,8 +250,9 @@ describe('@acusti/parsing', () => {
                 value: {},
             });
             // …and so does one whose first key is as far as the text has got, in the
-            // middle of a line too
+            // middle of a line too, and partway through an escape sequence
             expect(parseAsJSON('The result is {"sec').value).toEqual({});
+            expect(parseAsJSON('The result is {"C:\\').value).toEqual({});
             expect(parseAsJSON('The result is {"sections"').value).toEqual({
                 sections: '',
             });
