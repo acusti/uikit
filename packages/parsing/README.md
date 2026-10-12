@@ -221,6 +221,20 @@ parseAsJSON('{"count": 12' + '\n').value;
 // { count: 12 }
 ```
 
+## What it repairs, and what it doesn’t
+
+Every repair and rule in `parseAsJSON` has a cost: bytes in your bundle,
+code to maintain, and more surface for bugs. To be worth that cost, each
+has to have a plausible story for when a response would look that way. The
+goal is not to cover as many theoretical edge cases as possible, it’s to
+cover as many plausible ones as possible.
+
+So a text that no model is likely to write may come back as `null`, or be
+read in a way you wouldn’t guess, even where a rule for it is easy to
+imagine. If a response that a model did write is read wrongly, please [open
+an issue][] with the text, or one shaped like it. That is the story that a
+new repair needs.
+
 Again, there are more examples of the kinds of things that the parser can
 handle in the [unit tests][].
 
@@ -231,5 +245,6 @@ Developers Handbook][] helpful with a variety of different models (Llama 2
 
 [unit tests]:
     https://github.com/acusti/uikit/blob/main/packages/parsing/src/parse-as-json.test.ts
+[open an issue]: https://github.com/acusti/uikit/issues
 [llama 2: ai developers handbook]:
     https://www.pinecone.io/learn/llama-2/#Llama-2-Chat-Prompt-Structure
