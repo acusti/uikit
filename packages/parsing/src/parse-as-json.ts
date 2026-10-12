@@ -589,9 +589,10 @@ function isValuePosition(text: string, precedingText: string) {
 }
 
 // What the search for the start of the JSON has found out about the text, kept
-// so that it is not found out again for each bracket: whether there is no `*/`
-// from where the search has got to.
-type Search = { hasNoBlockCommentEnd?: boolean };
+// so that it is not found out again for each bracket: where the next code fence
+// is, by index in the whole text (-1 if there is none), and whether there is no
+// `*/` from where the search has got to.
+type Search = { fenceIndex?: number; hasNoBlockCommentEnd?: boolean };
 
 // The index of what follows the bracket that the text starts with, past the
 // comments after it. Only the comments are read, since this is asked of every
@@ -612,6 +613,82 @@ function indexOfBody(text: string, search: Search) {
             index = endIndex + 2;
         }
     }
+}
+
+// The first member of an object or array, written as JSON does not allow: after
+// a brace, a key with no quote marks, with single ones or with only its closing
+// one, a comma, or the wrong closing bracket; after a bracket, a string in
+// single quote marks or a comma.
+const UNREADABLE_AFTER_BRACE_REGEXP = /^\s*(?:[a-zA-Z_$][\w$]*"?\s*:|['\],])/;
+const UNREADABLE_AFTER_BRACKET_REGEXP = /^\s*[',]/;
+// the line that opens a code block or closes one
+const CODE_FENCE_REGEXP = /\n[ \t]*```/;
+const BRACKETS_REGEXP = /[[\]{}]/g;
+
+// The index of the bracket that closes the one that the text starts with, going
+// by the brackets on its first line alone and by none of that line’s quote
+// marks, or -1. Only for a line that has more text after it and an odd number
+// of quote marks on it: what is a string on that line cannot be known.
+function indexOfLineRootEnd(text: string) {
+    const lineEndIndex = text.indexOf('\n');
+    const line = lineEndIndex === -1 ? '' : text.slice(0, lineEndIndex);
+    if (line.split('"').length % 2 === 1) return -1;
+
+    let depth = 0;
+    for (const { 0: char, index } of line.matchAll(BRACKETS_REGEXP)) {
+        if (char === '{' || char === '[') {
+            depth++;
+        } else if (--depth === 0) {
+            return index;
+        }
+    }
+    return -1;
+}
+
+// What to pass over where the JSON does not start at the start of the text: all
+// up to the next bracket, which has nothing inside it (the JSON may come before
+// it is closed), unless it is the root of a document that cannot be read. That
+// is a bracket where a value would stand with a first member after it that JSON
+// does not allow. It is passed over with all that is inside it, so that none of
+// its members is taken for the JSON: up to the bracket that closes it, or to
+// the end of the text while it is not closed. A code block is not inside it.
+function getNotStart({
+    precedingText,
+    search,
+    text,
+}: {
+    precedingText: string;
+    search: Search;
+    text: string;
+}) {
+    const nextPart = text.match(NOT_START_REGEXP)?.[0] ?? text;
+    if ((text[0] !== '{' && text[0] !== '[') || !isBeforeValue(precedingText)) {
+        return nextPart;
+    }
+
+    const isObject = text[0] === '{';
+    const regexp = isObject
+        ? UNREADABLE_AFTER_BRACE_REGEXP
+        : UNREADABLE_AFTER_BRACKET_REGEXP;
+    if (!regexp.test(text.slice(indexOfBody(text, search)))) return nextPart;
+
+    const offset = precedingText.length;
+    if (
+        search.fenceIndex == null ||
+        (search.fenceIndex > -1 && search.fenceIndex < offset)
+    ) {
+        const fenceIndex = text.search(CODE_FENCE_REGEXP);
+        search.fenceIndex = fenceIndex === -1 ? -1 : offset + fenceIndex;
+    }
+    const rootText =
+        search.fenceIndex === -1 ? text : text.slice(0, search.fenceIndex - offset);
+    // (a stray quote mark on its first line can hide where it is closed)
+    const closingBracket = isObject ? '}' : ']';
+    let endIndex = indexOfRootEnd(rootText);
+    if (rootText[endIndex] !== closingBracket) endIndex = indexOfLineRootEnd(rootText);
+    return rootText[endIndex] === closingBracket
+        ? rootText.slice(0, endIndex + 1)
+        : rootText;
 }
 
 // whether the JSON starts where the text does, given the text that precedes it
@@ -692,16 +769,22 @@ export function parseAsJSON(text: string): ParsedResult {
 
     // identify start of JSON: the first brace that opens an object or bracket
     // that opens an array. Any other is part of the preamble, with all that
-    // follows it up to the next one (the last part taken off only joins the
-    // preamble if it has a word in it).
+    // follows it up to the next one, or all that is inside it if it is a root
+    // that cannot be read (the last such part only joins the preamble if it has
+    // a word in it).
     const search: Search = {};
     let lastPart = '';
     while (text !== '') {
         const precedingText = firstText.slice(0, firstText.length - text.length);
         if (isStartOfJSON({ precedingText, search, text })) break;
-        preamble += lastPart;
-        lastPart = text.match(NOT_START_REGEXP)?.[0] ?? text;
-        text = text.slice(lastPart.length);
+        const notStart = getNotStart({ precedingText, search, text });
+        if (text[0] === '{' || text[0] === '[') {
+            preamble += lastPart;
+            lastPart = notStart;
+        } else {
+            lastPart += notStart;
+        }
+        text = text.slice(notStart.length);
     }
     if (hasTextContent(lastPart)) preamble += lastPart;
     preamble = cleanThinkingText(preamble);

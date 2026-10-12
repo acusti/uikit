@@ -391,6 +391,126 @@ describe('@acusti/parsing', () => {
             });
         });
 
+        it('reads nothing from inside an object or array that it cannot read', () => {
+            const none = (preamble: string) => ({
+                postscript: '',
+                preamble,
+                value: null,
+            });
+            const read = (preamble: string) => ({
+                postscript: '',
+                preamble,
+                value: { a: 1 },
+            });
+            // a root that cannot be read is not read from one of its members: keys
+            // with no quote marks or with single ones, or a stray character after
+            // the bracket
+            for (const text of [
+                '{ a: "b", "c": {"d": 1} }',
+                "{'a': 'b', 'c': {\"d\": 1}}",
+                '{a": "b", "c": {"d": 1}}',
+                '{,"a": "b", "c": {"d": 1}}',
+                '{]"a": "b", "tags": ["x", "y"]}',
+                '{]"a": "b,\n"tags": ["x", "y"]}',
+                "['a', 'b', {\"d\": 1}]",
+                '[, {"d": 1}]',
+                // (a bracket in one of its strings does not close it, and a
+                // comment after its bracket is not what it is known by)
+                '{ a: "}", "c": {"d": 1} }',
+                '{ // settings\n  a: "b",\n  "c": {"d": 1}\n}',
+            ]) {
+                expect(parseAsJSON(text), text).toEqual(none(text));
+            }
+            // …nor while it streams in
+            for (const text of [
+                '{ a: "b", "c": {"d": "e"',
+                'Here you go:\n{ a: "b", "tags": ["x", "y"',
+                'Result: { a: "b", "c": {"d": "e"',
+                '{ a: "}", "c": {"d": "e',
+                '{ a: "}",\n  "c": {"d": "e',
+            ]) {
+                expect(parseAsJSON(text), text).toEqual(none(text));
+            }
+            // …nor in a code block
+            for (const text of [
+                'Here you go:\n```json\n{ a: "b", "c": {"d": 1',
+                'Here you go:\n```json\n{ a: "b", "c": {"d": 1} }\n```',
+            ]) {
+                expect(parseAsJSON(text).value, text).toBe(null);
+            }
+            // what follows it is still read: after its closing bracket…
+            expect(parseAsJSON('Config: {debug: true} and the JSON:\n{"a": 1}')).toEqual(
+                read('Config: {debug: true} and the JSON:'),
+            );
+            expect(parseAsJSON('{debug: true}.\n{"a": 1}')).toEqual(
+                read('{debug: true}.'),
+            );
+            // (which a stray quote mark on its line does not hide)
+            expect(parseAsJSON('{Note: 5" wide}\n{"a": 1}')).toEqual(
+                read('{Note: 5" wide}'),
+            );
+            // …and in a code block, whether it is closed or not
+            for (const text of [
+                '{ a: 1,\n```json\n{"foo": 1}\n```\n',
+                '{ a: 1,\n```\n{"foo": 1}\n```\n',
+                '{ a: 1,\n  ```json\n  {"foo": 1}\n  ```',
+                '{ a: 1,\n```json\n{"foo": 1}\n```\n}',
+            ]) {
+                expect(parseAsJSON(text).value, text).toEqual({ foo: 1 });
+            }
+            // (each code block in turn: here the JSON is in the second)
+            const twoBlocks = parseAsJSON(
+                '{ a: 1,\n```\nx\n```\n{ b: 2,\n```json\n{"foo": 1}\n```\nThat is all of it, as asked.',
+            );
+            expect(twoBlocks.value).toEqual({ foo: 1 });
+            expect(twoBlocks.postscript).toBe('That is all of it, as asked.');
+
+            // any other bracket has nothing inside it, closed or not, so the JSON
+            // after it or within it is read: a bracketed word or phrase…
+            for (const preamble of [
+                '[Aside] Here’s the result:',
+                '[Sounds good:',
+                '[draft',
+                'Note: [draft',
+                'See the [draft',
+                'Note: [5" pipe]',
+                '[Pipe size 5"]',
+                '[He said "hi]:',
+                'if (x)\n{ // say "hi\n  go();\n}',
+                // (nor is anything but a bracket where the JSON starts)
+                '5" pipe sizes:',
+            ]) {
+                expect(parseAsJSON(preamble + '\n{"a": 1}'), preamble).toEqual(
+                    read(preamble),
+                );
+            }
+            expect(parseAsJSON('[Sounds good:\n```json\n{"a": 1}\n```\n')).toEqual(
+                read('[Sounds good:'),
+            );
+            // …one that is closed after the JSON, also as the text streams in…
+            expect(parseAsJSON('[Here is the JSON: {"a": 1}]')).toEqual(
+                read('[Here is the JSON:'),
+            );
+            expect(parseAsJSON('Answer: [Here you go\n{"a": 1}\nbye]')).toEqual({
+                postscript: 'bye]',
+                preamble: 'Answer: [Here you go',
+                value: { a: 1 },
+            });
+            expect(parseAsJSON('Use { to start:\n{"a": 1}\nUse } to end')).toEqual({
+                postscript: 'Use } to end',
+                preamble: 'Use { to start:',
+                value: { a: 1 },
+            });
+            expect(parseAsJSON('See the [draft\n{"a": 1}\nOK]').value).toEqual({ a: 1 });
+            // …a root in the middle of a line, which is not known for one…
+            expect(parseAsJSON("The dict is {'a': 'b', 'c': {\"a\": 1}}").value).toEqual({
+                a: 1,
+            });
+            // …and a bracket that another follows
+            expect(parseAsJSON('{{"a": 1,').value).toEqual({ a: 1 });
+            expect(parseAsJSON('Here it is:\n{\n  {"a": 1}\n}').value).toEqual({ a: 1 });
+        });
+
         it('reads a value that is whole as it is, whatever follows it', () => {
             // a postscript, after spacing that the repairs do not expect
             expect(parseAsJSON('{"a": "b" , "c": "d"}\n\nHope this helps!')).toEqual({
