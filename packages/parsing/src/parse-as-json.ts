@@ -614,16 +614,14 @@ function isValuePosition(text: string, precedingText: string) {
 }
 
 // What the search for the start of the JSON has found out about the text, kept
-// so that it is not found out again for each bracket: where the next code fence
-// is, by index in the whole text (-1 if there is none), and whether there is no
-// `*/` from where the search has got to.
+// so that it is not found out again for each bracket: whether there is no `*/`
+// from where the search has got to.
 type Search = { hasNoBlockCommentEnd?: boolean };
 
 // The index of what follows the bracket that the text starts with, past the
-// comments after it. Only the comments are read, since this is asked of every
-// bracket in a preamble.
-function indexOfBody(text: string, search: Search) {
-    let index = 1;
+// comments after it (or of what follows the comments from another index). Only
+// the comments are read, since this is asked of every bracket in a preamble.
+function indexOfBody(text: string, search: Search, index = 1) {
     for (;;) {
         COMMENT_START_REGEXP.lastIndex = index;
         const comment = COMMENT_START_REGEXP.exec(text)?.[0];
@@ -641,11 +639,53 @@ function indexOfBody(text: string, search: Search) {
 }
 
 // The first member of an object or array, written as JSON does not allow: after
-// a brace, a key with no quote marks, with single ones or with only its closing
-// one, a comma, or the wrong closing bracket; after a bracket, a string in
-// single quote marks or a comma.
-const UNREADABLE_AFTER_BRACE_REGEXP = /^\s*(?:[a-zA-Z_$][\w$]*"?\s*:|['\],])/;
+// a brace, a key with no quote marks (as far as the text goes, so that it is
+// known for one before its colon streams in), with single ones or with only
+// its closing one, a comma, or the wrong closing bracket; after a bracket, a
+// string in single quote marks or a comma.
+const UNREADABLE_AFTER_BRACE_REGEXP = /^\s*(?:[a-zA-Z_$][\w$]*"?\s*(?::|$)|['\],])/;
 const UNREADABLE_AFTER_BRACKET_REGEXP = /^\s*[',]/;
+// the line break before a line that opens a code block or closes one
+const CODE_FENCE_REGEXP = /\n[ \t]*```/g;
+// A code fence: a line of three backticks and, where it opens a block that
+// names one, a language. No other backticks are on its line (so it is not
+// code that is written in a line of prose). It is looked for from an index
+// on, or at one.
+const CODE_FENCE_LINE_PATTERN = '(?:^|\\n)[ \\t]*```([^\\n`]*)(?=\\n|$)';
+const NEXT_CODE_FENCE_LINE_REGEXP = new RegExp(CODE_FENCE_LINE_PATTERN, 'g');
+const CODE_FENCE_LINE_REGEXP = new RegExp(CODE_FENCE_LINE_PATTERN, 'y');
+// the language of a code block that JSON is put in: json, jsonc, json5 or
+// jsonl, with anything after it but more of a name (jsonnet is code)
+const JSON_LANGUAGE_REGEXP = /^json(?:c|5|l)?\b/i;
+
+// Makes a test of whether an index in the text is inside one of its strings,
+// going by its quote marks. The indexes it is asked about have to come in
+// order, so that the text is only read through once.
+function createStringTest(text: string) {
+    let quoteIndex = text.indexOf('"');
+    let endIndex: number | undefined;
+    return (index: number) => {
+        while (quoteIndex > -1 && quoteIndex < index) {
+            endIndex ??= indexOfStringEnd(text, quoteIndex);
+            if (endIndex === -1 || endIndex > index) return true;
+            quoteIndex = text.indexOf('"', endIndex + 1);
+            endIndex = undefined;
+        }
+        return false;
+    };
+}
+
+// The index of the first code fence in the text that is not in one of its
+// strings (of the line break before it), or -1. A code block in a string is part
+// of the string: markdown, say.
+function indexOfCodeFence(text: string) {
+    const isInString = createStringTest(text);
+    for (const { index } of text.matchAll(CODE_FENCE_REGEXP)) {
+        if (!isInString(index)) return index;
+    }
+    return -1;
+}
+
 const BRACKETS_REGEXP = /[[\]{}]/g;
 
 // The index of the bracket that closes the one that the text starts with, going
@@ -668,6 +708,26 @@ function indexOfLineRootEnd(text: string) {
     return -1;
 }
 
+// Whether the text starts with the root of a document that cannot be read: a
+// bracket where a value would stand, with a first member after it that JSON does
+// not allow.
+function isUnreadableRoot({
+    precedingText,
+    search,
+    text,
+}: {
+    precedingText: string;
+    search: Search;
+    text: string;
+}) {
+    if ((text[0] !== '{' && text[0] !== '[') || !isBeforeValue(precedingText)) {
+        return false;
+    }
+    const regexp =
+        text[0] === '{' ? UNREADABLE_AFTER_BRACE_REGEXP : UNREADABLE_AFTER_BRACKET_REGEXP;
+    return regexp.test(text.slice(indexOfBody(text, search)));
+}
+
 // What to pass over where the JSON does not start at the start of the text: all
 // up to the next bracket, which has nothing inside it (the JSON may come before
 // it is closed), unless it is the root of a document that cannot be read. That
@@ -685,16 +745,9 @@ function getNotStart({
     search: Search;
     text: string;
 }) {
-    const nextPart = text.match(NOT_START_REGEXP)?.[0] ?? text;
-    if ((text[0] !== '{' && text[0] !== '[') || !isBeforeValue(precedingText)) {
-        return nextPart;
+    if (!isUnreadableRoot({ precedingText, search, text })) {
+        return text.match(NOT_START_REGEXP)?.[0] ?? text;
     }
-
-    const isObject = text[0] === '{';
-    const regexp = isObject
-        ? UNREADABLE_AFTER_BRACE_REGEXP
-        : UNREADABLE_AFTER_BRACKET_REGEXP;
-    if (!regexp.test(text.slice(indexOfBody(text, search)))) return nextPart;
 
     // (read once, as far as the bracket that closes it or the code block that
     // it is not closed before, whichever comes first)
@@ -704,7 +757,7 @@ function getNotStart({
     const rootText = fenceIndex === -1 ? text : text.slice(0, fenceIndex);
     // (a stray quote mark on its first line can hide where it is closed)
     const lineEndIndex = indexOfLineRootEnd(rootText);
-    return rootText[lineEndIndex] === (isObject ? '}' : ']')
+    return rootText[lineEndIndex] === (text[0] === '{' ? '}' : ']')
         ? rootText.slice(0, lineEndIndex + 1)
         : rootText;
 }
@@ -732,6 +785,133 @@ function isStartOfJSON({
     );
 }
 
+// Whether the brackets that the text starts with, one inside the other, come
+// to what a value starts with, each going by what follows it alone: `[[1, 2]]`
+// and `[{"a": 1}]` do, and `[[ -f a.json ]]` and `[{ id: 1 }]` do not.
+function isNestedStart(text: string, search: Search) {
+    let index = 0;
+    for (;;) {
+        const body = text.slice(indexOfBody(text, search, index + 1));
+        if (text[index] === '{') {
+            return (
+                KEY_AFTER_BRACE_REGEXP.test(body) || SCALAR_AFTER_BRACE_REGEXP.test(body)
+            );
+        }
+        if (SCALAR_AFTER_BRACKET_REGEXP.test(body)) return true;
+        const item = body.trimStart();
+        if (item[0] !== '[' && item[0] !== '{') return item[0] === '"';
+        index = text.length - item.length;
+    }
+}
+
+// The index at which the JSON starts in the code block that the fence at
+// fenceIndex opens, or -1 if that is no block with JSON in it. It is one if:
+//
+// - the fence has no language after it, or a JSON one. A block in any other
+//   language is code, whatever it starts with.
+// - JSON is what the block starts with, after any comments: a start as it is
+//   anywhere, with the brackets after a bracket taken more strictly, since it
+//   takes the place of what comes before it (`[[ -f a.json ]]` is a line of
+//   shell). In a block with a JSON language, a root that cannot be read is
+//   JSON too, so that the value is null and not what comes before the block.
+//   After a fence with no language it is not, since that fence may be the
+//   one that closes a block of code.
+function indexOfBlockJSON({
+    fenceIndex,
+    search,
+    text,
+}: {
+    fenceIndex: number;
+    search: Search;
+    text: string;
+}) {
+    CODE_FENCE_LINE_REGEXP.lastIndex = fenceIndex;
+    const fence = CODE_FENCE_LINE_REGEXP.exec(text);
+    if (!fence) return -1;
+    const language = fence[1].trim();
+    const isJSONBlock = JSON_LANGUAGE_REGEXP.test(language);
+    if (language !== '' && !isJSONBlock) return -1;
+
+    let index = indexOfBody(text, search, fenceIndex + fence[0].length);
+    while (WHITESPACE_CHARS.has(text[index])) index++;
+    const payload = {
+        precedingText: text.slice(0, index),
+        search,
+        text: text.slice(index),
+    };
+    const hasJSON = isStartOfJSON(payload)
+        ? isNestedStart(payload.text, search)
+        : isJSONBlock && isUnreadableRoot(payload);
+    return hasJSON ? index : -1;
+}
+
+// the index of the fence that is nearest before an index in the text (of the
+// line break before it, or 0 for a fence that the text starts with), or -1
+function lastIndexOfCodeFence(text: string, index: number) {
+    index = text.lastIndexOf('```', index);
+    while (index > -1) {
+        const fenceIndex = Math.max(text.lastIndexOf('\n', index), 0);
+        CODE_FENCE_LINE_REGEXP.lastIndex = fenceIndex;
+        if (CODE_FENCE_LINE_REGEXP.test(text)) return fenceIndex;
+        index = fenceIndex === 0 ? -1 : text.lastIndexOf('```', fenceIndex - 1);
+    }
+    return -1;
+}
+
+// The index at which the JSON starts in a code block, if the text has one after
+// where the JSON was taken to start (startIndex), or -1. The JSON in a code
+// block is the value whatever comes before the block, so the first fence that
+// JSON follows is where it starts (see indexOfBlockJSON): with no fence after
+// it too, while the text streams in. The fences are not counted to tell one
+// that opens a block from one that closes one: a block that was never closed,
+// or a fence in a string, would throw the count off and hide the block. Not a
+// fence in one of the strings of the value before it, which is part of that
+// value.
+//
+// The text is read once from startIndex on, and no further than the fence that
+// is returned, where the search moves to.
+function indexOfFencedStart({
+    search,
+    startIndex,
+    text,
+}: {
+    search: Search;
+    startIndex: number;
+    text: string;
+}) {
+    if (!text.includes('```', startIndex)) return -1;
+
+    // the JSON may be in a code block where it is
+    const lastFenceIndex = lastIndexOfCodeFence(text, startIndex);
+    if (
+        lastFenceIndex > -1 &&
+        indexOfBlockJSON({ fenceIndex: lastFenceIndex, search, text }) === startIndex
+    ) {
+        return -1;
+    }
+
+    let fencedStartIndex = -1;
+    const isBlockJSONAt = (fenceIndex: number) => {
+        fencedStartIndex = indexOfBlockJSON({ fenceIndex, search, text });
+        return fencedStartIndex > -1;
+    };
+    // the fences in the value that it was taken to start with, which readRoot
+    // leaves out if they are in one of its strings…
+    const { endIndex } = readRoot(text.slice(startIndex), (index) =>
+        isBlockJSONAt(startIndex + index),
+    );
+    if (fencedStartIndex > -1 || endIndex === -1) return fencedStartIndex;
+
+    // …and those after it, once it is closed, whatever its quote marks make of
+    // them (a stray one may follow the value)
+    NEXT_CODE_FENCE_LINE_REGEXP.lastIndex = startIndex + endIndex;
+    for (;;) {
+        const fence = NEXT_CODE_FENCE_LINE_REGEXP.exec(text);
+        if (!fence) return -1;
+        if (isBlockJSONAt(fence.index)) return fencedStartIndex;
+    }
+}
+
 const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
 
 // the backslashes that a text ends on, or that precede the unicode escape it
@@ -757,9 +937,11 @@ export function parseAsJSON(text: string): ParsedResult {
         const input = text;
         text = text.replace(CONTROL_TOKENS_REGEXP, '').trim();
         // if payload is entirely wrapped in a fenced code block, unwrap it first
+        // (one block: a fence within it that is in no string closes it, and
+        // what follows is not part of it)
         const fencedBlockMatch = text.match(FENCED_CODE_BLOCK_REGEXP);
         const fencedContent = fencedBlockMatch?.[2]?.trim();
-        if (fencedContent) {
+        if (fencedContent && indexOfCodeFence(fencedContent) === -1) {
             text = fencedContent;
         }
         // if anything followed the text (whitespace, a control token, or the end
@@ -786,16 +968,27 @@ export function parseAsJSON(text: string): ParsedResult {
     let newText = '';
 
     // identify start of JSON: the first brace that opens an object or bracket
-    // that opens an array. Any other is part of the preamble, with all that
-    // follows it up to the next one, or all that is inside it if it is a root
-    // that cannot be read (the last such part only joins the preamble if it has
-    // a word in it).
+    // that opens an array, or the one in a code block if there is a code block
+    // with JSON in it further on. Any other is part of the preamble, with all
+    // that follows it up to the next one, or all that is inside it if it is a
+    // root that cannot be read (the last such part only joins the preamble if
+    // it has a word in it).
     const search: Search = {};
     let lastPart = '';
     while (text !== '') {
         const precedingText = firstText.slice(0, firstText.length - text.length);
-        if (isStartOfJSON({ precedingText, search, text })) break;
-        const notStart = getNotStart({ precedingText, search, text });
+        let notStart;
+        if (isStartOfJSON({ precedingText, search, text })) {
+            const fencedStartIndex = indexOfFencedStart({
+                search,
+                startIndex: precedingText.length,
+                text: firstText,
+            });
+            if (fencedStartIndex === -1) break;
+            notStart = text.slice(0, fencedStartIndex - precedingText.length);
+        } else {
+            notStart = getNotStart({ precedingText, search, text });
+        }
         if (text[0] === '{' || text[0] === '[') {
             preamble += lastPart;
             lastPart = notStart;
