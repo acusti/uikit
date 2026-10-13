@@ -315,4 +315,36 @@ export function Comp({ label }: Props) {
             ),
         ).rejects.toThrow('Expected a semicolon');
     });
+
+    // oxc_parser dropped a `@__NO_SIDE_EFFECTS__` annotation written after
+    // `export` (`export /* @__NO_SIDE_EFFECTS__ */ function f() {}`), on
+    // compiled components and hooks too, so a bundler could not drop
+    // unused calls to the function; only an annotation before `export`
+    // survived. Kept upstream since 0.154.0
+    // (https://github.com/oxc-project/oxc/pull/27504)
+    it('keeps a no-side-effects annotation written after export', async () => {
+        const result = await transformCode(
+            `
+import { useState } from 'react';
+
+export /* @__NO_SIDE_EFFECTS__ */ function useCount() {
+    const [count, setCount] = useState(0);
+    return [count, () => setCount(count + 1)] as const;
+}
+
+export /* @__NO_SIDE_EFFECTS__ */ const Label = ({ text }: { text: string }) => (
+    <span>{text}</span>
+);
+`,
+            '/src/Comp.tsx',
+        );
+        // both annotated functions were compiled (each opens with the
+        // compiler’s memo cache), and still carry the annotation
+        expect(result?.code).toMatch(
+            /\/\* @__NO_SIDE_EFFECTS__ \*\/\s*export function useCount\(\) \{\s*const \$ = _c\(/,
+        );
+        expect(result?.code).toMatch(
+            /export const Label = \/\* @__NO_SIDE_EFFECTS__ \*\/ \([^)]*\) => \{\s*const \$ = _c\(/,
+        );
+    });
 });
