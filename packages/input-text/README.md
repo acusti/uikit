@@ -225,6 +225,9 @@ type Props = AriaAttributes & {
      * If true, pressing Enter submits the parent form and blurs by default.
      * Set keepFocusOnSubmit to submit without blurring.
      * For multi-line inputs, Cmd/Ctrl+Enter always submits.
+     * The Enter keydown is only prevented where it has a default action to
+     * stop: in a multi-line input, or in an input inside a <form>. See
+     * “Smart Enter Key Handling”.
      */
     submitOnEnter?: boolean;
     /**
@@ -830,6 +833,37 @@ The component intelligently handles Enter key behavior based on context:
 // Cmd/Ctrl+Enter submits the form, if any, and blurs
 <InputText multiLine />
 ```
+
+With `submitOnEnter`, the Enter `keydown` is only prevented
+(`event.preventDefault()`) where it has a default action to stop:
+
+- in a multi-line input, where Enter would add a line break
+- in an input inside a `<form>`, where the browser would submit the form.
+  `InputText` submits it itself (`form.requestSubmit()`), because blurring
+  the input keeps the browser from doing so, and prevents the key so that
+  the form isn’t submitted a second time when `keepFocusOnSubmit` leaves
+  the focus in the input
+
+In a single-line input with no form there is neither, so the `keydown` is
+left alone and reaches the input’s ancestors as it would from a plain
+`<input>`. A parent can then tell it from an Enter that a handler has
+prevented, and treat it as a submit. [`@acusti/dropdown`][] does, with
+`hasItems={false}` and `keepOpenOnSubmit={false}`:
+
+```tsx
+// Enter in the input blurs it and closes the dropdown
+<Dropdown hasItems={false} keepOpenOnSubmit={false}>
+    Rename
+    <InputText aria-label="Name" submitOnEnter />
+</Dropdown>
+```
+
+The input blurs before the dropdown closes, so the focus ends on `<body>`.
+With `keepFocusOnSubmit` the focus is still in the input when the dropdown
+closes, and the dropdown returns it to its trigger.
+
+[`@acusti/dropdown`]:
+    https://github.com/acusti/uikit/tree/main/packages/dropdown
 
 ### Browser Compatibility
 
