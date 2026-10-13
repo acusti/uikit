@@ -316,9 +316,12 @@ function isBeforeCodeFence(text: string, index: number) {
 //
 // With isEndedByFence, the read can also end at a code block. It is asked of
 // the line break before each code fence that is not in a string or a comment
-// (which is part of the object or array), and where it says so the read ends,
-// with that index as fenceIndex. The bracket that closes the object or array
-// then has to be of its own kind: after any other, only a code block ends it.
+// (which is part of the object or array), and where it says so the read ends
+// there: endIndex is -1, as where the text ends first, and fenceIndex is that
+// index. The bracket that closes the object or array then has to be of its own
+// kind: after any other, only a code block ends the read, so that a bracket
+// that was mistyped does not open the strings after it to the search for a
+// code block.
 function readRoot(text: string, isEndedByFence?: (index: number) => boolean) {
     const comments: Array<[number, number]> = [];
     const closingBracket = text[0] === '{' ? '}' : ']';
@@ -615,8 +618,10 @@ function isValuePosition(text: string, precedingText: string) {
 
 // What the search for the start of the JSON has found out about the text, kept
 // so that it is not found out again for each bracket: whether there is no `*/`
-// from where the search has got to.
-type Search = { hasNoBlockCommentEnd?: boolean };
+// from where the search has got to, and where the next code block is that
+// starts with JSON that can be read, by the index of its fence in the whole
+// text (-1 if there is none).
+type Search = { hasNoBlockCommentEnd?: boolean; jsonFenceIndex?: number };
 
 // The index of what follows the bracket that the text starts with, past the
 // comments after it (or of what follows the comments from another index). Only
@@ -734,31 +739,61 @@ function isUnreadableRoot({
 // is a bracket where a value would stand with a first member after it that JSON
 // does not allow. It is passed over with all that is inside it, so that none of
 // its members is taken for the JSON: up to the bracket that closes it, or to
-// the end of the text while it is not closed. A code block is not inside it,
-// unless it is in one of its strings.
+// the end of the text while it is not closed.
+//
+// A code block is not inside it, and ends it where it is not closed before the
+// block: one that is not in one of its strings or comments, which are part of
+// it. A code block that starts with JSON that can be read ends it wherever the
+// block is, by its fence alone and by none of the root’s quote marks: one with
+// no pair (an inches mark, say) would have a string run on past the fence and
+// hide the block. So such a block in one of the root’s strings or comments
+// ends it too. (Not one whose JSON cannot be read: it has no value to give,
+// and would only open the members after it to the search.) What follows the
+// fence is searched like any other text.
 function getNotStart({
     precedingText,
     search,
     text,
+    wholeText,
 }: {
     precedingText: string;
     search: Search;
     text: string;
+    wholeText: string;
 }) {
     if (!isUnreadableRoot({ precedingText, search, text })) {
         return text.match(NOT_START_REGEXP)?.[0] ?? text;
     }
 
-    // (read once, as far as the bracket that closes it or the code block that
-    // it is not closed before, whichever comes first)
-    const { endIndex, fenceIndex } = readRoot(text, () => true);
+    const offset = precedingText.length;
+    if (
+        search.jsonFenceIndex == null ||
+        (search.jsonFenceIndex > -1 && search.jsonFenceIndex < offset)
+    ) {
+        // (this reads ahead of where the search for the start has got to, so
+        // what it finds out about the text is its own)
+        search.jsonFenceIndex = indexOfJSONFence({
+            index: offset,
+            isReadableOnly: true,
+            search: {},
+            text: wholeText,
+        });
+    }
+    // (read once, as far as the bracket that closes it, the code block that it
+    // is not closed before, or the next code block with JSON in it, whichever
+    // comes first)
+    const readText =
+        search.jsonFenceIndex === -1
+            ? text
+            : text.slice(0, search.jsonFenceIndex - offset);
+    const { endIndex, fenceIndex } = readRoot(readText, () => true);
     if (endIndex > -1) return text.slice(0, endIndex + 1);
 
-    const rootText = fenceIndex === -1 ? text : text.slice(0, fenceIndex);
+    const rootText = fenceIndex === -1 ? readText : readText.slice(0, fenceIndex);
     // (a stray quote mark on its first line can hide where it is closed)
-    const lineEndIndex = indexOfLineRootEnd(rootText);
-    return rootText[lineEndIndex] === (text[0] === '{' ? '}' : ']')
-        ? rootText.slice(0, lineEndIndex + 1)
+    const lineEndIndex = indexOfLineRootEnd(text);
+    return text[lineEndIndex] === (text[0] === '{' ? '}' : ']')
+        ? text.slice(0, lineEndIndex + 1)
         : rootText;
 }
 
@@ -815,13 +850,16 @@ function isNestedStart(text: string, search: Search) {
 //   shell). In a block with a JSON language, a root that cannot be read is
 //   JSON too, so that the value is null and not what comes before the block.
 //   After a fence with no language it is not, since that fence may be the
-//   one that closes a block of code.
+//   one that closes a block of code, and nor is it where only JSON that can
+//   be read is asked for (isReadableOnly).
 function indexOfBlockJSON({
     fenceIndex,
+    isReadableOnly = false,
     search,
     text,
 }: {
     fenceIndex: number;
+    isReadableOnly?: boolean;
     search: Search;
     text: string;
 }) {
@@ -841,8 +879,32 @@ function indexOfBlockJSON({
     };
     const hasJSON = isStartOfJSON(payload)
         ? isNestedStart(payload.text, search)
-        : isJSONBlock && isUnreadableRoot(payload);
+        : isJSONBlock && !isReadableOnly && isUnreadableRoot(payload);
     return hasJSON ? index : -1;
+}
+
+// The index of the next fence from an index on that opens a code block with
+// JSON in it (of the line break before the fence), or -1.
+function indexOfJSONFence({
+    index,
+    isReadableOnly,
+    search,
+    text,
+}: {
+    index: number;
+    isReadableOnly?: boolean;
+    search: Search;
+    text: string;
+}) {
+    NEXT_CODE_FENCE_LINE_REGEXP.lastIndex = index;
+    for (;;) {
+        const fence = NEXT_CODE_FENCE_LINE_REGEXP.exec(text);
+        if (!fence) return -1;
+        const fenceIndex = fence.index;
+        if (indexOfBlockJSON({ fenceIndex, isReadableOnly, search, text }) > -1) {
+            return fenceIndex;
+        }
+    }
 }
 
 // the index of the fence that is nearest before an index in the text (of the
@@ -904,12 +966,8 @@ function indexOfFencedStart({
 
     // …and those after it, once it is closed, whatever its quote marks make of
     // them (a stray one may follow the value)
-    NEXT_CODE_FENCE_LINE_REGEXP.lastIndex = startIndex + endIndex;
-    for (;;) {
-        const fence = NEXT_CODE_FENCE_LINE_REGEXP.exec(text);
-        if (!fence) return -1;
-        if (isBlockJSONAt(fence.index)) return fencedStartIndex;
-    }
+    const fenceIndex = indexOfJSONFence({ index: startIndex + endIndex, search, text });
+    return fenceIndex === -1 ? -1 : indexOfBlockJSON({ fenceIndex, search, text });
 }
 
 const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
@@ -987,7 +1045,12 @@ export function parseAsJSON(text: string): ParsedResult {
             if (fencedStartIndex === -1) break;
             notStart = text.slice(0, fencedStartIndex - precedingText.length);
         } else {
-            notStart = getNotStart({ precedingText, search, text });
+            notStart = getNotStart({
+                precedingText,
+                search,
+                text,
+                wholeText: firstText,
+            });
         }
         if (text[0] === '{' || text[0] === '[') {
             preamble += lastPart;

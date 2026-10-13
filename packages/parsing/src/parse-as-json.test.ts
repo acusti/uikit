@@ -452,10 +452,17 @@ describe('@acusti/parsing', () => {
             ).toEqual({
                 a: 1,
             });
-            // (which a stray quote mark on its line does not hide)
+            // (which a stray quote mark on its line does not hide, whatever
+            // comes later in the text)
             expect(parseAsJSON('{Note: 5" wide}\n{"a": 1}')).toEqual(
                 read('{Note: 5" wide}'),
             );
+            for (const text of [
+                'Size:\n{ w: 5" } so: {"a": 1}\n```\nls\n```',
+                'Size:\n{ w: 5" } so: {"a": 1}\n```',
+            ]) {
+                expect(parseAsJSON(text).value, text).toEqual({ a: 1 });
+            }
             // …and in a code block, whether it is closed or not
             for (const text of [
                 '{ a: 1,\n```json\n{"foo": 1}\n```\n',
@@ -471,14 +478,76 @@ describe('@acusti/parsing', () => {
             );
             expect(twoBlocks.value).toEqual({ foo: 1 });
             expect(twoBlocks.postscript).toBe('That is all of it, as asked.');
-            // (not a code block in one of its strings, which is inside it, nor
-            // a line that starts with code written in a line of prose)
+            // (whatever its quote marks say: one with no pair (an inches mark,
+            // say) does not hide the code block after it…)
             for (const text of [
-                '{ content: "see:\n```json\n{"inner": 1}\n```\n", b: 2 }',
-                '{ content: "see:\n```json\n{"inner": 1',
-                '{ a: 1,\n``b`` is code\n{"foo": 1}',
+                'Note:\n{ size: 5" wide\n```json\n{"foo": 1}\n```',
+                'Spec:\n{\n  width: 5",\n  height: 3\n}\n```\n{"foo": 1}\n```',
+                'Spec:\n{\n  screen: "a 13" laptop",\n  ports: 2\n}\nAs JSON:\n```json\n{"foo": 1}\n```',
+                'You gave me:\n{\n  name: \'the 13" laptop\',\n  ports: 2\n}\nAs JSON:\n```json\n{"foo": 1}\n```',
+            ]) {
+                expect(parseAsJSON(text).value, text).toEqual({ foo: 1 });
+            }
+            // (…at the cost of a code block with JSON in it in what may be one
+            // of its strings or comments, which is read too, also as it streams
+            // in. Since the fences are not counted, that goes for JSON right
+            // after the fence that closes a block of code there as well.)
+            for (const [text, value] of [
+                ['{ content: "see:\n```json\n{"foo": 1}\n```\n", b: 2 }', { foo: 1 }],
+                ['{ content: "see:\n```json\n{"foo": "x', { foo: 'x' }],
+                ['{\n  a: 1,\n  /* e.g.\n```\n[1, 2]\n```\n  */\n}\n{"real": 2}', [1, 2]],
+                [
+                    'Note:\n{ a: "q\n```sh\nnpm i\n```\n{"foo": 1} then",\n  b: {"c": 1}\n}\n{"real": 2}',
+                    { foo: 1 },
+                ],
+            ] as const) {
+                expect(parseAsJSON(text).value, text).toEqual(value);
+            }
+            // no other fence in one of its strings or comments ends it, so its
+            // members after one are still not read: a block in another language
+            // or one that does not start with JSON, the fence that closes one
+            // where no JSON follows it, a block whose JSON cannot be read (which
+            // has no value to give), and a line that starts with code written
+            // in a line of prose
+            for (const text of [
+                'Note:\n{ a: "q\n```sh\nnpm i\n```\nthen",\n  b: {"c": 1}\n}\n{"real": 2}',
+                'Note:\n{ a: "q\n```\nls\n```\nthen", b: {"c": 1} }\n{"real": 2}',
+                'Note:\n{ doc: "Example:\n```json\n{ a: 1 }\n```\n", b: {"c": 1} }\n{"real": 2}',
+                'Note:\n{ a: "Run\n```npm i``` first", b: {"c": 1} }\n{"real": 2}',
+                'Note:\n{\n  a: 1,\n  /* e.g.\n```\nls\n```\n  */\n  b: {"c": 1}\n}\n{"real": 2}',
+            ]) {
+                expect(parseAsJSON(text).value, text).toEqual({ real: 2 });
+            }
+            for (const text of [
+                'Note:\n{ content: "see:\n```\nls\n```\n", data: {"x": 1} }',
+                'Note:\n{ doc: "Example:\n```json\n{ a: 1 }\n```\n", b: {"c": 1} }',
+                // (nor does that block end it where a quote mark with no pair
+                // comes before it, though what follows its closing fence does)
+                'Note:\n{ size: 5" wide\n```json\n{ a: 1 }\n```',
             ]) {
                 expect(parseAsJSON(text).value, text).toBe(null);
+            }
+            expect(
+                parseAsJSON('Note:\n{ size: 5" wide\n```json\n{ a: 1 }\n```\n{"real": 2}')
+                    .value,
+            ).toEqual({ real: 2 });
+            // (the next block with JSON in it is looked for again for a root
+            // that comes after the last one found: here that one is in a string
+            // of the value between the two roots, which is passed over)
+            expect(
+                parseAsJSON(
+                    '{ a: 1 }\n{"y": "see:\n```json\n{"inner": 1}\n```\ndone"}\n```json\n{ b: 2 }\n```\n{"real": 2}',
+                ).value,
+            ).toEqual({ real: 2 });
+            expect(parseAsJSON('{ a: 1,\n``b`` is code\n{"foo": 1}').value).toBe(null);
+            // (a fence that is in none of them does, as far as it is not closed,
+            // whatever the block holds)
+            for (const text of [
+                'Result: {status: ok\n```\nlog output\n```\nSo: {"foo": 1}',
+                '{ a: 1,\n```js\n{"foo": 1}\n```',
+                '{ a: 1,\n```json\n,{"foo": 1}\n```',
+            ]) {
+                expect(parseAsJSON(text).value, text).toEqual({ foo: 1 });
             }
 
             // any other bracket has nothing inside it, closed or not, so the JSON
@@ -538,6 +607,10 @@ describe('@acusti/parsing', () => {
             // roots that cannot be read, each of them cut short by a code block
             expect(time('Note:\n{ a: 1\n```\n'.repeat(16_000))).toBeLessThan(1000);
             expect(time("['a'\n```\n".repeat(16_000))).toBeLessThan(1000);
+            // …and many of them before the one code block in the text
+            expect(
+                time('Note:\n{ a: 1 }\n'.repeat(32_000) + '```json\n{"a": 1}\n```'),
+            ).toBeLessThan(1000);
             // values, each of them followed by a code block whose JSON cannot be
             // read, with the value closed and not
             for (const value of ['{"y": 1}', '{"y": 1']) {
@@ -588,6 +661,7 @@ describe('@acusti/parsing', () => {
             // …and after the comments that the block starts with
             for (const text of [
                 `${code}\n${fence}jsonc\n// the config\n{"a": 1}\n${fence}`,
+                `${code}\n${fence}jsonc\n// e.g. {"x": 1}\n{"a": 1}\n${fence}`,
                 `${code}\n${fence}jsonc\n/* the config */\n\n// in full\n{"a": 1}\n${fence}`,
                 `${fence}jsonc\n// the config\n{"a": 1}\n${fence}\nOr minimal:\n${fence}json\n{}\n${fence}`,
                 `Note:\n${fence}jsonc\n// not ${fence} this\n{"a": 1}\n${fence}\nOr:\n${fence}json\n{"b": 2}\n${fence}`,
@@ -805,15 +879,21 @@ describe('@acusti/parsing', () => {
                 `{"content": "Here is code:\n${fence}json\n{"inner": 1`,
                 `{"content": "Here is code:\n${fence}json\n[1, 2`,
                 `Here:\n${fence}json\n{"content": "see:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}\n${fence}`,
+                // (also after words in quote marks of their own, which go by
+                // pairs like any others)
+                `{"content": "say "hi" then:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}`,
+                `{"content": "set "port" to "8080" then:\n${fence}json\n{"inner": 1}\n${fence}\ndone"}`,
+                `{"content": "say "hi" then:\n${fence}json\n{"inner": 1`,
             ]) {
                 expect(parseAsJSON(text).value, text).toHaveProperty('content');
             }
-            // …nor one in a string of a root that cannot be read
+            // (nor after a bracket of the other kind, which does not close the
+            // value for this)
             expect(
                 parseAsJSON(
-                    `{ content: "see:\n${fence}json\n{"inner": 1}\n${fence}\n", b: 2 }`,
+                    `{"a": [1, 2}], "content": "see:\n${fence}json\n{"inner": 1}\n${fence}\ndone"}`,
                 ).value,
-            ).toBe(null);
+            ).toEqual({ a: [1, 2] });
         });
 
         it('reads a value that is whole as it is, whatever follows it', () => {
