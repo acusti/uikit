@@ -29,6 +29,13 @@ descendants aren’t focused.
 [keyboard event]:
     https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent
 
+The hook listens in the document of each same-origin `<iframe>` that is a
+direct child of the page (it doesn’t extend to grandchildren), so your
+handlers are called for keys pressed while focus is inside one, such as in
+content rendered into a frame with a portal. A frame’s document is picked
+up when a component that uses the hook mounts, so a document that loads
+after the last such mount isn’t listened to until the next.
+
 In addition to keyboard event handlers, you can pass the boolean prop
 `ignoreUsedKeyboardEvents`, which defaults to `true`. If the prop is true,
 the keyboard event target is an input, textarea, or contenteditable

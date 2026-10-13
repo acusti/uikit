@@ -3,10 +3,11 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import React from 'react';
-import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
     addHandler,
+    addHandlers,
     handlersData,
     isEventTargetUsingKeyEvent,
     NON_TEXT_INPUT_TYPES,
@@ -98,6 +99,87 @@ describe('@acusti/use-keyboard-events', () => {
                 expect(handlersData.keypress.length).toBe(0);
                 cleanupKeyUpHandler();
                 expect(handlersData.keyup.length).toBe(0);
+            });
+        });
+
+        describe('addHandlers', () => {
+            const EVENT_TYPES = ['keydown', 'keypress', 'keyup'] as const;
+            const handleKey = vi.fn<(event: KeyboardEvent) => void>();
+            let handlerCleanups: Array<() => void> = [];
+
+            beforeEach(() => {
+                handleKey.mockClear();
+                handlerCleanups = EVENT_TYPES.map((eventType) =>
+                    addHandler({ eventType, handler: handleKey }),
+                );
+            });
+
+            afterEach(() => {
+                for (const cleanupHandler of handlerCleanups) cleanupHandler();
+            });
+
+            // a document that belongs to the given window, as each of the
+            // documents that a frame loads belongs to the frame’s window
+            const createDocumentIn = (frameWindow: object) => {
+                const doc = document.implementation.createHTMLDocument();
+                Object.defineProperty(doc, 'defaultView', { value: frameWindow });
+                return doc;
+            };
+
+            const pressKey = (doc: Document, eventType: (typeof EVENT_TYPES)[number]) =>
+                doc.body.dispatchEvent(
+                    new KeyboardEvent(eventType, { bubbles: true, key: 'ArrowDown' }),
+                );
+
+            describe.each(EVENT_TYPES)('for %s events', (eventType) => {
+                it('calls the handlers for a key event in the document', () => {
+                    const doc = createDocumentIn({});
+                    const cleanupListeners = addHandlers(doc);
+                    pressKey(doc, eventType);
+
+                    expect(handleKey).toHaveBeenCalledTimes(1);
+                    cleanupListeners();
+                });
+
+                it('calls the handlers for a document that takes over the window of an earlier one', () => {
+                    // A frame that loads a document of its own (a srcdoc,
+                    // say) starts on a blank one, and Chromium hands the
+                    // blank document’s window on to the one that replaces it
+                    const frameWindow = {};
+                    const blankDocument = createDocumentIn(frameWindow);
+                    const loadedDocument = createDocumentIn(frameWindow);
+                    const cleanupBlank = addHandlers(blankDocument);
+                    const cleanupLoaded = addHandlers(loadedDocument);
+                    pressKey(loadedDocument, eventType);
+
+                    expect(handleKey).toHaveBeenCalledTimes(1);
+                    cleanupBlank();
+                    cleanupLoaded();
+                });
+
+                it('calls the handlers once for a document it was given more than once', () => {
+                    // every instance of the hook adds the handlers as it mounts
+                    const doc = createDocumentIn({});
+                    const cleanupListeners = addHandlers(doc);
+                    addHandlers(doc);
+                    pressKey(doc, eventType);
+
+                    expect(handleKey).toHaveBeenCalledTimes(1);
+                    cleanupListeners();
+                });
+
+                it('returns a cleanup function that stops the handlers for every caller', () => {
+                    // The listeners are added once however often they are
+                    // asked for, so the cleanup from any one call removes
+                    // them for all of the callers
+                    const doc = createDocumentIn({});
+                    const cleanupListeners = addHandlers(doc);
+                    addHandlers(doc);
+                    cleanupListeners();
+                    pressKey(doc, eventType);
+
+                    expect(handleKey).not.toHaveBeenCalled();
+                });
             });
         });
 
