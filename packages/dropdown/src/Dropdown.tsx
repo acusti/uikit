@@ -49,6 +49,7 @@ import {
     getSubmenuOfItem,
     getTriggerElement,
     isFormlessTextInput,
+    isIMEKeyEvent,
     isInOwnBody,
     isItemExpanded,
     isPointInTriangle,
@@ -1121,6 +1122,11 @@ function RootDropdown({
         const { altKey, ctrlKey, key, metaKey } = event;
         const eventTarget = event.target as HTMLElement;
         if (!dropdownElement) return;
+        // A key that an IME is taking is the IME’s alone, whether the
+        // dropdown is open or closed: the Enter that commits a composition
+        // submits nothing, and the arrows that move through its candidates
+        // leave the highlight where it is
+        if (isIMEKeyEvent(event)) return;
 
         const onEventHandled = () => {
             event.stopPropagation();

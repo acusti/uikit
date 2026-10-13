@@ -1330,6 +1330,13 @@ highlight into it.
   input, or one inside a custom trigger), where they move the caret instead
 - **Type characters**: Jump to the best-matching item in the current level
 
+While text is being composed with an IME, in a searchable dropdown’s input
+or a text field in a custom trigger, the dropdown ignores every keydown
+that the browser reports as part of the composition. With a Japanese IME,
+the Enter that commits the text doesn’t submit (the next Enter is an
+ordinary one), and the arrow keys and Escape don’t move the highlight or
+close the dropdown. Other IMEs can report their keys differently.
+
 For accessibility, the component focuses on semantic HTML structure and
 keyboard navigation. It works best when you use appropriate HTML elements
 in your dropdown content (like `<ul>` and `<li>` for lists, `<button>`

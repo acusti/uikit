@@ -36,16 +36,19 @@ export const isFormlessTextInput = (element: Element) => {
     return form == null && !NON_TEXT_INPUT_TYPES.includes(type);
 };
 
+// Whether a keydown is of a key that an IME is taking: Enter to commit a
+// composition, Space to convert it, the arrows to move through its
+// candidates, Escape to cancel it. isComposing says so while the composition
+// is under way; where it has already ended by the time of the keydown, only
+// keyCode 229 still gives it away
+export const isIMEKeyEvent = (event: KeyboardEvent) =>
+    // eslint-disable-next-line typescript/no-deprecated
+    event.isComposing || event.keyCode === 229;
+
 // Whether a keydown is an Enter that a form would submit on: one that no
 // handler has prevented (as a combobox does to pick its highlighted option)
-// and that isn’t committing an IME composition. A composition can end before
-// the keydown that commits it, when only keyCode 229 still gives it away
 export const isSubmitKey = (event: KeyboardEvent) =>
-    event.key === 'Enter' &&
-    !event.defaultPrevented &&
-    !event.isComposing &&
-    // eslint-disable-next-line typescript/no-deprecated
-    event.keyCode !== 229;
+    event.key === 'Enter' && !event.defaultPrevented;
 
 // The level root that owns an item: the closest [data-ukt-submenu] ancestor,
 // or null for items at the top level of the dropdown body
