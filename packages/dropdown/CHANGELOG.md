@@ -1,5 +1,48 @@
 # @acusti/dropdown
 
+## 1.1.0
+
+### Minor Changes
+
+- 83098e3: Close a `hasItems={false}` dropdown on submit with
+  `keepOpenOnSubmit={false}`
+
+    With `keepOpenOnSubmit={false}`, a `hasItems={false}` dropdown now
+    closes when a form in its body is submitted, by Enter in one of its
+    inputs or by its submit button, and stays open while the form’s own
+    validation blocks the submit. Enter in a single-line input that no form
+    owns closes it too. Space, and Enter anywhere else in the body, no
+    longer close it. When a submit closes it while focus is in its body,
+    focus returns to the trigger.
+
+- e382bae: Close a `hasItems={false}` dropdown with Enter or Space on its
+  trigger
+
+    Enter and Space pressed on the open trigger of a `hasItems={false}`
+    dropdown now close it, as a click on the trigger does. They used to
+    leave it open unless `keepOpenOnSubmit` was false. Space still goes to
+    a text field or a checkbox in the trigger, and an editable element used
+    as a trigger now gets it too.
+
+### Patch Changes
+
+- d140020: Fix a held Enter or Space acting on a dropdown again and again
+
+    A dropdown now opens, closes, and submits on the press of Enter or
+    Space, and ignores the repeats that follow while the key is held.
+    Holding either key on a menu’s trigger used to open and close the menu
+    over and over, and holding Enter on a highlighted item submitted it
+    once per repeat.
+
+- 89eb131: Fix Space and Enter around an open `hasItems={false}` dropdown
+
+    Space and Enter pressed in the body of an open `hasItems={false}`
+    dropdown now go to the control that has focus, where the dropdown used
+    to take them: a text field gets its space (and a textarea its line
+    break), a checkbox is toggled, and a button is pressed. The same goes
+    for a control outside the dropdown that keeps focus while it’s open, as
+    when it opened on hover.
+
 ## 1.0.0
 
 ### Major Changes
