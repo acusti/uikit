@@ -111,25 +111,18 @@ export const isEventTargetUsingKeyEvent = (event: KeyboardEvent) => {
     return NON_TEXT_INPUT_USES_KEYS.has(event.key);
 };
 
-type DefaultView = { __useKeyboardEventsAttached__?: boolean } & Window;
-
+// Safe to call again for a document that already has the listeners: adding
+// the same function for the same event a second time does nothing, so nothing
+// is kept to say that a document has them (a mark on its window can outlive
+// the document, as it does when a frame loads a document of its own). The
+// returned cleanup removes the listeners for every caller, and the hook does
+// not call it
 export function addHandlers(doc: Document) {
-    if (
-        !doc?.defaultView ||
-        (doc.defaultView as DefaultView).__useKeyboardEventsAttached__
-    ) {
-        return;
-    }
-
-    (doc.defaultView as DefaultView).__useKeyboardEventsAttached__ = true;
     doc.addEventListener('keydown', handleKeyboardEvent);
     doc.addEventListener('keypress', handleKeyboardEvent);
     doc.addEventListener('keyup', handleKeyboardEvent);
 
     return () => {
-        if (doc.defaultView) {
-            (doc.defaultView as DefaultView).__useKeyboardEventsAttached__ = false;
-        }
         doc.removeEventListener('keydown', handleKeyboardEvent);
         doc.removeEventListener('keypress', handleKeyboardEvent);
         doc.removeEventListener('keyup', handleKeyboardEvent);
