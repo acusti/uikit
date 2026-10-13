@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { createPortal } from 'react-dom';
 
 import useKeyboardEvents from '../../use-keyboard-events/src/useKeyboardEvents.js';
 
@@ -34,6 +35,27 @@ function Demo() {
                 <span className="label">Modifiers:</span>
                 <input disabled value={modifiers} />
             </p>
+        </Fragment>
+    );
+}
+
+// A frame that loads a document of its own, and has its children rendered
+// into that document once it has loaded
+function Frame({ children }: { children: React.ReactNode }) {
+    const [portalNode, setPortalNode] = useState<HTMLElement | null>(null);
+
+    return (
+        <Fragment>
+            {portalNode == null ? null : createPortal(children, portalNode)}
+            <iframe
+                onLoad={(event) => {
+                    setPortalNode(event.currentTarget.contentDocument?.body ?? null);
+                }}
+                srcDoc="<!doctype html>"
+                // tall enough for the demo without a scrollbar
+                style={{ height: 200 }}
+                title="A frame with a document of its own"
+            />
         </Fragment>
     );
 }
@@ -101,4 +123,27 @@ type Story = StoryObj<typeof Demo>;
 
 export const UseKeyboardEvents: Story = {
     args: {},
+};
+
+export const InsideAFrame: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'The hook listens in same-origin frames too. The frame here loads a document of its own (a `srcdoc`), and the second demo is rendered into it with a portal. Click inside the frame and press a key: both demos show it, as they do for a key pressed outside the frame.',
+            },
+        },
+    },
+    render: () => (
+        <Fragment>
+            {/* Mounts while the frame is still on its blank document. Keys
+                in the frame went unheard in Chromium only with a hook
+                mounted that early, so this demo is what makes the story
+                cover that */}
+            <Demo />
+            <Frame>
+                <p>Click here, then press a key.</p>
+                <Demo />
+            </Frame>
+        </Fragment>
+    ),
 };
