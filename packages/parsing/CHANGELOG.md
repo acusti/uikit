@@ -1,5 +1,117 @@
 # @acusti/parsing
 
+## 0.22.0
+
+### Minor Changes
+
+- f5f4c3d: Find a root array whatever its first item is, and pass over
+  brackets in prose
+
+    An array that opens on a number, a literal or a line break was taken
+    for preamble whenever the text needed a repair: `[1, 2]` with a line of
+    text after it returned a `value` of `null`, and a pretty-printed array
+    of objects lost its root. Both are now read. An empty array or object,
+    or an array that opens on a number or literal, is only taken for the
+    JSON if it starts a line or follows a colon, and nothing follows it on
+    its line but a full stop, a comma or a semicolon. So `As in [1], …`, a
+    list of references or `- [ ] todo` before the JSON stays in the
+    `preamble`, and `The answer is [1, 2, 3].` now returns `null`.
+
+- 39ab200: Take a brace for the start of the JSON only where it opens an
+  object
+
+    A `{` in a preamble (`Use {placeholders} like this: {"a": "b"}`, or
+    code with braces) was taken for the start of the JSON, so the
+    `preamble` was cut short at it, and a text with no JSON after it
+    returned `{}`. Such a brace is now part of the preamble: the `preamble`
+    runs up to the object, and a text with no JSON in it returns a `value`
+    of `null`.
+
+- 0ec100f: Read the JSON in a code block, whatever comes before the block
+
+    If the text has a code block that starts with JSON, that JSON is now
+    the `value`, also while the block is still open as the text streams in.
+    An object or array before the block (in prose, in code, or on a line of
+    its own) used to be returned in its place, as the first value in the
+    text. The block’s fence has to have no language, or the language
+    `json`, `jsonc`, `json5` or `jsonl`, and a code block inside one of the
+    JSON’s own strings is not taken for it.
+
+    Two things follow from this that can change a `value`:
+
+    - If the JSON in a block with one of those languages can’t be read, the
+      `value` is `null`, and not the object or array before the block.
+    - JSON right after the fence that closes a block of code is read as
+      JSON in a block, so it too takes the place of a value before it.
+
+- 8f21d12: Read JSON that has comments in it
+
+    `//` and `/* */` comments in the JSON are now left out when it is read.
+    A comment after a member (`"timeout": 30, // seconds`) used to end the
+    `value` at that member, with the rest of the JSON in the `postscript`,
+    and one after the opening brace put the brace in the `preamble`. A `//`
+    in a string, as in a URL, is not a comment.
+
+- c3b4eab: Return the first JSON value in the text
+
+    `parseAsJSON` could return a later value in place of the first: the
+    larger of two objects, or a fragment from past a mistake in place of
+    the document’s root (`{"a": ["b"\n-1, {"name": "Ann"` returned
+    `{ name: 'Ann' }`). The first object or array in the text is now the
+    `value`, and what follows it is the `postscript`. If you want a later
+    value, call `parseAsJSON` on the `postscript`.
+
+- 7b8e5d3: Stop reading a list of keys and values that has no braces
+
+    A text of `"key": "value",` lines with no braces around them is no
+    longer read as an object: the JSON now starts at a `{` or a `[`, never
+    at a quote mark. A quoted word in a preamble was being taken for a key,
+    which cut the `preamble` short or returned part of the preamble as the
+    value.
+
+- 0aa60f2: Stop converting markdown tables into objects
+
+    A two-column markdown table is no longer read as an object of keys and
+    values. The conversion ran over the whole text, so a table in a
+    preamble was returned in place of the JSON after it, and one after the
+    JSON was merged into it. If you need a table read, convert it before
+    calling `parseAsJSON`.
+
+- b7d5078: Stop returning a value from inside an object or array that can’t
+  be read
+
+    Where the JSON’s own opening bracket could not be read because its
+    first member is not written as JSON allows (a key with no quote marks,
+    or with single ones), `parseAsJSON` returned the first object or array
+    nested in it. It now returns a `value` of `null`, also while the text
+    streams in. A code block that follows such an object or array is still
+    read. So is one inside it that starts with JSON that can be read, if
+    its fence has no language or the language `json`, `jsonc`, `json5` or
+    `jsonl`.
+
+### Patch Changes
+
+- f5f4c3d: Find the JSON after a long preamble quickly
+
+    The time to get through a preamble with many brackets in it (citations,
+    links, code) grew with the square of its length: 8,000 lines with a
+    citation in each took over a second. It now takes a few milliseconds.
+
+- 6a419c8: Parse valid JSON that follows a preamble as it is
+
+    A whole, valid JSON value after a preamble went through the repairs,
+    which misread spacing they don’t expect:
+    `Here it is: {"a": "b" , "c": "d"}` returned a `value` of `null`. It is
+    now parsed as it is.
+
+- 359d933: Parse a valid JSON value as it is when text follows it
+
+    A whole, valid object or array that a postscript or the end of a code
+    block followed went through the repairs, which misread spacing they
+    don’t expect: `{"a": "b" , "c": "d"}` followed by `Hope this helps!`
+    returned a `value` of `null`. The value is now parsed as it is, and
+    what follows it is the `postscript`.
+
 ## 0.21.1
 
 ### Patch Changes
