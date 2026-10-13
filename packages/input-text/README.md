@@ -813,11 +813,8 @@ fallback for older browsers:
 The component intelligently handles Enter key behavior based on context:
 
 ```tsx
-// Single-line: Enter always submits or blurs
-<InputText
-    submitOnEnter  // Enter submits form or blurs input
-    type="search"
-/>
+// Single-line: Enter submits the form the input is in, if any, and blurs
+<InputText submitOnEnter type="search" />
 
 // Chat-style single-line: submit and keep typing
 <InputText
@@ -825,11 +822,13 @@ The component intelligently handles Enter key behavior based on context:
     submitOnEnter  // Enter submits without blurring
 />
 
-// Multi-line: Enter adds newline, Cmd/Ctrl+Enter submits
-<InputText
-    multiLine
-    submitOnEnter  // Cmd/Ctrl+Enter submits, Enter adds newline
-/>
+// Multi-line: Enter submits the form, if any, and blurs instead of adding
+// a line break; Shift+Enter adds one
+<InputText multiLine submitOnEnter />
+
+// Multi-line without submitOnEnter: Enter adds a line break, and
+// Cmd/Ctrl+Enter submits the form, if any, and blurs
+<InputText multiLine />
 ```
 
 ### Browser Compatibility
