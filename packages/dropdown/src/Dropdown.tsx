@@ -1158,7 +1158,10 @@ function RootDropdown({
                 (hasItems && (key === 'ArrowUp' || key === 'ArrowDown'))
             ) {
                 onEventHandled();
-                setIsOpen(true);
+                // On the press, not on the repeats of a held key, or the key
+                // that closed the dropdown from its trigger would open it
+                // again, and close it again, for as long as it is held
+                if (!event.repeat) setIsOpen(true);
             }
             return;
         }
@@ -1241,7 +1244,8 @@ function RootDropdown({
                 // A button input uses both keys too, but as a button does
                 if (!isTargetUsingKeyEvents || eventTarget.matches(CLICKABLE_SELECTOR)) {
                     onEventHandled();
-                    closeDropdown();
+                    // on the press, not on the repeats of a held key
+                    if (!event.repeat) closeDropdown();
                     return;
                 }
                 if (key === ' ') return;
@@ -1253,7 +1257,10 @@ function RootDropdown({
         // If dropdown isOpen, handle submitting the value
         if (key === 'Enter' || (key === ' ' && !inputElementRef.current)) {
             onEventHandled();
-            handleSubmitItem(event);
+            // On the press, not on the repeats of a held key: they would
+            // submit the active item again each time, and with none active
+            // would close the menu that the same key just opened
+            if (!event.repeat) handleSubmitItem(event);
             return;
         }
 
