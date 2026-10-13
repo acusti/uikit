@@ -3807,6 +3807,32 @@ describe('@acusti/dropdown', () => {
             expect(screen.getByTestId('results')).toBeTruthy();
         });
 
+        it('leaves Space to a checkbox that is the whole trigger', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <label>
+                        <input type="checkbox" /> Remind me
+                    </label>
+                    <p data-testid="reminder-options">Every morning</p>
+                </Dropdown>,
+            );
+
+            // the click checks it and opens the dropdown
+            const checkbox = screen.getByRole<HTMLInputElement>('checkbox', {
+                name: 'Remind me',
+            });
+            await user.click(checkbox);
+            expect(checkbox.checked).toBe(true);
+            expect(screen.getByTestId('reminder-options')).toBeTruthy();
+
+            // with no text input in the trigger, Space would be a submit
+            // if it weren’t the checkbox’s own
+            await user.keyboard(' ');
+            expect(checkbox.checked).toBe(false);
+            expect(screen.getByTestId('reminder-options')).toBeTruthy();
+        });
+
         it('opens and closes a nested popover from its trigger, leaving the outer dropdown open', async () => {
             const user = userEvent.setup();
             render(
@@ -3890,28 +3916,67 @@ describe('@acusti/dropdown', () => {
                     <div aria-label="Notes" contentEditable role="textbox" tabIndex={0} />
                 ),
             ],
-        ])(
-            'stays open on Enter and types Space in a trigger that is %s',
-            async (_, renderTrigger) => {
-                const user = userEvent.setup();
-                render(
-                    <Dropdown hasItems={false}>
-                        {renderTrigger()}
-                        <p data-testid="notes-help">Markdown is supported.</p>
-                    </Dropdown>,
-                );
+        ])('leaves Enter and Space to a trigger that is %s', async (_, renderTrigger) => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    {renderTrigger()}
+                    <p data-testid="notes-help">Markdown is supported.</p>
+                </Dropdown>,
+            );
 
-                const notes = screen.getByRole('textbox', { name: 'Notes' });
-                await user.click(notes);
-                expect(screen.getByTestId('notes-help')).toBeTruthy();
+            const notes = screen.getByRole('textbox', { name: 'Notes' });
+            await user.click(notes);
+            expect(screen.getByTestId('notes-help')).toBeTruthy();
 
-                // Enter is the dropdown’s, and Space is the text field’s
-                expect(fireEvent.keyDown(notes, { key: 'Enter' })).toBe(false);
-                expect(screen.getByTestId('notes-help')).toBeTruthy();
-                expect(fireEvent.keyDown(notes, { key: ' ' })).toBe(true);
-                expect(screen.getByTestId('notes-help')).toBeTruthy();
-            },
-        );
+            // both are the text field’s: Enter breaks the line there
+            expect(fireEvent.keyDown(notes, { key: 'Enter' })).toBe(true);
+            expect(fireEvent.keyDown(notes, { key: ' ' })).toBe(true);
+            expect(screen.getByTestId('notes-help')).toBeTruthy();
+        });
+
+        it('types line breaks into a textarea trigger', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false}>
+                    <textarea aria-label="Notes" />
+                    <p data-testid="notes-help">Markdown is supported.</p>
+                </Dropdown>,
+            );
+
+            const notes = screen.getByRole<HTMLTextAreaElement>('textbox', {
+                name: 'Notes',
+            });
+            await user.click(notes);
+            await user.keyboard('one{Enter}two');
+
+            expect(notes.value).toBe('one\ntwo');
+            expect(screen.getByTestId('notes-help')).toBeTruthy();
+        });
+
+        it('still submits the highlighted item on Enter in a textarea trigger of a dropdown with items', async () => {
+            const handleSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown onSubmitItem={handleSubmitItem}>
+                    <textarea aria-label="Message" />
+                    <ul>
+                        <li data-ukt-value="ada">Ada</li>
+                        <li data-ukt-value="grace">Grace</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const message = screen.getByRole('textbox', { name: 'Message' });
+            await user.click(message);
+            await user.keyboard('{ArrowDown}');
+
+            expect(fireEvent.keyDown(message, { key: 'Enter' })).toBe(false);
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'ada' }),
+            );
+        });
 
         it('leaves Space to a button in the body when the trigger is a text input', async () => {
             const handleClick = vi.fn<() => void>();
@@ -4463,6 +4528,35 @@ describe('@acusti/dropdown', () => {
             expect(screen.getByRole('textbox', { name: 'Choices' })).toBeTruthy();
         });
 
+        it.each([
+            ['a textarea', () => <textarea aria-label="Notes" />],
+            [
+                'an editable element',
+                () => (
+                    <div aria-label="Notes" contentEditable role="textbox" tabIndex={0} />
+                ),
+            ],
+        ])(
+            'stays open on Enter in a trigger that is %s when keepOpenOnSubmit is false',
+            async (_, renderTrigger) => {
+                const user = userEvent.setup();
+                render(
+                    <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                        {renderTrigger()}
+                        <p data-testid="notes-help">Markdown is supported.</p>
+                    </Dropdown>,
+                );
+
+                const notes = screen.getByRole('textbox', { name: 'Notes' });
+                await user.click(notes);
+                // a line break there, not a submit
+                await user.keyboard('{Enter}');
+                await waitPastCloseDelay();
+
+                expect(screen.getByTestId('notes-help')).toBeTruthy();
+            },
+        );
+
         it('stays open on an Enter that a handler has prevented', async () => {
             const user = userEvent.setup();
             render(
@@ -4487,6 +4581,54 @@ describe('@acusti/dropdown', () => {
             await waitPastCloseDelay();
 
             expect(screen.getByRole('textbox', { name: 'Address' })).toBeTruthy();
+        });
+
+        it('stays open on an Enter that a handler has prevented in a text input trigger', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                    <input
+                        aria-label="City"
+                        // a combobox picking its highlighted option, say
+                        onKeyDown={(event) => {
+                            if (event.key === 'Enter') event.preventDefault();
+                        }}
+                        type="text"
+                    />
+                    <p data-testid="city-help">Type to search.</p>
+                </Dropdown>,
+            );
+
+            await user.click(screen.getByRole('textbox', { name: 'City' }));
+            expect(screen.getByTestId('city-help')).toBeTruthy();
+            await user.keyboard('{Enter}');
+            await waitPastCloseDelay();
+
+            expect(screen.getByTestId('city-help')).toBeTruthy();
+        });
+
+        it('closes on Enter in a text input trigger that a form owns, and keeps the key from the form', async () => {
+            const handleSubmit = vi.fn<(event: SubmitEvent) => void>(preventDefault);
+            const user = userEvent.setup();
+            render(
+                <form onSubmit={handleSubmit}>
+                    <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                        <input aria-label="Tag" type="text" />
+                        <p data-testid="tag-help">Enter adds the tag.</p>
+                    </Dropdown>
+                </form>,
+            );
+
+            await user.click(screen.getByRole('textbox', { name: 'Tag' }));
+            expect(screen.getByTestId('tag-help')).toBeTruthy();
+
+            // Unlike a form in the body, a form around the trigger can’t
+            // tell the dropdown of a submit (its event never reaches the
+            // body), so the key is the submit, and the dropdown takes it:
+            // the form isn’t submitted from its trigger while it is open
+            await user.keyboard('{Enter}');
+            await waitFor(() => expect(screen.queryByTestId('tag-help')).toBeNull());
+            expect(handleSubmit).not.toHaveBeenCalled();
         });
 
         it('stays open on the Enter that commits an IME composition', async () => {

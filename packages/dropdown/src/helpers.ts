@@ -36,6 +36,11 @@ export const isFormlessTextInput = (element: Element) => {
     return form == null && !NON_TEXT_INPUT_TYPES.includes(type);
 };
 
+// Whether an element is a text field that Enter breaks a line in: a textarea
+// or an editable element
+export const isMultilineTextField = (element: HTMLElement) =>
+    element.tagName === 'TEXTAREA' || element.isContentEditable;
+
 // Whether a keydown is of a key that an IME is taking: Enter to commit a
 // composition, Space to convert it, the arrows to move through its
 // candidates, Escape to cancel it. isComposing says so while the composition

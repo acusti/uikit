@@ -52,6 +52,7 @@ import {
     isIMEKeyEvent,
     isInOwnBody,
     isItemExpanded,
+    isMultilineTextField,
     isPointInTriangle,
     isSubmitKey,
     LIST_CONTAINER_SELECTOR,
@@ -161,7 +162,8 @@ export type Props = {
      * multi-select. Defaults to !hasItems: a menu closes on submit, while a
      * hasItems={false} dialog stays open. In a hasItems={false} dropdown, a
      * submit is a form in the body being submitted, or Enter in a
-     * single-line input there that no form owns.
+     * single-line input that appears in the body with no form or in the
+     * trigger.
      */
     keepOpenOnSubmit?: boolean;
     /**
@@ -1246,15 +1248,18 @@ function RootDropdown({
                 // On the trigger, the keys that opened the dropdown close it,
                 // as a press there does. A control in the trigger that uses
                 // them itself keeps Space (a text field types it, a checkbox
-                // is toggled by it), and its Enter goes to the submit below.
-                // A button input uses both keys too, but as a button does
+                // is toggled by it), and Enter too where it breaks a line.
+                // Only an Enter that no handler has prevented, as a combobox
+                // does to pick its highlighted option, goes on to the submit
+                // below. A button input uses both keys too, but as a button
+                // does
                 if (!isTargetUsingKeyEvents || eventTarget.matches(CLICKABLE_SELECTOR)) {
                     onEventHandled();
                     // on the press, not on the repeats of a held key
                     if (!event.repeat) closeDropdown();
                     return;
                 }
-                if (key === ' ') return;
+                if (isMultilineTextField(eventTarget) || !isSubmitKey(event)) return;
             } else if (isTargetUsingKeyEvents || !eventTarget.contains(dropdownElement)) {
                 return;
             }
