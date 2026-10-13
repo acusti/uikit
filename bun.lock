@@ -135,7 +135,7 @@
     },
     "packages/dropdown": {
       "name": "@acusti/dropdown",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "dependencies": {
         "@acusti/matchmaking": "^0.10.0",
         "@acusti/use-keyboard-events": "^0.13.0",
@@ -190,7 +190,7 @@
     },
     "packages/parsing": {
       "name": "@acusti/parsing",
-      "version": "0.21.1",
+      "version": "0.22.0",
       "devDependencies": {
         "typescript": "^7",
         "vite": "^8.0.0-0",
@@ -302,7 +302,7 @@
     },
     "packages/vite-plugin-react-compiler": {
       "name": "@acusti/vite-plugin-react-compiler",
-      "version": "0.8.0",
+      "version": "0.9.0",
       "dependencies": {
         "oxc-transform-react": "0.154.0",
       },
