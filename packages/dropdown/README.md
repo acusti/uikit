@@ -325,7 +325,8 @@ type Props = {
      * multi-select. Defaults to !hasItems: a menu closes on submit, while a
      * hasItems={false} dialog stays open. In a hasItems={false} dropdown, a
      * submit is a form in the body being submitted, or Enter in a
-     * single-line input there that no form owns.
+     * single-line input that appears in the body with no form or in the
+     * trigger.
      */
     keepOpenOnSubmit?: boolean;
     /**
@@ -726,12 +727,17 @@ while it’s open, as when it opened on hover. Escape closes the dropdown
 unless focus is in a text field (a text input, a textarea, or an editable
 element). On the trigger, Space and Enter open the dropdown and, unless
 focus is in a text field or a checkbox there, close it again, as a click
-there does.
+there does. Once it is open, Enter in a textarea or an editable element
+used as the trigger adds a line break there. Enter in a single-line input
+used as the trigger is a submit, whether or not a form owns it: the
+dropdown takes the key, so a form around the trigger isn’t submitted from
+that input while the dropdown is open.
 
 A `hasItems={false}` dropdown stays open until it is dismissed. Pass
 `keepOpenOnSubmit={false}` to close it when its content is submitted. A
 submit is a form in the body being submitted, by Enter in one of its inputs
-or by its submit button, or Enter in a single-line input that no form owns:
+or by its submit button, or Enter in a single-line input, either one in the
+body that no form owns or one used as the trigger:
 
 ```tsx
 <Dropdown hasItems={false} keepOpenOnSubmit={false}>
@@ -753,9 +759,9 @@ empty. To keep it open after a submit that your own checks reject, call
 check that finishes later, such as a server round trip or a form library
 that validates asynchronously, can’t keep it open.
 
-Enter in an input that no form owns counts the way a form would count it:
-not when a handler has prevented the key, as a combobox does to pick an
-option, and not when it commits an IME composition.
+Enter in such an input, in the body or the trigger, counts the way a form
+would count it: not when a handler has prevented the key, as a combobox
+does to pick an option, and not when it commits an IME composition.
 
 When a submit closes the dropdown while focus is in its body, focus returns
 to the trigger, as it does on Escape.
