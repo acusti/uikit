@@ -120,12 +120,21 @@ before it is the `preamble`, and what follows it is the `postscript`.
   members. That is a `{` or `[` that starts a line or follows a colon, with
   a first member that JSON does not allow: a key with no quote marks or
   with single ones, or a comma. The `value` is `null`, also while the text
-  streams in. What follows its closing bracket is still read, and so is a
-  code block that starts before it is closed. A code block in one of its
-  strings in double quote marks, or in one of its comments, is part of it,
-  unless it is a block that counts (see above) and starts with JSON that
-  can be read. That block ends it, and what follows is read like any other
-  text.
+  streams in.
+    - What follows its closing bracket is still read. It is JavaScript or
+      Python more often than JSON, so that bracket is found with its
+      strings read as all three write them: in single or double quote
+      marks, closed on the line that they open on, and with no letter,
+      digit or underscore right outside their quote marks (so an inches
+      mark or an apostrophe opens no string). A string in double quote
+      marks can also run over line breaks, as it may in JSON with markdown
+      in it: from a quote mark with no pair on its line, where a value
+      starts, to the next with no pair on its line.
+    - A code block that starts before it is closed is still read too. A
+      code block in one of its strings in double quote marks, or in one of
+      its comments, is part of it, unless it is a block that counts (see
+      above) and starts with JSON that can be read. That block ends it, and
+      what follows is read like any other text.
 - Prose has empty objects and arrays too, and arrays that open on a number
   or on `true`, `false` or `null`. One of those is only taken for the JSON
   if it starts a line or follows a colon, and nothing follows it on its
@@ -160,6 +169,9 @@ parseAsJSON('The sizes are: [1, 2] in inches').value;
 
 parseAsJSON('{ name: "Ann", "address": {"city": "Oslo"} }').value;
 // null
+
+parseAsJSON('{ end: \']\' }\nAs JSON:\n{"end": "]"}').value;
+// { end: ']' }
 
 parseAsJSON('Call go({"y": 1}) first:\n```json\n{"a": 1}\n```').value;
 // { a: 1 }

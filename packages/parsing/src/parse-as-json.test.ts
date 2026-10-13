@@ -416,9 +416,16 @@ describe('@acusti/parsing', () => {
                 '{]"a": {"d": 1}, "tags": ["x", "y"]}',
                 "['a', 'b', {\"d\": 1}]",
                 '[, {"d": 1}]',
-                // (a bracket in one of its strings does not close it, and a
-                // comment after its bracket is not what it is known by)
+                // (a bracket in one of its strings does not close it, in quote
+                // marks of either kind and after a quote mark of the other kind
+                // or an escaped one, and a comment after its bracket is not
+                // what it is known by)
                 '{ a: "}", "c": {"d": 1} }',
+                '{ a: \'}\', "c": {"d": 1} }',
+                '{ a: "it\'s }", "c": {"d": 1} }',
+                '{ a: \'the 13" }\', "c": {"d": 1} }',
+                '{ a: \'O\\\'Brien }\', "c": {"d": 1} }',
+                '{ a: don\'t use \'}\' here, "c": {"d": 1} }',
                 '{ // settings\n  a: "b",\n  "c": {"d": 1}\n}',
             ]) {
                 expect(parseAsJSON(text), text).toEqual(none(text));
@@ -430,6 +437,7 @@ describe('@acusti/parsing', () => {
                 'Result: { a: "b", "c": {"d": "e"',
                 '{ a: "}", "c": {"d": "e',
                 '{ a: "}",\n  "c": {"d": "e',
+                '{ a: \'}\', "c": {"d": "e',
             ]) {
                 expect(parseAsJSON(text), text).toEqual(none(text));
             }
@@ -452,17 +460,105 @@ describe('@acusti/parsing', () => {
             ).toEqual({
                 a: 1,
             });
-            // (which a stray quote mark on its line does not hide, whatever
-            // comes later in the text)
+            // (Where that bracket is goes by its strings as JavaScript and
+            // Python have them as well as JSON, since most of these roots are
+            // written in one of the two: in quote marks of either kind, and
+            // closed on the line that they open on. So a bracket in single
+            // quote marks does not close it, and a quote mark of the other
+            // kind in a string, or one in a comment, opens nothing…)
+            expect(parseAsJSON('Note:\n{ end: \']\' }\nThe JSON:\n{"a": 1}')).toEqual(
+                read("Note:\n{ end: ']' }\nThe JSON:"),
+            );
+            for (const text of [
+                'You gave me:\n{\n  name: \'the 13" laptop\',\n  ports: 2\n}\nAs JSON:\n{"a": 1}',
+                'You sent:\n{\n  note: "it\'s here",\n  end: \']\',\n}\nAs JSON:\n{"a": 1}',
+                "In Python:\n{'name': 'O\\'Brien }', 'tags': ['}']}\nAs JSON:\n{\"a\": 1}",
+                'Config:\n{\n  // it\'s "odd\n  a: \']\',\n}\nFixed:\n{"a": 1}',
+                // (and a comment may follow a string in single quote marks, as
+                // it may one in double quote marks)
+                'You sent:\n{\n  a: \'x\' // see ] odd\n}\nAs JSON:\n{"a": 1}',
+                // (each string is read once, and the brackets between two of
+                // them count)
+                'You sent:\n{ greetings: ["Hi!", "Bye."], sep: "; " }\nAs JSON:\n{"a": 1}',
+            ]) {
+                expect(parseAsJSON(text).value, text).toEqual({ a: 1 });
+            }
+            // (…nor does a quote mark right after a letter, a digit or an
+            // underscore, in whatever script, which is an inches mark, an
+            // apostrophe, or the end of a string with quote marks of its own
+            // kind in it: it has no pair to find in the answer after it, also
+            // while that streams in…)
             expect(parseAsJSON('{Note: 5" wide}\n{"a": 1}')).toEqual(
                 read('{Note: 5" wide}'),
             );
             for (const text of [
                 'Size:\n{ w: 5" } so: {"a": 1}\n```\nls\n```',
                 'Size:\n{ w: 5" } so: {"a": 1}\n```',
+                'Size:\n{ w: 5" } so: {"a": 1}',
+                'Size:\n{ w: 5" } so: {"a": 1, "b',
+                'You sent:\n{ dims: { w: 5" }, h: 7" }\nAs JSON:\n{"a": 1}',
+                "You sent:\n{ note: it's the 'best', end: ']' }\nAs JSON:\n{\"a\": 1}",
+                "You sent:\n{ owner: José's pen, end: ']' } so: {\"a\": 1}",
+                "You sent:\n{ owner: foo_'s pen, end: ']' } so: {\"a\": 1}",
+                'Spec:\n{\n  screen: "a 13" laptop",\n  ports: 2\n}\nAs JSON:\n{"a": 1}',
             ]) {
                 expect(parseAsJSON(text).value, text).toEqual({ a: 1 });
             }
+            expect(parseAsJSON('Size:\n{ w: 5" } so:\n{"a": "x } y"}').value).toEqual({
+                a: 'x } y',
+            });
+            // (…nor one with no pair on its line, or whose pair comes right
+            // before a letter, a digit or an underscore: that is no closing
+            // quote mark.)
+            for (const text of [
+                '{ decade: \'90s }\nIt is the Smiths\' one:\n{"a": 1}',
+                '{ decade: \'90s } so: {"a": 1}',
+                '{ decade: \'90s } and it\'s here: {"a": 1}',
+                'Size:\n{ w: 5.5 " } so: {"a": 1}',
+                'Spec:\n{\n  size: 5.5 ",\n  ports: 2\n}\nAs JSON:\n{"a": 1}',
+                // (nor an escaped one, which is the one character that its
+                // backslash escapes)
+                'Size:\n{ w: 5\\"}\nSo:\n{"a": 1}',
+            ]) {
+                expect(parseAsJSON(text).value, text).toEqual({ a: 1 });
+            }
+            for (const key of ['2x', 'été', '_id']) {
+                expect(
+                    parseAsJSON(`Size:\n{ w: 5.5 " } so: {"${key}": 1}`).value,
+                    key,
+                ).toEqual({ [key]: 1 });
+            }
+            // (A string in double quote marks may run over line breaks too, as
+            // in JSON with markdown in it: from a quote mark with no pair on
+            // its line that stands where a value starts, to the next with no
+            // pair on its line. A bracket in it is part of it, as a code block
+            // is, so it neither closes the root nor keeps it open…)
+            expect(
+                parseAsJSON(
+                    '{ note: "End the block with\n} and run it.", "meta": {"a": 1} }',
+                ).value,
+            ).toBe(null);
+            expect(
+                parseAsJSON(
+                    'You sent:\n{\n  note: "Start the block with\nif (ok) {",\n  lang: "js"\n}\nAs JSON:\n{"a": 1}',
+                ).value,
+            ).toEqual({ a: 1 });
+            // (…and the next such quote mark closes it wherever it stands,
+            // also after a comma or a bracket, where one would open it…)
+            for (const text of [
+                'You sent:\n{\n  a: "Items:\nfoo,",\n  b: 1,\n  c: \']\'\n}\nAs JSON:\n{"a": 1}',
+                'You sent:\n{ a: "Index\nof x[", c: \']\' }\nAs JSON:\n{"a": 1}',
+            ]) {
+                expect(parseAsJSON(text).value, text).toEqual({ a: 1 });
+            }
+            // (…at the cost of a string that was never closed where a value
+            // starts: the rest of the root is passed over as part of it, and
+            // the answer with it.)
+            expect(
+                parseAsJSON(
+                    'You sent:\n{\n  title: "Hello,\n  count: 2\n}\nAs JSON:\n{"a": 1}',
+                ).value,
+            ).toBe(null);
             // …and in a code block, whether it is closed or not
             for (const text of [
                 '{ a: 1,\n```json\n{"foo": 1}\n```\n',
@@ -515,6 +611,15 @@ describe('@acusti/parsing', () => {
                 'Note:\n{ doc: "Example:\n```json\n{ a: 1 }\n```\n", b: {"c": 1} }\n{"real": 2}',
                 'Note:\n{ a: "Run\n```npm i``` first", b: {"c": 1} }\n{"real": 2}',
                 'Note:\n{\n  a: 1,\n  /* e.g.\n```\nls\n```\n  */\n  b: {"c": 1}\n}\n{"real": 2}',
+                // (a string that a code block is in runs over line breaks, so
+                // it is known by its quote marks that have no pair on their
+                // line: not one that is escaped, nor one in single quote marks)
+                'Note:\n{ a: "a 5\\" pipe:\n```sh\nls\n```\n", b: {"c": 1} }\n{"real": 2}',
+                'Note:\n{ a: \'5"\', b: "q\n```sh\nnpm i\n```\nthen",\n  c: {"d": 1}\n}\n{"real": 2}',
+                // (nor is it only the value of a key: an item in an array is
+                // one too)
+                'Note:\n{ a: ["q\n```sh\nnpm i\n```\nthen"], b: {"c": 1} }\n{"real": 2}',
+                'Note:\n[\'a\', "q\n```sh\nnpm i\n```\nthen", {"c": 1}]\n{"real": 2}',
             ]) {
                 expect(parseAsJSON(text).value, text).toEqual({ real: 2 });
             }
@@ -544,6 +649,9 @@ describe('@acusti/parsing', () => {
             // whatever the block holds)
             for (const text of [
                 'Result: {status: ok\n```\nlog output\n```\nSo: {"foo": 1}',
+                'Result: {status: don\'t know\n```\nlog output\n```\nSo: {"foo": 1}',
+                'Result: {status: "ok",\n```\nlog output\n```\nSo: {"foo": 1}',
+                'Result: {status: "not\nok",\n```\nlog output\n```\nSo: {"foo": 1}',
                 '{ a: 1,\n```js\n{"foo": 1}\n```',
                 '{ a: 1,\n```json\n,{"foo": 1}\n```',
             ]) {
@@ -687,6 +795,12 @@ describe('@acusti/parsing', () => {
             // …whatever follows that value on its line, and closed or not
             expect(
                 parseAsJSON(`A {"y": 1} is 5" wide\n${fence}json\n{"a": 1}\n${fence}`)
+                    .value,
+            ).toEqual({ a: 1 });
+            // (also where markdown has its brackets escaped: a backslash outside
+            // the strings of a value that can be read escapes nothing)
+            expect(
+                parseAsJSON(`A \\{"y": 1\\} is 5" wide\n${fence}json\n{"a": 1}\n${fence}`)
                     .value,
             ).toEqual({ a: 1 });
             expect(
@@ -884,6 +998,10 @@ describe('@acusti/parsing', () => {
                 `{"content": "say "hi" then:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}`,
                 `{"content": "set "port" to "8080" then:\n${fence}json\n{"inner": 1}\n${fence}\ndone"}`,
                 `{"content": "say "hi" then:\n${fence}json\n{"inner": 1`,
+                // (and after inches marks, which are quote marks like any
+                // others here: only a root that cannot be read has its
+                // strings read as code has them)
+                `{"content": "see the 13" and 15" models:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}`,
             ]) {
                 expect(parseAsJSON(text).value, text).toHaveProperty('content');
             }

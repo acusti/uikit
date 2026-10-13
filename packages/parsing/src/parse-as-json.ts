@@ -77,6 +77,8 @@ const LITERAL_END_CHARS = new Set('0123456789el');
 const LITERAL_DELIMITER_CHARS = new Set([...WHITESPACE_CHARS, ',', ']', '}']);
 // …and, as an item in an array, follows one of these
 const ITEM_OPENING_CHARS = new Set('[,');
+// what a value follows, as an item in an array or after its key in an object
+const VALUE_OPENING_CHARS = new Set([...ITEM_OPENING_CHARS, ':']);
 
 // what a comma can come between: any of the values above, or a bare literal
 const ITEM_START_CHARS = new Set([...VALUE_START_CHARS, ...LITERAL_START_CHARS]);
@@ -299,7 +301,13 @@ const COMMENT_REGEXP = /\/(?:\/[^\n]*|\*[^]*?(?:\*\/|$))/y;
 // space between, a colon or a value. Anything else is not one (text that only
 // seems to be outside a string, because of an unescaped quote mark before it).
 const BEFORE_COMMENT_REGEXP = /[\n,{}[\]]$/;
-const BEFORE_SPACED_COMMENT_REGEXP = /(?:[\n,{}[\]:"\d]|true|false|null)$/;
+const BEFORE_SPACED_COMMENT_REGEXP = /(?:[\n,{}[\]:"'\d]|true|false|null)$/;
+// a letter, a digit or an underscore, in any script
+const WORD_CHAR_REGEXP = /[\p{L}\p{N}_]/u;
+// a string in quote marks of either kind that is closed on the line that it
+// opens on, with none of those right after it (a backslash escapes what
+// follows it)
+const LINE_STRING_REGEXP = /(["'])(?:(?!\1)[^\\\n]|\\.)*\1(?![\p{L}\p{N}_])/uy;
 
 // whether the line that follows the line break at index opens a code block or
 // closes one
@@ -322,14 +330,53 @@ function isBeforeCodeFence(text: string, index: number) {
 // kind: after any other, only a code block ends the read, so that a bracket
 // that was mistyped does not open the strings after it to the search for a
 // code block.
-function readRoot(text: string, isEndedByFence?: (index: number) => boolean) {
+//
+// With isUnreadable, it is a root that cannot be read (see getNotStart). That
+// is JavaScript or Python more often than JSON, so its strings are read as
+// those have them too: in quote marks of either kind, closed on the line that
+// they open on, and with no letter, digit or underscore (in any script) right
+// outside their quote marks. So a quote mark right after one opens no string
+// (it is an inches mark, an apostrophe, or the end of a string with quote
+// marks of its own kind in it), nor does one whose pair comes right before one
+// (the start of another string, or of a word), nor one with no pair on its
+// line. A backslash escapes the character after it.
+//
+// A string in double quote marks may also run over line breaks, as it does
+// in JSON with markdown in it: from a quote mark with no pair on its line
+// that stands where a value starts, to the next with no pair on its line.
+// All that is in it is part of it (brackets, and a code block). Anywhere
+// else, a quote mark with no pair on its line is a stray one.
+function readRoot(
+    text: string,
+    {
+        isEndedByFence,
+        isUnreadable,
+    }: { isEndedByFence?: (index: number) => boolean; isUnreadable?: boolean } = {},
+) {
     const comments: Array<[number, number]> = [];
     const closingBracket = text[0] === '{' ? '}' : ']';
     let depth = 0;
     let fromIndex = 0;
+    // whether a string in double quote marks is open that runs over line breaks
+    let isStringOpen = false;
     for (let index = 0; index < text.length; index++) {
         const char = text[index];
-        if (char === '"') {
+        if (isUnreadable && (char === '"' || char === "'")) {
+            const string = WORD_CHAR_REGEXP.test(text[index - 1])
+                ? undefined
+                : matchAt({ index, regexp: LINE_STRING_REGEXP, text });
+            if (string) {
+                index += string.length - 1;
+            } else if (char === '"') {
+                isStringOpen =
+                    !isStringOpen &&
+                    isPreceededBy({ chars: VALUE_OPENING_CHARS, index, text });
+            }
+        } else if (isUnreadable && char === '\\') {
+            index++;
+        } else if (isStringOpen) {
+            continue;
+        } else if (char === '"') {
             index = indexOfStringEnd(text, index);
             if (index === -1) break;
         } else if (char === '{' || char === '[') {
@@ -691,28 +738,6 @@ function indexOfCodeFence(text: string) {
     return -1;
 }
 
-const BRACKETS_REGEXP = /[[\]{}]/g;
-
-// The index of the bracket that closes the one that the text starts with, going
-// by the brackets on its first line alone and by none of that line’s quote
-// marks, or -1. Only for a line that has more text after it and an odd number
-// of quote marks on it: what is a string on that line cannot be known.
-function indexOfLineRootEnd(text: string) {
-    const lineEndIndex = text.indexOf('\n');
-    const line = lineEndIndex === -1 ? '' : text.slice(0, lineEndIndex);
-    if (line.split('"').length % 2 === 1) return -1;
-
-    let depth = 0;
-    for (const { 0: char, index } of line.matchAll(BRACKETS_REGEXP)) {
-        if (char === '{' || char === '[') {
-            depth++;
-        } else if (--depth === 0) {
-            return index;
-        }
-    }
-    return -1;
-}
-
 // Whether the text starts with the root of a document that cannot be read: a
 // bracket where a value would stand, with a first member after it that JSON does
 // not allow.
@@ -739,17 +764,20 @@ function isUnreadableRoot({
 // is a bracket where a value would stand with a first member after it that JSON
 // does not allow. It is passed over with all that is inside it, so that none of
 // its members is taken for the JSON: up to the bracket that closes it, or to
-// the end of the text while it is not closed.
+// the end of the text while it is not closed. That bracket is found with its
+// strings read as JavaScript and Python have them too (see readRoot): read as
+// JSON has them, an inches mark, or a quote mark in single quote marks, opens
+// a string that runs on into the answer after it.
 //
 // A code block is not inside it, and ends it where it is not closed before the
 // block: one that is not in one of its strings or comments, which are part of
 // it. A code block that starts with JSON that can be read ends it wherever the
 // block is, by its fence alone and by none of the root’s quote marks: one with
-// no pair (an inches mark, say) would have a string run on past the fence and
-// hide the block. So such a block in one of the root’s strings or comments
-// ends it too. (Not one whose JSON cannot be read: it has no value to give,
-// and would only open the members after it to the search.) What follows the
-// fence is searched like any other text.
+// no pair (a string that was never closed, say) would have a string run on past
+// the fence and hide the block. So such a block in one of the root’s strings or
+// comments ends it too. (Not one whose JSON cannot be read: it has no value to
+// give, and would only open the members after it to the search.) What follows
+// the fence is searched like any other text.
 function getNotStart({
     precedingText,
     search,
@@ -786,15 +814,12 @@ function getNotStart({
         search.jsonFenceIndex === -1
             ? text
             : text.slice(0, search.jsonFenceIndex - offset);
-    const { endIndex, fenceIndex } = readRoot(readText, () => true);
+    const { endIndex, fenceIndex } = readRoot(readText, {
+        isEndedByFence: () => true,
+        isUnreadable: true,
+    });
     if (endIndex > -1) return text.slice(0, endIndex + 1);
-
-    const rootText = fenceIndex === -1 ? readText : readText.slice(0, fenceIndex);
-    // (a stray quote mark on its first line can hide where it is closed)
-    const lineEndIndex = indexOfLineRootEnd(text);
-    return text[lineEndIndex] === (text[0] === '{' ? '}' : ']')
-        ? text.slice(0, lineEndIndex + 1)
-        : rootText;
+    return fenceIndex === -1 ? readText : readText.slice(0, fenceIndex);
 }
 
 // whether the JSON starts where the text does, given the text that precedes it
@@ -959,9 +984,9 @@ function indexOfFencedStart({
     };
     // the fences in the value that it was taken to start with, which readRoot
     // leaves out if they are in one of its strings…
-    const { endIndex } = readRoot(text.slice(startIndex), (index) =>
-        isBlockJSONAt(startIndex + index),
-    );
+    const { endIndex } = readRoot(text.slice(startIndex), {
+        isEndedByFence: (index) => isBlockJSONAt(startIndex + index),
+    });
     if (fencedStartIndex > -1 || endIndex === -1) return fencedStartIndex;
 
     // …and those after it, once it is closed, whatever its quote marks make of
