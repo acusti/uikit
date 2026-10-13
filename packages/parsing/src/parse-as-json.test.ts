@@ -172,6 +172,7 @@ describe('@acusti/parsing', () => {
             'detects an object key with a missing value and fills it in',
             missingValuesTestCase,
         );
+        it('reads a member with no key as a key with no value', missingKeysTestCase);
         it('handles nested arrays without issue', nestedArraysTestCase);
         it('handles number values', numberValuesTestCase);
         it(
@@ -2312,6 +2313,193 @@ function missingCommasTestCase() {
             subheading: "We'd love to hear from you!",
         },
     });
+}
+
+function missingKeysTestCase() {
+    // a string alone where a key and its value were due (the text is shaped like
+    // a recorded response, in which the key that was left out is "category")
+    const response = `\
+{
+  "sections": [
+    {
+      "category": "hero",
+      "variant": "variant-c",
+      "props": {
+        "heading": "Fresh sourdough, baked daily"
+      }
+    },
+    {
+      "features",
+      "variant": "variant-a",
+      "props": {
+        "eyebrow": "Why Sourdough",
+        "items": [
+          {
+            "heading": "Slow Fermentation"
+          }
+        ]
+      }
+    },
+    {
+      "category": "faq",
+      "variant": "variant-b",
+      "props": {
+        "heading": "Questions"
+      }
+    }
+  ]
+}`;
+    expect(parseAsJSON(response)).toEqual({
+        postscript: '',
+        preamble: '',
+        value: {
+            sections: [
+                {
+                    category: 'hero',
+                    props: { heading: 'Fresh sourdough, baked daily' },
+                    variant: 'variant-c',
+                },
+                {
+                    features: '',
+                    props: {
+                        eyebrow: 'Why Sourdough',
+                        items: [{ heading: 'Slow Fermentation' }],
+                    },
+                    variant: 'variant-a',
+                },
+                {
+                    category: 'faq',
+                    props: { heading: 'Questions' },
+                    variant: 'variant-b',
+                },
+            ],
+        },
+    });
+
+    // it is read that way wherever it stands in its object: as the first member,
+    // the only one, the last one, or one in between, whatever comes before it
+    // and however the text is spaced
+    const readings: Array<[text: string, value: unknown]> = [
+        [
+            '{"s": [{"features", "variant": "b"}, {"category": "faq"}]}',
+            { s: [{ features: '', variant: 'b' }, { category: 'faq' }] },
+        ],
+        [
+            '{"s": [{"features"}, {"category": "faq"}]}',
+            { s: [{ features: '' }, { category: 'faq' }] },
+        ],
+        [
+            '{"s": [{"category": "hero", "features"}, {"category": "faq"}]}',
+            { s: [{ category: 'hero', features: '' }, { category: 'faq' }] },
+        ],
+        [
+            '{\n  "s": [\n    {\n      "category": "hero",\n      "features"\n    },\n    {\n      "category": "faq"\n    }\n  ]\n}',
+            { s: [{ category: 'hero', features: '' }, { category: 'faq' }] },
+        ],
+        [
+            '{"s": [{"variant": "b", "features", "x": 1}, {"category": "faq"}]}',
+            { s: [{ features: '', variant: 'b', x: 1 }, { category: 'faq' }] },
+        ],
+        [
+            '{\n  "s": [\n    {\n      "variant": "b",\n      "features",\n      "x": 1\n    }\n  ]\n}',
+            { s: [{ features: '', variant: 'b', x: 1 }] },
+        ],
+        [
+            '{"s": [{"count": 3, "features", "isLive": true, "pricing", "x": 1}]}',
+            { s: [{ count: 3, features: '', isLive: true, pricing: '', x: 1 }] },
+        ],
+        [
+            '{"s": [{"props": {"a": "b"}, "features", "tags": ["c"], "pricing"}]}',
+            { s: [{ features: '', pricing: '', props: { a: 'b' }, tags: ['c'] }] },
+        ],
+        // (as the value of a key, and as an item in an array at the root)
+        [
+            '{"hero": {"features", "variant": "b"}, "count": 1}',
+            { count: 1, hero: { features: '', variant: 'b' } },
+        ],
+        [
+            '[{"features", "variant": "b"}, {"category": "faq"}]',
+            [{ features: '', variant: 'b' }, { category: 'faq' }],
+        ],
+        ['{"hero": {"features"}, "count": 1}', { count: 1, hero: { features: '' } }],
+        ['[{"features"}, {"category": "faq"}]', [{ features: '' }, { category: 'faq' }]],
+        // in the root too: as its first member (bare, after a preamble and in a
+        // code block), and later on
+        ['{"features", "variant": "b"}', { features: '', variant: 'b' }],
+        ['{\n  "features",\n  "variant": "b"\n}', { features: '', variant: 'b' }],
+        ['Here it is:\n{"features", "variant": "b"}', { features: '', variant: 'b' }],
+        ['```json\n{"features", "variant": "b"}\n```', { features: '', variant: 'b' }],
+        [
+            '{"category": "hero", "features", "variant": "b"}',
+            { category: 'hero', features: '', variant: 'b' },
+        ],
+        [
+            '{\n  "category": "hero",\n  "features",\n  "variant": "b"\n}',
+            { category: 'hero', features: '', variant: 'b' },
+        ],
+        ['{"category": "hero", "features"}', { category: 'hero', features: '' }],
+        [
+            'Here it is:\n{\n  "category": "hero",\n  "features"\n}\nDone.',
+            { category: 'hero', features: '' },
+        ],
+        // (also where the root was closed too early, and a key follows its brace)
+        [
+            '{"heading": "Our Story", "subheading"}, "items": ["a"]}',
+            { heading: 'Our Story', items: ['a'], subheading: '' },
+        ],
+    ];
+    for (const [text, value] of readings) {
+        expect(parseAsJSON(text).value, text).toEqual(value);
+    }
+
+    // a member that has its key and its value is left as it is: only a string
+    // that no colon comes before, with a comma or its object’s closing brace
+    // right after it, is a key with no value
+    expect(
+        parseAsJSON('{"s": [{"features", "count": 3, "variant": "b"}]}').value,
+    ).toEqual({ s: [{ count: 3, features: '', variant: 'b' }] });
+    expect(parseAsJSON('{"s": [{"features", "count": 3}]}').value).toEqual({
+        s: [{ count: 3, features: '' }],
+    });
+    expect(parseAsJSON('{"s": [{"features", "tags": []}, {"a": {}}]}').value).toEqual({
+        s: [{ features: '', tags: [] }, { a: {} }],
+    });
+
+    // while the text streams in, the reading never goes away again, and the
+    // string is a key of its object from where the next member starts (or the
+    // object ends)
+    const getSection = (index: number) => (value: unknown) =>
+        (value as { sections: Array<unknown> }).sections[index];
+    const streams: Array<[text: string, getObject: (value: unknown) => unknown]> = [
+        [
+            '{"sections": [{"category": "hero", "variant": "a"}, {"features", "variant": "b"}, {"category": "faq", "variant": "c"}]}',
+            getSection(1),
+        ],
+        [
+            '{"sections": [{"category": "hero", "variant": "a"}, {"variant": "b", "features"}, {"category": "faq", "variant": "c"}]}',
+            getSection(1),
+        ],
+        [
+            '{\n  "sections": [\n    {\n      "features",\n      "count": 3\n    },\n    {\n      "features"\n    }\n  ]\n}',
+            getSection(0),
+        ],
+        [
+            '{\n  "features",\n  "variant": "b",\n  "props": {"heading": "Fresh"}\n}',
+            (value) => value,
+        ],
+    ];
+    for (const [text, getObject] of streams) {
+        const keyEndIndex = text.indexOf('"features"') + '"features"'.length;
+        const next = /^\s*(?:,\s*"|\})/.exec(text.slice(keyEndIndex));
+        const nextIndex = keyEndIndex + (next?.[0].length ?? 0);
+        for (let end = 1; end <= text.length; end++) {
+            const cutText = text.slice(0, end);
+            const { value } = parseAsJSON(cutText);
+            expect(value, cutText).not.toBe(null);
+            if (end < nextIndex) continue;
+            expect(getObject(value), cutText).toHaveProperty('features', '');
+        }
+    }
 }
 
 function missingOpeningQuoteTestCase() {
