@@ -4002,6 +4002,136 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('the repeats of a held key', () => {
+        // longer than the delay before a submit closes a menu
+        const waitPastCloseDelay = () =>
+            new Promise((resolve) => setTimeout(resolve, 150));
+
+        it('opens and closes on a press of Enter or Space on its trigger, not on the repeats of a held key', () => {
+            render(
+                <Dropdown hasItems={false}>
+                    <button type="button">Settings</button>
+                    <label>
+                        Label <input type="text" />
+                    </label>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Settings' });
+            for (const key of ['Enter', ' ']) {
+                // the press opens it, and the repeats that follow while the
+                // key is held are taken and do nothing…
+                expect(fireEvent.keyDown(trigger, { key })).toBe(false);
+                for (let count = 0; count < 3; count++) {
+                    expect(fireEvent.keyDown(trigger, { key, repeat: true })).toBe(false);
+                    expect(screen.getByRole('textbox')).toBeTruthy();
+                }
+
+                // …as they do once the next press has closed it
+                expect(fireEvent.keyDown(trigger, { key })).toBe(false);
+                for (let count = 0; count < 3; count++) {
+                    expect(fireEvent.keyDown(trigger, { key, repeat: true })).toBe(false);
+                    expect(screen.queryByRole('textbox')).toBeNull();
+                }
+            }
+        });
+
+        it('does not open a menu on the repeat of a key held on its trigger', () => {
+            render(
+                <Dropdown>
+                    Menu
+                    <ul>
+                        <li>One</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            for (const key of ['Enter', ' ', 'ArrowDown']) {
+                expect(fireEvent.keyDown(trigger, { key, repeat: true })).toBe(false);
+                expect(screen.queryByRole('menu')).toBeNull();
+            }
+        });
+
+        it('keeps a menu open through the repeats of the key that opened it', async () => {
+            render(
+                <Dropdown>
+                    Menu
+                    <ul>
+                        <li>One</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            for (const key of ['Enter', ' ']) {
+                expect(fireEvent.keyDown(trigger, { key })).toBe(false);
+                for (let count = 0; count < 3; count++) {
+                    expect(fireEvent.keyDown(trigger, { key, repeat: true })).toBe(false);
+                }
+                // with no active item, a submit would close the menu
+                await waitPastCloseDelay();
+                expect(screen.getByRole('menu')).toBeTruthy();
+
+                fireEvent.keyDown(trigger, { key: 'Escape' });
+                expect(screen.queryByRole('menu')).toBeNull();
+            }
+        });
+
+        it('submits the highlighted item once for a held Enter', async () => {
+            const handleSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown keepOpenOnSubmit onSubmitItem={handleSubmitItem}>
+                    Columns
+                    <ul>
+                        <li data-ukt-value="name">Name</li>
+                        <li data-ukt-value="email">Email</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Columns' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}');
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+            for (let count = 0; count < 3; count++) {
+                expect(fireEvent.keyDown(trigger, { key: 'Enter', repeat: true })).toBe(
+                    false,
+                );
+            }
+
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'name' }),
+            );
+        });
+
+        it('still moves through the items on the repeats of a held arrow key', async () => {
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Menu
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                        <li data-ukt-value="two">Two</li>
+                        <li data-ukt-value="three">Three</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.click(trigger);
+            fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+            fireEvent.keyDown(trigger, { key: 'ArrowDown', repeat: true });
+            fireEvent.keyDown(trigger, { key: 'ArrowDown', repeat: true });
+
+            expect(trigger.getAttribute('aria-activedescendant')).toBe(
+                screen.getByText('Three').id,
+            );
+        });
+    });
+
     describe('closing interactive content on submit (hasItems={false})', () => {
         // longer than the delay before a submit closes the dropdown
         const waitPastCloseDelay = () =>
