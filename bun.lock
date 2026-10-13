@@ -123,6 +123,7 @@
         "@storybook/addon-docs": "^10",
         "@storybook/react-vite": "^10",
         "@types/react": "^19.3",
+        "@types/react-dom": "^19.3",
         "@vitejs/plugin-react": "^6.1.0",
         "core-js": "^3.48.0",
         "oxc-transform-react": "^0.154.0",
