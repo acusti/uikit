@@ -95,7 +95,9 @@ export type Props = AriaAttributes & {
     /**
      * If true, pressing enter/return submits the <form> that the input is a
      * part of. By default, this also blurs the input unless
-     * keepFocusOnSubmit is true.
+     * keepFocusOnSubmit is true. The enter keydown is only prevented where it
+     * has a default action to stop: in a multiLine input, or in an input
+     * inside a <form>.
      */
     submitOnEnter?: boolean;
     tabIndex?: number;
@@ -314,8 +316,18 @@ export default function InputText({
             // For multi-line inputs, the primary modifier + Enter should always submit.
             isPrimaryModifierEnter
         ) {
-            event.preventDefault();
-            event.currentTarget.closest('form')?.requestSubmit();
+            const formElement = event.currentTarget.closest('form');
+            // Only prevent the key where it has a default action to stop: a
+            // line break in a multi-line input, or the browser’s own submission
+            // of the form, which is submitted from here instead (blurring the
+            // input would keep the browser from doing it). In a single-line
+            // input that no form owns, Enter has neither, and leaving it alone
+            // lets an ancestor tell it from an Enter that a handler has taken
+            // for something else (e.g. @acusti/dropdown, to close on submit)
+            if (multiLine || formElement) {
+                event.preventDefault();
+            }
+            formElement?.requestSubmit();
             if (!keepFocusOnSubmit) {
                 event.currentTarget.blur();
             }

@@ -206,6 +206,112 @@ describe('InputText.tsx', () => {
         expect(onBlur).not.toHaveBeenCalled();
     });
 
+    // With submitOnEnter, Enter is only prevented where it has a default
+    // action to stop: a form’s implicit submission (the component submits the
+    // form itself) or a textarea’s line break. Everywhere else it reaches the
+    // input’s ancestors as it would from a plain <input>, so that they can
+    // tell it apart from an Enter that a handler took for something else.
+    // fireEvent returns false if a handler prevented the event
+    describe('preventing Enter with submitOnEnter', () => {
+        it('leaves Enter alone in a single-line input that no form owns, and still blurs the input', async () => {
+            const user = userEvent.setup();
+            render(<InputText initialValue="hello" submitOnEnter />);
+            const input = screen.getByRole('textbox') as HTMLInputElement;
+            await user.click(input);
+            expect(input.matches(':focus')).toBe(true);
+
+            expect(fireEvent.keyDown(input, { key: 'Enter' })).toBe(true);
+            expect(input.matches(':focus')).toBe(false);
+        });
+
+        it('leaves Enter alone in a single-line input that no form owns, and keeps the focus with keepFocusOnSubmit', async () => {
+            const user = userEvent.setup();
+            render(<InputText initialValue="hello" keepFocusOnSubmit submitOnEnter />);
+            const input = screen.getByRole('textbox') as HTMLInputElement;
+            await user.click(input);
+
+            expect(fireEvent.keyDown(input, { key: 'Enter' })).toBe(true);
+            expect(input.matches(':focus')).toBe(true);
+        });
+
+        it.each([false, true])(
+            'prevents Enter in a single-line input that a form owns, so the form is only submitted once (keepFocusOnSubmit: %s)',
+            async (keepFocusOnSubmit) => {
+                const user = userEvent.setup();
+                const onSubmit = vi.fn<() => void>();
+                render(
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            onSubmit();
+                        }}
+                    >
+                        <InputText
+                            initialValue="hello"
+                            keepFocusOnSubmit={keepFocusOnSubmit}
+                            submitOnEnter
+                        />
+                    </form>,
+                );
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.click(input);
+                // user.keyboard submits the form as a browser does (implicit
+                // submission) if the keydown isn’t prevented and the input
+                // still has the focus, which would be a second submit
+                await user.keyboard('{Enter}');
+                expect(onSubmit).toHaveBeenCalledTimes(1);
+                expect(input.matches(':focus')).toBe(keepFocusOnSubmit);
+
+                expect(fireEvent.keyDown(input, { key: 'Enter' })).toBe(false);
+            },
+        );
+
+        it.each([
+            { inForm: false, keepFocusOnSubmit: false },
+            { inForm: false, keepFocusOnSubmit: true },
+            { inForm: true, keepFocusOnSubmit: false },
+            { inForm: true, keepFocusOnSubmit: true },
+        ])(
+            'prevents Enter in a multiLine input, so no line break is added (in a form: $inForm, keepFocusOnSubmit: $keepFocusOnSubmit)',
+            async ({ inForm, keepFocusOnSubmit }) => {
+                const user = userEvent.setup();
+                const onSubmit = vi.fn<() => void>();
+                const inputText = (
+                    <InputText
+                        initialValue="hello"
+                        keepFocusOnSubmit={keepFocusOnSubmit}
+                        multiLine
+                        submitOnEnter
+                    />
+                );
+                render(
+                    inForm ? (
+                        <form
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                onSubmit();
+                            }}
+                        >
+                            {inputText}
+                        </form>
+                    ) : (
+                        inputText
+                    ),
+                );
+                const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+                await user.click(textarea);
+                // user.keyboard adds the line break as a browser does if the
+                // keydown isn’t prevented and the textarea still has the focus
+                await user.keyboard('{Enter}');
+                expect(textarea.value).toBe('hello');
+                expect(onSubmit).toHaveBeenCalledTimes(inForm ? 1 : 0);
+                expect(textarea.matches(':focus')).toBe(keepFocusOnSubmit);
+
+                expect(fireEvent.keyDown(textarea, { key: 'Enter' })).toBe(false);
+            },
+        );
+    });
+
     it('allows Shift+Enter to insert a newline for multiLine submitOnEnter inputs with doubleClickToEdit', async () => {
         const user = userEvent.setup();
         const onSubmit = vi.fn<() => void>();
