@@ -15,6 +15,9 @@ import Dropdown, { type Item, type Props } from './Dropdown.js';
 
 afterEach(cleanup);
 
+// longer than the 90ms that Dropdown waits before a submit closes it
+const waitPastCloseDelay = () => new Promise((resolve) => setTimeout(resolve, 150));
+
 describe('@acusti/dropdown', () => {
     it('renders its contents as a dropdown menu with an empty button to trigger it when it’s rendered with a single child', async () => {
         const user = userEvent.setup();
@@ -4003,10 +4006,6 @@ describe('@acusti/dropdown', () => {
     });
 
     describe('the repeats of a held key', () => {
-        // longer than the delay before a submit closes a menu
-        const waitPastCloseDelay = () =>
-            new Promise((resolve) => setTimeout(resolve, 150));
-
         it('opens and closes on a press of Enter or Space on its trigger, not on the repeats of a held key', () => {
             render(
                 <Dropdown hasItems={false}>
@@ -4132,11 +4131,167 @@ describe('@acusti/dropdown', () => {
         });
     });
 
-    describe('closing interactive content on submit (hasItems={false})', () => {
-        // longer than the delay before a submit closes the dropdown
-        const waitPastCloseDelay = () =>
-            new Promise((resolve) => setTimeout(resolve, 150));
+    describe('the keys of an IME composition', () => {
+        // The keydown of a key that an IME takes: isComposing while the
+        // composition is under way, and a keyCode of 229 where it has
+        // already ended by the time of the keydown
+        const imeKeys = [
+            ['is composing', { isComposing: true }],
+            ['has a keyCode of 229', { keyCode: 229 }],
+        ] as const;
 
+        it.each(imeKeys)(
+            'does not create a value from the text of a searchable dropdown on an Enter that %s',
+            async (_, imeKey) => {
+                const handleSubmitItem = vi.fn<(payload: Item) => void>();
+                const user = userEvent.setup();
+                render(
+                    <Dropdown allowCreate isSearchable onSubmitItem={handleSubmitItem}>
+                        <ul>
+                            <li data-ukt-value="osaka">大阪</li>
+                            <li data-ukt-value="kyoto">京都</li>
+                        </ul>
+                    </Dropdown>,
+                );
+
+                const input = screen.getByRole<HTMLInputElement>('combobox');
+                await user.click(input);
+                await user.type(input, 'とうきょう');
+                // the Enter that commits the composition is the IME’s
+                expect(fireEvent.keyDown(input, { key: 'Enter', ...imeKey })).toBe(true);
+                await waitPastCloseDelay();
+                expect(handleSubmitItem).not.toHaveBeenCalled();
+                expect(input.getAttribute('aria-expanded')).toBe('true');
+
+                // Enter once more is the submit
+                fireEvent.keyDown(input, { key: 'Enter', keyCode: 13 });
+                expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+                expect(handleSubmitItem).toHaveBeenCalledWith(
+                    expect.objectContaining({ value: 'とうきょう' }),
+                );
+            },
+        );
+
+        it.each(imeKeys)(
+            'does not submit the highlighted item of a searchable dropdown on an Enter that %s',
+            async (_, imeKey) => {
+                const handleSubmitItem = vi.fn<(payload: Item) => void>();
+                const user = userEvent.setup();
+                render(
+                    <Dropdown isSearchable onSubmitItem={handleSubmitItem}>
+                        <ul>
+                            <li data-ukt-value="tokyo">Tokyo</li>
+                            <li data-ukt-value="toronto">Toronto</li>
+                        </ul>
+                    </Dropdown>,
+                );
+
+                const input = screen.getByRole<HTMLInputElement>('combobox');
+                await user.click(input);
+                // the text of a composition under way can match an item
+                await user.type(input, 'to');
+                expect(input.getAttribute('aria-activedescendant')).toBe(
+                    screen.getByText('Tokyo').id,
+                );
+
+                expect(fireEvent.keyDown(input, { key: 'Enter', ...imeKey })).toBe(true);
+                await waitPastCloseDelay();
+                expect(handleSubmitItem).not.toHaveBeenCalled();
+                expect(input.value).toBe('to');
+                expect(input.getAttribute('aria-expanded')).toBe('true');
+            },
+        );
+
+        it.each(imeKeys)(
+            'leaves the arrow keys and Escape to the IME on a keydown that %s',
+            async (_, imeKey) => {
+                const user = userEvent.setup();
+                render(
+                    <Dropdown isSearchable>
+                        <ul>
+                            <li data-ukt-value="one">One</li>
+                            <li data-ukt-value="two">Two</li>
+                            <li data-ukt-value="three">Three</li>
+                        </ul>
+                    </Dropdown>,
+                );
+
+                const input = screen.getByRole<HTMLInputElement>('combobox');
+                await user.click(input);
+                await user.keyboard('{ArrowDown}');
+                const activeId = screen.getByText('One').id;
+                expect(input.getAttribute('aria-activedescendant')).toBe(activeId);
+
+                // the arrows move through the IME’s candidates, and Escape
+                // cancels the composition
+                for (const key of ['ArrowDown', 'ArrowUp', 'Escape']) {
+                    expect(fireEvent.keyDown(input, { key, ...imeKey })).toBe(true);
+                }
+                expect(input.getAttribute('aria-activedescendant')).toBe(activeId);
+                expect(input.getAttribute('aria-expanded')).toBe('true');
+
+                await user.keyboard('{Escape}');
+                expect(input.getAttribute('aria-expanded')).toBe('false');
+            },
+        );
+
+        it.each(imeKeys)(
+            'does not open a closed dropdown on a Space or an Enter that %s',
+            async (_, imeKey) => {
+                const user = userEvent.setup();
+                render(
+                    <Dropdown isSearchable>
+                        <ul>
+                            <li data-ukt-value="one">One</li>
+                            <li data-ukt-value="two">Two</li>
+                        </ul>
+                    </Dropdown>,
+                );
+
+                // Escape closes the dropdown and leaves the focus in its input
+                const input = screen.getByRole<HTMLInputElement>('combobox');
+                await user.click(input);
+                await user.keyboard('{Escape}');
+                expect(input.ownerDocument.activeElement).toBe(input);
+                expect(input.getAttribute('aria-expanded')).toBe('false');
+
+                // Space converts the composition, and Enter commits it
+                for (const key of [' ', 'Enter']) {
+                    expect(fireEvent.keyDown(input, { key, ...imeKey })).toBe(true);
+                }
+                expect(input.getAttribute('aria-expanded')).toBe('false');
+            },
+        );
+
+        it.each(imeKeys)(
+            'stays open on an Enter that %s in a text input trigger when keepOpenOnSubmit is false',
+            async (_, imeKey) => {
+                const user = userEvent.setup();
+                render(
+                    <Dropdown hasItems={false} keepOpenOnSubmit={false}>
+                        <input aria-label="Tag" type="text" />
+                        <p data-testid="tag-help">Enter adds the tag.</p>
+                    </Dropdown>,
+                );
+
+                const input = screen.getByRole('textbox', { name: 'Tag' });
+                await user.click(input);
+                expect(screen.getByTestId('tag-help')).toBeTruthy();
+
+                expect(fireEvent.keyDown(input, { key: 'Enter', ...imeKey })).toBe(true);
+                await waitPastCloseDelay();
+                expect(screen.getByTestId('tag-help')).toBeTruthy();
+
+                // Enter once more is the submit
+                expect(fireEvent.keyDown(input, { key: 'Enter', keyCode: 13 })).toBe(
+                    false,
+                );
+                await waitFor(() => expect(screen.queryByTestId('tag-help')).toBeNull());
+            },
+        );
+    });
+
+    describe('closing interactive content on submit (hasItems={false})', () => {
         const preventDefault = (event: SubmitEvent) => event.preventDefault();
 
         const renderForm = ({
