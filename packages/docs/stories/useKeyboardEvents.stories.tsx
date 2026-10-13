@@ -137,8 +137,7 @@ export const InsideAFrame: Story = {
         <Fragment>
             {/* Mounts while the frame is still on its blank document. Keys
                 in the frame went unheard in Chromium only with a hook
-                mounted that early, so this demo is what makes the story
-                cover that */}
+                mounted that early, and this demo covers that */}
             <Demo />
             <Frame>
                 <p>Click here, then press a key.</p>
