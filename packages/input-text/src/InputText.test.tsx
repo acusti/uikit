@@ -266,6 +266,43 @@ describe('InputText.tsx', () => {
             },
         );
 
+        // The form that owns an input is the one the browser would submit:
+        // the form named by the input’s form prop, wherever the input is, and
+        // otherwise the form the input is inside. (An input inside one form
+        // whose form prop names another form, or no form at all, can’t be
+        // tested here: happy-dom reports the form it is inside as its owner.)
+        it.each([false, true])(
+            'prevents Enter in a single-line input tied to a form by its form prop, and submits that form once (keepFocusOnSubmit: %s)',
+            async (keepFocusOnSubmit) => {
+                const user = userEvent.setup();
+                const onSubmit = vi.fn<() => void>();
+                render(
+                    <>
+                        <form
+                            id="owner"
+                            onSubmit={(event) => {
+                                event.preventDefault();
+                                onSubmit();
+                            }}
+                        />
+                        <InputText
+                            form="owner"
+                            initialValue="hello"
+                            keepFocusOnSubmit={keepFocusOnSubmit}
+                            submitOnEnter
+                        />
+                    </>,
+                );
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.click(input);
+                await user.keyboard('{Enter}');
+                expect(onSubmit).toHaveBeenCalledTimes(1);
+                expect(input.matches(':focus')).toBe(keepFocusOnSubmit);
+
+                expect(fireEvent.keyDown(input, { key: 'Enter' })).toBe(false);
+            },
+        );
+
         it.each([
             { inForm: false, keepFocusOnSubmit: false },
             { inForm: false, keepFocusOnSubmit: true },
