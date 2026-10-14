@@ -1,5 +1,33 @@
 # @acusti/dropdown
 
+## 1.1.1
+
+### Patch Changes
+
+- a555d11: Fix a dropdown acting on the keys of an IME composition
+
+    A dropdown now ignores the keys an IME takes while text is being
+    composed, so that the Enter that commits a composition doesn’t also
+    submit the dropdown, the arrow keys don’t move the dropdown highlight,
+    and Escape doesn’t close it.
+
+- 9473044: Fix the keyboard in a dropdown inside a frame with its own
+  document
+
+    `@acusti/dropdown` now requires `@acusti/use-keyboard-events` 0.13.1.
+    In Chrome, a dropdown rendered into a same-origin frame that had loaded
+    a document of its own (a `srcdoc`, for example) ignored the keyboard if
+    a component using the hook had mounted while the frame was still blank.
+
+- 0a30104: Fix Enter in a text field trigger of a `hasItems={false}`
+  dropdown
+
+    Enter pressed in a textarea or an editable element that is the trigger
+    of an open `hasItems={false}` dropdown now adds a line break there,
+    where the dropdown used to take the key. In a single-line input
+    trigger, an Enter that a handler has prevented is no longer a submit,
+    so it doesn’t close a `keepOpenOnSubmit={false}` dropdown.
+
 ## 1.1.0
 
 ### Minor Changes
