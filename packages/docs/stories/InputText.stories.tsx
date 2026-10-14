@@ -126,7 +126,14 @@ export const MultiLineInputWithSubmitOnEnterNoForm: Story = {
                     {...args}
                     onKeyDown={(event) => {
                         args.onKeyDown?.(event);
-                        if (event.key === 'Enter' && !event.shiftKey && !event.altKey) {
+                        if (
+                            event.key === 'Enter' &&
+                            !event.shiftKey &&
+                            !event.altKey &&
+                            // the Enter that commits an IME composition is the IME’s
+                            !event.nativeEvent.isComposing &&
+                            event.keyCode !== 229
+                        ) {
                             setLastSubmitDate(new Date());
                         }
                     }}
