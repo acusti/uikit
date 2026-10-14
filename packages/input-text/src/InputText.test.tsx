@@ -349,6 +349,152 @@ describe('InputText.tsx', () => {
         );
     });
 
+    // The Enter that commits an IME composition (e.g. Japanese, Chinese or
+    // Korean) is the IME’s, so the component doesn’t act on it or prevent it.
+    // It comes as the composition is being committed (isComposing), or after
+    // the composition has already ended, when only its keyCode gives it away
+    describe('the Enter that commits an IME composition', () => {
+        const COMPOSING_ENTERS = [
+            { init: { isComposing: true, key: 'Enter' }, label: 'isComposing' },
+            { init: { key: 'Enter', keyCode: 229 }, label: 'keyCode 229' },
+        ];
+        const PLAIN_ENTER = { key: 'Enter', keyCode: 13 };
+
+        it.each(COMPOSING_ENTERS)('still passes it to onKeyDown ($label)', ({ init }) => {
+            const onKeyDown = vi.fn<() => void>();
+            render(<InputText onKeyDown={onKeyDown} submitOnEnter />);
+
+            fireEvent.keyDown(screen.getByRole('textbox'), init);
+            expect(onKeyDown).toHaveBeenCalledTimes(1);
+        });
+
+        it.each(COMPOSING_ENTERS)(
+            'doesn’t submit or blur a single-line input that a form owns, and the next Enter does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                const onSubmit = vi.fn<() => void>();
+                render(
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            onSubmit();
+                        }}
+                    >
+                        <InputText initialValue="hello" submitOnEnter />
+                    </form>,
+                );
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.click(input);
+
+                expect(fireEvent.keyDown(input, init)).toBe(true);
+                expect(onSubmit).not.toHaveBeenCalled();
+                expect(input.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(input, PLAIN_ENTER)).toBe(false);
+                expect(onSubmit).toHaveBeenCalledTimes(1);
+                expect(input.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(COMPOSING_ENTERS)(
+            'doesn’t blur a single-line input that no form owns, and the next Enter does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                render(<InputText initialValue="hello" submitOnEnter />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.click(input);
+
+                expect(fireEvent.keyDown(input, init)).toBe(true);
+                expect(input.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(input, PLAIN_ENTER)).toBe(true);
+                expect(input.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(COMPOSING_ENTERS)(
+            'doesn’t submit or blur a multiLine input, and the next Enter does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                const onSubmit = vi.fn<() => void>();
+                render(
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            onSubmit();
+                        }}
+                    >
+                        <InputText initialValue="hello" multiLine submitOnEnter />
+                    </form>,
+                );
+                const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+                await user.click(textarea);
+
+                expect(fireEvent.keyDown(textarea, init)).toBe(true);
+                expect(onSubmit).not.toHaveBeenCalled();
+                expect(textarea.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(textarea, PLAIN_ENTER)).toBe(false);
+                expect(onSubmit).toHaveBeenCalledTimes(1);
+                expect(textarea.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(COMPOSING_ENTERS)(
+            'doesn’t submit or blur a multiLine input with the primary modifier, and the next one does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                const onSubmit = vi.fn<() => void>();
+                render(
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            onSubmit();
+                        }}
+                    >
+                        <InputText initialValue="hello" multiLine />
+                    </form>,
+                );
+                const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+                await user.click(textarea);
+                // eslint-disable-next-line typescript/no-deprecated
+                const isApple = /mac|iphone|ipad|ipod/i.test(
+                    globalThis.navigator?.platform ?? '',
+                );
+                const modifier = isApple ? { metaKey: true } : { ctrlKey: true };
+
+                expect(fireEvent.keyDown(textarea, { ...init, ...modifier })).toBe(true);
+                expect(onSubmit).not.toHaveBeenCalled();
+                expect(textarea.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(textarea, { ...PLAIN_ENTER, ...modifier })).toBe(
+                    false,
+                );
+                expect(onSubmit).toHaveBeenCalledTimes(1);
+                expect(textarea.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(COMPOSING_ENTERS)(
+            'doesn’t finish editing a doubleClickToEdit input, and the next Enter does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                render(<InputText doubleClickToEdit initialValue="hello" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.dblClick(input);
+                expect(input.readOnly).toBe(false);
+
+                expect(fireEvent.keyDown(input, init)).toBe(true);
+                expect(input.readOnly).toBe(false);
+                expect(input.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(input, PLAIN_ENTER)).toBe(true);
+                expect(input.readOnly).toBe(true);
+                expect(input.matches(':focus')).toBe(false);
+            },
+        );
+    });
+
     it('allows Shift+Enter to insert a newline for multiLine submitOnEnter inputs with doubleClickToEdit', async () => {
         const user = userEvent.setup();
         const onSubmit = vi.fn<() => void>();

@@ -97,7 +97,8 @@ export type Props = AriaAttributes & {
      * the one named by the form prop, or else the one the input is inside. By
      * default, this also blurs the input unless keepFocusOnSubmit is true. The
      * enter keydown is only prevented where it has a default action to stop:
-     * in a multiLine input, or in an input that a form owns.
+     * in a multiLine input, or in an input that a form owns. The enter that
+     * commits an IME composition is left to the IME.
      */
     submitOnEnter?: boolean;
     tabIndex?: number;
@@ -292,6 +293,8 @@ export default function InputText({
         if (onKeyDown) onKeyDown(event);
         // special handling is only for Enter and Escape keys
         if (event.key !== 'Enter' && event.key !== 'Escape') return;
+        // the Enter that commits an IME composition is the IME’s
+        if (event.key === 'Enter' && isComposing(event)) return;
         const isPlainEnter =
             event.key === 'Enter' &&
             !event.shiftKey &&
@@ -421,6 +424,16 @@ function hasNonPrimaryModifier(event: KeyboardEvent<InputElement>) {
         event.shiftKey ||
         event.altKey ||
         (!isPrimaryModifierPressed(event) && (event.ctrlKey || event.metaKey))
+    );
+}
+
+// Whether a keydown is part of an IME composition. A composition can end
+// before the keydown that commits it, when only keyCode 229 still gives it away
+function isComposing(event: KeyboardEvent<InputElement>) {
+    return (
+        event.nativeEvent.isComposing ||
+        // eslint-disable-next-line typescript/no-deprecated
+        event.keyCode === 229
     );
 }
 
