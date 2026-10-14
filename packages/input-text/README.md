@@ -222,11 +222,12 @@ type Props = AriaAttributes & {
     style?: CSSProperties;
 
     /**
-     * If true, pressing Enter submits the parent form and blurs by default.
-     * Set keepFocusOnSubmit to submit without blurring.
+     * If true, pressing Enter submits the form that owns the input (the one
+     * named by the form prop, or else the one the input is inside) and
+     * blurs by default. Set keepFocusOnSubmit to submit without blurring.
      * For multi-line inputs, Cmd/Ctrl+Enter always submits.
      * The Enter keydown is only prevented where it has a default action to
-     * stop: in a multi-line input, or in an input inside a <form>. See
+     * stop: in a multi-line input, or in an input that a form owns. See
      * “Smart Enter Key Handling”.
      */
     submitOnEnter?: boolean;
@@ -816,7 +817,7 @@ fallback for older browsers:
 The component intelligently handles Enter key behavior based on context:
 
 ```tsx
-// Single-line: Enter submits the form the input is in, if any, and blurs
+// Single-line: Enter submits the input’s form, if any, and blurs
 <InputText submitOnEnter type="search" />
 
 // Chat-style single-line: submit and keep typing
@@ -838,11 +839,22 @@ With `submitOnEnter`, the Enter `keydown` is only prevented
 (`event.preventDefault()`) where it has a default action to stop:
 
 - in a multi-line input, where Enter would add a line break
-- in an input inside a `<form>`, where the browser would submit the form.
-  `InputText` submits it itself (`form.requestSubmit()`), because blurring
-  the input keeps the browser from doing so, and prevents the key so that
-  the form isn’t submitted a second time when `keepFocusOnSubmit` leaves
-  the focus in the input
+- in an input that a form owns. `InputText` submits that form itself
+  (`form.requestSubmit()`), including where the browser wouldn’t on Enter
+  (a form with several text fields and no submit button), and prevents the
+  key so that the browser doesn’t submit it a second time when
+  `keepFocusOnSubmit` leaves the focus in the input
+
+The form that owns an input is the one named by its `form` prop, wherever
+the input is, and otherwise the `<form>` the input is inside:
+
+```tsx
+// Enter in the input submits the form below it
+<InputText form="rename" name="name" submitOnEnter />
+<form id="rename" onSubmit={handleSubmit}>
+    <button type="submit">Save</button>
+</form>
+```
 
 In a single-line input with no form there is neither, so the `keydown` is
 left alone and reaches the input’s ancestors as it would from a plain
