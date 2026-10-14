@@ -227,7 +227,8 @@ type Props = AriaAttributes & {
      * blurs by default. Set keepFocusOnSubmit to submit without blurring.
      * For multi-line inputs, Cmd/Ctrl+Enter always submits.
      * The Enter keydown is only prevented where it has a default action to
-     * stop: in a multi-line input, or in an input that a form owns. See
+     * stop: in a multi-line input, or in an input that a form owns. The
+     * Enter that commits an IME composition is left to the IME. See
      * “Smart Enter Key Handling”.
      */
     submitOnEnter?: boolean;
@@ -637,8 +638,14 @@ function ChatInput({ onSendMessage, disabled }) {
 
     const handleKeyDown = useCallback(
         (event) => {
-            // Send on Enter, new line on Shift+Enter
-            if (event.key === 'Enter' && !event.shiftKey) {
+            // Send on Enter, new line on Shift+Enter, and leave the Enter
+            // that commits an IME composition to the IME
+            if (
+                event.key === 'Enter' &&
+                !event.shiftKey &&
+                !event.nativeEvent.isComposing &&
+                event.keyCode !== 229
+            ) {
                 event.preventDefault();
                 handleSend();
             }
@@ -738,6 +745,8 @@ function TagsInput() {
                 removeTag(index);
             } else if (
                 event.key === 'Enter' &&
+                !event.nativeEvent.isComposing &&
+                event.keyCode !== 229 &&
                 event.target.value.trim()
             ) {
                 event.preventDefault();
@@ -834,6 +843,14 @@ The component intelligently handles Enter key behavior based on context:
 // Cmd/Ctrl+Enter submits the form, if any, and blurs
 <InputText multiLine />
 ```
+
+The Enter that commits an IME composition (e.g. when typing Japanese,
+Chinese or Korean) is left to the IME: `InputText` doesn’t prevent it, and
+doesn’t submit, blur, or finish a `doubleClickToEdit` edit on it; the next
+Enter does. It still reaches `onKeyDown`, so a handler of your own that
+acts on Enter should skip it too, as the chat and tags examples above do:
+its `keydown` has `isComposing` set, or, where the composition has already
+ended by then, a `keyCode` of 229.
 
 With `submitOnEnter`, the Enter `keydown` is only prevented
 (`event.preventDefault()`) where it has a default action to stop:
