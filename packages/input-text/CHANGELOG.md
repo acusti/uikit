@@ -1,5 +1,33 @@
 # @acusti/input-text
 
+## 2.6.1
+
+### Patch Changes
+
+- b70b22f: Submit the form an input is tied to by its `form` prop on Enter
+
+    With `submitOnEnter`, Enter now submits the form that owns the input:
+    the one named by its `form` prop, wherever the input is, and otherwise
+    the `<form>` it is inside. A form that the input was tied to from
+    outside was not submitted before. An input inside a form whose `form`
+    prop names an id that matches no form has no form owner, as in a
+    browser, so Enter no longer submits the form it is inside.
+
+- 83018f9: Leave Enter alone in a single-line `submitOnEnter` input that no
+  form owns
+
+    With `submitOnEnter`, the Enter keydown is now only prevented where it
+    has a default action to stop: in a multi-line input, or in an input
+    that a form owns. In a single-line input with no form it reaches the
+    input’s ancestors as it would from a plain `<input>`, so a
+    `hasItems={false}` `@acusti/dropdown` with `keepOpenOnSubmit={false}`
+    now closes on it.
+
+    With `keepFocusOnSubmit`, the key there now also does what the browser
+    does for it: Chromium fires a `type="search"` input’s `search` event.
+    Without `keepFocusOnSubmit` the input has blurred by then, so it
+    doesn’t.
+
 ## 2.6.0
 
 ### Minor Changes
