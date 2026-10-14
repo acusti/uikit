@@ -18,5 +18,8 @@ yarn-error.log*
 # test scratch output (compiled modules imported by render tests)
 **/.test-tmp/
 
+# what the parseAsJSON harnesses save and write (packages/parsing/scripts)
+packages/parsing/scripts/runs/
+
 # claude code
 .claude
