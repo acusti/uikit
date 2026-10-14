@@ -226,6 +226,33 @@ function isValueDue({ controlChar, text }: { controlChar?: string; text: string 
     return controlChar === '}' && isPreceededBy({ char: ':', text });
 }
 
+// Whether what comes before the comma or closing brace at index, in an object,
+// is a key with no value: a string (the one that opens at stringIndex) that no
+// colon comes before, so that it stands where a key is due. Which of the two
+// was left out, its value or its own key, can’t be told from the text, and it
+// is kept as a key either way.
+//
+// Not as the first member of the root, though: with no colon after it, a brace
+// and a string are how a set is written (`{"a", "b"}`), which is no more JSON
+// where a value would stand than it is in a preamble (see isStartOfJSON).
+function isAfterKeyWithoutValue({
+    index,
+    isRoot,
+    stringIndex,
+    text,
+}: {
+    index: number;
+    isRoot: boolean;
+    stringIndex: number;
+    text: string;
+}) {
+    return (
+        isPreceededBy({ char: '"', index, text }) &&
+        !isPreceededBy({ char: ':', index: stringIndex, text }) &&
+        !(isRoot && isPreceededBy({ char: '{', index: stringIndex, text }))
+    );
+}
+
 // a sticky regular expression matches at its lastIndex only
 function matchAt({
     index,
@@ -1048,6 +1075,9 @@ export function parseAsJSON(text: string): ParsedResult {
     // initialize variables
     const stack: Array<string> = [];
     let isInsideString = false;
+    // where the last string opened: in the text, where what came before it can
+    // be read without reading newText back (which costs more as it grows)
+    let stringIndex = -1;
     let newText = '';
 
     // identify start of JSON: the first brace that opens an object or bracket
@@ -1315,12 +1345,25 @@ export function parseAsJSON(text: string): ParsedResult {
 
             if (char === '"') {
                 isInsideString = true;
+                stringIndex = index;
             } else if (char === '{') {
                 stack.push('}');
             } else if (char === '[') {
                 stack.push(']');
             } else if (char === '}' || char === ']') {
                 if (stack.length && stack.at(-1) === char) {
+                    // a key with no value before the brace is given an empty one
+                    if (
+                        char === '}' &&
+                        isAfterKeyWithoutValue({
+                            index,
+                            isRoot: stack.length === 1,
+                            stringIndex,
+                            text,
+                        })
+                    ) {
+                        newText += ': ""';
+                    }
                     if (char === '}' && stack.length === 1) {
                         // if this is the last closing brace, it should be the end of the JSON.
                         // if it is followed by a key, skip this closing brace and continue to process.
@@ -1361,12 +1404,14 @@ export function parseAsJSON(text: string): ParsedResult {
                 }
             } else if (char === ',' && stack.at(-1) === '}') {
                 // ensure comma follows a full key/value pair
-                // if not, convert current string into a key and add an empty value
-                // (only a string can be a key: after a number, object, or array,
-                // the previous string type is that of an earlier pair)
+                // if not, the string before it is a key: give it an empty value
                 if (
-                    isPreceededBy({ char: '"', text: newText }) &&
-                    getPreviousStringType(newText) === 'VALUE'
+                    isAfterKeyWithoutValue({
+                        index,
+                        isRoot: stack.length === 1,
+                        stringIndex,
+                        text,
+                    })
                 ) {
                     char = ': "",';
                 }

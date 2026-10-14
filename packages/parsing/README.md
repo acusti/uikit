@@ -236,6 +236,43 @@ parseAsJSON('{"count": 12' + '\n').value;
 // { count: 12 }
 ```
 
+## A member with its key or its value left out
+
+A model can leave the key out of a member, or its value, so that a string
+stands alone in an object where a key and its value were due. `parseAsJSON`
+can’t tell which of the two was left out, and does not guess at it: the
+string is kept as a key with `''` for its value, wherever it is in its
+object, and the rest of the text is read.
+
+```js
+parseAsJSON(
+    '{"sections": [{"category": "hero", "variant": "a"}, {"features", "variant": "b"}]}',
+).value;
+/* results in:
+{
+    sections: [
+        { category: 'hero', variant: 'a' },
+        { features: '', variant: 'b' },
+    ],
+}
+*/
+
+parseAsJSON('{"heading": "Our Story", "subheading", "items": []}').value;
+// { heading: 'Our Story', subheading: '', items: [] }
+
+parseAsJSON('{"heading": "Our Story", "subheading"}').value;
+// { heading: 'Our Story', subheading: '' }
+```
+
+The first member of the root is the exception. A brace, a string and no
+colon is how a set is written (`{"a", "b"}`), which is not JSON, so the
+`value` is `null`:
+
+```js
+parseAsJSON('{"features", "variant": "b"}').value;
+// null
+```
+
 ## What it repairs, and what it doesn’t
 
 Every repair and rule in `parseAsJSON` has a cost: bytes in your bundle,
