@@ -119,6 +119,48 @@ export const getComponentOptionsError = (options: ComponentOptions): null | stri
     return null;
 };
 
+// React DOM props it reads by truthiness: set when the prop is truthy,
+// unset when it isn’t — and "" isn’t, so the empty value that `<svg hidden>`
+// reads as would drop the attribute from the rendered element. Most are the
+// names React DOM 19 renders by truthiness in setProp (react-dom-client) and
+// pushAttribute (react-dom-server, the only one that writes autoFocus), and
+// it does so whatever the element: hidden on an SVG element as much as
+// disabled on HTML inside <foreignObject>. defaultChecked and selected are
+// form state, read by truthiness in initInput and the option case instead;
+// an <input>’s checked arrives as defaultChecked, via the mappings. Browsers
+// don’t act on hidden or inert on SVG elements, but a stylesheet’s [hidden]
+// rule (normalize.css, Tailwind’s preflight) and selectors do.
+const BOOLEAN_PROP_NAMES: ReadonlySet<string> = new Set([
+    'allowFullScreen',
+    'async',
+    'autoFocus',
+    'autoPlay',
+    'controls',
+    'credentialless',
+    'default',
+    'defaultChecked',
+    'defer',
+    'disabled',
+    'disablePictureInPicture',
+    'disableRemotePlayback',
+    'formNoValidate',
+    'hidden',
+    'inert',
+    'itemScope',
+    'loop',
+    'multiple',
+    'muted',
+    'noModule',
+    'noValidate',
+    'open',
+    'playsInline',
+    'readOnly',
+    'required',
+    'reversed',
+    'scoped',
+    'seamless',
+    'selected',
+]);
 const IDENTIFIER_REGEX = /^[A-Za-z_$][\w$]*$/;
 // lowercase-initial (intrinsic) JSX element names: JSX resolves these as
 // string tags; dashes and underscores are allowed after the first character
@@ -273,7 +315,15 @@ const toStyleObject = (style: string) => {
 const toJSXAttribute = (name: string, value: string, elementName: string) => {
     const propName = toPropName(name, elementName);
     if (propName === 'style') return `style={${toStyleObject(value)}}`;
-    if (isNumericValue(value)) return `${propName}={${Number(value)}}`;
+    const isBooleanProp = BOOLEAN_PROP_NAMES.has(propName);
+    if (isBooleanProp && value === '') return `${propName}={true}`;
+    // any other value of a boolean prop stays a string, numeric ones
+    // included: React renders a non-empty string as present, as HTML does,
+    // but hidden={0} is falsy. hidden="false" is present too, and React’s
+    // dev warning that the browser reads it as true points at the source.
+    if (!isBooleanProp && isNumericValue(value)) {
+        return `${propName}={${Number(value)}}`;
+    }
     return `${propName}="${escapeAttributeValue(value)}"`;
 };
 

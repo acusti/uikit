@@ -53,7 +53,7 @@ below. What consumers get out of it:
   microseconds, and compiling it with oxc takes about a millisecond, so the
   first `.svg?react` import costs single-digit milliseconds instead of the
   hundreds of milliseconds it takes to load and warm up a Babel pipeline.
-- **Seven SVGR conversion bugs fixed:** CDATA sections are preserved rather
+- **Eight SVGR conversion bugs fixed:** CDATA sections are preserved rather
   than dropped; `px` values inside a `style` attribute stay strings (SVGR
   stripped the unit, and React only adds it back to the CSS properties that
   take one, so `line-height: 20px` became a multiplier of 20 and
@@ -63,9 +63,12 @@ below. What consumers get out of it:
   containing double quotes no longer emit invalid JSX; whitespace between
   the children of a text-content element survives, so
   `<tspan>A</tspan> <tspan>B</tspan>` still renders “A B” rather than “AB”;
-  and attribute values become numbers only when that round-trips, so
-  `id="001"` stays `001` rather than turning into `1` and breaking the
-  `<use href="#001">` pointing at it.
+  a boolean attribute such as `hidden`, or `disabled` on HTML inside
+  `<foreignObject>`, is no longer dropped when its value is empty
+  (`hidden=""`) or `0` (SVGR passed React `""` or `0`, which React reads as
+  false for a boolean attribute); and other attribute values become numbers
+  only when that round-trips, so `id="001"` stays `001` rather than turning
+  into `1` and breaking the `<use href="#001">` pointing at it.
 
 [SVGO][]-style optimization is available as an opt-in: the `optimize`
 option below runs each SVG through [OXVG][] — the Rust, SVGO-compatible SVG
@@ -326,7 +329,7 @@ svgReact({
 });
 ```
 
-Two more things about OXVG itself:
+Three more things about OXVG itself:
 
 1. A job name it doesn’t recognize is ignored silently, which is what
    `satisfies Jobs` above is for.
@@ -335,6 +338,32 @@ Two more things about OXVG itself:
    matched it — usually a generated name like `.cls-1`, but if you style by
    class name from your app’s CSS and the SVG carries its own rule for that
    class, leave `inlineStyles` out as above.
+3. Two jobs in the default preset remove boolean attributes:
+   `removeUnknownsAndDefaults` removes `hidden` and `inert` from SVG
+   elements whatever their value, since they aren’t SVG attributes, and
+   `removeEmptyAttrs` removes empty ones, such as `hidden=""` or
+   `controls=""` on a `<video>` inside `<foreignObject>`. To keep them,
+   leave `removeEmptyAttrs` out and turn off the `unknownAttrs` part of
+   `removeUnknownsAndDefaults`, or `exclude` the files that use them:
+
+    ```ts
+    import { extend } from '@oxvg/napi';
+
+    const { removeEmptyAttrs, removeUnknownsAndDefaults, ...jobs } =
+        extend({ type: 'Default' });
+
+    svgReact({
+        optimize: {
+            jobs: {
+                ...jobs,
+                removeUnknownsAndDefaults: {
+                    ...removeUnknownsAndDefaults,
+                    unknownAttrs: false,
+                },
+            },
+        },
+    });
+    ```
 
 #### SVG files the `optimize` option rejects
 
@@ -352,8 +381,10 @@ the file and the line, and each still builds with `optimize` off:
   which XML doesn’t define. Without `optimize` these pass through
   literally; with it, `unknown entity reference 'nbsp'`.
 - **A minimized attribute** (`<svg hidden>`), which is legal inline in HTML
-  but not in XML. Without `optimize` it reads as `hidden=""`; with it,
-  `expected '=' not '>'`.
+  but not in XML. Without `optimize` it means what it does in HTML, and
+  renders as `<svg hidden="">`; with it, `expected '=' not '>'`. Once
+  normalized to `hidden=""` it builds, but the default preset then removes
+  it (see item 3 above).
 
 If you hit one of these, it’s the option and not your file: normalize the
 SVG once (`svgo`, or any XML formatter) or don’t use the `optimize` option.
