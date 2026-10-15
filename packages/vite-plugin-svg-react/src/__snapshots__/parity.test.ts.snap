@@ -7,6 +7,13 @@ export default SvgIcon;
 "
 `;
 
+exports[`svgr parity corpus > boolean attributes with empty, self-named, and other values 1`] = `
+"import type { SVGProps } from 'react';
+const SvgIcon = (props: SVGProps<SVGSVGElement>) => <svg hidden={true} autoFocus="autofocus" inert="INERT" {...props}><g hidden="false" /><g hidden="0" /><foreignObject><video controls={true} /></foreignObject></svg>;
+export default SvgIcon;
+"
+`;
+
 exports[`svgr parity corpus > component naming from a digit-initial file name 1`] = `
 "import type { SVGProps } from 'react';
 const Svg2Fast = (props: SVGProps<SVGSVGElement>) => <svg xmlns="http://www.w3.org/2000/svg" width={24} height={24} viewBox="0 0 24 24" {...props}><path d="M0 0h1v1H0z" /></svg>;

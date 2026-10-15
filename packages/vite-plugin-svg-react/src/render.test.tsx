@@ -7,6 +7,7 @@ import { mkdir, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { type ComponentType, createRef, type SVGProps } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { build } from 'vite';
 import { afterAll, afterEach, describe, expect, it } from 'vitest';
 
@@ -129,6 +130,31 @@ describe('rendered SVG components', () => {
         );
         expect(container.querySelector('text')?.getAttribute('font-family')).toBe(
             'A & B "C"',
+        );
+    });
+
+    it('keeps boolean attributes whose SVG value is empty or 0', async () => {
+        // React DOM drops a boolean prop whose value is falsy. Emitted as
+        // hidden="", the fixture’s <svg hidden> rendered without the
+        // attribute, out of reach of a stylesheet’s [hidden] rule; emitted as
+        // hidden={0}, so did its <rect hidden="0">; and emitted as
+        // defaultChecked="" and disabled="", the checkbox in its
+        // <foreignObject> was unchecked and enabled
+        const { default: Icon } = await loadFixture({
+            fixture: 'boolean-attributes.svg',
+        });
+        const { container } = render(<Icon />);
+        const svg = container.querySelector('svg')!;
+        expect(svg.getAttribute('hidden')).toBe('');
+        expect(svg.getAttribute('inert')).toBe('');
+        expect(container.querySelector('rect')?.getAttribute('hidden')).toBe('');
+        const input = container.querySelector('input')!;
+        expect(input.checked).toBe(true);
+        expect(input.disabled).toBe(true);
+        // a client render never writes autofocus (React focuses form
+        // controls on mount instead), so server rendering is where it shows
+        expect(renderToStaticMarkup(<Icon />)).toBe(
+            '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 4" hidden="" autofocus="" inert=""><rect hidden="" width="4" height="4"></rect><foreignObject width="4" height="4"><input type="checkbox" disabled="" checked=""/></foreignObject></svg>',
         );
     });
 

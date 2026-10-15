@@ -10,14 +10,15 @@ import { type ComponentOptions, generateComponentModule } from './generate.js';
 // declaration boundaries and CSS comments removed, attribute values fully
 // escaped at emission and converted to numbers only when that round-trips,
 // whitespace between the children of text-content elements preserved,
-// svgProps overrides appended instead of replaced in place, and namespaced
-// element names, non-<svg> roots, and character references outside XML’s
-// range rejected at build time). The corpus covers the supported options
-// (dimensions, icon, svgProps) and the markup edge cases; svgr options the
-// plugin deliberately dropped are rejected at config time and aren’t
-// represented here. If a change to generate.ts, parse.ts, or mappings.ts
-// alters a snapshot, that’s a fidelity break: update deliberately, with the
-// divergence documented, or not at all.
+// React DOM boolean props emitted as {true} when empty and as strings
+// otherwise, svgProps overrides appended instead of replaced in place, and
+// namespaced element names, non-<svg> roots, and character references
+// outside XML’s range rejected at build time). The corpus covers the
+// supported options (dimensions, icon, svgProps) and the markup edge cases;
+// svgr options the plugin deliberately dropped are rejected at config time
+// and aren’t represented here. If a change to generate.ts, parse.ts, or
+// mappings.ts alters a snapshot, that’s a fidelity break: update
+// deliberately, with the divergence documented, or not at all.
 
 const COMPLEX_SVG = `<?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
@@ -81,6 +82,15 @@ describe('svgr parity corpus', () => {
         // re-checked against @svgr/core@8.1: it emitted id={1}, data-code={16},
         // and data-pad={1.5} for these, changing what each one renders
         const svg = '<svg id="001" data-code="0x10" data-pad="1.50" width="24"/>';
+        expect(generate(svg)).toMatchSnapshot();
+    });
+
+    it('boolean attributes with empty, self-named, and other values', () => {
+        // re-checked against @svgr/core@8.1: it emitted hidden={0} and the
+        // rest as strings, and React drops hidden="", hidden={0}, and
+        // controls="" from the rendered element
+        const svg =
+            '<svg hidden="" autofocus="autofocus" inert="INERT"><g hidden="false"/><g hidden="0"/><foreignObject><video controls=""/></foreignObject></svg>';
         expect(generate(svg)).toMatchSnapshot();
     });
 

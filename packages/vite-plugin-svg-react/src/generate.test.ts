@@ -92,6 +92,45 @@ describe('generateComponentModule', () => {
         expect(code).toContain('aria-labelledby="t"');
     });
 
+    it('emits {true} for an empty boolean attribute', () => {
+        // React DOM renders its boolean props by truthiness alone, so the
+        // empty value a minimized attribute reads as would drop it from the
+        // rendered element
+        const code = generate('<svg hidden autofocus="" inert=""><g hidden=""/></svg>');
+        expect(code).toContain(
+            '<svg hidden={true} autoFocus={true} inert={true} {...props}>',
+        );
+        expect(code).toContain('<g hidden={true} />');
+    });
+
+    it('emits {true} for an empty boolean attribute of HTML inside <foreignObject>', () => {
+        // React DOM applies boolean semantics by prop name, whatever the element
+        const code = generate(
+            '<svg><foreignObject><video controls="" muted=""/><input disabled="" readonly=""/><details open=""/><input type="checkbox" checked=""/><select><option selected="">b</option></select></foreignObject></svg>',
+        );
+        expect(code).toContain('<video controls={true} muted={true} />');
+        expect(code).toContain('<input disabled={true} readOnly={true} />');
+        expect(code).toContain('<details open={true} />');
+        // an <input>’s checked arrives as defaultChecked, via the mappings
+        expect(code).toContain('<input type="checkbox" defaultChecked={true} />');
+        expect(code).toContain('<option selected={true}>');
+    });
+
+    it('leaves other values of boolean attributes, and empty values of others, as written', () => {
+        const code = generate(
+            '<svg hidden="false" aria-hidden="" data-flag=""><g hidden="hidden" inert="INERT"/><g hidden="0" inert="1"/></svg>',
+        );
+        expect(code).toContain('hidden="false"');
+        expect(code).toContain('aria-hidden=""');
+        expect(code).toContain('data-flag=""');
+        // a value naming the attribute is already truthy, so it renders the
+        // same as {true} would
+        expect(code).toContain('<g hidden="hidden" inert="INERT" />');
+        // numeric values stay strings too: hidden={0} is falsy, so React
+        // would drop the attribute that the string keeps
+        expect(code).toContain('<g hidden="0" inert="1" />');
+    });
+
     it('converts numeric-looking attribute values to expressions', () => {
         const code = generate(
             '<svg width="24" x="-1.5" viewBox="0 0 24 24" opacity="50%"/>',
