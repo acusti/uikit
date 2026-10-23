@@ -136,6 +136,10 @@ getBestMatch({ items: fontWeights, text: '9' });
 const values = ['7px', '11px', '18px', '36px', '128px'];
 getBestMatch({ items: values, text: '1' });
 // → '11px'
+
+// Numbers match the nearest number
+getBestMatch({ items: values, text: '15' });
+// → '18px'
 ```
 
 ## Advanced Usage
@@ -220,6 +224,13 @@ The matching algorithm implements best-effort scoring that considers:
 5. **Case insensitivity**: All matching is case-insensitive
 6. **Number-letter proximity**: Special handling for mixed alphanumeric
    content
+7. **Numbers**: When the text is a number, with or without a sign or unit
+   (`'12'`, `'-5'`, `'12px'`), an item that starts with a different number
+   ranks by how near that number is, so `'6'` finds `'7px'` before
+   `'36px'`, with the typed unit first between numbers as near as each
+   other (`'3px'` finds `'2px'` before `'2em'`). A thousands separator in
+   an item is read as part of its number (`'1,000'`). An item that starts
+   with the typed digits still ranks first (`'1'` finds `'11px'`).
 
 #### Scoring Examples
 

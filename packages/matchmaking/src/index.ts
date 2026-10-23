@@ -7,6 +7,15 @@ const MAX_DISTANCE = 15;
 const MAX_INEXACT_SCORE = 0.99999;
 const MAX_PARTIAL_EXACT_SCORE = 0.999999;
 const MIN_PARTIAL_EXACT_SCORE = 0.81; // cut-off for partial match vs mismatch
+// A number with an optional sign and unit, e.g. '12', '-1.5' or '12px' (once uppercased)
+const NUMBER_TEXT = /^-?\d+(?:\.\d+)?[A-Z%]*$/;
+// The number a string starts with, with an optional sign, e.g. '-1.5' in '-1.5REM'
+const LEADING_NUMBER = /^-?\d[\d.]*/;
+// A comma between thousands, as in '1,000'
+const THOUSANDS_SEPARATOR = /,(?=\d{3})/g;
+// The most an item scores for its number in a unit other than the typed one, just
+// below MAX_INEXACT_SCORE so that the typed unit breaks a tie
+const OTHER_UNIT_SCORE = 0.9999;
 
 export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean) => {
     if (!isSanitized) {
@@ -22,6 +31,21 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
 
     // If one of the texts is empty, they cannot match
     if (!shortestLength) return 0;
+
+    // If the text is a number (e.g. '12', '-5' or '12px') that the item doesn’t
+    // start with, an item that starts with a number scores by how near its number is
+    if (LEADING_NUMBER.test(strA) && NUMBER_TEXT.test(strB) && !strA.startsWith(strB)) {
+        const textNumber = parseFloat(strB);
+        const itemText = strA.replace(THOUSANDS_SEPARATOR, '');
+        const difference = Math.abs(parseFloat(itemText) - textNumber);
+        const isTypedUnit = itemText
+            .replace(LEADING_NUMBER, '')
+            .startsWith(strB.replace(LEADING_NUMBER, ''));
+        // From the top score for the same number toward 0 the further away it is
+        const scale = Math.abs(textNumber) || 1;
+        const topScore = isTypedUnit ? MAX_INEXACT_SCORE : OTHER_UNIT_SCORE;
+        return (topScore * scale) / (scale + difference);
+    }
 
     // Exact partial match is the next best score to an exact match with
     // relative length from the beginning applying a penalty to total score
