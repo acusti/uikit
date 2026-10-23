@@ -216,11 +216,12 @@ The matching algorithm implements best-effort scoring that considers:
 
 1. **Exact matches**: Perfect matches score highest (score = 1.0)
 2. **Partial exact matches**: An item that contains the text scores above
-   every item that doesn’t, higher the earlier in the item the text starts
-   (a number inside another number still ranks by value; see 7). Text that
-   contains the whole item (e.g. the item and a stray keystroke) scores
-   below every item that contains the text, and lower the further into the
-   text the item starts.
+   every item that doesn’t, higher when the text starts a word in it
+   (`'Wild Cat'` before `'Bobcat'` for `'cat'`), then the earlier in the
+   item it starts (a number inside another number still ranks by value; see
+   7). Text that contains the whole item (e.g. the item and a stray
+   keystroke) scores below every item that contains the text, and lower the
+   further into the text the item starts.
 3. **Character proximity**: Similar characters (e.g., 'a' and 'b') score
    better than distant ones
 4. **Consecutive matches**: Consecutive character matches from the start
@@ -234,13 +235,14 @@ The matching algorithm implements best-effort scoring that considers:
    ranks by how near that number is, so `'6'` finds `'7px'` before
    `'36px'`, with the typed unit first between numbers as near as each
    other (`'3px'` finds `'2px'` before `'2em'`). A thousands separator in
-   an item is read as part of its number (`'1,000'`). An item that starts
-   with the typed digits still ranks first (`'1'` finds `'11px'`). Any
-   other item that doesn’t contain the number scores a hundredth of what it
-   would otherwise, so neither the number’s unit nor a keyword outranks a
-   value of a similar size (`'6px'` finds `'4px'` before `'px'` or
-   `'auto'`), while a word typed with a digit for its first letter still
-   finds its item (`'0hio'` finds `'Ohio'`).
+   an item is read as part of its number (`'1,000'`). An item where the
+   typed number starts a word still contains it (`'1'` finds `'11px'`, and
+   `'5'` finds `'2 × 5'`). An item that doesn’t start with a number and
+   doesn’t contain it scores a hundredth of what it would otherwise, so
+   neither the number’s unit nor a keyword outranks a value of a similar
+   size (`'6px'` finds `'4px'` before `'px'` or `'auto'`), while a word
+   typed with a digit for its first letter still finds its item (`'0hio'`
+   finds `'Ohio'`).
 
 #### Scoring Examples
 
@@ -253,7 +255,8 @@ getMatchScore('apple', 'apple'); // → 1
 // Partial exact match: an item that contains the text scores above every
 // item that doesn’t, even one that starts like the text
 getMatchScore('application', 'app'); // → 0.999999
-getMatchScore('Bobcat', 'cat'); // → 0.9999945
+getMatchScore('Wild Cat', 'cat'); // → ~0.9999962 (starts a word)
+getMatchScore('Bobcat', 'cat'); // → ~0.9999923
 getMatchScore('Cart', 'cat'); // → ~0.99998
 
 // Character proximity matching
@@ -261,8 +264,8 @@ getMatchScore('abd', 'abc'); // → ~0.99998 (high, 'c' and 'd' are close)
 getMatchScore('axz', 'abc'); // → ~0.4222 (lower, 'b'→'x', 'c'→'z' are distant)
 
 // Bonus for matching closer to the start of the item
-getMatchScore('test', 'es'); // → ~0.9999968
-getMatchScore('test', 'st'); // → 0.9999945
+getMatchScore('test', 'es'); // → ~0.9999934
+getMatchScore('test', 'st'); // → ~0.9999923
 ```
 
 ## Common Use Cases
