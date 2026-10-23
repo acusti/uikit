@@ -5,6 +5,7 @@ const FIRST_LETTER = 65; // 'A'.charCodeAt(0);
 // Consider every distance greater than or equal to 15 to be functionally equivalent
 const MAX_DISTANCE = 15;
 const MAX_INEXACT_SCORE = 0.99999;
+const MIN_CLOSE_SCORE = 0.9999; // an inexact match whose distance is outweighed by its exact matches
 const MAX_PARTIAL_EXACT_SCORE = 0.999999;
 const MIN_PARTIAL_EXACT_SCORE = 0.81; // cut-off for partial match vs mismatch
 // A number with an optional sign and unit, e.g. '12', '-1.5' or '12px' (once uppercased)
@@ -91,12 +92,16 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
         }
     }
 
-    // If score came to 0 or less, use best possible score for an inexact match
-    if (score <= 0) return MAX_INEXACT_SCORE;
+    // If score came to 0 or less, the exact matches outweigh the distance, so
+    // score it from MIN_CLOSE_SCORE up toward MAX_INEXACT_SCORE the further
+    // below 0 it came (e.g. the longer the exact match from the start)
+    if (score <= 0) {
+        return MAX_INEXACT_SCORE - (MAX_INEXACT_SCORE - MIN_CLOSE_SCORE) / (1 - score);
+    }
     // Invert score and normalize into a range based on worst possible score
     score = (worstPossibleScore - score) / worstPossibleScore;
-    // Don’t allow an inexact match to get a score of 1 (reserved for an exact match)
-    return Math.min(MAX_INEXACT_SCORE, score);
+    // Keep it below every inexact match whose score came to 0 or less
+    return Math.min(MIN_CLOSE_SCORE, score);
 };
 
 type Payload = {

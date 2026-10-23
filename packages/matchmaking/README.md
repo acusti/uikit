@@ -220,7 +220,8 @@ The matching algorithm implements best-effort scoring that considers:
 3. **Character proximity**: Similar characters (e.g., 'a' and 'b') score
    better than distant ones
 4. **Consecutive matches**: Consecutive character matches from the start
-   get bonus scoring
+   get bonus scoring, so among close matches, the one that matches more of
+   the start ranks higher
 5. **Case insensitivity**: All matching is case-insensitive
 6. **Number-letter proximity**: Special handling for mixed alphanumeric
    content
@@ -245,7 +246,7 @@ getMatchScore('apple', 'apple'); // → 1.0
 getMatchScore('app', 'application'); // → ~0.999999 (very high)
 
 // Character proximity matching
-getMatchScore('abd', 'abc'); // → ~0.99999 (high, 'c' and 'd' are close)
+getMatchScore('abd', 'abc'); // → ~0.99998 (high, 'c' and 'd' are close)
 getMatchScore('axz', 'abc'); // → ~0.4222 (lower, 'b'→'x', 'c'→'z' are distant)
 
 // Bonus for matching closer to the start of the string
