@@ -257,5 +257,36 @@ describe('@acusti/matchmaking', () => {
                 getBestMatch({ items: ['100,000', '1,000,000'], text: '900000' }),
             ).toBe('1,000,000');
         });
+
+        it('tells close inexact matches apart when items share a long start', () => {
+            const timeZones = [
+                'America/Adak',
+                'America/Nassau',
+                'America/New_York',
+                'Europe/Amsterdam',
+                'Europe/Paris',
+            ];
+            expect(getBestMatch({ items: timeZones, text: 'america/new_yrok' })).toBe(
+                'America/New_York',
+            );
+            expect(getBestMatch({ items: timeZones, text: 'europe/parsi' })).toBe(
+                'Europe/Paris',
+            );
+            expect(
+                getBestMatch({ items: ['Calistoga', 'California'], text: 'califrnia' }),
+            ).toBe('California');
+            expect(
+                getBestMatch({
+                    items: ['Missouri', 'Mississauga', 'Mississippi'],
+                    text: 'missisipi',
+                }),
+            ).toBe('Mississippi');
+            expect(
+                getBestMatch({
+                    items: ['Torino', 'Tortola', 'Toronto'],
+                    text: 'torotno',
+                }),
+            ).toBe('Toronto');
+        });
     });
 });
