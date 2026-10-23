@@ -303,7 +303,7 @@
     },
     "packages/vite-plugin-react-compiler": {
       "name": "@acusti/vite-plugin-react-compiler",
-      "version": "0.9.0",
+      "version": "0.10.0",
       "dependencies": {
         "oxc-transform-react": "0.155.0",
       },
