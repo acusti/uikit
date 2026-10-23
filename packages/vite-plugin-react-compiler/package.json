@@ -41,7 +41,7 @@
         "tsc": "tsc --noEmit"
     },
     "dependencies": {
-        "oxc-transform-react": "0.154.0"
+        "oxc-transform-react": "0.155.0"
     },
     "devDependencies": {
         "@types/node": "^26.1.0",
