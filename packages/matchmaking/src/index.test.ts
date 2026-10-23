@@ -142,14 +142,14 @@ describe('@acusti/matchmaking', () => {
                 'Maine', // exact match
                 'Maryland', // exact match
                 'Massachusetts', // exact match
+                'Alabama', // end-of-text exact match
+                'Oklahoma', // end-of-text exact match
                 'Kansas', // partial match
                 'Hawaii', // partial match
                 'Michigan', // partial match (further distance on 2nd letter)
                 'Minnesota', // partial match (further distance on 2nd letter)
                 'Mississippi', // partial match (further distance on 2nd letter)
                 'Missouri', // partial match (further distance on 2nd letter)
-                'Alabama', // end-of-text exact match
-                'Oklahoma', // end-of-text exact match
                 'Nebraska', // short distance from match
                 'Nevada', // short distance from match
                 'New Hampshire', // short distance from match
@@ -165,6 +165,47 @@ describe('@acusti/matchmaking', () => {
                     text: '11',
                 }),
             ).toEqual(['11px']);
+        });
+
+        it('ranks an item that contains the text above every item that doesn’t, and an earlier match above a later one', () => {
+            expect(sortByBestMatch({ items: ['Cart', 'Bobcat'], text: 'cat' })).toEqual([
+                'Bobcat',
+                'Cart',
+            ]);
+            expect(
+                sortByBestMatch({ items: ['Bobcat', 'Catalog'], text: 'cat' }),
+            ).toEqual(['Catalog', 'Bobcat']);
+            expect(
+                sortByBestMatch({ items: ['Find and Replace', 'Cart'], text: 'a' }),
+            ).toEqual(['Cart', 'Find and Replace']);
+            // an item that is part of the text doesn’t contain it
+            expect(
+                sortByBestMatch({
+                    items: ['New York', 'New York City'],
+                    text: 'new york c',
+                }),
+            ).toEqual(['New York City', 'New York']);
+            // a two-character item that starts with the text
+            expect(sortByBestMatch({ items: ['em', 'px', 'rem'], text: 'p' })).toEqual([
+                'px',
+                'rem',
+                'em',
+            ]);
+        });
+
+        it('keeps every item that contains the text when excludeMismatches is true', () => {
+            expect(
+                sortByBestMatch({
+                    excludeMismatches: true,
+                    items: [
+                        'Pacific',
+                        'Toronto Eastern',
+                        'Easter Island',
+                        'Northeastern',
+                    ],
+                    text: 'eastern',
+                }),
+            ).toEqual(['Northeastern', 'Toronto Eastern', 'Easter Island']);
         });
     });
 
@@ -287,6 +328,110 @@ describe('@acusti/matchmaking', () => {
                     text: 'torotno',
                 }),
             ).toBe('Toronto');
+        });
+
+        it('prefers an item that contains the text to one that only starts like it', () => {
+            expect(getBestMatch({ items: ['Cart', 'Bobcat'], text: 'cat' })).toBe(
+                'Bobcat',
+            );
+            expect(
+                getBestMatch({
+                    items: ['Easter Island', 'Toronto Eastern'],
+                    text: 'eastern',
+                }),
+            ).toBe('Toronto Eastern');
+            expect(
+                getBestMatch({ items: ['Jakarta', 'Tokyo Japan'], text: 'japan' }),
+            ).toBe('Tokyo Japan');
+            // with no item containing the text, the fuzzy match still finds a typo
+            expect(getBestMatch({ items: ['Tortola', 'Toronto'], text: 'torotno' })).toBe(
+                'Toronto',
+            );
+        });
+
+        it('matches an item that the text contains, e.g. after a stray keystroke', () => {
+            expect(getBestMatch({ items: STATES, text: 'aalabama' })).toBe('Alabama');
+            expect(getBestMatch({ items: STATES, text: 'oohio' })).toBe('Ohio');
+            expect(getBestMatch({ items: STATES, text: 'new yorkk' })).toBe('New York');
+            const timeZones = [
+                'America/Adak',
+                'America/New_York',
+                'Europe/Amsterdam',
+                'Europe/Paris',
+            ];
+            expect(getBestMatch({ items: timeZones, text: 'america/new_yorkk' })).toBe(
+                'America/New_York',
+            );
+            expect(getBestMatch({ items: timeZones, text: 'europe/pariss' })).toBe(
+                'Europe/Paris',
+            );
+            expect(
+                getBestMatch({ items: FONT_WEIGHT_VALUES, text: 'font weight - 2000' }),
+            ).toBe('Font Weight - 200');
+        });
+
+        it('ranks an item that neither contains a number nor starts with one below every near value', () => {
+            // neither the number’s unit nor a keyword outranks a value
+            const clothingSizes = ['XS', 'S', 'M', 'L', 'XL', '2XL', '3XL'];
+            expect(getBestMatch({ items: clothingSizes, text: '4xl' })).toBe('3XL');
+            expect(getBestMatch({ items: clothingSizes, text: '5xl' })).toBe('3XL');
+            const scale = ['xs', 'sm', 'base', 'lg', 'xl', '2xl', '3xl', '4xl'];
+            expect(getBestMatch({ items: scale, text: '5xl' })).toBe('4xl');
+            expect(
+                getBestMatch({
+                    items: ['auto', 'px', '4px', '8px', '12px'],
+                    text: '6px',
+                }),
+            ).toBe('4px');
+            const spacing = ['auto', '4px', '8px', '16px', '32px'];
+            expect(getBestMatch({ items: spacing, text: '1px' })).toBe('4px');
+            expect(getBestMatch({ items: spacing, text: '1p' })).toBe('4px');
+            expect(
+                getBestMatch({
+                    items: ['none', 'thin', 'medium', 'thick', '4px', '8px'],
+                    text: '1px',
+                }),
+            ).toBe('4px');
+            // while such items still rank among themselves: a digit typed for a letter
+            expect(getBestMatch({ items: STATES, text: '0hio' })).toBe('Ohio');
+            expect(getBestMatch({ items: STATES, text: '1daho' })).toBe('Idaho');
+            expect(getBestMatch({ items: ['px', 'em', '%'], text: '50%' })).toBe('%');
+        });
+    });
+
+    describe('getMatchScore', () => {
+        it('scores an exact match 1, regardless of case and surrounding whitespace', () => {
+            expect(getMatchScore('Toronto', 'toronto')).toBe(1);
+            expect(getMatchScore(' Toronto', 'TORONTO ')).toBe(1);
+        });
+
+        it('scores an item that contains the text above every item that doesn’t', () => {
+            expect(getMatchScore('Bobcat', 'cat')).toBeGreaterThan(
+                getMatchScore('Cart', 'cat'),
+            );
+            expect(getMatchScore('Toronto Eastern', 'eastern')).toBeGreaterThan(
+                getMatchScore('Easter Island', 'eastern'),
+            );
+            expect(getMatchScore('New York City', 'new york c')).toBeGreaterThan(
+                getMatchScore('New York', 'new york c'),
+            );
+            expect(getMatchScore('px', 'p')).toBeGreaterThan(getMatchScore('rem', 'p'));
+            expect(getMatchScore('xp', 'p')).toBeGreaterThan(getMatchScore('rem', 'p'));
+            expect(getMatchScore('xp', 'p')).toBeLessThan(getMatchScore('px', 'p'));
+        });
+
+        it('scores an item that the text contains like the best inexact match at most', () => {
+            expect(getMatchScore('New York', 'new york c')).toBeGreaterThan(
+                getMatchScore('New Jersey', 'new york c'),
+            );
+            expect(getMatchScore('p', 'px')).toBeGreaterThan(getMatchScore('r', 'px'));
+            expect(getMatchScore('x', 'px')).toBeGreaterThanOrEqual(0.81);
+            expect(getMatchScore('x', 'px')).toBeLessThan(getMatchScore('p', 'px'));
+        });
+
+        it('scores an empty item or text 0', () => {
+            expect(getMatchScore('', 'cat')).toBe(0);
+            expect(getMatchScore('Cart', ' ')).toBe(0);
         });
     });
 });

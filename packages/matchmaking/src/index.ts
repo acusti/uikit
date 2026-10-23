@@ -6,8 +6,9 @@ const FIRST_LETTER = 65; // 'A'.charCodeAt(0);
 const MAX_DISTANCE = 15;
 const MAX_INEXACT_SCORE = 0.99999;
 const MIN_CLOSE_SCORE = 0.9999; // an inexact match whose distance is outweighed by its exact matches
+// An item that contains the text scores above MAX_INEXACT_SCORE, up to this
 const MAX_PARTIAL_EXACT_SCORE = 0.999999;
-const MIN_PARTIAL_EXACT_SCORE = 0.81; // cut-off for partial match vs mismatch
+const MIN_MATCH_SCORE = 0.81; // cut-off for match vs mismatch
 // A number with an optional sign and unit, e.g. '12', '-1.5' or '12px' (once uppercased)
 const NUMBER_TEXT = /^-?\d+(?:\.\d+)?[A-Z%]*$/;
 // The number a string starts with, with an optional sign, e.g. '-1.5' in '-1.5REM'
@@ -18,6 +19,10 @@ const THOUSANDS_SEPARATOR = /,(?=\d{3})/g;
 // below MAX_INEXACT_SCORE so that the typed unit breaks a tie
 const OTHER_UNIT_SCORE = 0.9999;
 
+/**
+ * Scores how well the item `strA` matches the search text `strB`, from 0
+ * (no match) to 1 (exact match, ignoring case and surrounding whitespace).
+ */
 export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean) => {
     if (!isSanitized) {
         strA = strA.trim().toUpperCase();
@@ -35,7 +40,8 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
 
     // If the text is a number (e.g. '12', '-5' or '12px') that the item doesn’t
     // start with, an item that starts with a number scores by how near its number is
-    if (LEADING_NUMBER.test(strA) && NUMBER_TEXT.test(strB) && !strA.startsWith(strB)) {
+    const isNumberText = NUMBER_TEXT.test(strB);
+    if (isNumberText && LEADING_NUMBER.test(strA) && !strA.startsWith(strB)) {
         const textNumber = parseFloat(strB);
         const itemText = strA.replace(THOUSANDS_SEPARATOR, '');
         const difference = Math.abs(parseFloat(itemText) - textNumber);
@@ -48,15 +54,26 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
         return (topScore * scale) / (scale + difference);
     }
 
-    // Exact partial match is the next best score to an exact match with
-    // relative length from the beginning applying a penalty to total score
-    const [strLonger, strShorter] = strALength > strBLength ? [strA, strB] : [strB, strA];
-    const matchStart = strLonger.indexOf(strShorter);
+    // An item that contains the text is the next best match to an exact match,
+    // above every other match, with a penalty for how far into the item it starts
+    let matchStart = strA.indexOf(strB);
     if (matchStart > -1) {
-        const penaltyPerStep = 0.15 / (strLonger.length - 2);
-        const penalty = penaltyPerStep * matchStart;
-        // Apply a minimum to partial exact matches
-        return Math.max(MAX_PARTIAL_EXACT_SCORE - penalty, MIN_PARTIAL_EXACT_SCORE);
+        const penalty =
+            ((MAX_PARTIAL_EXACT_SCORE - MAX_INEXACT_SCORE) * matchStart) / strALength;
+        return MAX_PARTIAL_EXACT_SCORE - penalty;
+    }
+
+    // A number matches any other item at a hundredth of its score, so neither its
+    // unit ('px' in '6px') nor a keyword ('auto') outranks a value of a similar
+    // size, while such items still rank among themselves ('0hio' finds 'Ohio')
+    const weight = isNumberText ? 0.01 : 1;
+
+    // Text that contains the item (e.g. the item and a stray keystroke) scores up
+    // to the best inexact score, with a penalty for how far into the text it starts
+    matchStart = strB.indexOf(strA);
+    if (matchStart > -1) {
+        const penalty = (0.15 * matchStart) / strBLength;
+        return weight * Math.min(MAX_PARTIAL_EXACT_SCORE - penalty, MAX_INEXACT_SCORE);
     }
 
     // To proportionally weight consecutive exact matches, increase bonus relative to total length
@@ -96,12 +113,15 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
     // score it from MIN_CLOSE_SCORE up toward MAX_INEXACT_SCORE the further
     // below 0 it came (e.g. the longer the exact match from the start)
     if (score <= 0) {
-        return MAX_INEXACT_SCORE - (MAX_INEXACT_SCORE - MIN_CLOSE_SCORE) / (1 - score);
+        return (
+            weight *
+            (MAX_INEXACT_SCORE - (MAX_INEXACT_SCORE - MIN_CLOSE_SCORE) / (1 - score))
+        );
     }
     // Invert score and normalize into a range based on worst possible score
     score = (worstPossibleScore - score) / worstPossibleScore;
     // Keep it below every inexact match whose score came to 0 or less
-    return Math.min(MIN_CLOSE_SCORE, score);
+    return weight * Math.min(MIN_CLOSE_SCORE, score);
 };
 
 type Payload = {
@@ -117,7 +137,7 @@ export const sortByBestMatch = ({ excludeMismatches, items, text }: Payload) => 
     const initialValues: [Array<string>, Array<number>] = [[], []];
     const [sortedItems] = items.reduce(([sorted, scores], item) => {
         const itemScore = getMatchScore(item.trim().toUpperCase(), text, true);
-        if (excludeMismatches && itemScore < MIN_PARTIAL_EXACT_SCORE) {
+        if (excludeMismatches && itemScore < MIN_MATCH_SCORE) {
             return [sorted, scores];
         }
 
