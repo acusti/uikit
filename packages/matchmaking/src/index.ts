@@ -22,45 +22,46 @@ const OTHER_UNIT_SCORE = 0.9999;
 const WORD_CHARACTER = /[\p{L}\p{M}\p{N}]/u;
 
 /**
- * Scores how well the item `strA` matches the search text `strB`, from 0
- * (no match) to 1 (exact match, ignoring case and surrounding whitespace).
+ * Scores how well `item` matches the search `text`, from 0 (no match) to 1
+ * (exact match, ignoring case and surrounding whitespace). Pass `isSanitized`
+ * as true when both are already trimmed and uppercased.
  */
-export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean) => {
+export const getMatchScore = (item: string, text: string, isSanitized?: boolean) => {
     if (!isSanitized) {
-        strA = strA.trim().toUpperCase();
-        strB = strB.trim().toUpperCase();
+        item = item.trim().toUpperCase();
+        text = text.trim().toUpperCase();
     }
     // Exact match scores 1
-    if (strA === strB) return 1;
+    if (item === text) return 1;
 
-    const strALength = strA.length;
-    const strBLength = strB.length;
-    const shortestLength = Math.min(strALength, strBLength);
+    const itemLength = item.length;
+    const textLength = text.length;
+    const shortestLength = Math.min(itemLength, textLength);
 
     // If one of the texts is empty, they cannot match
     if (!shortestLength) return 0;
 
     // Look for a match at the start of a word (-1 if there is none), counting a
     // minus sign that starts the item as part of the number after it
-    let matchStart = strA.indexOf(strB);
+    let matchStart = item.indexOf(text);
     let wordStart = matchStart;
     while (
         wordStart > 0 &&
-        (WORD_CHARACTER.test(strA[wordStart - 1]) || (wordStart === 1 && strA[0] === '-'))
+        (WORD_CHARACTER.test(item[wordStart - 1]) || (wordStart === 1 && item[0] === '-'))
     ) {
-        wordStart = strA.indexOf(strB, wordStart + 1);
+        wordStart = item.indexOf(text, wordStart + 1);
     }
 
     // If the text is a number (e.g. '12', '-5' or '12px') that doesn’t start a word
     // in the item, an item that starts with a number scores by how near its number is
-    const isNumberText = NUMBER_TEXT.test(strB);
-    if (isNumberText && LEADING_NUMBER.test(strA) && wordStart < 0) {
-        const textNumber = parseFloat(strB);
-        const itemText = strA.replace(THOUSANDS_SEPARATOR, '');
-        const difference = Math.abs(parseFloat(itemText) - textNumber);
-        const isTypedUnit = itemText
+    const isNumberText = NUMBER_TEXT.test(text);
+    if (isNumberText && LEADING_NUMBER.test(item) && wordStart < 0) {
+        const textNumber = parseFloat(text);
+        item = item.replace(THOUSANDS_SEPARATOR, '');
+        const difference = Math.abs(parseFloat(item) - textNumber);
+        const isTypedUnit = item
             .replace(LEADING_NUMBER, '')
-            .startsWith(strB.replace(LEADING_NUMBER, ''));
+            .startsWith(text.replace(LEADING_NUMBER, ''));
         // From the top score for the same number toward 0 the further away it is
         const scale = Math.abs(textNumber) || 1;
         const topScore = isTypedUnit ? MAX_INEXACT_SCORE : OTHER_UNIT_SCORE;
@@ -74,7 +75,7 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
         // and one inside a word in the lower half, each lower the later it starts
         const halfRange = (MAX_PARTIAL_EXACT_SCORE - MAX_INEXACT_SCORE) / 2;
         const position =
-            wordStart > -1 ? wordStart / strALength : 1 + matchStart / strALength;
+            wordStart > -1 ? wordStart / itemLength : 1 + matchStart / itemLength;
         return MAX_PARTIAL_EXACT_SCORE - halfRange * position;
     }
 
@@ -85,9 +86,9 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
 
     // Text that contains the item (e.g. the item and a stray keystroke) scores up
     // to the best inexact score, with a penalty for how far into the text it starts
-    matchStart = strB.indexOf(strA);
+    matchStart = text.indexOf(item);
     if (matchStart > -1) {
-        const penalty = (0.15 * matchStart) / strBLength;
+        const penalty = (0.15 * matchStart) / textLength;
         return weight * Math.min(MAX_PARTIAL_EXACT_SCORE - penalty, MAX_INEXACT_SCORE);
     }
 
@@ -99,16 +100,16 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
 
     for (let index = 0; index < shortestLength; index++) {
         // Build score from distance between original and comparison strings
-        const strACharCode = strA.charCodeAt(index);
-        const strBCharCode = strB.charCodeAt(index);
-        let distance = Math.abs(strACharCode - strBCharCode);
+        const itemCharCode = item.charCodeAt(index);
+        const textCharCode = text.charCodeAt(index);
+        let distance = Math.abs(itemCharCode - textCharCode);
         // If comparing a number to a letter, use minimum distance ('z' should be considered same distance from '3' as 'a')
         if (
-            strACharCode >= FIRST_NUMBER &&
-            strACharCode <= LAST_NUMBER &&
-            strBCharCode > FIRST_LETTER
+            itemCharCode >= FIRST_NUMBER &&
+            itemCharCode <= LAST_NUMBER &&
+            textCharCode > FIRST_LETTER
         ) {
-            distance = LAST_NUMBER + 1 - strACharCode;
+            distance = LAST_NUMBER + 1 - itemCharCode;
         }
         score += Math.min(MAX_DISTANCE, distance);
         worstPossibleScore += MAX_DISTANCE;
