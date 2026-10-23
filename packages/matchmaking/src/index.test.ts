@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { getBestMatch, sortByBestMatch } from './index.js';
+import { getBestMatch, getMatchScore, sortByBestMatch } from './index.js';
 
 const STATES = [
     'Alabama',
@@ -106,16 +106,16 @@ describe('@acusti/matchmaking', () => {
                 '11px',
                 '18px',
                 '128px',
+                '7px', // nearest number to 1 that doesn’t start with it
                 '36px',
-                '7px',
             ]);
 
             expect(sortByBestMatch({ items: CSS_VALUES, text: '12p' })).toEqual([
                 '11px',
-                '128px',
+                '7px',
                 '18px',
                 '36px',
-                '7px',
+                '128px',
             ]);
 
             expect(
@@ -164,7 +164,7 @@ describe('@acusti/matchmaking', () => {
                     items: CSS_VALUES,
                     text: '11',
                 }),
-            ).toEqual(['11px', '128px', '18px']);
+            ).toEqual(['11px']);
         });
     });
 
@@ -179,6 +179,83 @@ describe('@acusti/matchmaking', () => {
             );
             // 'rpyrg' is close to 'south', so best match is the first “south *” item
             expect(getBestMatch({ items: STATES, text: 'rpyrg' })).toBe('South Carolina');
+        });
+
+        it('returns the item with the nearest number when the text is a number', () => {
+            const sizes = ['8px', '10px', '12px', '16px', '24px'];
+            expect(getBestMatch({ items: sizes, text: '15' })).toBe('16px');
+            expect(getBestMatch({ items: sizes, text: '13px' })).toBe('12px');
+            expect(getBestMatch({ items: ['12px', '8px'], text: '0' })).toBe('8px');
+            expect(getBestMatch({ items: CSS_VALUES, text: '14' })).toBe('11px');
+            expect(getBestMatch({ items: CSS_VALUES, text: '70' })).toBe('36px');
+            expect(
+                getBestMatch({
+                    items: ['0.5rem', '1rem', '1.25rem', '2rem'],
+                    text: '1.9',
+                }),
+            ).toBe('2rem');
+            // the same number in another unit is the closest match short of exact
+            expect(getMatchScore('12em', '12px')).toBeLessThan(1);
+            expect(getMatchScore('12em', '12px')).toBeGreaterThan(
+                getMatchScore('11px', '12px'),
+            );
+            // with a sign
+            expect(
+                getBestMatch({ items: ['-20px', '-9px', '0', '10px'], text: '-10' }),
+            ).toBe('-9px');
+            expect(getMatchScore('-9px', '-10')).toBeLessThan(1);
+            expect(getMatchScore('-9px', '-10')).toBeGreaterThan(
+                getMatchScore('-20px', '-10'),
+            );
+            // an item that starts with the typed digits still comes first
+            expect(getBestMatch({ items: sizes, text: '2' })).toBe('24px');
+            // text with more than a number compares as text
+            expect(
+                getBestMatch({ items: ['3 Idiots', '3 Body Problem'], text: '3 bdy' }),
+            ).toBe('3 Body Problem');
+        });
+
+        it('breaks a tie between equally near numbers with the typed unit', () => {
+            const mixed = ['0.5em', '1em', '2em', '4em', '1px', '2px', '4px', '8px'];
+            expect(getBestMatch({ items: mixed, text: '3px' })).toBe('2px');
+            expect(getBestMatch({ items: mixed, text: '3p' })).toBe('2px');
+            expect(getBestMatch({ items: mixed, text: '6px' })).toBe('4px');
+            expect(
+                getBestMatch({
+                    items: ['25%', '50%', '75%', '100%', '50px', '100px'],
+                    text: '60px',
+                }),
+            ).toBe('50px');
+            // a nearer number in another unit still wins
+            expect(getBestMatch({ items: mixed, text: '0.6px' })).toBe('0.5em');
+        });
+
+        it('reads a thousands separator in an item as part of its number', () => {
+            expect(
+                getBestMatch({
+                    items: ['100', '500', '1,000', '5,000', '10,000'],
+                    text: '2000',
+                }),
+            ).toBe('1,000');
+            const companySizes = [
+                '1-10',
+                '11-50',
+                '51-200',
+                '201-500',
+                '501-1,000',
+                '1,001-5,000',
+                '5,001-10,000',
+                '10,001+',
+            ];
+            expect(getBestMatch({ items: companySizes, text: '3000' })).toBe(
+                '1,001-5,000',
+            );
+            expect(getBestMatch({ items: companySizes, text: '20000' })).toBe('10,001+');
+            // a decimal comma isn’t a thousands separator
+            expect(getBestMatch({ items: ['1,5 cm', '2 cm'], text: '15' })).toBe('2 cm');
+            expect(
+                getBestMatch({ items: ['100,000', '1,000,000'], text: '900000' }),
+            ).toBe('1,000,000');
         });
     });
 });
