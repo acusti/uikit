@@ -352,10 +352,12 @@ interface SearchOptions {
     excludeMismatches?: boolean;
 }
 
+const options: SearchOptions = { items: ['Cart', 'Bobcat'], text: 'cat' };
+
 // All functions are fully typed
 const result: string[] = sortByBestMatch(options);
 const best: string | undefined = getBestMatch(options);
-const score: number = getMatchScore('string1', 'string2');
+const score: number = getMatchScore('Bobcat', 'cat'); // the item, then the text
 ```
 
 ## Browser Support
