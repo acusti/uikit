@@ -286,7 +286,7 @@ function createAutocomplete(items) {
 }
 
 const searchStates = createAutocomplete(states);
-searchStates('new'); // → ['New York', 'New Jersey', 'New Mexico', 'New Hampshire']
+searchStates('new'); // → ['New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'Nevada', …]
 ```
 
 ### Search-as-you-type
@@ -327,7 +327,7 @@ function searchCommands(input) {
 }
 
 searchCommands('open'); // → ['Open File', 'Open Terminal']
-searchCommands('cls'); // → ['Close Tab'] (fuzzy match)
+searchCommands('cls'); // → ['Close Tab', 'Copy'] (fuzzy match)
 ```
 
 ## Performance Characteristics
