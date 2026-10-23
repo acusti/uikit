@@ -18,6 +18,8 @@ const THOUSANDS_SEPARATOR = /,(?=\d{3})/g;
 // The most an item scores for its number in a unit other than the typed one, just
 // below MAX_INEXACT_SCORE so that the typed unit breaks a tie
 const OTHER_UNIT_SCORE = 0.9999;
+// A letter (with any combining mark) or digit, which continues a word rather than starting one
+const WORD_CHARACTER = /[\p{L}\p{M}\p{N}]/u;
 
 /**
  * Scores how well the item `strA` matches the search text `strB`, from 0
@@ -38,10 +40,21 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
     // If one of the texts is empty, they cannot match
     if (!shortestLength) return 0;
 
-    // If the text is a number (e.g. '12', '-5' or '12px') that the item doesn’t
-    // start with, an item that starts with a number scores by how near its number is
+    // Look for a match at the start of a word (-1 if there is none), counting a
+    // minus sign that starts the item as part of the number after it
+    let matchStart = strA.indexOf(strB);
+    let wordStart = matchStart;
+    while (
+        wordStart > 0 &&
+        (WORD_CHARACTER.test(strA[wordStart - 1]) || (wordStart === 1 && strA[0] === '-'))
+    ) {
+        wordStart = strA.indexOf(strB, wordStart + 1);
+    }
+
+    // If the text is a number (e.g. '12', '-5' or '12px') that doesn’t start a word
+    // in the item, an item that starts with a number scores by how near its number is
     const isNumberText = NUMBER_TEXT.test(strB);
-    if (isNumberText && LEADING_NUMBER.test(strA) && !strA.startsWith(strB)) {
+    if (isNumberText && LEADING_NUMBER.test(strA) && wordStart < 0) {
         const textNumber = parseFloat(strB);
         const itemText = strA.replace(THOUSANDS_SEPARATOR, '');
         const difference = Math.abs(parseFloat(itemText) - textNumber);
@@ -56,11 +69,13 @@ export const getMatchScore = (strA: string, strB: string, isSanitized?: boolean)
 
     // An item that contains the text is the next best match to an exact match,
     // above every other match, with a penalty for how far into the item it starts
-    let matchStart = strA.indexOf(strB);
     if (matchStart > -1) {
-        const penalty =
-            ((MAX_PARTIAL_EXACT_SCORE - MAX_INEXACT_SCORE) * matchStart) / strALength;
-        return MAX_PARTIAL_EXACT_SCORE - penalty;
+        // A match at the start of a word scores in the upper half of the range
+        // and one inside a word in the lower half, each lower the later it starts
+        const halfRange = (MAX_PARTIAL_EXACT_SCORE - MAX_INEXACT_SCORE) / 2;
+        const position =
+            wordStart > -1 ? wordStart / strALength : 1 + matchStart / strALength;
+        return MAX_PARTIAL_EXACT_SCORE - halfRange * position;
     }
 
     // A number matches any other item at a hundredth of its score, so neither its

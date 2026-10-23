@@ -176,8 +176,8 @@ describe('@acusti/matchmaking', () => {
                 sortByBestMatch({ items: ['Bobcat', 'Catalog'], text: 'cat' }),
             ).toEqual(['Catalog', 'Bobcat']);
             expect(
-                sortByBestMatch({ items: ['Find and Replace', 'Cart'], text: 'a' }),
-            ).toEqual(['Cart', 'Find and Replace']);
+                sortByBestMatch({ items: ['Pennsylvania', 'Colorado'], text: 'a' }),
+            ).toEqual(['Colorado', 'Pennsylvania']);
             // an item that is part of the text doesn’t contain it
             expect(
                 sortByBestMatch({
@@ -205,7 +205,85 @@ describe('@acusti/matchmaking', () => {
                     ],
                     text: 'eastern',
                 }),
-            ).toEqual(['Northeastern', 'Toronto Eastern', 'Easter Island']);
+            ).toEqual(['Toronto Eastern', 'Northeastern', 'Easter Island']);
+        });
+
+        it('ranks a match at the start of a word above a match inside a word', () => {
+            expect(
+                sortByBestMatch({ items: ['Bobcat', 'Cart', 'Wild Cat'], text: 'cat' }),
+            ).toEqual(['Wild Cat', 'Bobcat', 'Cart']);
+            expect(
+                sortByBestMatch({ items: ['Find and Replace', 'Cart'], text: 'a' }),
+            ).toEqual(['Find and Replace', 'Cart']);
+            // a later match at the start of a word counts, ranked by where it starts
+            expect(
+                sortByBestMatch({ items: ['Canada', 'Grand Anse'], text: 'an' }),
+            ).toEqual(['Grand Anse', 'Canada']);
+            expect(
+                sortByBestMatch({ items: ['Grand Anse', 'Old Antwerp'], text: 'an' }),
+            ).toEqual(['Old Antwerp', 'Grand Anse']);
+            expect(
+                sortByBestMatch({
+                    items: ['Asia/Bangkok', 'America/Los_Angeles'],
+                    text: 'ang',
+                }),
+            ).toEqual(['America/Los_Angeles', 'Asia/Bangkok']);
+            // a digit or a letter outside A–Z continues a word
+            expect(sortByBestMatch({ items: ['B36', 'Gate 6'], text: '6' })).toEqual([
+                'Gate 6',
+                'B36',
+            ]);
+            expect(
+                sortByBestMatch({ items: ['Zürich', 'Port Richey'], text: 'rich' }),
+            ).toEqual(['Port Richey', 'Zürich']);
+            // so does a combining mark, as in a decomposed 'Résumé'
+            expect(
+                sortByBestMatch({ items: ['Résumé', 'Cum Sum'], text: 'sum' }),
+            ).toEqual(['Cum Sum', 'Résumé']);
+        });
+
+        it('treats a number that starts a word in an item as contained in it', () => {
+            expect(
+                sortByBestMatch({ items: ['8 × 10', '2 × 5', '4 × 6'], text: '5' }),
+            ).toEqual(['2 × 5', '4 × 6', '8 × 10']);
+            expect(
+                sortByBestMatch({
+                    excludeMismatches: true,
+                    items: ['12 Main St', '14 Oak Ave Apt 3', '9 Elm St'],
+                    text: '3',
+                }),
+            ).toEqual(['14 Oak Ave Apt 3']);
+            // a number inside another one doesn’t start a word, so '15' is read as 15
+            expect(
+                sortByBestMatch({ items: ['15 minutes', '10 minutes'], text: '5' }),
+            ).toEqual(['10 minutes', '15 minutes']);
+            // a minus sign at the start of an item belongs to its number…
+            expect(
+                getBestMatch({
+                    items: ['-5px', '-1px', '0', '1px', '4px', '6px'],
+                    text: '5',
+                }),
+            ).toBe('4px');
+            expect(
+                getBestMatch({
+                    items: ['-10px', '-5px', '0', '5px', '9px', '20px'],
+                    text: '10',
+                }),
+            ).toBe('9px');
+            // …but a later match still starts a word, as one after a range dash does
+            expect(sortByBestMatch({ items: ['4', '-5 to 5'], text: '5' })).toEqual([
+                '-5 to 5',
+                '4',
+            ]);
+            expect(sortByBestMatch({ items: ['9', '5-10'], text: '10' })).toEqual([
+                '5-10',
+                '9',
+            ]);
+            // and another symbol that starts an item still separates
+            expect(sortByBestMatch({ items: ['B5', '#5'], text: '5' })).toEqual([
+                '#5',
+                'B5',
+            ]);
         });
     });
 
