@@ -347,4 +347,25 @@ export /* @__NO_SIDE_EFFECTS__ */ const Label = ({ text }: { text: string }) => 
             /export const Label = \/\* @__NO_SIDE_EFFECTS__ \*\/ \([^)]*\) => \{\s*const \$ = _c\(/,
         );
     });
+
+    // the compiler printed a string literal holding a lone surrogate
+    // ('\ud800') as U+FFFD followed by the text `d800`, so a component or
+    // hook testing for the surrogate range, e.g. to truncate text without
+    // splitting an emoji, compared against garbage. Kept upstream since
+    // 0.155.0, when string literals moved to a UTF-16-exact type
+    // (https://github.com/oxc-project/oxc/pull/26548)
+    it('keeps lone surrogates in string literals of compiled functions', async () => {
+        const result = await transformCode(
+            `
+export function Truncated({ text, max }: { text: string; max: number }) {
+    const last = text.charAt(max - 1);
+    const end = last >= '\\ud800' && last <= '\\udbff' ? max - 1 : max;
+    return <span title={text}>{text.slice(0, end)}</span>;
+}
+`,
+            '/src/Truncated.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('last >= "\\ud800" && last <= "\\udbff"');
+    });
 });
