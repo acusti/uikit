@@ -1,5 +1,16 @@
 # @acusti/vite-plugin-react-compiler
 
+## 0.10.0
+
+### Minor Changes
+
+- ef139d9: Bump oxc-transform-react to 0.155.0
+
+    A string literal containing a lone surrogate (`'\ud800'`), such as the
+    bounds of a surrogate-range check, now survives inside a compiled
+    component or hook. It used to come out as a garbled character followed
+    by the text `d800`.
+
 ## 0.9.0
 
 ### Minor Changes
