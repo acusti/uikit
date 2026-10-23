@@ -199,14 +199,14 @@ const matches = sortByBestMatch({
 });
 console.log(matches);
 // → [
-//     'Maine',          // exact match at start
-//     'Maryland',       // exact match at start
-//     'Massachusetts',  // exact match at start
-//     'Kansas',         // contains 'ma' with good proximity
-//     'Hawaii',         // contains 'ma'
-//     'Alabama',        // ends with 'ma'
-//     'Oklahoma',       // ends with 'ma'
-//     // ... other quality matches
+//     'Maine',          // starts with 'ma'
+//     'Maryland',       // starts with 'ma'
+//     'Massachusetts',  // starts with 'ma'
+//     'Alabama',        // contains 'ma'
+//     'Oklahoma',       // contains 'ma'
+//     'Kansas',         // close to 'ma'
+//     'Hawaii',         // close to 'ma'
+//     // ... other close matches
 //   ]
 ```
 
@@ -215,8 +215,12 @@ console.log(matches);
 The matching algorithm implements best-effort scoring that considers:
 
 1. **Exact matches**: Perfect matches score highest (score = 1.0)
-2. **Partial exact matches**: Substrings get high scores with
-   position-based penalties
+2. **Partial exact matches**: An item that contains the text scores above
+   every item that doesn’t, higher the earlier in the item the text starts
+   (a number inside another number still ranks by value; see 7). Text that
+   contains the whole item (e.g. the item and a stray keystroke) scores
+   below every item that contains the text, and lower the further into the
+   text the item starts.
 3. **Character proximity**: Similar characters (e.g., 'a' and 'b') score
    better than distant ones
 4. **Consecutive matches**: Consecutive character matches from the start
@@ -231,27 +235,34 @@ The matching algorithm implements best-effort scoring that considers:
    `'36px'`, with the typed unit first between numbers as near as each
    other (`'3px'` finds `'2px'` before `'2em'`). A thousands separator in
    an item is read as part of its number (`'1,000'`). An item that starts
-   with the typed digits still ranks first (`'1'` finds `'11px'`).
+   with the typed digits still ranks first (`'1'` finds `'11px'`). Any
+   other item that doesn’t contain the number scores a hundredth of what it
+   would otherwise, so neither the number’s unit nor a keyword outranks a
+   value of a similar size (`'6px'` finds `'4px'` before `'px'` or
+   `'auto'`), while a word typed with a digit for its first letter still
+   finds its item (`'0hio'` finds `'Ohio'`).
 
 #### Scoring Examples
 
-First argument is the search string, second argument is the text in which
-to search.
+First argument is the item, second argument is the search text.
 
 ```js
 // Perfect exact match
-getMatchScore('apple', 'apple'); // → 1.0
+getMatchScore('apple', 'apple'); // → 1
 
-// Partial exact match (substring)
-getMatchScore('app', 'application'); // → ~0.999999 (very high)
+// Partial exact match: an item that contains the text scores above every
+// item that doesn’t, even one that starts like the text
+getMatchScore('application', 'app'); // → 0.999999
+getMatchScore('Bobcat', 'cat'); // → 0.9999945
+getMatchScore('Cart', 'cat'); // → ~0.99998
 
 // Character proximity matching
 getMatchScore('abd', 'abc'); // → ~0.99998 (high, 'c' and 'd' are close)
 getMatchScore('axz', 'abc'); // → ~0.4222 (lower, 'b'→'x', 'c'→'z' are distant)
 
-// Bonus for matching closer to the start of the string
-getMatchScore('es', 'test'); // → ~0.924999
-getMatchScore('st', 'test'); // → 0.849999
+// Bonus for matching closer to the start of the item
+getMatchScore('test', 'es'); // → ~0.9999968
+getMatchScore('test', 'st'); // → 0.9999945
 ```
 
 ## Common Use Cases
