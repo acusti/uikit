@@ -104,6 +104,9 @@ export default function CSSValueInput({
             ? String(valueFromProps)
             : valueFromProps;
     const submittedValueRef = useRef(value ?? '');
+    // Whether the last keydown of a key that matters here (an IME’s, or a plain
+    // ↑ or ↓) was one that an IME took
+    const isIMEKeyDownRef = useRef(false);
 
     useEffect(() => {
         submittedValueRef.current = value ?? '';
@@ -230,7 +233,16 @@ export default function CSSValueInput({
     const handleKeyDown = (event: KeyboardEvent<InputElement>) => {
         const input = event.currentTarget;
         if (onKeyDown) onKeyDown(event);
+        // a key that an IME is taking (the arrows that move through its
+        // candidates) is the IME’s
+        if (isIMEKeyEvent(event)) {
+            isIMEKeyDownRef.current = true;
+            return;
+        }
         if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
+        // only a plain ↑ or ↓ clears it, so that a key that goes down between
+        // an IME’s arrow and its keyup (a modifier, say) doesn’t
+        isIMEKeyDownRef.current = false;
 
         const currentValue = input.value || (placeholder ?? `0${unit}`);
         const nextValue = getNextValue({
@@ -249,6 +261,9 @@ export default function CSSValueInput({
 
     const handleKeyUp = (event: KeyboardEvent<InputElement>) => {
         if (onKeyUp) onKeyUp(event);
+        // A key up usually reports the real key and keyCode, even when its key
+        // down was taken by an IME, so the key down is what says it was
+        if (isIMEKeyDownRef.current) return;
         // If this is the key up from ↑ or ↓ keys, time to handleSubmitValue
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
             handleSubmitValue(event);
@@ -290,4 +305,14 @@ export default function CSSValueInput({
             </div>
         </label>
     );
+}
+
+// Whether a keydown is of a key that an IME is taking: Enter to commit a
+// composition, the arrows to move through its candidates, Escape to cancel it.
+// isComposing says so while the composition is under way; where it has
+// already ended by the time of the keydown, only keyCode 229 still gives it
+// away
+function isIMEKeyEvent(event: KeyboardEvent<InputElement>) {
+    // eslint-disable-next-line typescript/no-deprecated
+    return event.nativeEvent.isComposing || event.keyCode === 229;
 }

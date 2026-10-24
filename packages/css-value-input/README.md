@@ -794,9 +794,19 @@ function CustomValidators() {
 
 ### Arrow Keys
 
-- **↑/↓** - Increment/decrement by step amount
+- **↑/↓** - Increment/decrement by step amount (the value is submitted when
+  the key is released)
 - **Shift + ↑/↓** - Increment/decrement by step × 10
 - Works with all numeric CSS value types
+
+The ↑/↓ keys that an IME uses to move through its candidates (e.g. in
+Japanese, Chinese or Korean) are left to the IME: they don't step the
+value, aren't prevented, and releasing them doesn't submit. Both still
+reach `onKeyDown` and `onKeyUp`. On keydown,
+`event.nativeEvent.isComposing` is set on such a key, or, where the
+composition has already ended by then, `event.keyCode` is 229. A keyup
+often reports the real arrow without either, so a handler of your own that
+acts on ↑/↓ should remember what the keydown said and skip its keyup too.
 
 ### Special Keys
 
