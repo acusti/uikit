@@ -135,10 +135,11 @@ before it is the `preamble`, and what follows it is the `postscript`.
       its comments, is part of it, unless it is a block that counts (see
       above) and starts with JSON that can be read. That block ends it, and
       what follows is read like any other text.
-- Prose has empty objects and arrays too, and arrays that open on a number
-  or on `true`, `false` or `null`. One of those is only taken for the JSON
-  if it starts a line or follows a colon, and nothing follows it on its
-  line but a full stop, a comma or a semicolon, and a comment.
+- Prose has empty objects and arrays too, arrays that open on a number or
+  on `true`, `false` or `null`, and sets (`{"a", "b"}`). One of those is
+  only taken for the JSON if it starts a line or follows a colon, and
+  nothing follows it on its line but a full stop, a comma or a semicolon,
+  and a comment.
 - If the value is valid JSON it is parsed as it is, unless a key follows an
   object’s closing brace (the object was closed too early, as above, and is
   repaired). Otherwise only a value that is unfinished or malformed is
@@ -234,6 +235,34 @@ parseAsJSON('{"count": 12').value;
 
 parseAsJSON('{"count": 12' + '\n').value;
 // { count: 12 }
+```
+
+## A member with its key or its value left out
+
+A model can leave the key out of a member, or its value, so that a string
+stands alone in an object where a key and its value were due. `parseAsJSON`
+can’t tell which of the two was left out, and does not guess at it: the
+string is kept as a key with `''` for its value, wherever it is in its
+object, and the rest of the text is read.
+
+```js
+parseAsJSON(
+    '{"sections": [{"category": "hero", "variant": "a"}, {"features", "variant": "b"}]}',
+).value;
+/* results in:
+{
+    sections: [
+        { category: 'hero', variant: 'a' },
+        { features: '', variant: 'b' },
+    ],
+}
+*/
+
+parseAsJSON('{"heading": "Our Story", "subheading", "items": []}').value;
+// { heading: 'Our Story', subheading: '', items: [] }
+
+parseAsJSON('{"heading": "Our Story", "subheading"}').value;
+// { heading: 'Our Story', subheading: '' }
 ```
 
 ## What it repairs, and what it doesn’t
