@@ -1,5 +1,15 @@
 # @acusti/vite-plugin-svg-react
 
+## 0.5.0
+
+### Minor Changes
+
+- 0b7e4cc: A boolean attribute such as `hidden` is no longer dropped when
+  its value is empty (`<svg hidden>`, `hidden=""`) or `0`, so an
+  `<svg hidden>` now matches a stylesheet’s `[hidden]` rule. With
+  `optimize`, OXVG’s default preset still removes `hidden`, `inert`, and
+  most empty attributes; the README shows how to keep them.
+
 ## 0.4.0
 
 ### Minor Changes
