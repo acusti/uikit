@@ -1,11 +1,11 @@
 // Each test input (the last of its prefixes), with one mutation of its structure:
 // a comma before a closing bracket or after an opening one, a raw line break
-// (escaped or not) in a word, an escaped backslash before a closing quote mark,
-// a punctuation mark deleted or doubled or with one of `,[]{}` put before it,
-// and a preamble with a first key that has lost its opening quote mark. Read
-// whole, and cut at each of the 40 lengths after the mutation and at 6 more, by
-// base and by branch. There is no known answer: each difference is written out
-// to be accounted for.
+// (escaped or not) in a word (of letters in any script), an escaped backslash
+// before a closing quote mark, a punctuation mark deleted or doubled or with one
+// of `,[]{}` put before it, and a preamble with a first key that has lost its
+// opening quote mark. Read whole, and cut at each of the 40 lengths after the
+// mutation and at 6 more, by base and by branch. There is no known answer: each
+// difference is written out to be accounted for.
 import path from 'node:path';
 
 import {
@@ -24,17 +24,16 @@ const dir = getRunDir();
 const run = await loadRun(dir);
 const random = createRandom(Number(process.env.SEED ?? 1234));
 
-const pick = <T>(items: Array<T>, max: number) =>
-    items.length <= max
-        ? items
-        : [
-              ...new Set(
-                  Array.from(
-                      { length: max },
-                      () => items[Math.floor(random() * items.length)],
-                  ),
-              ),
-          ];
+// up to max of the items, drawn without replacement
+const pick = <T>(items: Array<T>, max: number) => {
+    if (items.length <= max) return items;
+    const drawn = [...items];
+    for (let index = 0; index < max; index++) {
+        const other = index + Math.floor(random() * (drawn.length - index));
+        [drawn[index], drawn[other]] = [drawn[other], drawn[index]];
+    }
+    return drawn.slice(0, max);
+};
 
 type Mutation = { at: number; kind: string; text: string };
 
@@ -68,7 +67,9 @@ function mutate(input: string) {
     for (const index of pick(indexesOf('{'), 15)) insert('comma after {', index + 1, ',');
     const inWords = indexesWhere(
         (index) =>
-            index > 0 && /[a-z]/i.test(input[index - 1]) && /[a-z ]/i.test(input[index]),
+            index > 0 &&
+            /\p{L}/u.test(input[index - 1]) &&
+            /[\p{L} ]/u.test(input[index]),
     );
     for (const index of pick(inWords, 30)) {
         insert('escaped backslash + raw line break', index, '\\\\\n');

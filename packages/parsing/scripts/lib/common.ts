@@ -90,13 +90,17 @@ export function getChange(before: string, after: string): Change {
     return 'valueToValue';
 }
 
-// a linear congruential generator, so that a run with the same seed makes the
-// same texts
+// A linear congruential generator, so that a run with the same seed makes the
+// same texts. It multiplies in 32 bits (Math.imul), as its constants are made
+// for: a product as a double loses its low bits once it passes 2⁵³, and that
+// put every seed in one cycle of 10,466 states, where this has 2³¹. What it
+// returns is in [0, 1), as Math.random’s is: the state over 2³¹, since the
+// state reaches 2³¹ − 1.
 export function createRandom(seed: number) {
     let state = seed;
     return () => {
-        state = (state * 1103515245 + 12345) & 0x7fffffff;
-        return state / 0x7fffffff;
+        state = (Math.imul(state, 1103515245) + 12345) & 0x7fffffff;
+        return state / 2 ** 31;
     };
 }
 
