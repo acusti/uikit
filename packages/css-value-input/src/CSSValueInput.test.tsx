@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
@@ -140,6 +140,193 @@ describe('CSSValueInput.tsx', () => {
 
         expect(input.value).toBe('14px');
         expect(onSubmit).toHaveBeenCalledTimes(1);
+    });
+
+    // The arrows that move through an IME’s candidates (e.g. of Japanese,
+    // Chinese or Korean) are the IME’s, so they don’t step the value, aren’t
+    // prevented, and their keyup doesn’t submit. A keydown of one comes while
+    // the composition is under way (isComposing), or after it has already
+    // ended, when only its keyCode gives it away. Its keyup usually reports the
+    // key’s real keyCode, so the keydown is what tells it apart
+    describe('an arrow key that an IME is taking', () => {
+        const IME_KEYS = [
+            { init: { isComposing: true }, label: 'isComposing' },
+            { init: { keyCode: 229 }, label: 'keyCode 229' },
+        ];
+        const ARROWS = [
+            { key: 'ArrowDown', keyCode: 40, stepped: '9px' },
+            { key: 'ArrowUp', keyCode: 38, stepped: '11px' },
+        ];
+        const CASES = ARROWS.flatMap((arrow) =>
+            IME_KEYS.map(({ init, label }) => ({ ...arrow, init, label })),
+        );
+
+        it.each(CASES)(
+            'still passes $key to onKeyDown and onKeyUp ($label)',
+            ({ init, key, keyCode }) => {
+                const onKeyDown = vi.fn<(event: { key: string }) => void>();
+                const onKeyUp =
+                    vi.fn<(event: { key: string; keyCode: number }) => void>();
+                render(
+                    <CSSValueInput
+                        onKeyDown={onKeyDown}
+                        onKeyUp={onKeyUp}
+                        onSubmitValue={noop}
+                        value="10px"
+                    />,
+                );
+                const input = screen.getByRole('textbox');
+
+                fireEvent.keyDown(input, { ...init, key });
+                expect(onKeyDown).toHaveBeenCalledTimes(1);
+                expect(onKeyDown).toHaveBeenCalledWith(expect.objectContaining({ key }));
+                fireEvent.keyUp(input, { key, keyCode });
+                expect(onKeyUp).toHaveBeenCalledTimes(1);
+                expect(onKeyUp).toHaveBeenCalledWith(
+                    expect.objectContaining({ key, keyCode }),
+                );
+            },
+        );
+
+        it.each(CASES)(
+            'doesn’t stop $key from reaching an ancestor’s onKeyDown ($label)',
+            ({ init, key }) => {
+                const onAncestorKeyDown = vi.fn<(event: { key: string }) => void>();
+                render(
+                    // eslint-disable-next-line jsx-a11y/no-static-element-interactions
+                    <div onKeyDown={onAncestorKeyDown}>
+                        <CSSValueInput onSubmitValue={noop} value="10px" />
+                    </div>,
+                );
+
+                fireEvent.keyDown(screen.getByRole('textbox'), { ...init, key });
+                expect(onAncestorKeyDown).toHaveBeenCalledTimes(1);
+                expect(onAncestorKeyDown).toHaveBeenCalledWith(
+                    expect.objectContaining({ key }),
+                );
+            },
+        );
+
+        it.each(CASES)(
+            'doesn’t step the value, prevent $key, or submit on its keyup ($label)',
+            ({ init, key, keyCode }) => {
+                const onChange = vi.fn<() => void>();
+                const onSubmitValue = vi.fn<() => void>();
+                render(
+                    <CSSValueInput
+                        onChange={onChange}
+                        onSubmitValue={onSubmitValue}
+                        value="10px"
+                    />,
+                );
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+
+                expect(fireEvent.keyDown(input, { ...init, key })).toBe(true);
+                expect(input.value).toBe('10px');
+                // the keyup reports the real keyCode and no isComposing
+                fireEvent.keyUp(input, { key, keyCode });
+                expect(input.value).toBe('10px');
+                expect(onChange).not.toHaveBeenCalled();
+                expect(onSubmitValue).not.toHaveBeenCalled();
+            },
+        );
+
+        it.each(CASES)(
+            'doesn’t submit on the keyup of $key that carries isComposing ($label)',
+            ({ init, key }) => {
+                const onSubmitValue = vi.fn<() => void>();
+                render(<CSSValueInput onSubmitValue={onSubmitValue} value="10px" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+
+                fireEvent.keyDown(input, { ...init, key });
+                fireEvent.keyUp(input, { isComposing: true, key });
+                expect(input.value).toBe('10px');
+                expect(onSubmitValue).not.toHaveBeenCalled();
+            },
+        );
+
+        it.each(CASES)(
+            'doesn’t submit on the keyup of $key if another key went down in between, once the composition has ended ($label)',
+            ({ init, key, keyCode }) => {
+                const onSubmitValue = vi.fn<() => void>();
+                render(<CSSValueInput onSubmitValue={onSubmitValue} value="10px" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+
+                fireEvent.keyDown(input, { ...init, key });
+                fireEvent.keyDown(input, { key: 'Shift', keyCode: 16 });
+                fireEvent.keyUp(input, { key, keyCode });
+                expect(input.value).toBe('10px');
+                expect(onSubmitValue).not.toHaveBeenCalled();
+            },
+        );
+
+        it.each(IME_KEYS)(
+            'doesn’t submit on the keyup of either of two IME arrows that overlap ($label)',
+            ({ init }) => {
+                const onSubmitValue = vi.fn<() => void>();
+                render(<CSSValueInput onSubmitValue={onSubmitValue} value="10px" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+
+                fireEvent.keyDown(input, { ...init, key: 'ArrowUp' });
+                fireEvent.keyDown(input, { ...init, key: 'ArrowDown' });
+                fireEvent.keyUp(input, { key: 'ArrowUp', keyCode: 38 });
+                fireEvent.keyUp(input, { key: 'ArrowDown', keyCode: 40 });
+                expect(input.value).toBe('10px');
+                expect(onSubmitValue).not.toHaveBeenCalled();
+            },
+        );
+
+        it.each(ARROWS)(
+            'doesn’t submit on the keyup of $key where its keydown was reported as Process',
+            ({ key, keyCode }) => {
+                const onSubmitValue = vi.fn<() => void>();
+                render(<CSSValueInput onSubmitValue={onSubmitValue} value="10px" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+
+                expect(fireEvent.keyDown(input, { key: 'Process', keyCode: 229 })).toBe(
+                    true,
+                );
+                fireEvent.keyUp(input, { key, keyCode });
+                expect(input.value).toBe('10px');
+                expect(onSubmitValue).not.toHaveBeenCalled();
+            },
+        );
+
+        it.each(CASES)(
+            'steps and submits on a plain $key afterwards ($label)',
+            ({ init, key, keyCode, stepped }) => {
+                const onSubmitValue = vi.fn<() => void>();
+                render(<CSSValueInput onSubmitValue={onSubmitValue} value="10px" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+
+                fireEvent.keyDown(input, { ...init, key });
+                fireEvent.keyUp(input, { key, keyCode });
+                expect(onSubmitValue).not.toHaveBeenCalled();
+
+                expect(fireEvent.keyDown(input, { key, keyCode })).toBe(false);
+                expect(input.value).toBe(stepped);
+                expect(onSubmitValue).not.toHaveBeenCalled();
+                fireEvent.keyUp(input, { key, keyCode });
+                expect(onSubmitValue).toHaveBeenCalledTimes(1);
+                expect(onSubmitValue).toHaveBeenCalledWith(stepped);
+            },
+        );
+
+        it.each(CASES)(
+            'steps and submits on a plain $key even if the keyup of the IME one never came ($label)',
+            ({ init, key, keyCode, stepped }) => {
+                const onSubmitValue = vi.fn<() => void>();
+                render(<CSSValueInput onSubmitValue={onSubmitValue} value="10px" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+
+                fireEvent.keyDown(input, { ...init, key });
+                fireEvent.keyDown(input, { key, keyCode });
+                expect(input.value).toBe(stepped);
+                fireEvent.keyUp(input, { key, keyCode });
+                expect(onSubmitValue).toHaveBeenCalledTimes(1);
+                expect(onSubmitValue).toHaveBeenCalledWith(stepped);
+            },
+        );
     });
 
     it('forwards aria-* attributes and role to the input, not the wrapper label', () => {
