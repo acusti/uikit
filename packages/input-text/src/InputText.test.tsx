@@ -387,6 +387,202 @@ describe('InputText.tsx', () => {
         );
     });
 
+    // A key that an IME is taking (the Enter that commits a composition, e.g.
+    // of Japanese, Chinese or Korean, or the Escape that cancels it) is the
+    // IME’s, so the component doesn’t act on it or prevent it. It comes while
+    // the composition is under way (isComposing), or after the composition has
+    // already ended, when only its keyCode gives it away
+    describe('a key that an IME is taking', () => {
+        const IME_KEYS = [
+            { init: { isComposing: true }, label: 'isComposing' },
+            { init: { keyCode: 229 }, label: 'keyCode 229' },
+        ];
+        const PLAIN_ENTER = { key: 'Enter', keyCode: 13 };
+        const PLAIN_ESCAPE = { key: 'Escape', keyCode: 27 };
+
+        it.each(
+            ['Enter', 'Escape'].flatMap((key) =>
+                IME_KEYS.map(({ init, label }) => ({
+                    init: { ...init, key },
+                    key,
+                    label,
+                })),
+            ),
+        )('still passes $key to onKeyDown ($label)', ({ init }) => {
+            const onKeyDown = vi.fn<() => void>();
+            render(<InputText discardOnEscape onKeyDown={onKeyDown} submitOnEnter />);
+
+            fireEvent.keyDown(screen.getByRole('textbox'), init);
+            expect(onKeyDown).toHaveBeenCalledTimes(1);
+        });
+
+        it.each(IME_KEYS)(
+            'doesn’t submit or blur a single-line input that a form owns on Enter, and the next Enter does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                const onSubmit = vi.fn<() => void>();
+                render(
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            onSubmit();
+                        }}
+                    >
+                        <InputText initialValue="hello" submitOnEnter />
+                    </form>,
+                );
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.click(input);
+
+                expect(fireEvent.keyDown(input, { ...init, key: 'Enter' })).toBe(true);
+                expect(onSubmit).not.toHaveBeenCalled();
+                expect(input.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(input, PLAIN_ENTER)).toBe(false);
+                expect(onSubmit).toHaveBeenCalledTimes(1);
+                expect(input.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(IME_KEYS)(
+            'doesn’t blur a single-line input that no form owns on Enter, and the next Enter does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                render(<InputText initialValue="hello" submitOnEnter />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.click(input);
+
+                expect(fireEvent.keyDown(input, { ...init, key: 'Enter' })).toBe(true);
+                expect(input.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(input, PLAIN_ENTER)).toBe(true);
+                expect(input.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(IME_KEYS)(
+            'doesn’t submit or blur a multiLine input on Enter, and the next Enter does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                const onSubmit = vi.fn<() => void>();
+                render(
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            onSubmit();
+                        }}
+                    >
+                        <InputText initialValue="hello" multiLine submitOnEnter />
+                    </form>,
+                );
+                const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+                await user.click(textarea);
+
+                expect(fireEvent.keyDown(textarea, { ...init, key: 'Enter' })).toBe(true);
+                expect(onSubmit).not.toHaveBeenCalled();
+                expect(textarea.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(textarea, PLAIN_ENTER)).toBe(false);
+                expect(onSubmit).toHaveBeenCalledTimes(1);
+                expect(textarea.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(IME_KEYS)(
+            'doesn’t submit or blur a multiLine input on the primary modifier plus Enter, and the next one does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                const onSubmit = vi.fn<() => void>();
+                render(
+                    <form
+                        onSubmit={(event) => {
+                            event.preventDefault();
+                            onSubmit();
+                        }}
+                    >
+                        <InputText initialValue="hello" multiLine />
+                    </form>,
+                );
+                const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+                await user.click(textarea);
+                // eslint-disable-next-line typescript/no-deprecated
+                const isApple = /mac|iphone|ipad|ipod/i.test(
+                    globalThis.navigator?.platform ?? '',
+                );
+                const modifier = isApple ? { metaKey: true } : { ctrlKey: true };
+
+                expect(
+                    fireEvent.keyDown(textarea, { ...init, ...modifier, key: 'Enter' }),
+                ).toBe(true);
+                expect(onSubmit).not.toHaveBeenCalled();
+                expect(textarea.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(textarea, { ...PLAIN_ENTER, ...modifier })).toBe(
+                    false,
+                );
+                expect(onSubmit).toHaveBeenCalledTimes(1);
+                expect(textarea.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(IME_KEYS)(
+            'doesn’t finish editing a doubleClickToEdit input on Enter, and the next Enter does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                render(<InputText doubleClickToEdit initialValue="hello" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.dblClick(input);
+                expect(input.readOnly).toBe(false);
+
+                expect(fireEvent.keyDown(input, { ...init, key: 'Enter' })).toBe(true);
+                expect(input.readOnly).toBe(false);
+                expect(input.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(input, PLAIN_ENTER)).toBe(true);
+                expect(input.readOnly).toBe(true);
+                expect(input.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(IME_KEYS)(
+            'doesn’t discard the changes to a discardOnEscape input or blur it on Escape, and the next Escape does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                render(<InputText discardOnEscape initialValue="hello" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.type(input, ' world');
+                expect(input.value).toBe('hello world');
+
+                expect(fireEvent.keyDown(input, { ...init, key: 'Escape' })).toBe(true);
+                expect(input.value).toBe('hello world');
+                expect(input.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(input, PLAIN_ESCAPE)).toBe(true);
+                expect(input.value).toBe('hello');
+                expect(input.matches(':focus')).toBe(false);
+            },
+        );
+
+        it.each(IME_KEYS)(
+            'doesn’t finish editing a doubleClickToEdit input on Escape, and the next Escape does ($label)',
+            async ({ init }) => {
+                const user = userEvent.setup();
+                render(<InputText doubleClickToEdit initialValue="hello" />);
+                const input = screen.getByRole('textbox') as HTMLInputElement;
+                await user.dblClick(input);
+                expect(input.readOnly).toBe(false);
+
+                expect(fireEvent.keyDown(input, { ...init, key: 'Escape' })).toBe(true);
+                expect(input.readOnly).toBe(false);
+                expect(input.matches(':focus')).toBe(true);
+
+                expect(fireEvent.keyDown(input, PLAIN_ESCAPE)).toBe(true);
+                expect(input.readOnly).toBe(true);
+                expect(input.matches(':focus')).toBe(false);
+            },
+        );
+    });
+
     it('allows Shift+Enter to insert a newline for multiLine submitOnEnter inputs with doubleClickToEdit', async () => {
         const user = userEvent.setup();
         const onSubmit = vi.fn<() => void>();

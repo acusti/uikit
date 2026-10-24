@@ -32,14 +32,16 @@ export type Props = AriaAttributes & {
     /**
      * If true, resets input’s value to its last committed one (initialValue,
      * or the value it had when it was last blurred, whichever is more recent)
-     * and blurs when user presses the escape key.
+     * and blurs when user presses the escape key. The escape that cancels an
+     * IME composition is left to the IME.
      */
     discardOnEscape?: boolean;
     /**
      * If true, input renders as readonly initially and only becomes interactive
      * when double-clicked or when user focuses the readonly input and then
      * presses the enter key. Likewise, the input becomes readonly again when
-     * it is blurred or when the user presses enter or escape.
+     * it is blurred or when the user presses enter or escape, except for an
+     * enter or escape that commits or cancels an IME composition.
      */
     doubleClickToEdit?: boolean;
     enterKeyHint?: InputHTMLAttributes<HTMLInputElement>['enterKeyHint'];
@@ -104,7 +106,8 @@ export type Props = AriaAttributes & {
      * the one named by the form prop, or else the one the input is inside. By
      * default, this also blurs the input unless keepFocusOnSubmit is true. The
      * enter keydown is only prevented where it has a default action to stop:
-     * in a multiLine input, or in an input that a form owns.
+     * in a multiLine input, or in an input that a form owns. The enter that
+     * commits an IME composition is left to the IME.
      */
     submitOnEnter?: boolean;
     tabIndex?: number;
@@ -303,6 +306,9 @@ export default function InputText({
         if (onKeyDown) onKeyDown(event);
         // special handling is only for Enter and Escape keys
         if (event.key !== 'Enter' && event.key !== 'Escape') return;
+        // a key that an IME is taking (the Enter that commits a composition,
+        // the Escape that cancels it) is the IME’s
+        if (isIMEKeyEvent(event)) return;
         const isPlainEnter =
             event.key === 'Enter' &&
             !event.shiftKey &&
@@ -439,6 +445,15 @@ function isHeightEmpty(
     value?: null | number | string,
 ): value is '' | null | typeof Infinity | undefined {
     return value == null || value === '' || value === 0 || value === Infinity;
+}
+
+// Whether a keydown is of a key that an IME is taking: Enter to commit a
+// composition, Escape to cancel it. isComposing says so while the composition
+// is under way; where it has already ended by the time of the keydown, only
+// keyCode 229 still gives it away
+function isIMEKeyEvent(event: KeyboardEvent<InputElement>) {
+    // eslint-disable-next-line typescript/no-deprecated
+    return event.nativeEvent.isComposing || event.keyCode === 229;
 }
 
 function isPrimaryModifierPressed(event: KeyboardEvent<InputElement>) {

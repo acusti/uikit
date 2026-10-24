@@ -106,7 +106,8 @@ type Props = AriaAttributes & {
     /**
      * If true, pressing Escape resets the input’s value to its last
      * committed one (initialValue, or the value it had when it was last
-     * blurred, whichever is more recent) and blurs it.
+     * blurred, whichever is more recent) and blurs it. The Escape that
+     * cancels an IME composition is left to the IME.
      */
     discardOnEscape?: boolean;
 
@@ -114,7 +115,8 @@ type Props = AriaAttributes & {
      * If true, input renders as readonly initially and only becomes interactive
      * when double-clicked or when user focuses the readonly input and then
      * presses the enter key. Input becomes readonly again when blurred or
-     * when the user presses Enter or Escape.
+     * when the user presses Enter or Escape, except for an Enter or Escape
+     * that commits or cancels an IME composition.
      */
     doubleClickToEdit?: boolean;
 
@@ -241,7 +243,8 @@ type Props = AriaAttributes & {
      * blurs by default. Set keepFocusOnSubmit to submit without blurring.
      * For multi-line inputs, Cmd/Ctrl+Enter always submits.
      * The Enter keydown is only prevented where it has a default action to
-     * stop: in a multi-line input, or in an input that a form owns. See
+     * stop: in a multi-line input, or in an input that a form owns. The
+     * Enter that commits an IME composition is left to the IME. See
      * “Smart Enter Key Handling”.
      */
     submitOnEnter?: boolean;
@@ -651,8 +654,14 @@ function ChatInput({ onSendMessage, disabled }) {
 
     const handleKeyDown = useCallback(
         (event) => {
-            // Send on Enter, new line on Shift+Enter
-            if (event.key === 'Enter' && !event.shiftKey) {
+            // Send on Enter, new line on Shift+Enter, and leave the Enter
+            // that commits an IME composition to the IME
+            if (
+                event.key === 'Enter' &&
+                !event.shiftKey &&
+                !event.nativeEvent.isComposing &&
+                event.keyCode !== 229
+            ) {
                 event.preventDefault();
                 handleSend();
             }
@@ -752,6 +761,8 @@ function TagsInput() {
                 removeTag(index);
             } else if (
                 event.key === 'Enter' &&
+                !event.nativeEvent.isComposing &&
+                event.keyCode !== 229 &&
                 event.target.value.trim()
             ) {
                 event.preventDefault();
@@ -887,6 +898,17 @@ prevented, and treat it as a submit. [`@acusti/dropdown`][] does, with
 The input blurs before the dropdown closes, so the focus ends on `<body>`.
 With `keepFocusOnSubmit` the focus is still in the input when the dropdown
 closes, and the dropdown returns it to its trigger.
+
+The keys that an IME takes while text is being composed (e.g. in Japanese,
+Chinese or Korean) are left to the IME. The Enter that commits a
+composition isn’t prevented, and doesn’t submit, blur, or finish a
+`doubleClickToEdit` edit. The Escape that cancels one doesn’t discard the
+changes (`discardOnEscape`), end a `doubleClickToEdit` edit, or blur the
+input. The next Enter or Escape does. Both still reach `onKeyDown`, so a
+handler of your own that acts on Enter or Escape should skip them too, as
+the chat and tags examples above do: `event.nativeEvent.isComposing` is set
+on such a key, or, where the composition has already ended by then,
+`event.keyCode` is 229.
 
 [`@acusti/dropdown`]:
     https://github.com/acusti/uikit/tree/main/packages/dropdown
