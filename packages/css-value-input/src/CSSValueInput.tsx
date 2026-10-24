@@ -7,7 +7,7 @@ import {
     getUnitFromCSSValue,
     roundToPrecision,
 } from '@acusti/css-values';
-import InputText, { type InputElement } from '@acusti/input-text';
+import InputText, { type InputElement, isIMEKeyEvent } from '@acusti/input-text';
 import clsx from 'clsx';
 import {
     type AriaAttributes,
@@ -230,6 +230,9 @@ export default function CSSValueInput({
     const handleKeyDown = (event: KeyboardEvent<InputElement>) => {
         const input = event.currentTarget;
         if (onKeyDown) onKeyDown(event);
+        // a key that an IME is taking (the arrows that move through its
+        // candidates) is the IME’s
+        if (isIMEKeyEvent(event)) return;
         if (event.key !== 'ArrowDown' && event.key !== 'ArrowUp') return;
 
         const currentValue = input.value || (placeholder ?? `0${unit}`);
@@ -249,6 +252,10 @@ export default function CSSValueInput({
 
     const handleKeyUp = (event: KeyboardEvent<InputElement>) => {
         if (onKeyUp) onKeyUp(event);
+        // a keyup has no keyCode 229, so only isComposing marks one as an IME’s.
+        // It is already false on the keyup of a key that ended the composition
+        // (MDN, “keyup event”), which this takes for a plain key
+        if (isIMEKeyEvent(event)) return;
         // If this is the key up from ↑ or ↓ keys, time to handleSubmitValue
         if (event.key === 'ArrowUp' || event.key === 'ArrowDown') {
             handleSubmitValue(event);

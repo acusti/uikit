@@ -794,9 +794,23 @@ function CustomValidators() {
 
 ### Arrow Keys
 
-- **↑/↓** - Increment/decrement by step amount
+- **↑/↓** - Increment/decrement by step amount (the value is submitted when
+  the key is released)
 - **Shift + ↑/↓** - Increment/decrement by step × 10
 - Works with all numeric CSS value types
+
+The ↑/↓ keys that an IME uses to move through its candidates (e.g. in
+Japanese or Chinese) are left to the IME: they don't step the value, aren't
+prevented, and releasing them doesn't submit. Both still reach `onKeyDown`
+and `onKeyUp`, so a handler of your own that acts on ↑/↓ should skip them
+too, with [`isIMEKeyEvent(event)`] from `@acusti/input-text`, which
+`CSSValueInput` is built on (add it to your own dependencies to import it).
+A keyup has no `keyCode` of 229, so only `isComposing` marks it, which is
+already false on the keyup of a key that ended the composition. The README
+of `@acusti/input-text` says how Chrome, Firefox and Safari behave.
+
+[`isIMEKeyEvent(event)`]:
+    https://github.com/acusti/uikit/tree/main/packages/input-text#isimekeyevent
 
 ### Special Keys
 
