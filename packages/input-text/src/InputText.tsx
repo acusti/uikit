@@ -30,8 +30,9 @@ export type Props = AriaAttributes & {
     className?: string;
     disabled?: boolean;
     /**
-     * If true, resets input’s value to initialValue and blurs when user presses
-     * the escape key.
+     * If true, resets input’s value to its last committed one (initialValue,
+     * or the value it had when it was last blurred, whichever is more recent)
+     * and blurs when user presses the escape key.
      */
     discardOnEscape?: boolean;
     /**
