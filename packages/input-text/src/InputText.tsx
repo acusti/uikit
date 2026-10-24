@@ -45,8 +45,14 @@ export type Props = AriaAttributes & {
     form?: string;
     id?: string;
     /**
-     * The initial value of the text input. If props.initialValue changes at
-     * any point, the new value will override the local state of the input.
+     * The initial value of the text input. If this prop changes value, the
+     * input value is updated to match it. Unlike a controlled input,
+     * InputText keeps what the user types, but passing each change back
+     * from onChangeValue keeps initialValue in step so that setting it
+     * later (e.g. to '' to clear the input) updates the input’s value.
+     * Doing so also makes each change the value that discardOnEscape
+     * resets to, so Escape only blurs the input.
+     * @default ''
      */
     initialValue?: string;
     inputMode?: InputHTMLAttributes<HTMLInputElement>['inputMode'];
