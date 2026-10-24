@@ -136,9 +136,9 @@
     },
     "packages/dropdown": {
       "name": "@acusti/dropdown",
-      "version": "1.1.1",
+      "version": "1.2.0",
       "dependencies": {
-        "@acusti/matchmaking": "^0.10.0",
+        "@acusti/matchmaking": "^0.11.0",
         "@acusti/use-keyboard-events": "^0.13.1",
         "clsx": "^2",
       },
@@ -182,7 +182,7 @@
     },
     "packages/matchmaking": {
       "name": "@acusti/matchmaking",
-      "version": "0.10.0",
+      "version": "0.11.0",
       "devDependencies": {
         "typescript": "^7",
         "vite": "^8.0.0-0",
