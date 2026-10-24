@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { createRef } from 'react';
+import { createRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Props } from './InputText.js';
@@ -19,6 +19,13 @@ vi.stubGlobal('CSS', {
 const InputText = (await import('./InputText.js')).default;
 
 vi.unstubAllGlobals();
+
+// Passes each change back as initialValue, as a parent does with
+// onChangeValue={setValue} and initialValue={value}
+function EchoingInputText(props: Props) {
+    const [value, setValue] = useState('');
+    return <InputText {...props} initialValue={value} onChangeValue={setValue} />;
+}
 
 afterEach(cleanup);
 
@@ -42,6 +49,37 @@ describe('InputText.tsx', () => {
         // re-render with different initialValue, value state should reset
         rerender(<InputText initialValue="foo Bar " />);
         expect(input.value).toBe('foo Bar ');
+    });
+
+    // A parent that passes each change back as initialValue gives the input
+    // the value it already has. Writing it to the input anyway ends an IME
+    // composition in progress (seen in Safari)
+    it.each([false, true])(
+        'leaves the value alone when initialValue changes to the value the input already has (multiLine: %s)',
+        (multiLine) => {
+            render(<EchoingInputText multiLine={multiLine} />);
+            const input = screen.getByRole('textbox') as HTMLInputElement;
+            const setInputValue = vi.spyOn(input, 'value', 'set');
+
+            fireEvent.change(input, { target: { value: 'a' } });
+            fireEvent.change(input, { target: { value: 'ab' } });
+            expect(input.value).toBe('ab');
+            expect(setInputValue).not.toHaveBeenCalled();
+        },
+    );
+
+    it('resets to the latest initialValue on Escape with discardOnEscape, even if the input already had it', async () => {
+        const user = userEvent.setup();
+        const { rerender } = render(<InputText discardOnEscape initialValue="" />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+
+        await user.type(input, 'ab');
+        // e.g. a parent that saves what was typed while the input keeps focus
+        rerender(<InputText discardOnEscape initialValue="ab" />);
+        await user.type(input, 'c');
+        expect(input.value).toBe('abc');
+        await user.keyboard('{Escape}');
+        expect(input.value).toBe('ab');
     });
 
     it('supports rendering multi-line inputs as a <textarea>', async () => {
