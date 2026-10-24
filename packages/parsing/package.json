@@ -32,7 +32,11 @@
     "scripts": {
         "test": "vitest",
         "build": "vite build && tsc -p tsconfig.build.json",
-        "tsc": "tsc --noEmit"
+        "tsc": "tsc --noEmit && tsc -p scripts",
+        "compare": "bun scripts/compare.ts",
+        "mutate": "bun scripts/mutate.ts",
+        "perf": "bun scripts/perf.ts",
+        "size": "bun scripts/size.ts"
     },
     "devDependencies": {
         "typescript": "^7",
