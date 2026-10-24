@@ -121,8 +121,14 @@ type Props = AriaAttributes & {
     id?: string;
 
     /**
-     * The initial value of the text input. If this prop changes,
-     * the input value will be updated to match the new value.
+     * The initial value of the text input. If this prop changes value, the
+     * input value is updated to match it. Unlike a controlled input,
+     * InputText keeps what the user types, but passing each change back
+     * from onChangeValue keeps initialValue in step so that setting it
+     * later (e.g. to '' to clear the input) updates the input’s value.
+     * Doing so also makes each change the value that discardOnEscape
+     * resets to, so Escape only blurs the input.
+     * @default ''
      */
     initialValue?: string;
 
