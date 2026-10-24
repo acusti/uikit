@@ -238,7 +238,11 @@ export default function InputText({
     useEffect(() => {
         committedValueRef.current = valueFromProps;
         if (!inputRef.current) return;
-        // if props.initialValue changes, override input value with it
+        // if props.initialValue changes, override input value with it, unless
+        // the input already has it (e.g. a controlled-input-style parent):
+        // writing it anyway moves the caret to the end and ends an IME
+        // composition in Safari
+        if (inputRef.current.value === valueFromProps) return;
         inputRef.current.value = valueFromProps;
     }, [valueFromProps]);
 
