@@ -104,9 +104,17 @@ type Props = AriaAttributes & {
     disabled?: boolean;
 
     /**
+     * If true, pressing Escape resets the input’s value to its last
+     * committed one (initialValue, or the value it had when it was last
+     * blurred, whichever is more recent) and blurs it.
+     */
+    discardOnEscape?: boolean;
+
+    /**
      * If true, input renders as readonly initially and only becomes interactive
      * when double-clicked or when user focuses the readonly input and then
-     * presses the enter key. Input becomes readonly again when blurred.
+     * presses the enter key. Input becomes readonly again when blurred or
+     * when the user presses Enter or Escape.
      */
     doubleClickToEdit?: boolean;
 
