@@ -1,5 +1,5 @@
 ---
-'@acusti/input-text': patch
+'@acusti/input-text': minor
 ---
 
 Fix `InputText` acting on the keys of an IME composition
@@ -8,4 +8,5 @@ Fix `InputText` acting on the keys of an IME composition
 is being composed, so that the Enter that commits a composition doesn’t
 also submit, blur the input or finish a `doubleClickToEdit` edit, and the
 Escape that cancels one doesn’t also discard the changes
-(`discardOnEscape`) or end the edit. Both keys still reach `onKeyDown`.
+(`discardOnEscape`) or end the edit. Both keys still reach `onKeyDown`. The
+new util it uses, `isIMEKeyEvent(event)`, is exported for external use.

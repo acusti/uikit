@@ -281,6 +281,49 @@ import type { InputElement } from '@acusti/input-text';
 type InputElement = HTMLInputElement | HTMLTextAreaElement;
 ```
 
+### isIMEKeyEvent
+
+```tsx
+import { type InputElement, isIMEKeyEvent } from '@acusti/input-text';
+import type { KeyboardEvent } from 'react';
+
+function handleKeyDown(event: KeyboardEvent<InputElement>) {
+    if (isIMEKeyEvent(event)) return;
+    // the key is the user’s, not the IME’s
+}
+```
+
+`isIMEKeyEvent(event)` takes a `KeyboardEvent<InputElement>` and returns a
+boolean: whether the event of a keydown or a keyup is of a key that an IME
+is taking (the Enter that commits a composition, the arrows that move
+through its candidates, the Escape that cancels it). It is true if
+`event.nativeEvent.isComposing` is set or, on a keydown, if `event.keyCode`
+is 229, which also marks the keydown that opens a composition (before
+`compositionstart`, in Chrome and Firefox) and one that comes after the
+composition has ended. A keyup has no `keyCode` of 229, so on a keyup only
+`isComposing` marks an IME’s key; MDN notes that it is already false on the
+keyup of a key that ended the composition.
+
+How the browsers behave, as checked with a Japanese IME on macOS in Chrome
+155, Firefox 159 and Safari 27:
+
+- The keydown of the key that opens a composition has `isComposing` false
+  and `keyCode` 229 in Chrome and Firefox, where `compositionstart` follows
+  it, so the `keyCode` is what flags it. In Safari `compositionstart` came
+  first, and `isComposing` was already true.
+- Every other keydown during the composition has `isComposing` true and
+  `keyCode` 229 in all three (Firefox reports its `key` as `Process`).
+- Every keyup during the composition has `isComposing` true and the key’s
+  real `keyCode`, in all three. That includes the ↑/↓ that move through the
+  candidates and, in Chrome and Firefox, the Enter that commits, since
+  `compositionend` follows its keyup.
+- Not seen in these runs: the keyup of a key that ended the composition
+  before it, or the `compositionend` that Safari is reported to fire before
+  the keydown of the Enter that commits.
+- A Korean 2-Set arrow pressed after typing a syllable arrived in Safari as
+  a plain key, on keydown and keyup.
+- Not checked: Windows, Linux, other IMEs.
+
 ## Usage Examples
 
 ### Basic Text Inputs (equivalent API to native <input>)
@@ -636,7 +679,7 @@ function UserProfileForm() {
 ### Chat Input with Enhanced UX
 
 ```tsx
-import InputText from '@acusti/input-text';
+import InputText, { isIMEKeyEvent } from '@acusti/input-text';
 import { useState, useRef, useCallback } from 'react';
 
 function ChatInput({ onSendMessage, disabled }) {
@@ -659,8 +702,7 @@ function ChatInput({ onSendMessage, disabled }) {
             if (
                 event.key === 'Enter' &&
                 !event.shiftKey &&
-                !event.nativeEvent.isComposing &&
-                event.keyCode !== 229
+                !isIMEKeyEvent(event)
             ) {
                 event.preventDefault();
                 handleSend();
@@ -725,7 +767,7 @@ function ChatInput({ onSendMessage, disabled }) {
 ### Dynamic Input List
 
 ```tsx
-import InputText from '@acusti/input-text';
+import InputText, { isIMEKeyEvent } from '@acusti/input-text';
 import { useState, useCallback } from 'react';
 
 function TagsInput() {
@@ -761,8 +803,7 @@ function TagsInput() {
                 removeTag(index);
             } else if (
                 event.key === 'Enter' &&
-                !event.nativeEvent.isComposing &&
-                event.keyCode !== 229 &&
+                !isIMEKeyEvent(event) &&
                 event.target.value.trim()
             ) {
                 event.preventDefault();
@@ -906,12 +947,12 @@ composition isn’t prevented, and doesn’t submit, blur, or finish a
 changes (`discardOnEscape`), end a `doubleClickToEdit` edit, or blur the
 input. The next Enter or Escape does. Both still reach `onKeyDown`, so a
 handler of your own that acts on Enter or Escape should skip them too, as
-the chat and tags examples above do: `event.nativeEvent.isComposing` is set
-on such a key, or, where the composition has already ended by then,
-`event.keyCode` is 229.
+the chat and tags examples above do, with [`isIMEKeyEvent(event)`] (see the
+API Reference).
 
 [`@acusti/dropdown`]:
     https://github.com/acusti/uikit/tree/main/packages/dropdown
+[`isIMEKeyEvent(event)`]: #isimekeyevent
 
 ### Browser Compatibility
 

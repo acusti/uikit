@@ -16,7 +16,7 @@ vi.stubGlobal('CSS', {
     },
 });
 
-const InputText = (await import('./InputText.js')).default;
+const { default: InputText, isIMEKeyEvent } = await import('./InputText.js');
 
 vi.unstubAllGlobals();
 
@@ -851,5 +851,52 @@ describe('InputText.tsx', () => {
         await user.dblClick(input);
         expect(input.readOnly).toBe(false);
         expect(onDoubleClick).not.toHaveBeenCalled();
+    });
+});
+
+describe('isIMEKeyEvent', () => {
+    // Whether isIMEKeyEvent says that the key event is an IME’s, for a keydown
+    // (or a keyup) that reaches an input
+    const isIMEKey = (
+        init: { isComposing?: boolean; key: string; keyCode?: number },
+        type: 'keyDown' | 'keyUp' = 'keyDown',
+    ) => {
+        const verdicts: Array<boolean> = [];
+        const onKey = (event: Parameters<typeof isIMEKeyEvent>[0]) => {
+            verdicts.push(isIMEKeyEvent(event));
+        };
+        render(<input onKeyDown={onKey} onKeyUp={onKey} />);
+        fireEvent[type](screen.getByRole('textbox'), init);
+        expect(verdicts).toHaveLength(1);
+        return verdicts[0];
+    };
+
+    it('is true for a key while a composition is under way', () => {
+        expect(isIMEKey({ isComposing: true, key: 'ArrowUp' })).toBe(true);
+    });
+
+    it('is true for a key with the keyCode 229 of an IME that has already ended its composition', () => {
+        expect(isIMEKey({ key: 'Enter', keyCode: 229 })).toBe(true);
+    });
+
+    it('is true for a keyup while a composition is under way, with its real keyCode', () => {
+        expect(
+            isIMEKey({ isComposing: true, key: 'ArrowUp', keyCode: 38 }, 'keyUp'),
+        ).toBe(true);
+    });
+
+    it('is false for a keyup of a key that ended the composition before it', () => {
+        expect(isIMEKey({ key: 'ArrowUp', keyCode: 38 }, 'keyUp')).toBe(false);
+    });
+
+    it('is true for a key that has both', () => {
+        expect(isIMEKey({ isComposing: true, key: 'Escape', keyCode: 229 })).toBe(true);
+    });
+
+    it.each([
+        { key: 'ArrowUp', keyCode: 38 },
+        { key: 'a', keyCode: 65 },
+    ])('is false for $key, which has neither', (init) => {
+        expect(isIMEKey(init)).toBe(false);
     });
 });
