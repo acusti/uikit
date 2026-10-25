@@ -104,19 +104,19 @@ type Props = AriaAttributes & {
     disabled?: boolean;
 
     /**
-     * If true, pressing Escape resets the input’s value to its last
-     * committed one (initialValue, or the value it had when it was last
-     * blurred, whichever is more recent) and blurs it. The Escape that
-     * cancels an IME composition is left to the IME.
+     * If true, pressing Escape resets the input’s value to its last committed
+     * one (initialValue, or the value it had when it was last blurred,
+     * whichever is more recent) and blurs it. The Escape that cancels an IME
+     * composition is left to the IME.
      */
     discardOnEscape?: boolean;
 
     /**
-     * If true, input renders as readonly initially and only becomes interactive
-     * when double-clicked or when user focuses the readonly input and then
-     * presses the enter key. Input becomes readonly again when blurred or
-     * when the user presses Enter or Escape, except for an Enter or Escape
-     * that commits or cancels an IME composition.
+     * If true, the input renders as readonly at first and only becomes editable
+     * when it is double-clicked, or when the user focuses it and presses Enter.
+     * It becomes readonly again when it is blurred or when the user presses
+     * Enter or Escape, except for an Enter or Escape that commits or cancels an
+     * IME composition.
      */
     doubleClickToEdit?: boolean;
 
@@ -190,8 +190,8 @@ type Props = AriaAttributes & {
     onChange?: (event: ChangeEvent<InputElement>) => unknown;
 
     /**
-     * Simplified change handler that receives just the new value.
-     * Perfect for passing setState functions directly.
+     * A change handler that receives only the new value, so that a state setter
+     * can be passed to it directly, e.g. onChangeValue={setValue}.
      */
     onChangeValue?: (value: string) => unknown;
 
@@ -225,7 +225,7 @@ type Props = AriaAttributes & {
     /** Initial number of rows for multi-line inputs */
     rows?: number;
 
-    /** If true, all text is selected when input receives focus */
+    /** If true, the contents of the input are selected when it’s focused. */
     selectTextOnFocus?: boolean;
 
     /** Visual size of the input (character width) */
@@ -239,18 +239,17 @@ type Props = AriaAttributes & {
 
     /**
      * If true, pressing Enter submits the form that owns the input (the one
-     * named by the form prop, or else the one the input is inside) and
-     * blurs by default. Set keepFocusOnSubmit to submit without blurring.
-     * For multi-line inputs, Cmd/Ctrl+Enter always submits.
-     * The Enter keydown is only prevented where it has a default action to
-     * stop: in a multi-line input, or in an input that a form owns. The
-     * Enter that commits an IME composition is left to the IME. See
-     * “Smart Enter Key Handling”.
+     * named by the form prop, or else the one the input is inside) and blurs
+     * the input, unless keepFocusOnSubmit is set. For multi-line inputs,
+     * Cmd/Ctrl+Enter always submits. The Enter keydown is only prevented where
+     * it has a default action to stop: in a multi-line input, or in an input
+     * that a form owns. The Enter that commits an IME composition is left to
+     * the IME. See “Smart Enter Key Handling”.
      */
     submitOnEnter?: boolean;
     /**
-     * If true, pressing Enter while submitOnEnter is enabled keeps focus
-     * on the input instead of blurring.
+     * If true, pressing Enter while submitOnEnter is enabled keeps focus on the
+     * input instead of blurring it.
      */
     keepFocusOnSubmit?: boolean;
 
