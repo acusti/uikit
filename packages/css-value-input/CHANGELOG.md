@@ -1,5 +1,17 @@
 # @acusti/css-value-input
 
+## 2.6.1
+
+### Patch Changes
+
+- 4e6b365: Fix `CSSValueInput` stepping its value on the arrow keys of an
+  IME composition
+
+    `CSSValueInput` now leaves the ↑/↓ keys that an IME uses to move
+    through its candidates (in Japanese or Chinese, say) to the IME: they
+    no longer step the value, and releasing them no longer submits it. Both
+    keys still reach `onKeyDown` and `onKeyUp`.
+
 ## 2.6.0
 
 ### Minor Changes
