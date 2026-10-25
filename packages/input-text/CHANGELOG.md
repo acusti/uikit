@@ -1,5 +1,31 @@
 # @acusti/input-text
 
+## 2.7.0
+
+### Minor Changes
+
+- 7ec4dda: Fix `InputText` acting on the keys of an IME composition
+
+    `InputText` now ignores the Enter and Escape that an IME takes while
+    text is being composed, so that the Enter that commits a composition
+    doesn’t also submit, blur the input or finish a `doubleClickToEdit`
+    edit, and the Escape that cancels one doesn’t also discard the changes
+    (`discardOnEscape`) or end the edit. Both keys still reach `onKeyDown`.
+    The new util it uses, `isIMEKeyEvent(event)`, is exported for external
+    use.
+
+### Patch Changes
+
+- 175bf14: Fix the caret and IME input in an `InputText` used in the React
+  controlled input pattern
+
+    An `InputText` whose `initialValue` is set from its own
+    `onChangeValue`, as in a React controlled input, no longer writes that
+    value back into the input on every keystroke. In Safari, the write
+    moved the caret to the end of the text after each key, ended an IME
+    composition after one key, and made the characters typed after it come
+    out doubled.
+
 ## 2.6.1
 
 ### Patch Changes
