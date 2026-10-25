@@ -2,7 +2,7 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 import { type ComponentProps, type FormEvent, useEffect, useState } from 'react';
 import { fn } from 'storybook/test';
 
-import InputText from '../../input-text/src/InputText.js';
+import InputText, { isIMEKeyEvent } from '../../input-text/src/InputText.js';
 
 import './InputText.css';
 
@@ -131,8 +131,7 @@ export const MultiLineInputWithSubmitOnEnterNoForm: Story = {
                             !event.shiftKey &&
                             !event.altKey &&
                             // the Enter that commits an IME composition is the IME’s
-                            !event.nativeEvent.isComposing &&
-                            event.keyCode !== 229
+                            !isIMEKeyEvent(event)
                         ) {
                             setLastSubmitDate(new Date());
                         }

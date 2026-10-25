@@ -11,6 +11,7 @@ import * as React from 'react';
 
 import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
 import Dropdown, { Menubar } from '../../dropdown/src/Dropdown.js';
+import { isIMEKeyEvent } from '../../input-text/src/InputText.js';
 
 import './CSSValueInput.css';
 import './Dropdown.css';
@@ -421,11 +422,7 @@ export const DropdownClosingOnEnter: Story = {
                                 // so the input decides for itself, by the same
                                 // checks: Enter, and not the one that commits
                                 // an IME composition
-                                if (
-                                    event.key !== 'Enter' ||
-                                    event.nativeEvent.isComposing ||
-                                    event.keyCode === 229
-                                ) {
+                                if (event.key !== 'Enter' || isIMEKeyEvent(event)) {
                                     return;
                                 }
                                 const tag = event.currentTarget.value.trim();

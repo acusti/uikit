@@ -447,11 +447,13 @@ function isHeightEmpty(
     return value == null || value === '' || value === 0 || value === Infinity;
 }
 
-// Whether a keydown is of a key that an IME is taking: Enter to commit a
-// composition, Escape to cancel it. isComposing says so while the composition
-// is under way; where it has already ended by the time of the keydown, only
-// keyCode 229 still gives it away
-function isIMEKeyEvent(event: KeyboardEvent<InputElement>) {
+// Whether a key event is of a key that an IME is taking: Enter to commit a
+// composition, the arrows to move through its candidates, Escape to cancel
+// it. isComposing says so while the composition is under way. Where it has
+// already ended by the time of a keydown, only keyCode 229 still gives it
+// away; a keyup has no such keyCode, so only isComposing marks one, and it is
+// false on the keyup of a key that ended the composition
+export function isIMEKeyEvent(event: KeyboardEvent<InputElement>) {
     // eslint-disable-next-line typescript/no-deprecated
     return event.nativeEvent.isComposing || event.keyCode === 229;
 }
