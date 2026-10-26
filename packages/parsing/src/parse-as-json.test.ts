@@ -1,10 +1,6 @@
 import { beforeAll, describe, expect, it } from 'vitest';
 
-import {
-    getPreviousStringType,
-    parseAsJSON,
-    parseUnfinishedJSON,
-} from './parse-as-json.js';
+import { parseAsJSON, parseUnfinishedJSON } from './parse-as-json.js';
 
 // an unfinished page, up to where the props of its first section are open
 const PAGE_STARTS = [
@@ -26,44 +22,6 @@ const STOPS_IN_KEY_REGEXP = /[{,]\s*"(?:[^"\\]|\\.)*\\?$/;
 const STOPS_AFTER_KEY_REGEXP = /[{,]\s*"(?:[^"\\]|\\.)*"\s*:?\s*$/;
 
 describe('@acusti/parsing', () => {
-    describe('getPreviousStringType', () => {
-        it('returns KEY if the previous string token is an object key', () => {
-            expect(getPreviousStringType('{"foo": "')).toBe('KEY');
-        });
-
-        it('returns VALUE if the previous string token is not an object key', () => {
-            expect(getPreviousStringType('{"foo": "bar", "')).toBe('VALUE');
-        });
-
-        it('returns null if the previous token isn’t a string', () => {
-            expect(getPreviousStringType('{"foo": 42, "')).toBe(null);
-            expect(getPreviousStringType('{"foo": ["one", "two"]')).toBe(null);
-        });
-
-        it('goes by whichever ended later, a key or a value, each a string that another follows', () => {
-            // a value ended later
-            expect(getPreviousStringType('{"a":"b","c"')).toBe('VALUE');
-            expect(getPreviousStringType('{"a":"b","c":"d","e"')).toBe('VALUE');
-            // a key ended later, though a value ended before it
-            expect(getPreviousStringType('{"a":"b","c":"d"')).toBe('KEY');
-            expect(getPreviousStringType('{"a":"b","c","d":"e"')).toBe('KEY');
-            // an array closed after both
-            expect(getPreviousStringType('{"a":"b","c":["d"]')).toBe(null);
-            expect(getPreviousStringType('{"a":["b","c"],"d"')).toBe(null);
-            // an array closed before either
-            expect(getPreviousStringType('{"a":["b"],"c":"d"')).toBe('KEY');
-            expect(getPreviousStringType('{"a":["b"],"c":"d","e"')).toBe('VALUE');
-            // more than one space between the two strings does not count
-            expect(getPreviousStringType('{"a":  "b",  "c"')).toBe(null);
-            expect(getPreviousStringType('{"a":"b",\n"c"')).toBe('KEY');
-            // nor does an end at the very start of the text
-            expect(getPreviousStringType('":"a')).toBe(null);
-            expect(getPreviousStringType('x":"a')).toBe('KEY');
-            expect(getPreviousStringType('","a')).toBe(null);
-            expect(getPreviousStringType('x","a')).toBe('VALUE');
-        });
-    });
-
     // parseAsJSON’s readings can’t show whether closing a text or repairing it
     // read it, since both are held to the same readings, so these ask the closer
     describe('parseUnfinishedJSON', () => {
@@ -138,7 +96,7 @@ describe('@acusti/parsing', () => {
         );
         it('handles too many closing curly braces', extraClosingCurliesTestCase);
         it(
-            'handles unterminated string values and invalid object nesting',
+            'does not end a string that is never closed at a line break before a bracket',
             unterminatedStringsAndInvalidNestingTestCase,
         );
         it(
@@ -154,6 +112,10 @@ describe('@acusti/parsing', () => {
         );
         it('leaves a markdown table as the text that it is', markdownTableTestCase);
         it('preserves escaped new lines within strings', preservesNewLinesTestCase);
+        it(
+            'keeps a raw line break in a string whatever the next line starts with',
+            lineBreakBeforeBracketTestCase,
+        );
         it('handles extraneous escape characters', extraneousEscapeCharactersTestCase);
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
         it(
@@ -990,10 +952,8 @@ describe('@acusti/parsing', () => {
             ).toEqual({ b: 2, content: 'see:\n```json\n{"inner": 1}\n```' });
             // …or not (the string is misread, but it is the root that is read)
             for (const text of [
-                `{"content": "Here is code:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}`,
                 `{"content": "Here is code:\n${fence}json\n{"inner": 1`,
                 `{"content": "Here is code:\n${fence}json\n[1, 2`,
-                `Here:\n${fence}json\n{"content": "see:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}\n${fence}`,
                 // (also after words in quote marks of their own, which go by
                 // pairs like any others)
                 `{"content": "say "hi" then:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}`,
@@ -1005,6 +965,15 @@ describe('@acusti/parsing', () => {
                 `{"content": "see the 13" and 15" models:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}`,
             ]) {
                 expect(parseAsJSON(text).value, text).toHaveProperty('content');
+            }
+            // (a colon after the quote mark that closes `inner` ends the string
+            // there, which leaves no root to read: the value is null, and it is not
+            // the block in the string)
+            for (const text of [
+                `{"content": "Here is code:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}`,
+                `Here:\n${fence}json\n{"content": "see:\n${fence}json\n{"inner": 1}\n${fence}\ndone", "b": 2}\n${fence}`,
+            ]) {
+                expect(parseAsJSON(text).value, text).toBe(null);
             }
             // (nor after a bracket of the other kind, which does not close the
             // value for this)
@@ -1137,7 +1106,8 @@ describe('@acusti/parsing', () => {
                     value: { a: 'b' },
                 });
                 // what the text ends partway through is not the start of a member
-                expect(parseAsJSON('{"a": "b", "c\n{').value).toEqual({ a: 'b', c: {} });
+                // (a key, whose line break and bracket are part of it)
+                expect(parseAsJSON('{"a": "b", "c\n{').value).toEqual({ a: 'b' });
                 expect(parseAsJSON('{"a": ["b", x tr')).toEqual({
                     postscript: ', x tr',
                     preamble: '',
@@ -2244,6 +2214,99 @@ function isPrefixOf({
     });
 }
 
+function lineBreakBeforeBracketTestCase() {
+    // a raw line break in a string is escaped, whatever the next line starts
+    // with: a markdown link, a placeholder, code, a citation, a task list, or
+    // JSON that is escaped
+    const values: Array<[string, unknown]> = [
+        [
+            '{"body": "See the docs\n[here](https://example.com) for more", "b": "c"}',
+            { b: 'c', body: 'See the docs\n[here](https://example.com) for more' },
+        ],
+        [
+            '{"heading": "Hi", "body": "Intro\n{name}, welcome"}',
+            { body: 'Intro\n{name}, welcome', heading: 'Hi' },
+        ],
+        [
+            '{"code": "function f()\n{ return 1; }", "b": "c"}',
+            { b: 'c', code: 'function f()\n{ return 1; }' },
+        ],
+        [
+            '{"body": "As shown\n[1] in the paper", "n": 1}',
+            { body: 'As shown\n[1] in the paper', n: 1 },
+        ],
+        [
+            '{"body": "Read:\n[a](https://a.com)\n[b](https://b.com)", "n": 1}',
+            { body: 'Read:\n[a](https://a.com)\n[b](https://b.com)', n: 1 },
+        ],
+        ['{"body": "Steps:\n  [x] done", "n": 1}', { body: 'Steps:\n  [x] done', n: 1 }],
+        [
+            '{"example": "Send:\n{\\"a\\": 1}", "n": 1}',
+            { example: 'Send:\n{"a": 1}', n: 1 },
+        ],
+        // (after a blank line and indentation, as the root’s only member, or in an array)
+        [
+            '{"body": "See the docs\n\n    [here](https://example.com)"}',
+            { body: 'See the docs\n\n    [here](https://example.com)' },
+        ],
+        ['["Intro\n[see](https://x.com)", "b"]', ['Intro\n[see](https://x.com)', 'b']],
+        [
+            '[{"body": "Intro\n[see](https://x.com)"}, {"body": "Outro\n{name}"}]',
+            [{ body: 'Intro\n[see](https://x.com)' }, { body: 'Outro\n{name}' }],
+        ],
+        // (a code block in the string, with the quote marks of its JSON escaped)
+        [
+            '{"content": "see:\n```json\n{\\"inner\\": 1}\n```\ndone", "b": 2}',
+            { b: 2, content: 'see:\n```json\n{"inner": 1}\n```\ndone' },
+        ],
+        // (a line break that a backslash precedes is the backslash’s mistake)
+        ['{"body": "See\\\n[x]", "n": 1}', { body: 'See\n[x]', n: 1 }],
+    ];
+    for (const [text, value] of values) {
+        expect(parseAsJSON(text), text).toEqual({ postscript: '', preamble: '', value });
+    }
+    // …also after a preamble, and in a code block
+    expect(
+        parseAsJSON(
+            'Here is the page:\n```json\n{"body": "See the docs\n[here](https://example.com)", "b": "c"}\n```',
+        ),
+    ).toEqual({
+        postscript: '',
+        preamble: 'Here is the page:',
+        value: { b: 'c', body: 'See the docs\n[here](https://example.com)' },
+    });
+    expect(
+        parseAsJSON(
+            'Here:\n```json\n{"content": "see:\n```json\n{\\"inner\\": 1}\n```\ndone", "b": 2}\n```',
+        ),
+    ).toEqual({
+        postscript: '',
+        preamble: 'Here:',
+        value: { b: 2, content: 'see:\n```json\n{"inner": 1}\n```\ndone' },
+    });
+    // a key can’t hold a line break and a bracket either, and the line break is
+    // not what ends the string
+    expect(parseAsJSON('{"a": "b", "c\n[x]": "d"}').value).toEqual({
+        a: 'b',
+        'c\n[x]': 'd',
+    });
+
+    // while the text streams in, a string is read as far as the text goes, with
+    // no key that the finished text won’t have
+    const text =
+        '{"heading": "Hi", "body": "See the docs\n[here](https://example.com) for more\n{name}, welcome", "b": "c"}';
+    const whole = JSON.parse(text.replaceAll('\n', '\\n')) as unknown;
+    for (let length = 1; length <= text.length; length++) {
+        const { postscript, preamble, value } = parseAsJSON(text.slice(0, length));
+        expect(
+            postscript === '' &&
+                preamble === '' &&
+                isPrefixOf({ isAwaitingValue: true, partial: value, whole }),
+            text.slice(0, length),
+        ).toBe(true);
+    }
+}
+
 function markdownTableTestCase() {
     // a table in the preamble is part of the preamble
     expect(
@@ -2632,14 +2695,14 @@ Sure, here's an example JSON output for the "Services" section based on the prov
 Here are some of the services we offer:
 {
 "contentLi`;
+    // (a string that is not closed runs on over the line breaks that follow it)
     expect(parseAsJSON(response)).toEqual({
-        postscript: '',
+        postscript: 'contentLi',
         preamble:
             'Sure, here\'s an example JSON output for the "Services" section based on the provided information:',
         value: {
             bodyCopy:
-                'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.',
-            'Here are some of the services we offer': {},
+                'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.\nHere are some of the services we offer:\n{\n',
         },
     });
 
@@ -2712,36 +2775,9 @@ Here are some of the services we offer:
         "button": "Add to Cart",
         "imageURL": "/`;
 
-    expect(parseAsJSON(response).value).toEqual({
-        items: [
-            {
-                '```json': {
-                    heading: 'Lava Lamps',
-                    items: [
-                        {
-                            button: 'Add to Cart',
-                            heading: 'Classic Lava Lamp',
-                            imageAlt: 'Classic Lava Lamp',
-                            imageURL: '/classic-lava-lamp.jpg',
-                            price: '$39.99',
-                        },
-                        {
-                            button: 'Add to Cart',
-                            heading: 'Glowing Lava Lamp',
-                            imageURL: '/',
-                            price: '$44.99',
-                        },
-                    ],
-                    subheading:
-                        'Choose from our wide selection of lava lamps in different sizes, colors, and features.',
-                },
-                description:
-                    "Lava is a unique store located in the heart of Noe Valley, San Francisco. We specialize in selling a wide variety of lava lamps, from classic designs to modern and quirky creations. But that's not all! We also offer a delicious treat that's sure to tantalize your taste buds: free whisky ice cream for those who come in before noon. Come visit us and experience the Lava magic for yourself!",
-                heading: 'Welcome to Lava',
-                subheading: 'Your One-Stop Shop for Lava Lamps and Whisky Ice Cream',
-            },
-        ],
-    });
+    // a key that is never closed, with an object after it on the next line, reads
+    // on to the next quote mark as any string does (the line break is part of it)
+    expect(parseAsJSON(response).value).toBe(null);
 }
 
 function preambleTestCase() {
@@ -3280,71 +3316,13 @@ Here are some of the services we offer:
 ]
 
 }}`;
+    // a string that is never closed is not ended at a line break before a bracket,
+    // as a markdown link or code in a string would be cut short too: the object
+    // that follows is part of the string, and nothing of the response is read
     expect(parseAsJSON(response)).toEqual({
         postscript: '',
         preamble:
             'Sure, here\'s an example JSON output for the "Services" section based on the provided information:',
-        value: {
-            bodyCopy:
-                'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.',
-            'Here are some of the services we offer': {
-                contentList1: [
-                    {
-                        content: 'Surgical debridement',
-                        description:
-                            'Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.',
-                        title: 'Surgical Debridement',
-                    },
-                ],
-                contentList2: [
-                    {
-                        content: 'Other services',
-                        description:
-                            'In addition to our core services, we also offer a range of other services to help you manage your wounds and promote healing. These include wound assessment and monitoring, pain management, and education on wound care and prevention.',
-                        title: 'Other Services',
-                    },
-                ],
-                contentList3: [
-                    {
-                        content: 'Our team',
-                        description:
-                            'Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible. Meet our team of experts today.',
-                        title: 'Our Team',
-                    },
-                ],
-            },
-        },
-    });
-
-    // the line is made a key however the string was repaired before it: with no
-    // line break, with several, or with an escaped backslash before one
-    for (const [body, value] of [
-        ['We care. ', 'We care.'],
-        ['We care.\n\nWe heal.\n', 'We care.\n\nWe heal.'],
-        ['In C:\\\\\nWe care.\n', 'In C:\\\nWe care.'],
-    ]) {
-        expect(
-            parseAsJSON(
-                `{"a": "b",\n"body": "${body}Here is what we offer:\n{\n"c": "d"\n}}`,
-            ),
-        ).toEqual({
-            postscript: '',
-            preamble: '',
-            value: { a: 'b', body: value, 'Here is what we offer': { c: 'd' } },
-        });
-    }
-
-    // a string that is itself a key is not cut there: the read ends inside it, as
-    // it does wherever a text stops inside a key
-    expect(
-        parseAsJSON(
-            'Here is the JSON output for the "Benefits{" page:\n{\n"teamMemberName1": "John Doe"\n}',
-        ).value,
-    ).toEqual({ teamMemberName1: 'John Doe' });
-    // …which keeps what was read before that key, and leaves the rest unread
-    expect(parseAsJSON('{"a": "b",\n"Options:\n{\n"c": "d"\n}}')).toEqual({
-        postscript: '{\n"c": "d"\n}}',
-        preamble: '',
-        value: { a: 'b' },
+        value: null,
     });
 }
