@@ -88,7 +88,11 @@ wrong, and write a few of each kind to `<name>.jsonl`.
   its first line is whole, since a line of brackets alone may yet be JSON.
 - `code-block-in-string`: a code block in one of the JSON's strings is part
   of the string: the whole text reads as all of the outer value, and each
-  cut as the outer value as far as it goes.
+  cut as the outer value as far as it goes. The block's JSON and the prose
+  before it have their quote marks escaped and their line breaks raw, as a
+  model writes them. In the rows named `COST` their quote marks are not
+  escaped: the first that a colon follows (or an inches mark, which ends
+  the string early) ends the string, so the outer value is not read.
 - `root-before-answer`: an answer after an object or array that cannot be
   read reads as it does alone.
 
