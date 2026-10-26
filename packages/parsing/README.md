@@ -265,6 +265,41 @@ parseAsJSON('{"heading": "Our Story", "subheading"}').value;
 // { heading: 'Our Story', subheading: '' }
 ```
 
+## A raw line break in a string
+
+JSON has no raw line break in a string (`\n` stands for one), but a model
+that writes markdown or code in a string sometimes puts them in.
+`parseAsJSON` reads each raw `\n` as part of the string, whatever the next
+line starts with: a markdown link, a citation, a task list box, a
+placeholder, or code. A raw carriage return or tab in a string (a CRLF line
+break, tab-indented code) is not repaired, and a text with one returns
+`null`.
+
+```js
+parseAsJSON(
+    '{"body": "See the docs\n[here](https://example.com) for more", "b": "c"}',
+).value;
+/* results in:
+{
+    body: 'See the docs\n[here](https://example.com) for more',
+    b: 'c',
+}
+*/
+
+parseAsJSON('{"body": "See the docs\n[').value;
+// { body: 'See the docs\n[' }
+```
+
+So a line break before a bracket does not end a string. One that is never
+closed runs on over the lines after it, to a quote mark that looks like the
+end of a string, and takes in an object or array that follows it on a line
+of its own, which usually leaves a `value` of `null`.
+
+```js
+parseAsJSON('{"a": "one\n{"b": 2}}').value;
+// null
+```
+
 ## What it repairs, and what it doesn’t
 
 Every repair and rule in `parseAsJSON` has a cost: bytes in your bundle,
