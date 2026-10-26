@@ -1155,8 +1155,10 @@ export function parseAsJSON(text: string): ParsedResult {
                         char = '",';
                     }
                 }
-            } else if (char === '\n') {
+            } else if (text.charCodeAt(index) < 0x20) {
+                // a raw control character (JSON has none in a string)
                 if (
+                    char === '\n' &&
                     stack.at(-1) === '}' &&
                     OBJECT_KEY_REGEXP.test(text.substring(index + 1))
                 ) {
@@ -1165,8 +1167,8 @@ export function parseAsJSON(text: string): ParsedResult {
                     isInsideString = false;
                     char = '",\n';
                 } else {
-                    // if not escaped, escape the newline character now
-                    char = '\\n';
+                    // if not escaped, escape the control character now
+                    char = JSON.stringify(char).slice(1, -1);
                     // check if there is already an extraneous escape character
                     if (isEscaped(text, index)) {
                         newText = newText.slice(0, -1);
