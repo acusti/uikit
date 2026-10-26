@@ -321,7 +321,7 @@
       "name": "@acusti/vite-plugin-svg-react",
       "version": "0.5.0",
       "devDependencies": {
-        "@oxvg/napi": "^0.0.7",
+        "@oxvg/napi": "^0.0.9",
         "@testing-library/react": "^16.3.2",
         "@types/node": "^26.1.0",
         "@types/react": "^19.3",
@@ -772,23 +772,23 @@
 
     "@oxlint/binding-win32-x64-msvc": ["@oxlint/binding-win32-x64-msvc@1.89.0", "", { "os": "win32", "cpu": "x64" }, "sha512-hLFJ/o0f/dTJh/EW0vmcbREYSQO9tYgfiAAlsOkiLFiJuRRWvYtFELUXN5o2ijpSo/tlO1n+YlWN58tZwPG18A=="],
 
-    "@oxvg/napi": ["@oxvg/napi@0.0.7", "", { "optionalDependencies": { "@oxvg/napi-darwin-arm64": "0.0.7", "@oxvg/napi-darwin-x64": "0.0.7", "@oxvg/napi-linux-arm64-gnu": "0.0.7", "@oxvg/napi-linux-arm64-musl": "0.0.7", "@oxvg/napi-linux-x64-gnu": "0.0.7", "@oxvg/napi-linux-x64-musl": "0.0.7", "@oxvg/napi-win32-arm64-msvc": "0.0.7", "@oxvg/napi-win32-x64-msvc": "0.0.7" } }, "sha512-yqqemUhCCBGVfbqTjPmMXhXaKLkdXxEf4MLFaZPa00edfKP965CHHrPwggc6/KuusjQ9+zcA09mFE3nUEyt0dA=="],
+    "@oxvg/napi": ["@oxvg/napi@0.0.9", "", { "optionalDependencies": { "@oxvg/napi-darwin-arm64": "0.0.9", "@oxvg/napi-darwin-x64": "0.0.9", "@oxvg/napi-linux-arm64-gnu": "0.0.9", "@oxvg/napi-linux-arm64-musl": "0.0.9", "@oxvg/napi-linux-x64-gnu": "0.0.9", "@oxvg/napi-linux-x64-musl": "0.0.9", "@oxvg/napi-win32-arm64-msvc": "0.0.9", "@oxvg/napi-win32-x64-msvc": "0.0.9" } }, "sha512-10EuQRmdo6EHF0PSkWCGRqyvgo4rNUHrzTXATudX/Xg6MeggqwCK9f9dpEgkGqFKrNjmlMDF7/R1bvlP3OIv1Q=="],
 
-    "@oxvg/napi-darwin-arm64": ["@oxvg/napi-darwin-arm64@0.0.7", "", { "os": "darwin", "cpu": "arm64" }, "sha512-wB1sMzdR0tDHv0+oqBgCFp1A+hbwgul9ZmOJBIVgcamJAwa7kAeNli4HYlZtUASmbZIZpc6ERmIXz5N2Siukyg=="],
+    "@oxvg/napi-darwin-arm64": ["@oxvg/napi-darwin-arm64@0.0.9", "", { "os": "darwin", "cpu": "arm64" }, "sha512-M74DtyxDy7vvxJQAb9d187U/12aSWu1gc163wqHe3lz34guzoZ+WcrhYOu7oNTLTpxyfmmA6mwc15YcJHDDu5Q=="],
 
-    "@oxvg/napi-darwin-x64": ["@oxvg/napi-darwin-x64@0.0.7", "", { "os": "darwin", "cpu": "x64" }, "sha512-oDgkpExxzn12xAQEQzU58OMUXPh88+mj4lMocxluSaNX8sx7zDBV8LMVjpUDJxxGFko4TSSj5VtdC4f62XueFw=="],
+    "@oxvg/napi-darwin-x64": ["@oxvg/napi-darwin-x64@0.0.9", "", { "os": "darwin", "cpu": "x64" }, "sha512-yWy3/gEoRxX7RVg4oXSM9DKGwvbpjfQDhlsjJxmJcFWkoGNcwT2QiJKPelIAQTOkqIpfxg0qzNzjvci3Uu5dMA=="],
 
-    "@oxvg/napi-linux-arm64-gnu": ["@oxvg/napi-linux-arm64-gnu@0.0.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-G5rjAsdTpBXJdXof3+G0h8udO3oV5UHRkV+B5goBG4r4N599A+AtJvmxRs5N75lDUuPY8W8WY+ZT5Nqr+RJf2A=="],
+    "@oxvg/napi-linux-arm64-gnu": ["@oxvg/napi-linux-arm64-gnu@0.0.9", "", { "os": "linux", "cpu": "arm64" }, "sha512-rVE9rh02Pwl1+SEUJVUJr1F0+Iu/RJnb+Pj6ZjQHA4IzB5/kHugSa5T+uZRv7zbyqXkt7dpSBeEFvx2hQa2BXA=="],
 
-    "@oxvg/napi-linux-arm64-musl": ["@oxvg/napi-linux-arm64-musl@0.0.7", "", { "os": "linux", "cpu": "arm64" }, "sha512-T1NOQjnoGjE9q6bOjFyfUoHjcJEMjwLq71p51Rx802WWp89AnJB1ahuhSSbwwZ/FbaWZ/Bnu9PCnhMUs4J6mkQ=="],
+    "@oxvg/napi-linux-arm64-musl": ["@oxvg/napi-linux-arm64-musl@0.0.9", "", { "os": "linux", "cpu": "arm64" }, "sha512-PuYz3Ygmg2OSpadP3cfSHQhBla24ZNakq3TEFwpff2iKEBF9BJLfA16GgZJCRe74f9c9hcWE31/JZ1Ve10VyHA=="],
 
-    "@oxvg/napi-linux-x64-gnu": ["@oxvg/napi-linux-x64-gnu@0.0.7", "", { "os": "linux", "cpu": "x64" }, "sha512-FDHlb6Ss8jPREoAk4sdprcnlBJcKz5N30CxLdOyKbOUC7nkodmnhKRyUseP1SuQofElsxGZUq9CPwW7VNwBx0w=="],
+    "@oxvg/napi-linux-x64-gnu": ["@oxvg/napi-linux-x64-gnu@0.0.9", "", { "os": "linux", "cpu": "x64" }, "sha512-VGXZhwvC8Fpw8ryOVJQ4tdZaMpt/l5usAM3qm6U4NzoDdQwx8Y4Kn5eBvRBgFCSCYE9nNEhVo+uqQO32ZEEh6A=="],
 
-    "@oxvg/napi-linux-x64-musl": ["@oxvg/napi-linux-x64-musl@0.0.7", "", { "os": "linux", "cpu": "x64" }, "sha512-7N1vVBV/QHQ5yMBRQM9vMU9rB0SKOqccXFFKk3m+h54EhkMIlycZL0xxeNO7lx0DDsosc0+KuprprRZAxz6+/A=="],
+    "@oxvg/napi-linux-x64-musl": ["@oxvg/napi-linux-x64-musl@0.0.9", "", { "os": "linux", "cpu": "x64" }, "sha512-0aaA7sa41wFASbDxKY8/SPS+AEcPtwRDHShBAS3QzEikSkPsef/njmcnpt1TNeqmsVcfFFPkjT9iEco5Gb3XZg=="],
 
-    "@oxvg/napi-win32-arm64-msvc": ["@oxvg/napi-win32-arm64-msvc@0.0.7", "", { "os": "win32", "cpu": "arm64" }, "sha512-rCvsnfkqfZYsFoCb9dOU9vCt17BJkygzCgAUbmOrzv5CIOyseLLONspsCL7gv/HnCk/d4h+q4UClyvURBbRzoA=="],
+    "@oxvg/napi-win32-arm64-msvc": ["@oxvg/napi-win32-arm64-msvc@0.0.9", "", { "os": "win32", "cpu": "arm64" }, "sha512-+K5Di+k5+mQOJD5tcmxJm3QlyfTOlNp8IKwLSa+5KzZl1f8HzkyGBVdUXIBE6/yoWYajA5P+44CdyreqlfdnYw=="],
 
-    "@oxvg/napi-win32-x64-msvc": ["@oxvg/napi-win32-x64-msvc@0.0.7", "", { "os": "win32", "cpu": "x64" }, "sha512-IrgikB6itQOqFg9VxK6YT6OWXfsZpV7l/PZgtfMG4A8p9IIgTT9A/7qyxMCQwJkccWG2ChmLv203L3XsVo9Kdw=="],
+    "@oxvg/napi-win32-x64-msvc": ["@oxvg/napi-win32-x64-msvc@0.0.9", "", { "os": "win32", "cpu": "x64" }, "sha512-IazO6/aDp4QOn5dZiVnuUtDVOOw1L23QJN7skfqtJjOTAhJmByoiaOa37LGNTmOiEPDAgJHJGyQQI3MiW75Stg=="],
 
     "@pnpm/deps.graph-sequencer": ["@pnpm/deps.graph-sequencer@1100.0.1", "", {}, "sha512-pOr5+q1fLYKwFN3LAJuGZEnfXDcQ73zqgDHMtGy+K+uIoUqyY+6MeDCWFwfu+4EFuq76I5EPFofoNAI+Bmmq4A=="],
 
