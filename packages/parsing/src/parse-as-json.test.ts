@@ -219,8 +219,8 @@ describe('@acusti/parsing', () => {
             expect(parseAsJSON('The result is {"sections"').value).toEqual({
                 sections: '',
             });
-            // a quote mark after the brace has to open a key, which a string that a
-            // line break and a bracket cut short is not
+            // a quote mark after the brace has to open a key that the text goes on
+            // to close
             expect(
                 parseAsJSON('Here is the "Benefits{" page:\n{\n"name": "John"\n}'),
             ).toEqual({
@@ -228,15 +228,26 @@ describe('@acusti/parsing', () => {
                 preamble: 'Here is the "Benefits{" page:',
                 value: { name: 'John' },
             });
+            // …or the text has to end inside it, as a key does that has yet to be
+            // closed (so the brace is its start until more of the text comes in)
             expect(parseAsJSON('Here is the "Benefits{" page:\n{')).toEqual({
                 postscript: '',
-                preamble: 'Here is the "Benefits{" page:',
+                preamble: 'Here is the "Benefits',
                 value: {},
             });
-            // (a key with a line break in it is one, and the line break is repaired)
+            // (a key with a line break in it is one, and the line break is repaired,
+            // also where a bracket follows it, as in a string of any other kind)
             expect(
                 parseAsJSON('Here it is:\n{"first\nname": "Ann",\n"age": "40"}').value,
             ).toEqual({ age: '40', 'first\nname': 'Ann' });
+            expect(
+                parseAsJSON('Here it is:\n{"first\n[x]": "Ann", "age": "40"}'),
+            ).toEqual({
+                postscript: '',
+                preamble: 'Here it is:',
+                value: { age: '40', 'first\n[x]': 'Ann' },
+            });
+            expect(parseAsJSON('{"a\n[x]", "b"}').value).toEqual({ 'a\n[x]': '', b: '' });
             // as does one whose first key has lost its opening quote mark, which is
             // restored where it follows a line break
             expect(parseAsJSON('{\nheading": "Hi",\n"sub": "Yo"\n}')).toEqual({
