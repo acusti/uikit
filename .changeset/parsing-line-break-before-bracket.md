@@ -2,12 +2,12 @@
 '@acusti/parsing': minor
 ---
 
-Read a string with a raw line break in it whole
+Read a string with a raw line break, tab or carriage return in it whole
 
-A raw line break before a `{` or `[` in a string (a markdown link, a
-placeholder, code) used to cut the string short and make up a `key` for the
-bracket. It is now part of the string, as a line break before anything else
-is.
+A string with a raw line break, tab or carriage return in it (or another
+control character) is now read whole. A line break before a `{` or `[` (a
+markdown link, a placeholder, code) used to cut the string short and make
+up a `key`, and a tab or carriage return gave a `value` of `null`.
 
 Two things can change a `value`:
 

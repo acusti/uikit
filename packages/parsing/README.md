@@ -265,15 +265,16 @@ parseAsJSON('{"heading": "Our Story", "subheading"}').value;
 // { heading: 'Our Story', subheading: '' }
 ```
 
-## A raw line break in a string
+## A raw line break, tab, carriage return or other control character in a string
 
 JSON has no raw line break in a string (`\n` stands for one), but a model
 that writes markdown or code in a string sometimes puts them in.
 `parseAsJSON` reads each raw `\n` as part of the string, whatever the next
 line starts with (bar a key, below): a markdown link, a citation, a task
-list box, a placeholder, or code. A raw carriage return or tab in a string
-(a CRLF line break, tab-indented code) is not repaired, and a text with one
-returns `null`.
+list box, a placeholder, or code. It does the same for a raw tab
+(tab-indented code, columns copied from a spreadsheet) and a raw carriage
+return (a CRLF line break), and for any other control character, which JSON
+leaves out of a string too (U+0000 to U+001F).
 
 ```js
 parseAsJSON(
@@ -288,6 +289,12 @@ parseAsJSON(
 
 parseAsJSON('{"body": "See the docs\n[').value;
 // { body: 'See the docs\n[' }
+
+parseAsJSON('{"code": "if (x) {\n\treturn 1;\n}"}').value;
+// { code: 'if (x) {\n\treturn 1;\n}' }
+
+parseAsJSON('{"body": "See\r\n[here](https://example.com)"}').value;
+// { body: 'See\r\n[here](https://example.com)' }
 ```
 
 In an object, a line that starts with a key and its colon ends a string
