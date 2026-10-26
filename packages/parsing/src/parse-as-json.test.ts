@@ -116,6 +116,10 @@ describe('@acusti/parsing', () => {
             'keeps a raw line break in a string whatever the next line starts with',
             lineBreakBeforeBracketTestCase,
         );
+        it(
+            'keeps a raw tab, carriage return or other control character in a string',
+            rawControlCharactersTestCase,
+        );
         it('handles extraneous escape characters', extraneousEscapeCharactersTestCase);
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
         it(
@@ -2991,6 +2995,93 @@ function quoteMarkStartTestCase() {
 
 // what an unfinished page reads to, given the props of its first section: the
 // page’s own root, with nothing left over
+function rawControlCharactersTestCase() {
+    // a raw tab (indented code, columns copied from a spreadsheet) or carriage
+    // return (a CRLF line break) in a string is escaped as a raw line break is
+    const values: Array<[string, unknown]> = [
+        ['{"code": "if (x) {\n\treturn 1;\n}"}', { code: 'if (x) {\n\treturn 1;\n}' }],
+        [
+            '{"body": "See\r\n[here](https://example.com)", "b": "c"}',
+            { b: 'c', body: 'See\r\n[here](https://example.com)' },
+        ],
+        ['{"a": "x\ty", "b": 1}', { a: 'x\ty', b: 1 }],
+        ['{"a": "x\ry", "b": 1}', { a: 'x\ry', b: 1 }],
+        // (at the start and the end of a string, in a key, and in an array)
+        ['{"a": "\tx", "b": "y\t"}', { a: '\tx', b: 'y\t' }],
+        ['{"a\tb": 1}', { 'a\tb': 1 }],
+        ['["x\ty", "z\r\nw"]', ['x\ty', 'z\r\nw']],
+        [
+            '{"table": "name\tage\nAnn\t40\nBo\t33"}',
+            { table: 'name\tage\nAnn\t40\nBo\t33' },
+        ],
+        // (in a text with CRLF line breaks throughout, and in one indented with tabs)
+        [
+            '{\r\n  "a": "one\r\ntwo",\r\n  "b": "three"\r\n}',
+            { a: 'one\r\ntwo', b: 'three' },
+        ],
+        [
+            '{\n\t"a": "one\n\ttwo",\n\t"b": ["three\t", "four"]\n}',
+            { a: 'one\n\ttwo', b: ['three\t', 'four'] },
+        ],
+        // (a backslash before one is the backslash’s mistake, and an escaped
+        // backslash before one is whole)
+        ['{"a": "x\\\ty", "b": 1}', { a: 'x\ty', b: 1 }],
+        ['{"a": "x\\\\\ty", "b": 1}', { a: 'x\\\ty', b: 1 }],
+    ];
+    for (const [text, value] of values) {
+        expect(parseAsJSON(text), text).toEqual({ postscript: '', preamble: '', value });
+    }
+    // …every control character that JSON leaves out of a string, not just those two
+    for (let code = 0; code < 0x20; code++) {
+        const char = String.fromCharCode(code);
+        expect(
+            parseAsJSON(`{"a": "x${char}y", "b": "z${char}"}`).value,
+            `${code}`,
+        ).toEqual({
+            a: `x${char}y`,
+            b: `z${char}`,
+        });
+    }
+    // (the range ends at U+001F: a space is not one, so a backslash before it is
+    // no mistake to take out)
+    expect(parseAsJSON('{"a": "x\\ y", "b": 1}').value).toBe(null);
+    // (only a line break that a key follows ends a string, as before: a tab or a
+    // carriage return before a key is part of the string)
+    expect(parseAsJSON('{"a": "b", "c\t"d": 1}').value).toEqual({ a: 'b', 'c\t"d': 1 });
+    expect(parseAsJSON('{"a": "b", "c\r"d": 1}').value).toEqual({ a: 'b', 'c\r"d': 1 });
+    // …also after a preamble, in a code block, and before a postscript
+    expect(
+        parseAsJSON(
+            'Here is the code:\n```json\n{"code": "if (x) {\n\treturn 1;\n}"}\n```',
+        ),
+    ).toEqual({
+        postscript: '',
+        preamble: 'Here is the code:',
+        value: { code: 'if (x) {\n\treturn 1;\n}' },
+    });
+    expect(parseAsJSON('{"a": "x\ty\r\nz"}\nLet me know!')).toEqual({
+        postscript: 'Let me know!',
+        preamble: '',
+        value: { a: 'x\ty\r\nz' },
+    });
+
+    // while the text streams in, a string is read as far as the text goes, with
+    // a value at every length
+    const text = '{"heading": "Hi", "code": "if (x) {\n\treturn 1;\r\n}\t", "b": "c"}';
+    const whole = JSON.parse(
+        text.replaceAll('\n', '\\n').replaceAll('\t', '\\t').replaceAll('\r', '\\r'),
+    ) as unknown;
+    for (let length = 1; length <= text.length; length++) {
+        const { postscript, preamble, value } = parseAsJSON(text.slice(0, length));
+        expect(
+            postscript === '' &&
+                preamble === '' &&
+                isPrefixOf({ isAwaitingValue: true, partial: value, whole }),
+            text.slice(0, length),
+        ).toBe(true);
+    }
+}
+
 function readPage(props: Record<string, unknown>) {
     return {
         postscript: '',

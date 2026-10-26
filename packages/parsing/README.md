@@ -271,8 +271,10 @@ JSON has no raw line break in a string (`\n` stands for one), but a model
 that writes markdown or code in a string often puts them in. `parseAsJSON`
 reads each raw `\n` as part of the string, whatever the next line starts
 with: a markdown link, a citation, a task list box, a placeholder, or code.
-A raw carriage return or tab in a string (a CRLF line break, tab-indented
-code) is not repaired, and a text with one returns `null`.
+It does the same for a raw tab (tab-indented code, columns copied from a
+spreadsheet) and a raw carriage return (a CRLF line break), and for any
+other control character, which JSON leaves out of a string too (U+0000 to
+U+001F).
 
 ```js
 parseAsJSON(
@@ -287,6 +289,12 @@ parseAsJSON(
 
 parseAsJSON('{"body": "See the docs\n[').value;
 // { body: 'See the docs\n[' }
+
+parseAsJSON('{"code": "if (x) {\n\treturn 1;\n}"}').value;
+// { code: 'if (x) {\n\treturn 1;\n}' }
+
+parseAsJSON('{"body": "See\r\n[here](https://example.com)"}').value;
+// { body: 'See\r\n[here](https://example.com)' }
 ```
 
 So a line break before a bracket does not end a string. One that is never

@@ -1155,13 +1155,14 @@ export function parseAsJSON(text: string): ParsedResult {
                         char = '",';
                     }
                 }
-            } else if (char === '\n') {
-                if (OBJECT_KEY_REGEXP.test(text.substring(index + 1))) {
+            } else if (text.charCodeAt(index) < 0x20) {
+                // a raw control character (JSON has none in a string)
+                if (char === '\n' && OBJECT_KEY_REGEXP.test(text.substring(index + 1))) {
                     // if not escaped but we seem to no longer be in a string, break out
                     char = '",\n';
                 } else {
-                    // if not escaped, escape the newline character now
-                    char = '\\n';
+                    // if not escaped, escape the control character now
+                    char = JSON.stringify(char).slice(1, -1);
                     // check if there is already an extraneous escape character
                     if (isEscaped(text, index)) {
                         newText = newText.slice(0, -1);
