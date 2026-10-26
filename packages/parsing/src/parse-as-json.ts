@@ -111,39 +111,6 @@ const UNFINISHED_KEY_REGEXP = /([{,])\s*"(?:[^"\\]|\\.)*\\?$/;
 
 type GenericObject = Record<string, unknown>;
 
-// the last index at which the text has a quote mark, the separator, and then
-// (after no more than one space) another quote mark, no further back than minIndex
-function lastIndexOfSeparator(text: string, separator: string, minIndex: number) {
-    const start = '"' + separator;
-    let index = text.lastIndexOf(start);
-    while (index > -1 && index >= minIndex) {
-        const next = text[index + 2];
-        if (next === '"' || (next === ' ' && text[index + 3] === '"')) return index;
-        index = index === 0 ? -1 : text.lastIndexOf(start, index - 1);
-    }
-    return -1;
-}
-
-// whether the last string in the text is a key or a value, going by which ended
-// later: a string that a colon and another string follow, or a comma and one
-export function getPreviousStringType(text: string): 'KEY' | 'VALUE' | null {
-    const lastEndKeyIndex = lastIndexOfSeparator(text, ':', 0);
-    // the end of a value only matters if it is after the end of the last key, so
-    // look no further back than that (the whole text, at every comma, adds up)
-    const lastEndValueIndex = lastIndexOfSeparator(
-        text,
-        ',',
-        Math.max(lastEndKeyIndex, 0),
-    );
-    // if cannot determine the type, return null
-    if (lastEndKeyIndex <= 0 && lastEndValueIndex <= 0) return null;
-    // if last token is an array
-    const lastEndIndex = Math.max(lastEndKeyIndex, lastEndValueIndex);
-    if (text.indexOf(']', lastEndIndex + 1) > -1) return null;
-
-    return lastEndValueIndex > lastEndKeyIndex ? 'VALUE' : 'KEY';
-}
-
 function isValidContext({
     char,
     controlChar,
@@ -610,9 +577,6 @@ const cleanThinkingText = (preamble: string) =>
 
 const FENCED_CODE_BLOCK_REGEXP =
     /^([ \t]*)```(?:[a-z0-9_-]{1,20})?[ \t]*\n([\s\S]*?)\n\1```[ \t]*$/i;
-
-const getObjectKeyFromIndex = (index: number) =>
-    `"key${index === 1 ? '' : '-' + index}":`;
 
 const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
 // what follows the brace that closes an object too early: a key, after a comma
@@ -1193,82 +1157,7 @@ export function parseAsJSON(text: string): ParsedResult {
                     }
                 }
             } else if (char === '\n') {
-                const controlCharIndex = indexOfClosestChar({
-                    chars: ['{', '['],
-                    index,
-                    text,
-                });
-
-                if (controlCharIndex > index && text[controlCharIndex]) {
-                    // if not escaped, but a new control structure is next, break out
-                    isInsideString = false;
-
-                    // if this is a valid context for a control char, just break out of the string
-                    if (
-                        isValidContext({
-                            char: text[controlCharIndex],
-                            controlChar: stack.at(-1),
-                            original: text,
-                            originalIndex: controlCharIndex,
-                            text: newText + '"',
-                        })
-                    ) {
-                        char = '",';
-                    } else {
-                        // if not valid context for new object/array, find an existing key or add one
-                        const lastColonIndex = indexOfClosestChar({
-                            char: ':',
-                            index,
-                            step: -1,
-                            text,
-                        });
-                        if (
-                            lastColonIndex > -1 &&
-                            stack.at(-1) === '}' &&
-                            UNFINISHED_KEY_REGEXP.test(newText)
-                        ) {
-                            // the string is a key: end the read inside it, as where
-                            // the text stops inside any key
-                            isInsideString = true;
-                            break;
-                        }
-                        if (lastColonIndex > -1) {
-                            // convert last bit of text into a key (its colon is the
-                            // last one in newText, since only whitespace follows it)
-                            const colonIndex = newText.lastIndexOf(':');
-                            const minimumStartIndex = newText.lastIndexOf('"') + 1;
-                            const lastLineStartIndex = newText.lastIndexOf('\\n') + 2;
-                            const lastSentenceStartIndex = newText.lastIndexOf('. ') + 2;
-                            const lastWordStartIndex = newText.lastIndexOf(' ') + 1;
-                            const keyStartIndex = Math.min(
-                                Math.max(
-                                    lastLineStartIndex,
-                                    lastSentenceStartIndex,
-                                    minimumStartIndex,
-                                ),
-                                lastWordStartIndex,
-                            );
-                            newText =
-                                newText
-                                    .substring(0, keyStartIndex)
-                                    .replace(/(\\n|\s)+$/, '') +
-                                '", "' +
-                                newText.substring(keyStartIndex, colonIndex) +
-                                '"' +
-                                newText.substring(colonIndex);
-                        } else if (getPreviousStringType(newText) === 'VALUE') {
-                            // if previous string is a value, convert current string into a key
-                            char = '":';
-                        } else {
-                            // if no key was found, add one
-                            let keyIndex = 1;
-                            while (text.includes(getObjectKeyFromIndex(keyIndex))) {
-                                keyIndex++;
-                            }
-                            char = `", ${getObjectKeyFromIndex(keyIndex)} `;
-                        }
-                    }
-                } else if (OBJECT_KEY_REGEXP.test(text.substring(index + 1))) {
+                if (OBJECT_KEY_REGEXP.test(text.substring(index + 1))) {
                     // if not escaped but we seem to no longer be in a string, break out
                     char = '",\n';
                 } else {
