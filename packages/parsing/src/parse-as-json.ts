@@ -587,9 +587,8 @@ const NEXT_KEY_REGEXP = /^\s*,?\s*"[^"]+":/;
 // the JSON and not for part of the preamble.
 //
 // a string from its opening quote mark, as far as the text goes (which may be
-// partway through an escape sequence) and not past a line break that a bracket
-// follows (where the walk would cut the string short)
-const STRING_START_PATTERN = '"(?:[^"\\\\\\n]|\\\\(?:.|$)|\\n(?!\\s*[{[]))*';
+// partway through an escape sequence)
+const STRING_START_PATTERN = '"(?:[^"\\\\]|\\\\(?:.|$))*';
 // a bare literal as far as it goes, where the text ends on it or partway through
 const LITERAL_START_PATTERN =
     't(?:r(?:ue?)?)?|f(?:a(?:l(?:se?)?)?)?|n(?:u(?:ll?)?)?|-?\\d[\\d.eE+-]*|-';

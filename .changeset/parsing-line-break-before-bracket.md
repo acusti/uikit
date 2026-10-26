@@ -11,3 +11,7 @@ is now escaped as any other is, and the string is read whole. A string that
 is never closed is no longer ended at a line break before a bracket either:
 it is read on to its next quote mark, which usually leaves a `value` of
 `null` where the next object or array stood on a line of its own.
+
+The search for where the JSON starts no longer stops an object's first key
+at such a line break, so an object whose first key holds one starts the
+JSON.
