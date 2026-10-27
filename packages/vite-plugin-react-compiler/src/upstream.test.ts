@@ -389,4 +389,38 @@ export function UserName({ users, userId }: { users?: User[]; userId: string }) 
         expect(result?.code).toContain('react/compiler-runtime');
         expect(result?.code).toContain('users?.find((user) => user.id === userId).name');
     });
+
+    // a value that a branch inside `try` picks from props, with a constant
+    // on each side, was treated as a constant itself, so the element built
+    // from it was cached once per mount and kept rendering the first value
+    // after the prop changed; babel-plugin-react-compiler@1.0.0 caches it
+    // the same way. Recomputed upstream since 0.156.0
+    // (https://github.com/oxc-project/oxc/pull/27817)
+    it('recomputes a value that a branch inside try picks from props', async () => {
+        const result = await transformCode(
+            `
+declare function track(event: string): void;
+
+export function Banner({ isSignedIn }: { isSignedIn: boolean }) {
+    let message;
+    try {
+        if (isSignedIn) {
+            message = 'Welcome back';
+        } else {
+            message = 'Sign in to continue';
+        }
+        track('banner-view');
+    } catch {
+        message = 'Welcome';
+    }
+    return <p>{message}</p>;
+}
+`,
+            '/src/Banner.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        // the element is cached against message instead of once per mount
+        expect(result?.code).toMatch(/\$\[\d+\] !== message\b/);
+        expect(result?.code).not.toContain('react.memo_cache_sentinel');
+    });
 });
