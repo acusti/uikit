@@ -113,8 +113,12 @@ describe('@acusti/parsing', () => {
         it('leaves a markdown table as the text that it is', markdownTableTestCase);
         it('preserves escaped new lines within strings', preservesNewLinesTestCase);
         it(
-            'keeps a raw line break in a string whatever the next line starts with',
+            'keeps a raw line break in a string unless the next line starts with a key',
             lineBreakBeforeBracketTestCase,
+        );
+        it(
+            'ends a string that was left open at a line that starts with a key',
+            endsOpenStringAtKeyLineTestCase,
         );
         it('handles extraneous escape characters', extraneousEscapeCharactersTestCase);
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
@@ -1842,6 +1846,110 @@ function convertToJSONTestCase() {
     });
 }
 
+function endsOpenStringAtKeyLineTestCase() {
+    // a line that starts with a key and its colon ends a string that was left open
+    // (a closing quote mark dropped at the end of a line), and the key is read
+    for (const [text, value] of [
+        ['{\n"label": "Go\n"rating": 5\n}', { label: 'Go', rating: 5 }],
+        ['{"a": "one\n"b": 2}', { a: 'one', b: 2 }],
+        [
+            '{"a": "one\n"b": 2, "c": "three\n"d": 4}',
+            { a: 'one', b: 2, c: 'three', d: 4 },
+        ],
+        [
+            '{\n  "heading": "Our Story\n  "subheading": "A Passion for Sourdough"\n}',
+            { heading: 'Our Story', subheading: 'A Passion for Sourdough' },
+        ],
+        // (in an array of objects)
+        [
+            '[{"a": "one\n"b": 2}, {"a": "two\n"b": 3}]',
+            [
+                { a: 'one', b: 2 },
+                { a: 'two', b: 3 },
+            ],
+        ],
+        // (a line break in the string before the line that ends it is kept)
+        ['{"a": "one\ntwo\n"b": 2}', { a: 'one\ntwo', b: 2 }],
+        // (a key that starts with something other than a letter)
+        [
+            '{"a": "one\n"_id": 2, "c": "three\n"2xl": 4, "d": "five\n"$ref": 6}',
+            { _id: 2, '2xl': 4, $ref: 6, a: 'one', c: 'three', d: 'five' },
+        ],
+    ] as Array<[string, unknown]>) {
+        expect(parseAsJSON(text), text).toEqual({ postscript: '', preamble: '', value });
+    }
+    expect(
+        parseAsJSON('Here it is:\n```json\n{\n"label": "Go\n"rating": 5\n}\n```'),
+    ).toEqual({
+        postscript: '',
+        preamble: 'Here it is:',
+        value: { label: 'Go', rating: 5 },
+    });
+
+    // a string left open before an object with no key, and that object’s members
+    // (the object’s brace stays in the string)
+    expect(
+        parseAsJSON(
+            'Sure:\n{\n"bodyCopy": "Our clinic helps patients.\nHere are the services:\n{\n"debridement": [\n{\n"title": "Debridement"\n}\n]\n\n"pain": [\n{\n"title": "Pain"\n}\n]\n\n}}',
+        ),
+    ).toEqual({
+        postscript: '',
+        preamble: 'Sure:',
+        value: {
+            bodyCopy: 'Our clinic helps patients.\nHere are the services:\n{',
+            debridement: [{ title: 'Debridement' }],
+            pain: [{ title: 'Pain' }],
+        },
+    });
+
+    // a line that starts with an escaped quote mark is part of the string, and
+    // so is one with no colon after its quote mark
+    expect(parseAsJSON('{"a": "x\n\\"b\\": 1", "c": 2}').value).toEqual({
+        a: 'x\n"b": 1',
+        c: 2,
+    });
+    expect(parseAsJSON('{"a": "x\n"quoted" word", "c": 2}').value).toEqual({
+        a: 'x\n"quoted" word',
+        c: 2,
+    });
+
+    // in an array it is not a key, so the line stays in the string and no item is
+    // made of it
+    expect(parseAsJSON('["description\n"rating": 5]')).toEqual({
+        postscript: ': 5]',
+        preamble: '',
+        value: ['description\n"rating'],
+    });
+    expect(parseAsJSON('["one\n"two", "three"]').value).toEqual(['one\n"two', 'three']);
+    // (also in an array that an object holds)
+    expect(parseAsJSON('{"items": ["one", "two\n"rating": 5]}')).toEqual({
+        postscript: ': 5]}',
+        preamble: '',
+        value: { items: ['one', 'two\n"rating'] },
+    });
+
+    // while the text streams in, the key is read once its colon is in
+    expect(parseAsJSON('{\n"label": "Go\n"rating":').value).toEqual({
+        label: 'Go',
+        rating: '',
+    });
+    expect(parseAsJSON('{\n"label": "Go\n"rating": 5').value).toEqual({ label: 'Go' });
+    expect(parseAsJSON('{\n"label": "Go\n"rating": 5\n').value).toEqual({
+        label: 'Go',
+        rating: 5,
+    });
+
+    // (a cost: unescaped JSON in a string, pretty-printed, has lines that start with
+    // a key, so the string ends at the first, and what follows is left unread)
+    expect(
+        parseAsJSON('{\n  "example": "Send:\n{\n  "a": 1\n}\ndone",\n  "b": 2\n}'),
+    ).toEqual({
+        postscript: 'done",\n  "b": 2\n}',
+        preamble: '',
+        value: { a: 1, example: 'Send:\n{' },
+    });
+}
+
 function extraClosingCurliesTestCase() {
     let response = `\
 {
@@ -2227,8 +2335,9 @@ function isPrefixOf({
 
 function lineBreakBeforeBracketTestCase() {
     // a raw line break in a string is escaped, whatever the next line starts
-    // with: a markdown link, a placeholder, code, a citation, a task list, or
-    // JSON that is escaped
+    // with but a key and its colon (see endsOpenStringAtKeyLineTestCase): a
+    // markdown link, a placeholder, code, a citation, a task list, or JSON that
+    // is escaped
     const values: Array<[string, unknown]> = [
         [
             '{"body": "See the docs\n[here](https://example.com) for more", "b": "c"}',
@@ -3279,14 +3388,42 @@ Here are some of the services we offer:
 ]
 
 }}`;
-    // a string that is never closed is not ended at a line break before a bracket,
-    // as a markdown link or code in a string would be cut short too: the object
-    // that follows is part of the string, and nothing of the response is read
+    // a string that is never closed is not ended at a line break before a bracket
+    // (a markdown link or code in a string would be cut short too), so the object’s
+    // brace stays in the string; the line after it starts with a key, which ends
+    // the string, and the members that follow are read
     expect(parseAsJSON(response)).toEqual({
         postscript: '',
         preamble:
             'Sure, here\'s an example JSON output for the "Services" section based on the provided information:',
-        value: null,
+        value: {
+            bodyCopy:
+                'At the Cleveland Clinic Wound Center in Vero Beach, Florida, our team of experienced healthcare professionals is dedicated to getting you back to your normal life as quickly as possible.\nHere are some of the services we offer:\n{',
+            contentList1: [
+                {
+                    content: 'Surgical debridement',
+                    description:
+                        'Surgical debridement is a procedure that involves removing dead tissue from a wound to promote healing. Our experienced surgeons use the latest techniques and technologies to ensure the best possible outcomes.',
+                    title: 'Surgical Debridement',
+                },
+            ],
+            contentList2: [
+                {
+                    content: 'Other services',
+                    description:
+                        'In addition to our core services, we also offer a range of other services to help you manage your wounds and promote healing. These include wound assessment and monitoring, pain management, and education on wound care and prevention.',
+                    title: 'Other Services',
+                },
+            ],
+            contentList3: [
+                {
+                    content: 'Our team',
+                    description:
+                        'Our team of experienced healthcare professionals is dedicated to providing high-quality, personalized care to help you recover and get back to your normal life as quickly as possible. Meet our team of experts today.',
+                    title: 'Our Team',
+                },
+            ],
+        },
     });
 }
 
