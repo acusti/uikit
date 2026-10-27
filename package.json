@@ -55,7 +55,7 @@
         "@vitejs/plugin-react": "^6.1.0",
         "eslint-plugin-perfectionist": "^5.9.1",
         "happy-dom": "^21.0.4",
-        "oxc-transform-react": "^0.155.0",
+        "oxc-transform-react": "^0.156.0",
         "oxfmt": "^0.67.0",
         "oxlint": "^1.87.0",
         "oxlint-tsgolint": "^7",

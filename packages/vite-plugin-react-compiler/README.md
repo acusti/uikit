@@ -137,6 +137,24 @@ content, not once per environment. With `panicThreshold` set to
 `'critical_errors'` or `'all_errors'`, the diagnostic that escalates fails
 the build through `this.error(...)` as described above instead of warning.
 
+Like React Compiler main, and unlike babel-plugin-react-compiler@1.0.0, the
+compiler also skips a component or hook whose `useMemo` or `useCallback`
+dependency list is missing a dependency or lists an extra one, so its
+memoization updates exactly as written. With `reportDiagnostics` on, each
+one is reported as “Found missing memoization dependencies” or “Found extra
+memoization dependencies”; with `panicThreshold` set to `'critical_errors'`
+or `'all_errors'`, that diagnostic fails the build. To compile those
+components with the dependencies the compiler infers instead, as the Babel
+plugin does, turn the check off:
+
+```ts
+reactCompiler({
+    compiler: {
+        environment: { validateExhaustiveMemoizationDependencies: false },
+    },
+});
+```
+
 [compiler options]:
     https://react.dev/reference/react-compiler/configuration
 
@@ -145,23 +163,26 @@ the build through `this.error(...)` as described above instead of warning.
 The Rust port of React Compiler and the oxc-transform-react bindings are
 experimental and explicitly labeled as such upstream. Measure and verify
 against the Babel plugin before trusting it (the `__COMPILER_RUNTIME.c`
-memo cache calls in output are easy to diff). Alongside the plugin’s own
-tests, this repo runs an upstream-tracking suite against the pinned
-bindings version: it pins the ways the Rust port already exceeds
-babel-plugin-react-compiler@1.0.0 by tracking React Compiler main (computed
-object keys and try/catch value blocks both compile), pins Babel-parity
-fixes as they land (react-hooks lint suppressions opt functions out of
-compilation since 0.144.0), and tracks known upstream divergences as they
-arise, re-verified on every bindings bump before it ships in a plugin
-release.
+memo cache calls in output are easy to diff).
 
-Verified results from the production Vite 8 + React Router app this plugin
-was extracted from, compared against babel-plugin-react-compiler@1.0.0
-across 987 source files:
+Because the Rust port tracks React Compiler main rather than the 1.0.0
+release, it differs from babel-plugin-react-compiler@1.0.0 in both
+directions: it compiles some code the Babel plugin bails on (computed
+object keys, try/catch value blocks), and it skips components and hooks
+whose manual memoization has missing or extra dependencies, which the Babel
+plugin compiles (see [Options](#options)). Alongside the plugin’s own
+tests, this repo runs an upstream-tracking suite against the pinned
+bindings version: it pins both kinds of divergence, pins Babel-parity fixes
+as they land (react-hooks lint suppressions opt functions out of
+compilation since 0.144.0), and tracks known upstream gaps as they arise,
+re-verified on every bindings bump before it ships in a plugin release.
+
+Measured at launch, on oxc-transform-react 0.142.0, in the production Vite
+8 + React Router app this plugin was extracted from, against
+babel-plugin-react-compiler@1.0.0 across 987 source files:
 
 - **Full memoization parity with zero regressions** — every function the
-  Babel plugin compiles, the Rust port compiles. It compiles a strict
-  superset, since the Rust port tracks React Compiler main rather than the
-  latest stable release.
-- **The compiler pass is ~16x faster** than the Babel pass.
-- **The full production build is ~2.5x faster** (53s → 21s).
+  Babel plugin compiled, the Rust port compiled too, and it compiled a
+  strict superset.
+- **The compiler pass was ~16x faster** than the Babel pass.
+- **The full production build was ~2.5x faster** (53s → 21s).
