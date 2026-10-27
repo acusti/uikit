@@ -16,15 +16,23 @@ import vitePluginReactCompiler from './index.js';
 //   PR, and the test gets promoted to a plain it — a new pinned
 //   regression test.
 
-const plugin = vitePluginReactCompiler();
-const transform = plugin.transform as (
-    this: { error: (message: string) => never },
+type Transform = (
+    this: { error: (message: string) => never; warn: (message: string) => void },
     code: string,
     id: string,
 ) => Promise<null | { code: string }>;
+
+const plugin = vitePluginReactCompiler();
+const transform = plugin.transform as Transform;
 const context = {
     error(message: string): never {
         throw new Error(message);
+    },
+    // by default the plugin only warns about oxc’s own non-fatal
+    // diagnostics, and no input here should have one; fail readably if one
+    // does
+    warn(message: string) {
+        throw new Error(`Unexpected warning: ${message}`);
     },
 };
 const transformCode = (code: string, id: string) => transform.call(context, code, id);
@@ -501,5 +509,83 @@ export function Preview({ json }: { json: string }) {
         );
         expect(branches?.code).toContain('react/compiler-runtime');
         expect(branches?.code).toContain('<pre>{json}</pre>');
+    });
+
+    // a component or hook whose useMemo or useCallback dependency list is
+    // missing a dependency or lists an extra one is left uncompiled, with
+    // its manual memoization as written, matching React Compiler main.
+    // babel-plugin-react-compiler@1.0.0 and the bindings from 0.144.0
+    // through 0.155.0 compile it with the dependencies they infer instead,
+    // so the value updates on a different schedule than the uncompiled
+    // code’s: below, sorting again whenever sortKey changes, and ignoring
+    // label
+    // (https://github.com/oxc-project/oxc/pull/28101)
+    it('leaves manual memoization with missing or extra dependencies as written', async () => {
+        const reporting = vitePluginReactCompiler({
+            compiler: { reportDiagnostics: true },
+        });
+        // oxc ignores unknown environment keys, so a rename upstream would
+        // turn the opt-out the README documents into a silent no-op; passing
+        // it here fails tsc on a rename and this test on a no-op
+        const optedOut = vitePluginReactCompiler({
+            compiler: {
+                environment: { validateExhaustiveMemoizationDependencies: false },
+            },
+        });
+        // asserts the input is skipped for this reason alone (an input can be
+        // skipped for others, like “Existing memoization could not be
+        // preserved”) and compiles once the check is off
+        const expectSkipped = async (code: string, id: string, diagnostic: string) => {
+            const result = await transformCode(code, id);
+            expect(result?.code).not.toContain('react/compiler-runtime');
+
+            const warnings: Array<string> = [];
+            const recording = {
+                ...context,
+                warn(message: string) {
+                    warnings.push(message);
+                },
+            };
+            await (reporting.transform as Transform).call(recording, code, id);
+            expect(warnings).toEqual([expect.stringContaining(diagnostic)]);
+
+            const compiled = await (optedOut.transform as Transform).call(
+                context,
+                code,
+                id,
+            );
+            expect(compiled?.code).toContain('react/compiler-runtime');
+            return result?.code;
+        };
+
+        const missing = await expectSkipped(
+            `
+import { useMemo } from 'react';
+
+declare function sortBy<T>(items: T[], key: string): T[];
+
+export function SortedList({ items, sortKey }: { items: string[]; sortKey?: string }) {
+    const sorted = useMemo(() => sortBy(items, sortKey ?? 'name'), [items]);
+    return <ul>{sorted.map((item) => <li key={item}>{item}</li>)}</ul>;
+}
+`,
+            '/src/SortedList.tsx',
+            'Found missing memoization dependencies',
+        );
+        expect(missing).toContain('useMemo(');
+
+        const extra = await expectSkipped(
+            `
+import { useCallback } from 'react';
+
+export function Row({ id, label, onSelect }: { id: string; label: string; onSelect: (id: string) => void }) {
+    const handleClick = useCallback(() => onSelect(id), [onSelect, id, label]);
+    return <button onClick={handleClick}>{label}</button>;
+}
+`,
+            '/src/Row.tsx',
+            'Found extra memoization dependencies',
+        );
+        expect(extra).toContain('useCallback(');
     });
 });
