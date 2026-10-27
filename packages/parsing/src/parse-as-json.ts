@@ -1156,8 +1156,13 @@ export function parseAsJSON(text: string): ParsedResult {
                     }
                 }
             } else if (char === '\n') {
-                if (OBJECT_KEY_REGEXP.test(text.substring(index + 1))) {
+                if (
+                    stack.at(-1) === '}' &&
+                    OBJECT_KEY_REGEXP.test(text.substring(index + 1))
+                ) {
                     // if not escaped but we seem to no longer be in a string, break out
+                    // (a line that starts with a key is the next member of an object only)
+                    isInsideString = false;
                     char = '",\n';
                 } else {
                     // if not escaped, escape the newline character now
