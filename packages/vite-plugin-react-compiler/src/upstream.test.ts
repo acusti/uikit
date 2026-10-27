@@ -368,4 +368,25 @@ export function Truncated({ text, max }: { text: string; max: number }) {
         expect(result?.code).toContain('react/compiler-runtime');
         expect(result?.code).toContain('last >= "\\ud800" && last <= "\\udbff"');
     });
+
+    // the compiler dropped the `?.` from an optional chain continued
+    // through a non-null assertion, printing `users?.find(…)!.name` as
+    // `users.find(…).name`, which throws while `users` is undefined;
+    // babel-plugin-react-compiler@1.0.0 keeps it. Kept upstream since
+    // 0.156.0 (https://github.com/oxc-project/oxc/pull/28144)
+    it('keeps an optional chain continued through a non-null assertion', async () => {
+        const result = await transformCode(
+            `
+type User = { id: string; name: string };
+
+export function UserName({ users, userId }: { users?: User[]; userId: string }) {
+    const name = users?.find((user) => user.id === userId)!.name;
+    return <span>{name}</span>;
+}
+`,
+            '/src/UserName.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('users?.find((user) => user.id === userId).name');
+    });
 });
