@@ -423,4 +423,29 @@ export function Banner({ isSignedIn }: { isSignedIn: boolean }) {
         expect(result?.code).toMatch(/\$\[\d+\] !== message\b/);
         expect(result?.code).not.toContain('react.memo_cache_sentinel');
     });
+
+    // a value that `catch` assigns when a call inside `try` throws on a
+    // prop was treated as a constant, so the element built from it was
+    // cached once per mount: a link that started out valid kept rendering
+    // as valid after its href became invalid;
+    // babel-plugin-react-compiler@1.0.0 caches it the same way. Recomputed
+    // upstream since 0.156.0 (https://github.com/oxc-project/oxc/pull/28005)
+    it('recomputes a value that catch assigns when a prop makes try throw', async () => {
+        const result = await transformCode(
+            `
+export function LinkStatus({ href }: { href: string }) {
+    let isValid = true;
+    try {
+        new URL(href);
+    } catch {
+        isValid = false;
+    }
+    return <span>{isValid ? 'Valid link' : 'Invalid link'}</span>;
+}
+`,
+            '/src/LinkStatus.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).not.toContain('react.memo_cache_sentinel');
+    });
 });
