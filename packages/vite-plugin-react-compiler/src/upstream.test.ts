@@ -448,4 +448,58 @@ export function LinkStatus({ href }: { href: string }) {
         expect(result?.code).toContain('react/compiler-runtime');
         expect(result?.code).not.toContain('react.memo_cache_sentinel');
     });
+
+    // once a `try` holds nothing that can throw, such as when its risky
+    // call is commented out, its `catch` can never run, and the compiler
+    // panicked on a component like the first one below, which aborts the
+    // whole process (a dev server included), or silently compiled one
+    // like the second, whose `catch` branches, to a function that renders
+    // nothing, dropping everything after the `try`;
+    // babel-plugin-react-compiler@1.0.0 skips the first and also empties
+    // the second. Both compile upstream since 0.156.0
+    // (https://github.com/oxc-project/oxc/pull/28066)
+    it('compiles a try whose catch can never run', async () => {
+        const reassigns = await transformCode(
+            `
+declare function parse(json: string, options: object): unknown;
+
+export function Preview({ json }: { json: string }) {
+    let isValid = true;
+    try {
+        const options = { strict: true };
+        // parse(json, options);
+    } catch {
+        isValid = false;
+    }
+    return <pre className={isValid ? 'valid' : 'invalid'}>{json}</pre>;
+}
+`,
+            '/src/Preview.tsx',
+        );
+        expect(reassigns?.code).toContain('react/compiler-runtime');
+        expect(reassigns?.code).toContain('className={isValid ? "valid" : "invalid"}');
+
+        const branches = await transformCode(
+            `
+declare function parse(json: string, options: object): unknown;
+
+export function Preview({ json }: { json: string }) {
+    try {
+        const options = { strict: true };
+        // parse(json, options);
+    } catch (error) {
+        if (error instanceof SyntaxError) {
+            console.warn(error.message);
+        } else {
+            throw error;
+        }
+    }
+    return <pre>{json}</pre>;
+}
+`,
+            '/src/Preview.tsx',
+        );
+        expect(branches?.code).toContain('react/compiler-runtime');
+        expect(branches?.code).toContain('<pre>{json}</pre>');
+    });
 });
