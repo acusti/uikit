@@ -167,15 +167,16 @@ memo cache calls in output are easy to diff).
 
 Because the Rust port tracks React Compiler main rather than the 1.0.0
 release, it differs from babel-plugin-react-compiler@1.0.0 in both
-directions: it compiles some code the Babel plugin bails on (computed
-object keys, try/catch value blocks), and it skips components and hooks
-whose manual memoization has missing or extra dependencies, which the Babel
-plugin compiles (see [Options](#options)). Alongside the plugin’s own
-tests, this repo runs an upstream-tracking suite against the pinned
-bindings version: it pins both kinds of divergence, pins Babel-parity fixes
-as they land (react-hooks lint suppressions opt functions out of
-compilation since 0.144.0), and tracks known upstream gaps as they arise,
-re-verified on every bindings bump before it ships in a plugin release.
+directions: it compiles some code the Babel plugin bails on
+(template-literal object keys, conditionals inside try/catch), and it skips
+components and hooks whose manual memoization has missing or extra
+dependencies, which the Babel plugin compiles (see [Options](#options)).
+Alongside the plugin’s own tests, this repo runs an upstream-tracking suite
+against the pinned bindings version: it pins both kinds of divergence, pins
+Babel-parity fixes as they land (react-hooks lint suppressions opt
+functions out of compilation since 0.144.0), and tracks known upstream gaps
+as they arise, re-verified on every bindings bump before it ships in a
+plugin release.
 
 Measured at launch, on oxc-transform-react 0.142.0, in the production Vite
 8 + React Router app this plugin was extracted from, against

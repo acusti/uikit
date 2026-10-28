@@ -38,21 +38,22 @@ const context = {
 const transformCode = (code: string, id: string) => transform.call(context, code, id);
 
 describe('oxc-transform-react upstream behavior', () => {
-    // babel-plugin-react-compiler@1.0.0 (stable) bails on try/catch used
-    // as a value block, but React Compiler main — which the Rust port
-    // tracks — supports them: upstream confirmed the compiled output
-    // conforms to the unpublished Babel compiler and dropped the
-    // bailout-restoration attempt
+    // babel-plugin-react-compiler@1.0.0 (stable) bails on a value block (a
+    // conditional, logical or optional-chain expression) inside try/catch
+    // (“Support value blocks … within a try/catch statement”), but React
+    // Compiler main — which the Rust port tracks — supports them: upstream
+    // confirmed the compiled output conforms to the unpublished Babel
+    // compiler and dropped the bailout-restoration attempt
     // (https://github.com/oxc-project/oxc/issues/25343 closed as not
     // planned; https://github.com/oxc-project/oxc/pull/25409 closed
     // unmerged), so compiling is the supported behavior and this pins it
-    it('compiles try/catch value blocks the stable Babel plugin bails on', async () => {
+    it('compiles value blocks inside try/catch, which the stable Babel plugin bails on', async () => {
         const result = await transformCode(
             `
 export function SafeParse({ json }: { json: string }) {
     let value = null;
     try {
-        value = JSON.parse(json);
+        value = json ? JSON.parse(json) : null;
     } catch {
         value = null;
     }
@@ -64,12 +65,15 @@ export function SafeParse({ json }: { json: string }) {
         expect(result?.code).toContain('react/compiler-runtime');
     });
 
-    // babel-plugin-react-compiler@1.0.0 bails on computed object keys
-    it('compiles computed object keys the Babel plugin bails on', async () => {
+    // babel-plugin-react-compiler@1.0.0 bails on a computed object key that
+    // isn’t an identifier, a member expression or a string literal
+    // (“Expected Identifier, got TemplateLiteral key in ObjectExpression”),
+    // such as the template literal naming a CSS custom property here
+    it('compiles template-literal object keys the Babel plugin bails on', async () => {
         const result = await transformCode(
             `
 export function Swatch({ prop, value }: { prop: string; value: string }) {
-    const style = { [prop]: value };
+    const style = { [\`--\${prop}\`]: value };
     return <div style={style} />;
 }
 `,
