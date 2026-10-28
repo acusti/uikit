@@ -593,11 +593,9 @@ const STRING_START_PATTERN = '"(?:[^"\\\\]|\\\\(?:.|$))*';
 const LITERAL_START_PATTERN =
     't(?:r(?:ue?)?)?|f(?:a(?:l(?:se?)?)?)?|n(?:u(?:ll?)?)?|-?\\d[\\d.eE+-]*|-';
 // Wherever it stands: after a brace, a key and its colon (as far as the text
-// goes), or a key that has lost its opening quote mark (which the walk restores
-// where the key follows a line break); after a bracket, a string, an object or
-// an array.
+// goes); after a bracket, a string, an object or an array.
 const KEY_AFTER_BRACE_REGEXP = new RegExp(
-    `^\\s*(?:${STRING_START_PATTERN}(?:"\\s*(?::|$)|$)|\\n[a-zA-Z][^"\\n]*"\\s*:)`,
+    `^\\s*${STRING_START_PATTERN}(?:"\\s*(?::|$)|$)`,
 );
 const ITEM_AFTER_BRACKET_REGEXP = /^\s*["[{]/;
 // Only where a value would stand (isValuePosition), since prose has these too:
@@ -1108,8 +1106,6 @@ export function parseAsJSON(text: string): ParsedResult {
         }
     }
 
-    const originalText = text;
-    let textLengthDelta = 0;
     let index = 0;
     // process each character in the string one at a time
     for (; index < text.length; index++) {
@@ -1302,21 +1298,8 @@ export function parseAsJSON(text: string): ParsedResult {
                     char = ': "",';
                 }
             } else if (char === '\n') {
-                // treat new lines outside strings as separators
-                const remainingText = text.substring(index + 1);
-                // first, check if there is a missing opening quote mark in rest of text
-                // (a bare literal where a value is due is not missing one)
-                if (
-                    /^[a-zA-Z]/.test(remainingText) &&
-                    !(
-                        isValueDue({ controlChar, text: newText }) &&
-                        readLiteral({ index: index + 1, isEndDelimited, text }) != null
-                    )
-                ) {
-                    text = text.substring(0, index + 1) + '"' + remainingText;
-                    textLengthDelta++;
-                }
-                // if a comma is missing but needed, add one now
+                // treat new lines outside strings as separators: if a comma is
+                // missing but needed, add one now
                 if (
                     (isPreceededBy({ chars: SCALAR_END_CHARS, text: newText }) &&
                         isFollowedBy({ char: '"', index, text })) ||
@@ -1373,7 +1356,7 @@ export function parseAsJSON(text: string): ParsedResult {
     }
 
     // what the walk did not read is the postscript, unless it has no content
-    postscript = originalText.substring(index - textLengthDelta).trim();
+    postscript = text.substring(index).trim();
     if (!hasTextContent(postscript)) {
         postscript = '';
     }
