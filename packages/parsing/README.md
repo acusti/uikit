@@ -337,6 +337,31 @@ parseAsJSON('{"a": "one\n{"b": 2}}').value;
 // null
 ```
 
+## A quote mark in a string that is not escaped
+
+A model sometimes leaves the backslash off a quote mark in a string.
+`parseAsJSON` takes a quote mark in a string for the one that closes it
+where a colon follows it, or a comma and the next key or item, with any
+spaces or tabs around them. It does too where no other quote mark follows
+it before the end of its line, or before the bracket that would close its
+object or array. Any other quote mark is kept in the string.
+
+```js
+parseAsJSON('{"quote": "She said "yes" to it" , "next": "Go"}').value;
+// { quote: 'She said "yes" to it', next: 'Go' }
+
+parseAsJSON('{"tip": "Say "yes" , then go", "next": "Go"}').value;
+// { tip: 'Say "yes" , then go', next: 'Go' }
+```
+
+So a quoted word in prose that a comma and another quoted word follow ends
+the string, and the next quoted word is read as a key:
+
+```js
+parseAsJSON('{"tip": "Pick "yes" , "no" or both", "next": "Go"}').value;
+// { tip: 'Pick "yes', 'no" or both': '', next: 'Go' }
+```
+
 ## What it repairs, and what it doesn’t
 
 Every repair and rule in `parseAsJSON` has a cost: bytes in your bundle,

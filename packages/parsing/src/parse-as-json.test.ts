@@ -131,6 +131,10 @@ describe('@acusti/parsing', () => {
         it('handles extraneous escape characters', extraneousEscapeCharactersTestCase);
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
         it(
+            'tells a closing quote mark by what follows it, whatever its spacing',
+            closingQuoteSpacingTestCase,
+        );
+        it(
             'handles fenced JSON with percent signs and nested arrays of objects',
             fencedJSONWithPercentSignsTestCase,
         );
@@ -1692,6 +1696,81 @@ function closeCutText(text: string): { closed: unknown; isAwaitingValue: boolean
         return { closed: JSON.parse(closedText + closers) as unknown, isAwaitingValue };
     } catch {
         return { closed: undefined, isAwaitingValue };
+    }
+}
+
+function closingQuoteSpacingTestCase() {
+    // a text that needs a repair (here, a trailing comma) reads the same with any
+    // spacing that JSON allows around a comma or a colon
+    for (const text of [
+        '{"a": "b", "c": "d",}',
+        '{"a": "b" , "c": "d",}',
+        '{"a": "b",  "c": "d",}',
+        '{"a": "b",\t"c": "d",}',
+        '{"a"  : "b", "c": "d",}',
+        '{"a"\t: "b", "c": "d",}',
+        '{ "a" : "b" , "c" : "d" , }',
+        '{\r\n\t"a" : "b" ,\r\n\t"c" : "d",\r\n}',
+    ]) {
+        expect(parseAsJSON(text).value, JSON.stringify(text)).toEqual({ a: 'b', c: 'd' });
+    }
+    expect(parseAsJSON('["a" , "b",]').value).toEqual(['a', 'b']);
+    expect(parseAsJSON('["a",\t"b",]').value).toEqual(['a', 'b']);
+    // …also where a string has unescaped quote marks in it, of which only the
+    // closing one is followed by a comma and the next string
+    expect(parseAsJSON('{"quote": "She said "yes" to it" , "b": "c"}').value).toEqual({
+        b: 'c',
+        quote: 'She said "yes" to it',
+    });
+
+    // and at every length, as it reads with no spacing at all (a cut in the
+    // spacing as with a space after it, which says that a number before it is whole)
+    const template =
+        '{•"title"•:•"The "best" one"•,•"tags"•:•[•"a"•,•"b"•,•]•,•"rating"•:•4•}';
+    expect(parseAsJSON(template.replaceAll('•', '')).value).toEqual({
+        rating: 4,
+        tags: ['a', 'b'],
+        title: 'The "best" one',
+    });
+    for (const space of [' ', '  ', '\t', '\n', ' \n  ', '\r\n\t']) {
+        const text = template.replaceAll('•', space);
+        const misread: Array<string> = [];
+        for (let length = 1; length <= text.length; length++) {
+            let reference = '';
+            let position = 0;
+            for (const char of template) {
+                if (position >= length) break;
+                if (char === '•') {
+                    position += space.length;
+                    if (position >= length) reference += ' ';
+                } else {
+                    position++;
+                    reference += char;
+                }
+            }
+            const cutText = text.slice(0, length);
+            if (
+                JSON.stringify(parseAsJSON(cutText).value) !==
+                JSON.stringify(parseAsJSON(reference).value)
+            ) {
+                misread.push(cutText);
+            }
+        }
+        expect(misread, JSON.stringify(space)).toEqual([]);
+    }
+
+    // A quote mark in a string is not taken for its end where a space that is not
+    // JSON’s comes before a colon (French puts a no-break space there) or after a
+    // comma, nor where a comma follows it with no string after
+    for (const text of [
+        'Il a dit "non"\u00a0: rien de plus',
+        'He said "no",\u00a0"yes" and left',
+        'He said "no" , then left',
+    ]) {
+        expect(parseAsJSON(`{"text": "${text}", "b": "c"}`).value, text).toEqual({
+            b: 'c',
+            text,
+        });
     }
 }
 
