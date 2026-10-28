@@ -118,9 +118,9 @@ before it is the `preamble`, and what follows it is the `postscript`.
   (`{"a", "b"}`).
 - An object or array that can’t be read is not read from one of its
   members. That is a `{` or `[` that starts a line or follows a colon, with
-  a first member that JSON does not allow: a key with no quote marks or
-  with single ones, or a comma. The `value` is `null`, also while the text
-  streams in.
+  a first member that JSON does not allow: a key with no quote marks, with
+  single ones or with only its closing one, or a comma. The `value` is
+  `null`, also while the text streams in.
     - What follows its closing bracket is still read. It is JavaScript or
       Python more often than JSON, so that bracket is found with its
       strings read as all three write them: in single or double quote
@@ -144,6 +144,11 @@ before it is the `preamble`, and what follows it is the `postscript`.
   object’s closing brace (the object was closed too early, as above, and is
   repaired). Otherwise only a value that is unfinished or malformed is
   repaired.
+- A line that starts with a letter after a member of an object or array,
+  such as a line of prose, ends the JSON, whether or not a closing bracket
+  follows it. It is not taken for a key or an item, and is the start of the
+  `postscript`. (In an array, a `true`, `false` or `null` after a comma is
+  an item.)
 - A second value in the text is left in the `postscript`. To read it, call
   `parseAsJSON` on the `postscript`.
 
@@ -184,6 +189,15 @@ parseAsJSON(
     '{"name": "Ann"}\nOr in Python:\n```python\n{"name": "Bo"}\n```',
 ).value;
 // { name: 'Ann' }
+
+parseAsJSON('{"tags": ["pasta", "salad"\nHope this helps!');
+/* results in:
+{
+    preamble: '',
+    value: { tags: ['pasta', 'salad'] },
+    postscript: 'Hope this helps!',
+}
+*/
 ````
 
 A markdown table, and a list of `"key": "value"` lines with no braces

@@ -110,6 +110,10 @@ describe('@acusti/parsing', () => {
             'returns the first value in the text, with what follows it as the postscript',
             restartsMidResponseTestCase,
         );
+        it(
+            'leaves a line of prose after a member of an array or object to the postscript',
+            proseAfterMemberTestCase,
+        );
         it('leaves a markdown table as the text that it is', markdownTableTestCase);
         it('preserves escaped new lines within strings', preservesNewLinesTestCase);
         it(
@@ -146,7 +150,7 @@ describe('@acusti/parsing', () => {
         it('handles nested arrays without issue', nestedArraysTestCase);
         it('handles number values', numberValuesTestCase);
         it(
-            'handles missing opening quotemarks for object keys',
+            'reads an object up to a key that has lost its opening quote mark',
             missingOpeningQuoteTestCase,
         );
         it(
@@ -256,13 +260,9 @@ describe('@acusti/parsing', () => {
                 value: { age: '40', 'first\n[x]': 'Ann' },
             });
             expect(parseAsJSON('{"a\n[x]", "b"}').value).toEqual({ 'a\n[x]': '', b: '' });
-            // as does one whose first key has lost its opening quote mark, which is
-            // restored where it follows a line break
-            expect(parseAsJSON('{\nheading": "Hi",\n"sub": "Yo"\n}')).toEqual({
-                postscript: '',
-                preamble: '',
-                value: { heading: 'Hi', sub: 'Yo' },
-            });
+            // (but one whose first key has lost its opening quote mark is a root that
+            // can’t be read, also where the key starts a line)
+            expect(parseAsJSON('{\nheading": "Hi",\n"sub": "Yo"\n}').value).toBe(null);
         });
 
         it('takes a bracket for the start of the JSON by what follows it and where it stands', () => {
@@ -386,12 +386,13 @@ describe('@acusti/parsing', () => {
                 value: { a: 1 },
             });
             // a root that cannot be read is not read from one of its members: keys
-            // with no quote marks or with single ones, or a stray character after
-            // the bracket
+            // with no quote marks, with single ones or with only their closing
+            // one, or a stray character after the bracket
             for (const text of [
                 '{ a: "b", "c": {"d": 1} }',
                 "{'a': 'b', 'c': {\"d\": 1}}",
                 '{a": "b", "c": {"d": 1}}',
+                '{\na": "b", "c": {"d": 1}}',
                 '{,"a": "b", "c": {"d": 1}}',
                 '{]"a": "b", "tags": ["x", "y"]}',
                 '{]"a": "b,\n"tags": ["x", "y"]}',
@@ -1546,11 +1547,11 @@ Here is the button:
                     preamble: 'Here is the button:',
                     value: { enabled: true, image: null, label: 'Go', rating: 5 },
                 });
-                // with the opening quote of the next key missing after one
+                // and up to a key that has lost its opening quote mark after one
                 expect(parseAsJSON('{"enabled": true\nlabel": "Go"}')).toEqual({
-                    postscript: '',
+                    postscript: 'label": "Go"}',
                     preamble: '',
-                    value: { enabled: true, label: 'Go' },
+                    value: { enabled: true },
                 });
             });
 
@@ -2693,12 +2694,14 @@ function missingKeysTestCase() {
 }
 
 function missingOpeningQuoteTestCase() {
-    const response =
-        '{"heading":"The Unbreakable Bond"\ndescription":"In a world ravaged by chaos and despair, the heartwarming relationship between Big Man and Sweet Tooth stands as a beacon of hope and love. As Big Man takes the young hybrid under his wing, nurturing him with unwavering devotion, the two forge an unbreakable bond that transcends the boundaries of blood and biology."}<|im_end|>';
-    expect(parseAsJSON(response).value).toEqual({
-        description:
-            'In a world ravaged by chaos and despair, the heartwarming relationship between Big Man and Sweet Tooth stands as a beacon of hope and love. As Big Man takes the young hybrid under his wing, nurturing him with unwavering devotion, the two forge an unbreakable bond that transcends the boundaries of blood and biology.',
-        heading: 'The Unbreakable Bond',
+    // the key is not read, and nor is what follows it: that is the postscript
+    const description =
+        'In a world ravaged by chaos and despair, the heartwarming relationship between Big Man and Sweet Tooth stands as a beacon of hope and love. As Big Man takes the young hybrid under his wing, nurturing him with unwavering devotion, the two forge an unbreakable bond that transcends the boundaries of blood and biology.';
+    const response = `{"heading":"The Unbreakable Bond"\ndescription":"${description}"}<|im_end|>`;
+    expect(parseAsJSON(response)).toEqual({
+        postscript: `description":"${description}"}`,
+        preamble: '',
+        value: { heading: 'The Unbreakable Bond' },
     });
 }
 
@@ -3067,6 +3070,57 @@ function preservesNewLinesTestCase() {
                 },
             ],
         },
+    });
+}
+
+function proseAfterMemberTestCase() {
+    // it is not an item of the array, at any length of it…
+    const prose = 'Hope this helps!';
+    for (let end = 1; end <= prose.length; end++) {
+        const line = prose.slice(0, end);
+        expect(parseAsJSON(`["Pasta", "Salad"\n${line}`)).toEqual({
+            postscript: line.trim(),
+            preamble: '',
+            value: ['Pasta', 'Salad'],
+        });
+        // (nor where it is indented, as before)
+        expect(parseAsJSON(`["Pasta", "Salad"\n  ${line}`)).toEqual({
+            postscript: line.trim(),
+            preamble: '',
+            value: ['Pasta', 'Salad'],
+        });
+    }
+    expect(parseAsJSON('{"tags": ["pasta", "salad"\nand more')).toEqual({
+        postscript: 'and more',
+        preamble: '',
+        value: { tags: ['pasta', 'salad'] },
+    });
+    // (also where a closing bracket follows it)
+    expect(parseAsJSON('["Pasta", "Salad"\nHope this helps!\n]')).toEqual({
+        postscript: 'Hope this helps!\n]',
+        preamble: '',
+        value: ['Pasta', 'Salad'],
+    });
+    // (and where the brackets that close it follow on its line)
+    expect(parseAsJSON('{"a": [1, 2\nthree]}')).toEqual({
+        postscript: 'three]}',
+        preamble: '',
+        value: { a: [1, 2] },
+    });
+    // …nor a key of the object
+    expect(parseAsJSON('{"heading": "Menu"\n\nHope this helps!')).toEqual({
+        postscript: 'Hope this helps!',
+        preamble: '',
+        value: { heading: 'Menu' },
+    });
+    expect(
+        parseAsJSON(
+            '{"items": [\n{"name": "Pasta"},\n{"name": "Salad"}\nThat is all of them.',
+        ),
+    ).toEqual({
+        postscript: 'That is all of them.',
+        preamble: '',
+        value: { items: [{ name: 'Pasta' }, { name: 'Salad' }] },
     });
 }
 
