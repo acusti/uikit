@@ -94,6 +94,10 @@ const NEXT_ITEM_REGEXP = new RegExp(
     `\\s*,\\s*(?:[{[]|(?:${LITERAL_PATTERN})\\s*[,\\]])`,
     'y',
 );
+// what follows a quote mark that ends a string: a colon, or a comma and the next
+// string, with any spaces or tabs around them (not any other space: French prose
+// has a no-break space before a colon)
+const STRING_END_REGEXP = /[ \t]*(?::|,[ \t]*")/y;
 // the start of a bare literal that runs to the end of the text
 const UNFINISHED_LITERAL_REGEXP =
     /(?:t(?:ru?)?|f(?:a(?:ls?)?)?|n(?:ul?)?|-?\d*(?:\.\d*)?(?:[eE][+-]?\d*)?)$/y;
@@ -1114,10 +1118,12 @@ export function parseAsJSON(text: string): ParsedResult {
             if (char === '"' && !isEscaped(text, index)) {
                 // set state to not insideString (will set back to true if is unescaped quote mark)
                 isInsideString = false;
-                // if quote mark is followed by ':', ', "', or new line, treat it as a string terminus
-                // (as it is in an array, if followed by a next item that is not a string)
+                // if quote mark is followed by ':' or ', "' (spaces or tabs aside), or in
+                // an array by a comma and a next item that is not a string, treat it as a
+                // string terminus (and below, where no other quote mark comes before the
+                // next line break or closing bracket)
                 if (
-                    !/^( ?:|, ?"|,?\n)/.test(text.substring(index + 1)) &&
+                    !matchAt({ index: index + 1, regexp: STRING_END_REGEXP, text }) &&
                     !(
                         stack.at(-1) === ']' &&
                         matchAt({ index: index + 1, regexp: NEXT_ITEM_REGEXP, text })
