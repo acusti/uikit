@@ -147,8 +147,9 @@ before it is the `preamble`, and what follows it is the `postscript`.
 - A line that starts with a letter after a member of an object or array,
   such as a line of prose, ends the JSON, whether or not a closing bracket
   follows it. It is not taken for a key or an item, and is the start of the
-  `postscript`. (In an array, a `true`, `false` or `null` after a comma is
-  an item.)
+  `postscript`. After a key’s colon, such a line ends the JSON too, and the
+  key holds `''`. (Where a value is due, after a comma in an array or after
+  a colon, a `true`, `false` or `null` is a value.)
 - A second value in the text is left in the `postscript`. To read it, call
   `parseAsJSON` on the `postscript`.
 

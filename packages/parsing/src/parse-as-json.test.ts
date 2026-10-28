@@ -2742,6 +2742,21 @@ function missingValuesTestCase() {
             subheading: 'Get the Answers You Need',
         },
     });
+
+    // where the walk stops at what follows a key’s colon, such as a line of
+    // prose, the key holds '', whatever the whitespace after the colon
+    for (const whitespace of [' ', '  ', '\t', '\n', '\n  ']) {
+        expect(parseAsJSON(`{"a": "b", "c":${whitespace}Hope this helps!`)).toEqual({
+            postscript: 'Hope this helps!',
+            preamble: '',
+            value: { a: 'b', c: '' },
+        });
+    }
+    expect(parseAsJSON('{"a":\nTrue}')).toEqual({
+        postscript: 'True}',
+        preamble: '',
+        value: { a: '' },
+    });
 }
 
 function nestedArraysTestCase() {

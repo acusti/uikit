@@ -1332,7 +1332,7 @@ export function parseAsJSON(text: string): ParsedResult {
         // if we are in the key of a key/value pair, append ': ""' to close the pair
         if (LAST_KEY_WITHOUT_VALUE_REGEXP.test(newText)) {
             newText += ': ""';
-        } else if (/": ?$/.test(newText)) {
+        } else if (/":\s*$/.test(newText)) {
             // if we are in between a key/value pair, append '""' to close the pair
             newText += '""';
         }
