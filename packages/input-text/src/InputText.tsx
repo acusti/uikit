@@ -176,6 +176,7 @@ export default function InputText({
     const valueFromProps = initialValue ?? '';
     const committedValueRef = useRef(valueFromProps);
     const transitionTimingsRef = useRef<null | TransitionTimings>(null);
+    const fittedValueRef = useRef<null | string>(null);
 
     const setInputHeight = () => {
         if (!inputRef.current || SUPPORTS_FIELD_SIZING) return;
@@ -227,6 +228,7 @@ export default function InputText({
         if (height) {
             inputRef.current.style.height = `${height}px`;
         }
+        fittedValueRef.current = inputRef.current.value;
     };
 
     const handleRef = (element: InputRef) => {
@@ -278,6 +280,18 @@ export default function InputText({
         if (inputRef.current.value === valueFromProps) return;
         inputRef.current.value = valueFromProps;
     }, [valueFromProps]);
+
+    // fit a multiLine input to a value that nothing has fitted it to: one the
+    // effect above wrote, which fires no input event (and, with the height
+    // set, no resize), or one React showed by updating the defaultValue of a
+    // textarea that hasn’t been typed in (e.g. one mounted empty, or after its
+    // form was reset). It runs after every commit, but only measures a value
+    // it hasn’t fitted, so a keystroke that onInput fitted costs it nothing
+    useLayoutEffect(() => {
+        if (!inputRef.current || !multiLine || SUPPORTS_FIELD_SIZING) return;
+        if (inputRef.current.value === fittedValueRef.current) return;
+        setInputHeight();
+    });
 
     const [readOnlyState, setReadOnlyState] = useState<boolean | undefined>(
         readOnly ?? doubleClickToEdit,
