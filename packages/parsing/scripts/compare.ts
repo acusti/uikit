@@ -26,6 +26,7 @@ const HARNESSES = [
     'code-block-before',
     'code-block-after',
     'root-before-answer',
+    'spacing',
     'fuzz-structural',
     'corpus',
     'code-block-in-string',

@@ -95,8 +95,20 @@ wrong, and write a few of each kind to `<name>.jsonl`.
   the string early) ends the string, so the outer value is not read.
 - `root-before-answer`: an answer after an object or array that cannot be
   read reads as it does alone.
+- `spacing`: spacing that JSON allows reads as JSON’s usual spacing does. A
+  value is written with spaces or tabs before or after its colons or
+  commas, or with line breaks and spacing that `JSON.stringify` does not
+  write (a space at the end of a line, commas first, CRLF, tabs, blank
+  lines), or a mix of these at random. It is written with no repair, or
+  with one that sends the text to the walk (trailing commas, an unescaped
+  quote mark or a raw line break in a string, a string left open before a
+  line that starts with a key, an object closed too early). Each text reads
+  as the same tokens do with `JSON.stringify`’s spacing, cut at the same
+  token. Its rows are named by the spacing. Those named `OPEN` are the two
+  repairs that look for a key’s colon right after its closing quote mark,
+  where spacing comes before a colon.
 
-The first four fail where the branch reads a text wrong that the base read
+The first five fail where the branch reads a text wrong that the base read
 right. Some of their rows are wrong in both versions by design (costs that
 a release accepted, named `COST`, and known gaps, named `OPEN`). A change
 in them is counted (`changed`, or `fixed`) but does not fail. The values
