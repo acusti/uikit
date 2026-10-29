@@ -3,7 +3,7 @@ type IndexOfClosestCharFullPayload = {
     chars: Array<string> | Set<string>;
     index?: number; // defaults to last character in text
     step?: number; // defaults to 1
-    text: ArrayLike<string>; // a string, or its characters one to an item
+    text: ArrayLike<string>; // a string, or the text that the walk writes (newChars)
 };
 
 type IndexOfClosestCharPayload =
@@ -112,6 +112,10 @@ const LAST_KEY_WITHOUT_VALUE_REGEXP = /[{,]\s*"(?:[^"\\]|\\.)*"\s*$/;
 // the key that a text ends partway through (on a backslash, if it ends on the
 // start of an escape sequence), with the brace or comma before it
 const UNFINISHED_KEY_REGEXP = /([{,])\s*"(?:[^"\\]|\\.)*\\?$/;
+// a run of characters in a string that the walk writes as they are: none of them
+// a quote mark, a backslash or a control character
+// eslint-disable-next-line no-control-regex
+const STRING_RUN_REGEXP = /[^"\\\x00-\x1f]+/y;
 
 type GenericObject = Record<string, unknown>;
 
@@ -1088,11 +1092,14 @@ export function parseAsJSON(text: string): ParsedResult {
     // where the last string opened, in the text (where isAfterKeyWithoutValue
     // reads what came before it)
     let stringIndex = -1;
-    // The text that the walk writes, one character to an item. The walk reads
-    // the end of it back at almost every comma, colon, bracket and line break,
-    // and a string that something has been added to is copied whole when it is
-    // read, so that the time for those reads would grow with the square of the
-    // text’s length. It is joined once the walk is done.
+    // The text that the walk writes, one character to an item, but for a run of
+    // characters in a string that are written as they are (STRING_RUN_REGEXP),
+    // which is one item: the walk reads none of those back, and an item each
+    // would cost more to write and to join. The walk reads the end of the text
+    // back at almost every comma, colon, bracket and line break, and a string
+    // that something has been added to is copied whole when it is read, so that
+    // the time for those reads would grow with the square of the text’s length.
+    // It is joined once the walk is done.
     const newChars: Array<string> = [];
 
     // identify start of JSON: the first brace that opens an object or bracket
@@ -1172,6 +1179,12 @@ export function parseAsJSON(text: string): ParsedResult {
     for (; index < text.length; index++) {
         let char = text[index];
         if (isInsideString) {
+            const run = matchAt({ index, regexp: STRING_RUN_REGEXP, text });
+            if (run) {
+                newChars.push(run);
+                index += run.length - 1;
+                continue;
+            }
             if (char === '"' && !isEscaped(text, index)) {
                 // set state to not insideString (will set back to true if is unescaped quote mark)
                 isInsideString = false;
@@ -1255,8 +1268,9 @@ export function parseAsJSON(text: string): ParsedResult {
                         controlChar === '}'
                             ? dropLastKey(writtenText)
                             : dropLastComma(writtenText);
-                    // (what is left out is where the text ends)
-                    newChars.length = keptText.length;
+                    // (the walk is done, so what is kept can be one item)
+                    newChars.length = 0;
+                    newChars.push(keptText);
                     index = text.length;
                     break;
                 }
