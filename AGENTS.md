@@ -51,7 +51,11 @@ bun run format
   separate history adds no blame value.
 - Never create merge commits. Keep history linear: rebase onto the target
   branch instead of merging it in (e.g. `git pull --rebase`,
-  `git rebase origin/main`).
+  `git rebase origin/main`). This applies to every branch, whoever created
+  it and however many people are working on it, and to every way of
+  bringing in the base: resolving a PR’s merge conflicts, a “base branch
+  recovered” notice, and `update_pull_request_branch` (which creates a
+  merge commit) all get a rebase instead.
 
 ## Changesets
 
