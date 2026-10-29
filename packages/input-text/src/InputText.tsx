@@ -118,6 +118,13 @@ export type Props = AriaAttributes & {
 
 type InputRef = InputElement | null;
 
+const TRANSITION_TIMING_NAMES = ['transitionDelay', 'transitionDuration'] as const;
+
+type TransitionTimings = Pick<
+    CSSStyleDeclaration,
+    (typeof TRANSITION_TIMING_NAMES)[number]
+>;
+
 export default function InputText({
     autoCapitalize,
     autoComplete,
@@ -168,6 +175,7 @@ export default function InputText({
     const inputRef = useRef<InputRef>(null);
     const valueFromProps = initialValue ?? '';
     const committedValueRef = useRef(valueFromProps);
+    const transitionTimingsRef = useRef<null | TransitionTimings>(null);
 
     const setInputHeight = () => {
         if (!inputRef.current || SUPPORTS_FIELD_SIZING) return;
@@ -178,11 +186,34 @@ export default function InputText({
             return;
         }
 
-        const { transitionDelay, transitionDuration } = inputRef.current.style;
-        // Set all CSS transition timings to 0s to prevent endless growing bug
-        inputRef.current.style.transitionDelay = '0s';
-        inputRef.current.style.transitionDuration = '0s';
-        inputRef.current.style.height = '';
+        // Set all CSS transition timings to 0s to prevent endless growing bug,
+        // and restore the originals asynchronously to prevent ResizeObserver
+        // loop. While a restore is pending, a timing other than the 0s written
+        // here is a new original (e.g. from a style prop that changed since),
+        // and the restore leaves alone a timing that isn’t 0s anymore
+        const elementStyle = inputRef.current.style;
+        const pendingTimings = transitionTimingsRef.current;
+        const timings = { transitionDelay: '', transitionDuration: '' };
+        for (const timingName of TRANSITION_TIMING_NAMES) {
+            timings[timingName] =
+                pendingTimings && elementStyle[timingName] === '0s'
+                    ? pendingTimings[timingName]
+                    : elementStyle[timingName];
+            elementStyle[timingName] = '0s';
+        }
+        transitionTimingsRef.current = timings;
+        if (!pendingTimings) {
+            setTimeout(() => {
+                const timingsToRestore = transitionTimingsRef.current;
+                transitionTimingsRef.current = null;
+                if (!inputRef.current || !timingsToRestore) return;
+                for (const timingName of TRANSITION_TIMING_NAMES) {
+                    if (inputRef.current.style[timingName] !== '0s') continue;
+                    inputRef.current.style[timingName] = timingsToRestore[timingName];
+                }
+            }, 0);
+        }
+        elementStyle.height = '';
 
         const minHeightValue =
             typeof minHeight === 'string' ? parseFloat(minHeight) : minHeight;
@@ -196,15 +227,6 @@ export default function InputText({
         if (height) {
             inputRef.current.style.height = `${height}px`;
         }
-
-        // Restore original transition timings asynchronously to prevent ResizeObserver loop
-        setTimeout(() => {
-            if (!inputRef.current) return;
-            inputRef.current.style.transitionDelay =
-                transitionDelay === '0s' ? '' : transitionDelay;
-            inputRef.current.style.transitionDuration =
-                transitionDuration === '0s' ? '' : transitionDuration;
-        }, 0);
     };
 
     const handleRef = (element: InputRef) => {
