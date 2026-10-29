@@ -1195,6 +1195,13 @@ describe('@acusti/parsing', () => {
                     expect(parseAsJSON(start + '"description":')).toEqual(
                         readTo({ description: '' }),
                     );
+                    // whatever the spacing before its colon
+                    expect(parseAsJSON(start + '"description" :')).toEqual(
+                        readTo({ description: '' }),
+                    );
+                    expect(parseAsJSON(start + '"description"\n:')).toEqual(
+                        readTo({ description: '' }),
+                    );
                     // a string that is a value, or an item in an array, is read as far as it goes
                     expect(parseAsJSON(start + '"description":"Go')).toEqual(
                         readTo({ description: 'Go' }),
