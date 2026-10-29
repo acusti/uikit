@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { createRef, useState } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { Props } from './InputText.js';
 
@@ -831,6 +831,54 @@ describe('InputText.tsx', () => {
         expect(height).toBeGreaterThanOrEqual(50);
         expect(height).toBeLessThanOrEqual(100);
     });
+
+    it('keeps the transition timings from the style prop when a multiLine input is fitted twice in one task', () => {
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        const style = { transitionDuration: '200ms' };
+        // an inline callback ref is a new function each render, so each
+        // render runs the ref callback again, which fits the textarea
+        const { rerender } = render(
+            <InputText multiLine ref={vi.fn<() => void>()} style={style} />,
+        );
+        rerender(<InputText multiLine ref={vi.fn<() => void>()} style={style} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        expect(textarea.style.transitionDuration).toBe('0s');
+        vi.runAllTimers();
+        expect(textarea.style.transitionDuration).toBe('200ms');
+    });
+
+    it.each([
+        ['fitted again by an inline callback ref', () => vi.fn<() => void>()],
+        ['not fitted again', () => undefined],
+    ])(
+        'keeps a transition timing that the style prop changes before the restore (a multiLine input %s)',
+        (_, getRef) => {
+            vi.useFakeTimers();
+            onTestFinished(() => {
+                vi.useRealTimers();
+            });
+            const { rerender } = render(
+                <InputText
+                    multiLine
+                    ref={getRef()}
+                    style={{ transitionDuration: '200ms' }}
+                />,
+            );
+            rerender(
+                <InputText
+                    multiLine
+                    ref={getRef()}
+                    style={{ transitionDuration: '300ms' }}
+                />,
+            );
+            const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+            vi.runAllTimers();
+            expect(textarea.style.transitionDuration).toBe('300ms');
+        },
+    );
 
     it('forwards aria-* attributes and role to the input', () => {
         render(
