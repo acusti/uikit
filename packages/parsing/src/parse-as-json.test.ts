@@ -726,8 +726,10 @@ describe('@acusti/parsing', () => {
                 // string, and between members
                 [`{"a": "x${spaces}y", "b": 1,}`, { a: `x${spaces}y`, b: 1 }],
                 [`{"a": [1,],${spaces}"b": 2}`, { a: [1], b: 2 }],
-                // …and in a string, before a number that the text ends partway through
+                // …and in a string, before a number that the text ends partway
+                // through, in an array and in an object (where its key is left out)
                 [`[[1,], "x${spaces}y", 1`, [[1], `x${spaces}y`]],
+                [`{"a": [1,], "b": "x${spaces}y", "c": 1`, { a: [1], b: `x${spaces}y` }],
             ];
             for (const [text, value] of cases) {
                 const start = performance.now();
@@ -1392,6 +1394,11 @@ describe('@acusti/parsing', () => {
                         readTo({ buttonLink: {} }),
                     );
                     expect(parseAsJSON(start + '"image": nul')).toEqual(readTo({}));
+                    // …and after a key with no value, which keeps its ''
+                    expect(
+                        parseAsJSON('{"category": "features"\n"variant"\n"count": 12')
+                            .value,
+                    ).toEqual({ category: 'features', variant: '' });
                 });
 
                 it('holds a number back until the text shows where it ends', () => {
