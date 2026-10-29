@@ -955,6 +955,19 @@ describe('InputText.tsx', () => {
         expect(scrollHeight).toHaveBeenCalledTimes(3);
     });
 
+    it('resizes a multiLine input to fit the value that Escape restores with discardOnEscape', async () => {
+        stubTextareaScrollHeight();
+        const user = userEvent.setup();
+        render(<InputText discardOnEscape multiLine />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await user.click(textarea);
+        fireEvent.input(textarea, { target: { value: 'x'.repeat(100) } });
+        expect(textarea.style.height).toBe('120px');
+        await user.keyboard('{Escape}');
+        expect(textarea.value).toBe('');
+        expect(textarea.style.height).toBe('20px');
+    });
+
     it('forwards aria-* attributes and role to the input', () => {
         render(
             <InputText

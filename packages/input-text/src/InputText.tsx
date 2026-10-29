@@ -405,6 +405,8 @@ export default function InputText({
                 event.currentTarget.value !== committedValueRef.current
             ) {
                 event.currentTarget.value = committedValueRef.current;
+                // a write fires no input event, so fit a multiLine input to it
+                if (multiLine) setInputHeight();
                 // if the value changed, manually trigger onChange handlers
                 handleChange(event as unknown as ChangeEvent<InputElement>);
             }
