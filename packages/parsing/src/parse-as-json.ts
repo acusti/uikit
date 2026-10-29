@@ -103,7 +103,8 @@ const UNFINISHED_LITERAL_REGEXP =
     /(?:t(?:ru?)?|f(?:a(?:ls?)?)?|n(?:ul?)?|-?\d*(?:\.\d*)?(?:[eE][+-]?\d*)?)$/y;
 
 // the key that a text ends on, with its colon and the comma that precedes it
-const LAST_KEY_REGEXP = /,?\s*"(?:[^"\\]|\\.)*"\s*:\s*$/;
+// (searched for from where it can start: see dropLastKey)
+const LAST_KEY_REGEXP = /,?\s*"(?:[^"\\]|\\.)*"\s*:\s*$/g;
 // the key that a text ends on, if it has no colon or value yet (a key follows a
 // brace or a comma, and may hold escaped quote marks, as may a value, in which
 // a comma and a quote mark are not the start of one)
@@ -291,6 +292,30 @@ function indexOfStringEnd(text: string, index: number) {
         endIndex = text.indexOf('"', endIndex + 1);
     }
     return endIndex;
+}
+
+// the index of the quote mark that opens the string that closes at index, or -1
+function indexOfStringStart(text: string, index: number) {
+    let startIndex = text.lastIndexOf('"', index - 1);
+    while (startIndex > 0 && isEscaped(text, startIndex)) {
+        startIndex = text.lastIndexOf('"', startIndex - 1);
+    }
+    return startIndex;
+}
+
+// Leaves out the key that the text ends on, with its colon and the comma that
+// precedes it. The search for it starts where the last string in the text opens
+// (with the whitespace and the comma before it), since a key that opens further
+// back would have that string’s opening quote mark in it. (From the start of the
+// text, it would go through each run of whitespace from each of its indexes: its
+// time would grow with the square of the run’s length.)
+function dropLastKey(text: string) {
+    const quoteIndex = indexOfStringStart(text, text.lastIndexOf('"'));
+    LAST_KEY_REGEXP.lastIndex = dropLastComma(
+        text.slice(0, Math.max(quoteIndex, 0)),
+    ).length;
+    const key = LAST_KEY_REGEXP.exec(text);
+    return key ? text.slice(0, key.index) : text;
 }
 
 // a comment, which JSON has none of: the rest of a line from `//`, or all from
@@ -1201,7 +1226,7 @@ export function parseAsJSON(text: string): ParsedResult {
                     // yet known: leave it out (with its key) rather than guess at it
                     newText =
                         controlChar === '}'
-                            ? newText.replace(LAST_KEY_REGEXP, '')
+                            ? dropLastKey(newText)
                             : dropLastComma(newText);
                     index = text.length;
                     break;
