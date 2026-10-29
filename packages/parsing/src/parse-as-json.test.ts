@@ -797,6 +797,21 @@ describe('@acusti/parsing', () => {
                     `{"start": "x"\n${JSON.stringify(members).slice(1)}`,
                     { start: 'x', ...members },
                 ],
+                // objects that each end on a trailing comma, as a model that writes
+                // one writes them throughout, on one line and pretty-printed
+                [
+                    'objects, each with a trailing comma',
+                    `[${'{"a": 1,}, '.repeat(12_000)}]`,
+                    Array.from({ length: 12_000 }, () => ({ a: 1 })),
+                ],
+                [
+                    'objects, pretty-printed, each with a trailing comma',
+                    JSON.stringify(items.slice(0, 4_000), null, 2).replace(
+                        /"\n {2}}/g,
+                        '",\n  }',
+                    ),
+                    items.slice(0, 4_000),
+                ],
             ];
             for (const [label, text, value] of cases) {
                 const start = performance.now();
@@ -3756,11 +3771,32 @@ function trailingCommasTestCase() {
         preamble: '',
         value: { a: 'b' },
     });
-    // a comma that follows a key with no value yet is not a trailing one: that
-    // key is given '', as it is where the text ends on it
+    // a trailing comma after a key with no value yet is left out too, once that
+    // key is given ''
     expect(parseAsJSON('{"c",}').value).toEqual({ c: '' });
     expect(parseAsJSON('{"a": 1, "c",}').value).toEqual({ a: 1, c: '' });
     expect(parseAsJSON('{"a": "b", "c",}').value).toEqual({ a: 'b', c: '' });
+    // (on a line of its own, and with an escaped quote mark in it)
+    expect(parseAsJSON('{\n  "a": 1,\n  "c",\n}').value).toEqual({ a: 1, c: '' });
+    expect(parseAsJSON('{"a": 1, "q\\"k",}').value).toEqual({ a: 1, 'q"k': '' });
+    // …and what follows its object is read: the rest of the object or array that
+    // holds it, and the postscript after the root
+    expect(parseAsJSON('{"x": {"a": 1, "c",}, "y": 2}')).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { x: { a: 1, c: '' }, y: 2 },
+    });
+    expect(parseAsJSON('[{"a": 1, "c",}, {"b": 2}]').value).toEqual([
+        { a: 1, c: '' },
+        { b: 2 },
+    ]);
+    expect(parseAsJSON('{"a": 1, "c",}\n\nHope this helps!')).toEqual({
+        postscript: 'Hope this helps!',
+        preamble: '',
+        value: { a: 1, c: '' },
+    });
+    // a comma right after a key's colon is not a trailing one: that key is given
+    // '', as it is where the text ends on it
     expect(parseAsJSON('{"a": "b", "c":,}').value).toEqual({ a: 'b', c: '' });
     expect(parseAsJSON('{"a": ,}').value).toEqual({ a: '' });
 
