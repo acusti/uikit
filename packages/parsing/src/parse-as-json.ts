@@ -582,10 +582,13 @@ const cleanThinkingText = (preamble: string) =>
 const FENCED_CODE_BLOCK_REGEXP =
     /^([ \t]*)```(?:[a-z0-9_-]{1,20})?[ \t]*\n([\s\S]*?)\n\1```[ \t]*$/i;
 
-const OBJECT_KEY_REGEXP = /^\s*"[^"]+":/;
+// a key and its colon, with any spaces or tabs between them (as the closing
+// quote mark check allows, and not the no-break space that French puts before
+// a colon in prose)
+const OBJECT_KEY_REGEXP = /^\s*"[^"]+"[ \t]*:/;
 // what follows the brace that closes an object too early: a key, after a comma
 // or without one
-const NEXT_KEY_REGEXP = /^\s*,?\s*"[^"]+":/;
+const NEXT_KEY_REGEXP = /^\s*,?\s*"[^"]+"[ \t]*:/;
 
 // What a brace or bracket has to be followed by to be taken for the start of
 // the JSON and not for part of the preamble.

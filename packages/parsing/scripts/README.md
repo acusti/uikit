@@ -105,8 +105,8 @@ wrong, and write a few of each kind to `<name>.jsonl`.
   line that starts with a key, an object closed too early). Each text reads
   as the same tokens do with `JSON.stringify`’s spacing, cut at the same
   token. Its rows are named by the spacing. Those named `OPEN` are the two
-  repairs that look for a key’s colon right after its closing quote mark,
-  where spacing comes before a colon.
+  repairs that look for a key and its colon, where a line break comes
+  before the colon, which they do not take.
 
 The first five fail where the branch reads a text wrong that the base read
 right. Some of their rows are wrong in both versions by design (costs that

@@ -1966,6 +1966,9 @@ function endsOpenStringAtKeyLineTestCase() {
             '{"a": "one\n"_id": 2, "c": "three\n"2xl": 4, "d": "five\n"$ref": 6}',
             { _id: 2, '2xl': 4, $ref: 6, a: 'one', c: 'three', d: 'five' },
         ],
+        // (with spaces or tabs between the key and its colon)
+        ['{\n  "label" : "Go\n  "rating" : 5\n}', { label: 'Go', rating: 5 }],
+        ['{\n\t"label"\t: "Go\n\t"rating"\t: 5\n}', { label: 'Go', rating: 5 }],
     ] as Array<[string, unknown]>) {
         expect(parseAsJSON(text), text).toEqual({ postscript: '', preamble: '', value });
     }
@@ -2003,6 +2006,13 @@ function endsOpenStringAtKeyLineTestCase() {
         a: 'x\n"quoted" word',
         c: 2,
     });
+    // (a no-break space before a colon is French typography, not a key’s spacing)
+    expect(
+        parseAsJSON('{"a": "Il a dit\n"non"\u00a0: rien de plus", "c": 2}').value,
+    ).toEqual({
+        a: 'Il a dit\n"non"\u00a0: rien de plus',
+        c: 2,
+    });
 
     // in an array it is not a key, so the line stays in the string and no item is
     // made of it
@@ -2021,6 +2031,10 @@ function endsOpenStringAtKeyLineTestCase() {
 
     // while the text streams in, the key is read once its colon is in
     expect(parseAsJSON('{\n"label": "Go\n"rating":').value).toEqual({
+        label: 'Go',
+        rating: '',
+    });
+    expect(parseAsJSON('{\n  "label" : "Go\n  "rating" :').value).toEqual({
         label: 'Go',
         rating: '',
     });
@@ -3136,6 +3150,58 @@ function prematureClosingCurliesTestCase() {
         value: { a: 'b' },
     });
     expect(parseAsJSON('{},\n"a": "b", "c": "d"}').value).toEqual({ a: 'b', c: 'd' });
+
+    // a key with spaces or tabs between it and its colon follows the brace too
+    for (const [text, value] of [
+        [
+            '{"heading" : "Our Story"}, "subheading" : "About us"}',
+            { heading: 'Our Story', subheading: 'About us' },
+        ],
+        [
+            '{\n\t"heading"\t: "Our Story"\n},\n\t"subheading"\t: "About us"\n}',
+            { heading: 'Our Story', subheading: 'About us' },
+        ],
+        // (also where the object needs another repair)
+        [
+            '{"heading" : "Our Story", "tags" : ["a",]}, "subheading" : "About us"}',
+            { heading: 'Our Story', subheading: 'About us', tags: ['a'] },
+        ],
+    ] as Array<[string, unknown]>) {
+        expect(parseAsJSON(text).value, text).toEqual(value);
+    }
+    expect(parseAsJSON('Here it is: {} "a" : "b"}')).toEqual({
+        postscript: '',
+        preamble: 'Here it is:',
+        value: { a: 'b' },
+    });
+    // (not a line break or a no-break space, which no model puts there)
+    for (const [text, value] of [
+        [
+            '{"heading": "Our Story"}, "subheading"\n: "About us"}',
+            { heading: 'Our Story' },
+        ],
+        [
+            '{"heading": "Our Story"}, "subheading"\u00a0: "About us"}',
+            { heading: 'Our Story' },
+        ],
+        [
+            '{"heading": "Our Story", "tags": ["a",]}, "subheading"\n: "About us"}',
+            { heading: 'Our Story', tags: ['a'] },
+        ],
+    ] as Array<[string, unknown]>) {
+        expect(parseAsJSON(text), text).toEqual({
+            postscript: text.slice(text.indexOf('"sub')),
+            preamble: '',
+            value,
+        });
+    }
+    // (nor where the JSON starts, so such a `{}` stays in the preamble)
+    for (const text of [
+        'Résultat : {} "vide"\u00a0: rien trouvé\n\n{"a": 1}',
+        'Note: {} "x"\n: y\n\n{"a": 1}',
+    ]) {
+        expect(parseAsJSON(text).value, text).toEqual({ a: 1 });
+    }
 }
 
 function preservesNewLinesTestCase() {
