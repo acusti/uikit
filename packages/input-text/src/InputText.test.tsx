@@ -1,5 +1,5 @@
 // @vitest-environment happy-dom
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { createRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -49,6 +49,48 @@ describe('InputText.tsx', () => {
         // re-render with different initialValue, value state should reset
         rerender(<InputText initialValue="foo Bar " />);
         expect(input.value).toBe('foo Bar ');
+    });
+
+    it('shows a new initialValue in the same commit as the rest of the render that sets it', async () => {
+        // empties its input once a save resolves, so the update comes from a
+        // timer rather than straight from the click
+        function NoteForm() {
+            const [note, setNote] = useState('');
+            const [savedNote, setSavedNote] = useState<null | string>(null);
+            const save = () => {
+                setTimeout(() => {
+                    setSavedNote(note);
+                    setNote('');
+                }, 0);
+            };
+            return (
+                <>
+                    <InputText initialValue={note} onChangeValue={setNote} />
+                    <button onClick={save} type="button">
+                        Save
+                    </button>
+                    {savedNote == null ? null : <p>{`Saved ${savedNote}`}</p>}
+                </>
+            );
+        }
+        const { container } = render(<NoteForm />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+        fireEvent.change(input, { target: { value: 'Buy milk' } });
+
+        // A MutationObserver callback is a microtask, so it reads the input
+        // right after the commit that shows the saved note and before that
+        // commit’s passive effects, which React runs as a separate task
+        let valueInGap: null | string = null;
+        const observer = new MutationObserver(() => {
+            if (screen.queryByText('Saved Buy milk') == null) return;
+            observer.disconnect();
+            valueInGap = input.value;
+        });
+        observer.observe(container, { childList: true, subtree: true });
+
+        fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+        await waitFor(() => expect(valueInGap).not.toBeNull());
+        expect(valueInGap).toBe('');
     });
 
     // A parent that passes each change back as initialValue gives the input
