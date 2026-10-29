@@ -716,6 +716,28 @@ describe('@acusti/parsing', () => {
             }
         });
 
+        it('gets through a long run of whitespace in good time', () => {
+            // (a model in JSON mode can write whitespace for as long as it is let
+            // go on; each takes a few milliseconds when the time grows with the
+            // length of the run, and several seconds when it grows with its square)
+            const spaces = ' '.repeat(100_000);
+            const cases: Array<[string, unknown]> = [
+                // in a text that needs a repair (a trailing comma): spaces in a
+                // string, and between members
+                [`{"a": "x${spaces}y", "b": 1,}`, { a: `x${spaces}y`, b: 1 }],
+                [`{"a": [1,],${spaces}"b": 2}`, { a: [1], b: 2 }],
+                // …and in a string, before a number that the text ends partway through
+                [`[[1,], "x${spaces}y", 1`, [[1], `x${spaces}y`]],
+            ];
+            for (const [text, value] of cases) {
+                const start = performance.now();
+                const result = parseAsJSON(text);
+                const label = JSON.stringify(text.replace(/(\s+?)\1+/g, '$1…'));
+                expect(performance.now() - start, label).toBeLessThan(1000);
+                expect(result.value, label).toEqual(value);
+            }
+        });
+
         it('reads the JSON in a code block, whatever comes before the block', () => {
             const fence = '```';
             // code with an object in it, and then the answer in a code block, with

@@ -104,7 +104,6 @@ const UNFINISHED_LITERAL_REGEXP =
 
 // the key that a text ends on, with its colon and the comma that precedes it
 const LAST_KEY_REGEXP = /,?\s*"(?:[^"\\]|\\.)*"\s*:\s*$/;
-const LAST_COMMA_REGEXP = /,?\s*$/;
 // the key that a text ends on, if it has no colon or value yet (a key follows a
 // brace or a comma, and may hold escaped quote marks, as may a value, in which
 // a comma and a quote mark are not the start of one)
@@ -265,6 +264,15 @@ function dropUnfinishedEscape(text: string) {
     const escape = UNFINISHED_ESCAPE_REGEXP.exec(text);
     if (escape == null || escape[1].length % 2 === 0) return text;
     return text.slice(0, escape.index + escape[1].length - 1);
+}
+
+// Leaves out the whitespace that the text ends on, and a comma before it. (A
+// search for `/,?\s*$/` would try each index in turn, and so go through each
+// run of whitespace in the text from each of its indexes: its time would grow
+// with the square of the run’s length.)
+function dropLastComma(text: string) {
+    text = text.trimEnd();
+    return text.endsWith(',') ? text.slice(0, -1) : text;
 }
 
 // whether the character at index is escaped, which it is if it follows an odd
@@ -1191,10 +1199,10 @@ export function parseAsJSON(text: string): ParsedResult {
                 if (literal === '') {
                     // the text ends partway through the literal, so its value is not
                     // yet known: leave it out (with its key) rather than guess at it
-                    newText = newText.replace(
-                        controlChar === '}' ? LAST_KEY_REGEXP : LAST_COMMA_REGEXP,
-                        '',
-                    );
+                    newText =
+                        controlChar === '}'
+                            ? newText.replace(LAST_KEY_REGEXP, '')
+                            : dropLastComma(newText);
                     index = text.length;
                     break;
                 }
@@ -1349,7 +1357,7 @@ export function parseAsJSON(text: string): ParsedResult {
 
     // a comma that the text ends on separates nothing, so it is left out (the
     // walk only keeps one there after the end of the root value)
-    newText = newText.replace(LAST_COMMA_REGEXP, '');
+    newText = dropLastComma(newText);
 
     // close any remaining open structures in the reverse order that they were opened
     for (let stackIndex = stack.length - 1; stackIndex >= 0; stackIndex--) {
