@@ -21,5 +21,6 @@ yarn-error.log*
 # what the parseAsJSON harnesses save and write (packages/parsing/scripts)
 packages/parsing/scripts/runs/
 
-# claude code
-.claude
+# claude code (all but the root settings that every session shares)
+**/.claude/*
+!.claude/settings.json
