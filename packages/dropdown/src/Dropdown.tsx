@@ -732,6 +732,12 @@ function RootDropdown({
     // oxlint-disable-next-line react/exhaustive-effect-dependencies
     useEffect(() => clearHoverCloseTimer, []);
 
+    const clearClosingTimer = () => {
+        if (closingTimerRef.current == null) return;
+        clearTimeout(closingTimerRef.current);
+        closingTimerRef.current = null;
+    };
+
     // End the press that opened the dropdown along with its 1s timer. A timer
     // left running would end a later open’s press partway through, and that
     // press’s mouseup would then close the menu it had just opened.
@@ -755,10 +761,7 @@ function RootDropdown({
         clearHoverCloseTimer();
         safeAreaRef.current = null;
         wasInSafeAreaRef.current = false;
-        if (closingTimerRef.current != null) {
-            clearTimeout(closingTimerRef.current);
-            closingTimerRef.current = null;
-        }
+        clearClosingTimer();
         // A self-dismissal — Escape, an outside click, or an item selection —
         // takes an enclosing menubar out of menu-mode. Switching menus,
         // clearing the open menu on hover, and focus changes pass
@@ -767,6 +770,14 @@ function RootDropdown({
             menubar.notifyClosed(dropdownElement);
         }
     };
+
+    // A submit closes the dropdown 90ms later. If it unmounts in that window,
+    // close it now so the timer can’t fire against unmounted DOM, and if
+    // <Activity> hides it, so it isn’t shown again still open.
+    const closeOnPendingSubmit = useEffectEvent(() => {
+        if (closingTimerRef.current != null) closeDropdown();
+    });
+    useEffect(() => () => closeOnPendingSubmit(), []);
 
     // The pointer entered the trigger or (if open) the body: cancel any
     // pending close and, if props.openOnHover and not already open, open now
@@ -850,6 +861,7 @@ function RootDropdown({
         if (isOpenRef.current && !keepOpenOnSubmit) {
             // A short timeout before closing is better UX when user selects an item so dropdown
             // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
+            clearClosingTimer();
             closingTimerRef.current = setTimeout(() => {
                 // The body of a hasItems={false} dropdown can hold the focus
                 // (the input Enter was pressed in, the form’s Save button),

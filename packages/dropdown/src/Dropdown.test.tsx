@@ -1302,6 +1302,81 @@ describe('@acusti/dropdown', () => {
         expect(screen.queryByText('Item A')).not.toBeNull();
     });
 
+    it('leaves no close pending when it unmounts right after a submit', () => {
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        const { unmount } = render(
+            <Dropdown isOpenOnMount>
+                <button type="button">Menu</button>
+                <ul>
+                    <li data-ukt-value="a">Item A</li>
+                </ul>
+            </Dropdown>,
+        );
+        const item = screen.getByText('Item A');
+        fireEvent.mouseOver(item);
+        // Submits, which closes the dropdown 90ms later
+        fireEvent.mouseUp(item);
+        expect(vi.getTimerCount()).toBe(1);
+
+        unmount();
+        expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it('leaves no close pending when it unmounts after two quick submits', () => {
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        const { unmount } = render(
+            <Dropdown isOpenOnMount>
+                <button type="button">Menu</button>
+                <ul>
+                    <li data-ukt-value="a">Item A</li>
+                </ul>
+            </Dropdown>,
+        );
+        const trigger = screen.getByRole('button', { name: 'Menu' });
+        fireEvent.mouseOver(screen.getByText('Item A'));
+        // Two presses inside the 90ms window, each a submit
+        fireEvent.keyDown(trigger, { key: 'Enter' });
+        fireEvent.keyDown(trigger, { key: 'Enter' });
+        expect(vi.getTimerCount()).toBe(1);
+
+        unmount();
+        expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it('stays closed when <Activity> hides it while a submit’s close is pending', () => {
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        const renderInActivity = (mode: 'hidden' | 'visible') => (
+            <Activity mode={mode}>
+                <Dropdown isOpenOnMount>
+                    <button type="button">Menu</button>
+                    <ul>
+                        <li data-ukt-value="a">Item A</li>
+                    </ul>
+                </Dropdown>
+            </Activity>
+        );
+        const { rerender } = render(renderInActivity('visible'));
+        const item = screen.getByText('Item A');
+        fireEvent.mouseOver(item);
+        // Submits, which closes the dropdown 90ms later
+        fireEvent.mouseUp(item);
+        rerender(renderInActivity('hidden'));
+        act(() => {
+            vi.advanceTimersByTime(90);
+        });
+        rerender(renderInActivity('visible'));
+        expect(screen.queryByText('Item A')).toBeNull();
+    });
+
     describe('click delegation to buttons and links', () => {
         it('invokes click on a button when the item contains exactly one button', async () => {
             const handleButtonClick = vi.fn<() => void>();
