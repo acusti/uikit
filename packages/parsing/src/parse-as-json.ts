@@ -1346,14 +1346,19 @@ export function parseAsJSON(text: string): ParsedResult {
                 }
             } else if (char === '\n') {
                 // treat new lines outside strings as separators: if a comma is
-                // missing but needed, add one now
+                // missing but needed, add one now. That is only asked at the first
+                // line break in a run of whitespace: what is around the others is the
+                // same, or the comma that the first was given, and asked at each of
+                // them the search for it would take time that grows with the square
+                // of the run’s length
                 if (
-                    (isPreceededBy({ chars: SCALAR_END_CHARS, text: newText }) &&
+                    !isPreceededBy({ char: '\n', index, text }) &&
+                    ((isPreceededBy({ chars: SCALAR_END_CHARS, text: newText }) &&
                         isFollowedBy({ char: '"', index, text })) ||
-                    (isPreceededBy({ char: '}', text: newText }) &&
-                        isFollowedBy({ char: '{', index, text })) ||
-                    (isPreceededBy({ char: ']', text: newText }) &&
-                        isFollowedBy({ char: '[', index, text }))
+                        (isPreceededBy({ char: '}', text: newText }) &&
+                            isFollowedBy({ char: '{', index, text })) ||
+                        (isPreceededBy({ char: ']', text: newText }) &&
+                            isFollowedBy({ char: '[', index, text })))
                 ) {
                     char = ',';
                 }

@@ -727,6 +727,7 @@ describe('@acusti/parsing', () => {
             // go on; each takes a few milliseconds when the time grows with the
             // length of the run, and several seconds when it grows with its square)
             const spaces = ' '.repeat(100_000);
+            const lines = '\n'.repeat(20_000);
             const cases: Array<[string, unknown]> = [
                 // in a text that needs a repair (a trailing comma): spaces in a
                 // string, and between members
@@ -741,6 +742,12 @@ describe('@acusti/parsing', () => {
                 // that line
                 [`{"a": 1}${spaces}Note`, { a: 1 }],
                 [`Note:\n[1]${spaces}then\n{"a": [1,]}`, { a: [1] }],
+                // line breaks between members (of either kind), whole and as the
+                // text streams in, and after the root, before a note
+                [`{"a": [1,],${lines}"b": 2}`, { a: [1], b: 2 }],
+                [`{"a": [1,],${lines.replaceAll('\n', '\r\n')}"b": 2}`, { a: [1], b: 2 }],
+                [`{"a": [1,], "b": 2,${lines}"c`, { a: [1], b: 2 }],
+                [`{"a": [1,]}${lines}Note`, { a: [1] }],
             ];
             for (const [text, value] of cases) {
                 const start = performance.now();
@@ -2644,6 +2651,9 @@ function missingCommasTestCase() {
             subheading: "We'd love to hear from you!",
         },
     });
+    // (where the line before ends on a space, or the line break is `\r\n`)
+    expect(parseAsJSON('{"a": 1 \n"b": 2}').value).toEqual({ a: 1, b: 2 });
+    expect(parseAsJSON('{"a": 1\r\n"b": 2}').value).toEqual({ a: 1, b: 2 });
 }
 
 function missingKeysTestCase() {
