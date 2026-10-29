@@ -1291,16 +1291,21 @@ export function parseAsJSON(text: string): ParsedResult {
             // handle invalid characters outside of a string value
             if (!isValidContext(validContextPayload)) {
                 // a trailing comma (one that the end of its array or object
-                // follows) is left out, and the text is read on from there, unless
-                // in an object it follows a key with no value yet (given '' below)
+                // follows) is left out, and the text is read on from there (in an
+                // object, after a key with no value yet, once that key is given '')
                 if (
                     char === ',' &&
                     controlChar != null &&
                     isFollowedBy({ char: controlChar, index, text }) &&
                     (controlChar === ']' ||
-                        (isPreceededBy({ chars: ITEM_END_CHARS, text: newChars }) &&
-                            !LAST_KEY_WITHOUT_VALUE_REGEXP.test(newChars.join(''))))
+                        isPreceededBy({ chars: ITEM_END_CHARS, text: newChars }))
                 ) {
+                    if (
+                        controlChar === '}' &&
+                        isAfterKeyWithoutValue({ index, stringIndex, text })
+                    ) {
+                        pushChars(newChars, ': ""');
+                    }
                     continue;
                 }
                 // if previous character was a comma, remove it
