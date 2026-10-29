@@ -3,7 +3,7 @@ type IndexOfClosestCharFullPayload = {
     chars: Array<string> | Set<string>;
     index?: number; // defaults to last character in text
     step?: number; // defaults to 1
-    text: string;
+    text: ArrayLike<string>; // a string, or its characters one to an item
 };
 
 type IndexOfClosestCharPayload =
@@ -126,7 +126,7 @@ function isValidContext({
     controlChar?: string;
     original: string;
     originalIndex: number;
-    text: string;
+    text: ArrayLike<string>;
 }) {
     const index = text.length - 1 + char.length;
     switch (char) {
@@ -192,7 +192,13 @@ function isValidContext({
 
 // a bare literal can only stand where a value is due: as an item in an array,
 // or after the colon that follows a key in an object
-function isValueDue({ controlChar, text }: { controlChar?: string; text: string }) {
+function isValueDue({
+    controlChar,
+    text,
+}: {
+    controlChar?: string;
+    text: ArrayLike<string>;
+}) {
     if (controlChar === ']') return isPreceededBy({ chars: ITEM_OPENING_CHARS, text });
     return controlChar === '}' && isPreceededBy({ char: ':', text });
 }
@@ -274,6 +280,11 @@ function dropUnfinishedEscape(text: string) {
 function dropLastComma(text: string) {
     text = text.trimEnd();
     return text.endsWith(',') ? text.slice(0, -1) : text;
+}
+
+// adds each character of text to chars, as an item of its own
+function pushChars(chars: Array<string>, text: string) {
+    for (let index = 0; index < text.length; index++) chars.push(text[index]);
 }
 
 // whether the character at index is escaped, which it is if it follows an odd
@@ -1074,10 +1085,15 @@ export function parseAsJSON(text: string): ParsedResult {
     // initialize variables
     const stack: Array<string> = [];
     let isInsideString = false;
-    // where the last string opened: in the text, where what came before it can
-    // be read without reading newText back (which costs more as it grows)
+    // where the last string opened, in the text (where isAfterKeyWithoutValue
+    // reads what came before it)
     let stringIndex = -1;
-    let newText = '';
+    // The text that the walk writes, one character to an item. The walk reads
+    // the end of it back at almost every comma, colon, bracket and line break,
+    // and a string that something has been added to is copied whole when it is
+    // read, so that the time for those reads would grow with the square of the
+    // text’s length. It is joined once the walk is done.
+    const newChars: Array<string> = [];
 
     // identify start of JSON: the first brace that opens an object or bracket
     // that opens an array, or the one in a code block if there is a code block
@@ -1219,7 +1235,7 @@ export function parseAsJSON(text: string): ParsedResult {
                     char = JSON.stringify(char).slice(1, -1);
                     // check if there is already an extraneous escape character
                     if (isEscaped(text, index)) {
-                        newText = newText.slice(0, -1);
+                        newChars.pop();
                     }
                 }
             }
@@ -1228,21 +1244,24 @@ export function parseAsJSON(text: string): ParsedResult {
             // read a bare literal (true, false, null, or a number) as a whole
             if (
                 LITERAL_START_CHARS.has(char) &&
-                isValueDue({ controlChar, text: newText })
+                isValueDue({ controlChar, text: newChars })
             ) {
                 const literal = readLiteral({ index, isEndDelimited, text });
                 if (literal === '') {
                     // the text ends partway through the literal, so its value is not
                     // yet known: leave it out (with its key) rather than guess at it
-                    newText =
+                    const writtenText = newChars.join('');
+                    const keptText =
                         controlChar === '}'
-                            ? dropLastKey(newText)
-                            : dropLastComma(newText);
+                            ? dropLastKey(writtenText)
+                            : dropLastComma(writtenText);
+                    // (what is left out is where the text ends)
+                    newChars.length = keptText.length;
                     index = text.length;
                     break;
                 }
                 if (literal != null) {
-                    newText += literal;
+                    pushChars(newChars, literal);
                     index += literal.length - 1;
                     continue;
                 }
@@ -1253,7 +1272,7 @@ export function parseAsJSON(text: string): ParsedResult {
                 controlChar,
                 original: text,
                 originalIndex: index,
-                text: newText,
+                text: newChars,
             };
             // handle invalid characters outside of a string value
             if (!isValidContext(validContextPayload)) {
@@ -1265,16 +1284,16 @@ export function parseAsJSON(text: string): ParsedResult {
                     controlChar != null &&
                     isFollowedBy({ char: controlChar, index, text }) &&
                     (controlChar === ']' ||
-                        (isPreceededBy({ chars: ITEM_END_CHARS, text: newText }) &&
-                            !LAST_KEY_WITHOUT_VALUE_REGEXP.test(newText)))
+                        (isPreceededBy({ chars: ITEM_END_CHARS, text: newChars }) &&
+                            !LAST_KEY_WITHOUT_VALUE_REGEXP.test(newChars.join(''))))
                 ) {
                     continue;
                 }
                 // if previous character was a comma, remove it
-                const trailingPayload = { char: ',', step: -1, text: newText };
+                const trailingPayload = { char: ',', step: -1, text: newChars };
                 const trailingCommaIndex = indexOfClosestChar(trailingPayload);
                 if (trailingCommaIndex > 0) {
-                    newText = newText.substring(0, trailingCommaIndex);
+                    newChars.length = trailingCommaIndex;
                 }
                 break;
             }
@@ -1297,7 +1316,7 @@ export function parseAsJSON(text: string): ParsedResult {
                             text,
                         })
                     ) {
-                        newText += ': ""';
+                        pushChars(newChars, ': ""');
                     }
                     if (char === '}' && stack.length === 1) {
                         // if this is the last closing brace, it should be the end of the JSON.
@@ -1317,12 +1336,12 @@ export function parseAsJSON(text: string): ParsedResult {
                         if (OBJECT_KEY_REGEXP.test(maybeKey)) {
                             // if missing a comma, add it here (or skip the one
                             // that is there, if the object has nothing in it yet)
-                            const isEmpty = isPreceededBy({ char: '{', text: newText });
+                            const isEmpty = isPreceededBy({ char: '{', text: newChars });
                             if (
                                 quoteIndex > startIndex &&
                                 !text.slice(startIndex, quoteIndex).includes(',')
                             ) {
-                                if (!isEmpty) newText += ',';
+                                if (!isEmpty) newChars.push(',');
                             } else if (isEmpty) {
                                 index = startIndex;
                             }
@@ -1333,7 +1352,7 @@ export function parseAsJSON(text: string): ParsedResult {
                     stack.pop();
                     // ensure that we have a trailing comma if needed
                     if (isFollowedBy({ chars: ['"', '{', '['], index, text })) {
-                        newText += char;
+                        newChars.push(char);
                         char = ',';
                     }
                 }
@@ -1358,11 +1377,11 @@ export function parseAsJSON(text: string): ParsedResult {
                 // of the run’s length
                 if (
                     !isPreceededBy({ char: '\n', index, text }) &&
-                    ((isPreceededBy({ chars: SCALAR_END_CHARS, text: newText }) &&
+                    ((isPreceededBy({ chars: SCALAR_END_CHARS, text: newChars }) &&
                         isFollowedBy({ char: '"', index, text })) ||
-                        (isPreceededBy({ char: '}', text: newText }) &&
+                        (isPreceededBy({ char: '}', text: newChars }) &&
                             isFollowedBy({ char: '{', index, text })) ||
-                        (isPreceededBy({ char: ']', text: newText }) &&
+                        (isPreceededBy({ char: ']', text: newChars }) &&
                             isFollowedBy({ char: '[', index, text })))
                 ) {
                     char = ',';
@@ -1371,8 +1390,10 @@ export function parseAsJSON(text: string): ParsedResult {
         }
 
         // append the processed character to the new string
-        newText += char;
+        pushChars(newChars, char);
     }
+
+    let newText = newChars.join('');
 
     if (isInsideString && stack.at(-1) === '}' && UNFINISHED_KEY_REGEXP.test(newText)) {
         // if the text ends partway through a key, the key it would become is not

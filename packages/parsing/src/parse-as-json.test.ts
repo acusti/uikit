@@ -775,6 +775,37 @@ describe('@acusti/parsing', () => {
             }
         });
 
+        it('gets through a long array or object that needs a repair in good time', () => {
+            // (each takes tens of milliseconds when the time grows with the length
+            // of the text, and seconds when it grows with its square)
+            const numbers = Array.from({ length: 40_000 }, (_, index) => index);
+            const items = numbers
+                .slice(0, 8_000)
+                .map((index) => ({ id: index, name: `item ${index}` }));
+            const members = Object.fromEntries(
+                numbers.slice(0, 20_000).map((index) => [`key${index}`, index]),
+            );
+            const cases: Array<[string, string, unknown]> = [
+                ['numbers, a trailing comma', `[${numbers.join(', ')},]`, numbers],
+                [
+                    'objects, pretty-printed, a trailing comma',
+                    JSON.stringify(items, null, 2).replace(/\n]$/, ',\n]'),
+                    items,
+                ],
+                [
+                    'members, a comma missing after the first',
+                    `{"start": "x"\n${JSON.stringify(members).slice(1)}`,
+                    { start: 'x', ...members },
+                ],
+            ];
+            for (const [label, text, value] of cases) {
+                const start = performance.now();
+                const result = parseAsJSON(text);
+                expect(performance.now() - start, label).toBeLessThan(1000);
+                expect(result.value, label).toEqual(value);
+            }
+        });
+
         it('reads the JSON in a code block, whatever comes before the block', () => {
             const fence = '```';
             // code with an object in it, and then the answer in a code block, with
@@ -1111,6 +1142,12 @@ describe('@acusti/parsing', () => {
             // but not a key after an object: it was closed too early, which is
             // repaired
             expect(parseAsJSON('{"a": "b"}, "c": "d"} done')).toEqual({
+                postscript: 'done',
+                preamble: '',
+                value: { a: 'b', c: 'd' },
+            });
+            // (and given the comma that it is missing, if it is)
+            expect(parseAsJSON('{"a": "b"} "c": "d"} done')).toEqual({
                 postscript: 'done',
                 preamble: '',
                 value: { a: 'b', c: 'd' },
@@ -3713,6 +3750,12 @@ function trailingCommasTestCase() {
     expect(parseAsJSON('{"a": "b"},').value).toEqual({ a: 'b' });
     expect(parseAsJSON('{"a": true,},\n').value).toEqual({ a: true });
     expect(parseAsJSON('["a", "b",],').value).toEqual(['a', 'b']);
+    // …and where more of them come before a note
+    expect(parseAsJSON('{"a": "b",},,\nNote: done')).toEqual({
+        postscript: 'Note: done',
+        preamble: '',
+        value: { a: 'b' },
+    });
     // a comma that follows a key with no value yet is not a trailing one: that
     // key is given '', as it is where the text ends on it
     expect(parseAsJSON('{"c",}').value).toEqual({ c: '' });
