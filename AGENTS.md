@@ -53,6 +53,14 @@ bun run format
   branch instead of merging it in (e.g. `git pull --rebase`,
   `git rebase origin/main`).
 
+## Changesets
+
+- A changeset answers two questions for someone reading the changelog:
+  should I upgrade to this version, and if I do, what should I look out
+  for?
+- Focus on what the change is and what it means in practice. Explaining the
+  previous behavior is rarely helpful; minimize it or leave it out.
+
 ## Dependency upgrades
 
 To pick up the latest in-range versions, regenerate `bun.lock` (delete it
