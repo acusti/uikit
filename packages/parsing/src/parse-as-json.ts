@@ -627,6 +627,11 @@ const cleanThinkingText = (preamble: string) =>
         .replace(/^```(?:[a-z0-9]{1,9})?$/im, '')
         .trim();
 
+// what follows the JSON is the postscript, less a comma that it starts with,
+// unless it has no content
+const toPostscript = (rest: string) =>
+    hasTextContent(rest) ? cleanThinkingText(rest.replace(/^\s*,/, '')) : '';
+
 const FENCED_CODE_BLOCK_REGEXP =
     /^([ \t]*)```(?:[a-z0-9_-]{1,20})?[ \t]*\n([\s\S]*?)\n\1```[ \t]*$/i;
 
@@ -1052,7 +1057,6 @@ type ParsedResult = {
 
 export function parseAsJSON(text: string): ParsedResult {
     let preamble = '';
-    let postscript = '';
     // whether anything is known to have followed the text
     let isEndDelimited = false;
     if (text == null) {
@@ -1073,17 +1077,17 @@ export function parseAsJSON(text: string): ParsedResult {
         if (!input.endsWith(text)) isEndDelimited = true;
     }
     // if the input is empty, use value: null to indicate failure
-    if (text === '') return { postscript, preamble, value: null };
+    if (text === '') return { postscript: '', preamble, value: null };
 
     // attempt to parse the string as-is (minus control tokens)
     const wholeValue = parseWholeJSON(text);
-    if (wholeValue !== undefined) return { postscript, preamble, value: wholeValue };
+    if (wholeValue !== undefined) return { postscript: '', preamble, value: wholeValue };
 
     // if it is JSON as far as it goes, closing what it leaves open is all it needs
     const firstText = text;
     const unfinishedValue = parseUnfinishedJSON({ isEndDelimited, text });
     if (unfinishedValue !== undefined) {
-        return { postscript, preamble, value: unfinishedValue };
+        return { postscript: '', preamble, value: unfinishedValue };
     }
 
     // initialize variables
@@ -1149,19 +1153,13 @@ export function parseAsJSON(text: string): ParsedResult {
     const rootEndIndex = indexOfRootEnd(text);
     if (rootEndIndex > -1) {
         // if the object or array that the JSON starts with is whole, it is the
-        // value, and what follows it is the postscript, less a comma that it starts
-        // with (unless a key follows an object: it was closed too early, which
-        // is for the walk to repair)
+        // value, and what follows it is the postscript (unless a key follows an
+        // object: it was closed too early, which is for the walk to repair)
         const rest = text.slice(rootEndIndex + 1);
         if (text[0] !== '{' || !NEXT_KEY_REGEXP.test(rest)) {
             const rootValue = parseWholeJSON(text.slice(0, rootEndIndex + 1));
             if (rootValue !== undefined) {
-                postscript = hasTextContent(rest) ? rest.replace(/^\s*,/, '').trim() : '';
-                return {
-                    postscript: cleanThinkingText(postscript),
-                    preamble,
-                    value: rootValue,
-                };
+                return { postscript: toPostscript(rest), preamble, value: rootValue };
             }
         }
     } else if (text !== firstText) {
@@ -1170,7 +1168,7 @@ export function parseAsJSON(text: string): ParsedResult {
         // it goes
         const remainingValue = parseUnfinishedJSON({ isEndDelimited, text });
         if (remainingValue !== undefined) {
-            return { postscript, preamble, value: remainingValue };
+            return { postscript: '', preamble, value: remainingValue };
         }
     }
 
@@ -1453,11 +1451,6 @@ export function parseAsJSON(text: string): ParsedResult {
         // in case of error, check remainder of text, else return value: null
     }
 
-    // what the walk did not read is the postscript, unless it has no content
-    postscript = text.substring(index).trim();
-    if (!hasTextContent(postscript)) {
-        postscript = '';
-    }
-
-    return { postscript: cleanThinkingText(postscript), preamble, value };
+    // what the walk did not read is the postscript
+    return { postscript: toPostscript(text.substring(index)), preamble, value };
 }

@@ -1244,7 +1244,7 @@ describe('@acusti/parsing', () => {
                 // (a key, whose line break and bracket are part of it)
                 expect(parseAsJSON('{"a": "b", "c\n{').value).toEqual({ a: 'b' });
                 expect(parseAsJSON('{"a": ["b", x tr')).toEqual({
-                    postscript: ', x tr',
+                    postscript: 'x tr',
                     preamble: '',
                     value: { a: ['b'] },
                 });
@@ -3410,6 +3410,64 @@ function proseAfterMemberTestCase() {
         preamble: '',
         value: { items: [{ name: 'Pasta' }, { name: 'Salad' }] },
     });
+    // a comma between the member and the line is left out of the postscript,
+    // whether or not the array or object was closed before the comma
+    for (let end = 1; end <= prose.length; end++) {
+        const line = prose.slice(0, end);
+        expect(parseAsJSON(`["Pasta", "Salad",\n${line}`)).toEqual({
+            postscript: line.trim(),
+            preamble: '',
+            value: ['Pasta', 'Salad'],
+        });
+        expect(parseAsJSON(`{"heading": "Menu",\n${line}`)).toEqual({
+            postscript: line.trim(),
+            preamble: '',
+            value: { heading: 'Menu' },
+        });
+    }
+    expect(parseAsJSON('{"tags": ["pasta", "salad",\nand more')).toEqual({
+        postscript: 'and more',
+        preamble: '',
+        value: { tags: ['pasta', 'salad'] },
+    });
+    expect(parseAsJSON('{"tags": ["pasta", "salad"],\nand more')).toEqual({
+        postscript: 'and more',
+        preamble: '',
+        value: { tags: ['pasta', 'salad'] },
+    });
+    expect(parseAsJSON('["Pasta", "Salad"],\nHope this helps!')).toEqual({
+        postscript: 'Hope this helps!',
+        preamble: '',
+        value: ['Pasta', 'Salad'],
+    });
+    // (whatever whitespace comes before the comma or after it)
+    expect(parseAsJSON('["Pasta", "Salad"] ,\nHope this helps!')).toEqual({
+        postscript: 'Hope this helps!',
+        preamble: '',
+        value: ['Pasta', 'Salad'],
+    });
+    expect(parseAsJSON('["Pasta", "Salad"]\n,Hope this helps!')).toEqual({
+        postscript: 'Hope this helps!',
+        preamble: '',
+        value: ['Pasta', 'Salad'],
+    });
+    // (in an array, a line that could start a `null`, `true` or `false` is read
+    // past the comma to, and is the start of the postscript all the same)
+    expect(parseAsJSON('[1, 2,\nnothing else to add.')).toEqual({
+        postscript: 'nothing else to add.',
+        preamble: '',
+        value: [1, 2],
+    });
+    expect(parseAsJSON('["Pasta", "Salad",\ntoo many to list.')).toEqual({
+        postscript: 'too many to list.',
+        preamble: '',
+        value: ['Pasta', 'Salad'],
+    });
+    expect(parseAsJSON('["Pasta", "Salad",\nfeel free to ask!')).toEqual({
+        postscript: 'feel free to ask!',
+        preamble: '',
+        value: ['Pasta', 'Salad'],
+    });
 }
 
 function quoteMarkStartTestCase() {
@@ -3636,12 +3694,12 @@ function stripInvalidJSONTestCase() {
     // a comma that follows an opening bracket is not between two items or two
     // key/value pairs, so the text is read up to it
     expect(parseAsJSON('{"heading": "Hi", "tags": [, "a"]}')).toEqual({
-        postscript: ', "a"]}',
+        postscript: '"a"]}',
         preamble: '',
         value: { heading: 'Hi', tags: [] },
     });
     expect(parseAsJSON('{"heading": "Hi", "link": {, "a": "b"}}')).toEqual({
-        postscript: ', "a": "b"}}',
+        postscript: '"a": "b"}}',
         preamble: '',
         value: { heading: 'Hi', link: {} },
     });
@@ -3800,20 +3858,33 @@ function trailingCommasTestCase() {
     expect(parseAsJSON('{"a": "b", "c":,}').value).toEqual({ a: 'b', c: '' });
     expect(parseAsJSON('{"a": ,}').value).toEqual({ a: '' });
 
-    // only a comma is left out, and only where the bracket that closes its array
-    // or object follows it: the text is read up to anything else that is not JSON
+    // only a comma is read past, and only where the bracket that closes its
+    // array or object follows it: the text is read up to anything else that
+    // is not JSON, and the postscript starts there (after it, if it is a comma)
     expect(parseAsJSON('{"tags": ["a" x], "b": "c"}')).toEqual({
         postscript: 'x], "b": "c"}',
         preamble: '',
         value: { tags: ['a'] },
     });
     expect(parseAsJSON('{"tags": ["a", } and more')).toEqual({
-        postscript: ', } and more',
+        postscript: '} and more',
         preamble: '',
         value: { tags: ['a'] },
     });
     expect(parseAsJSON('{"a": "b", ] and more')).toEqual({
-        postscript: ', ] and more',
+        postscript: '] and more',
+        preamble: '',
+        value: { a: 'b' },
+    });
+    // (with or without a comma before it, a bracket that closes neither is
+    // the start of the postscript)
+    expect(parseAsJSON('{"tags": ["a"} and more')).toEqual({
+        postscript: '} and more',
+        preamble: '',
+        value: { tags: ['a'] },
+    });
+    expect(parseAsJSON('{"a": "b"] and more')).toEqual({
+        postscript: '] and more',
         preamble: '',
         value: { a: 'b' },
     });
