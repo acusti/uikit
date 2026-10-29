@@ -10,7 +10,7 @@ import {
     type KeyboardEvent,
     type Ref,
     type SyntheticEvent,
-    useEffect,
+    useLayoutEffect,
     useRef,
     useState,
 } from 'react';
@@ -240,7 +240,13 @@ export default function InputText({
         };
     };
 
-    useEffect(() => {
+    // a layout effect, so the input shows a new initialValue in the same commit
+    // as the rest of the render that sets it: React only runs passive effects
+    // in the commit’s own task for an update from flushSync or straight from a
+    // discrete event (a click, a keypress), so after a timer, a response, a
+    // transition or a pointermove, the input would show its old value until
+    // they ran
+    useLayoutEffect(() => {
         committedValueRef.current = valueFromProps;
         if (!inputRef.current) return;
         // if props.initialValue changes, override input value with it, unless
