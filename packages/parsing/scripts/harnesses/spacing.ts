@@ -12,10 +12,11 @@
 // with the reference cut after its spacing, or with a space put in where it has
 // none, since a space after a number says that it is whole.
 //
-// Rows named OPEN are the two repairs that look for a key’s colon right after its
-// closing quote mark (a string left open before a line that starts with a key,
-// and an object closed too early), where spacing comes before a colon. Both
-// versions get them wrong, and only a change counts.
+// Rows named OPEN are the two repairs that look for a key and its colon (a string
+// left open before a line that starts with a key, and an object closed too
+// early), where a line break comes before a colon: they take spaces and tabs
+// there, but no formatter writes a line break. Both versions get them wrong, and
+// only a change counts.
 import path from 'node:path';
 
 import {
@@ -217,7 +218,8 @@ const REPAIRS = [
     'an object closed too early',
 ] as const;
 type Repair = (typeof REPAIRS)[number];
-// the repairs that look for a key’s colon right after its closing quote mark
+// the repairs that look for a key and its colon, with spaces or tabs between
+// them but not a line break
 const KEY_REPAIRS: Array<Repair> = [
     'a string left open before a key',
     'an object closed too early',
@@ -255,13 +257,13 @@ function writeString(string: string, repair: Repair) {
 function write(value: unknown, spacing: Spacing, repair: Repair) {
     const segments: Array<Segment> = [];
     let token = 0;
-    let hasSpaceBeforeColon = false;
+    let hasLineBreakBeforeColon = false;
     let isStringLeftOpen = false;
     const push = (text: string) =>
         segments.push({ isSpace: false, text, token: token++ });
     const space = (slot: Slot, depth: number, text = spacing.space(slot, depth)) => {
         if (!text) return;
-        if (slot === 'beforeColon') hasSpaceBeforeColon = true;
+        if (slot === 'beforeColon' && text.includes('\n')) hasLineBreakBeforeColon = true;
         segments.push({ isSpace: true, text, token });
     };
     const writeNode = (node: unknown, depth: number) => {
@@ -329,7 +331,7 @@ function write(value: unknown, spacing: Spacing, repair: Repair) {
         push(isArray ? ']' : '}');
     };
     writeNode(value, 0);
-    return { hasSpaceBeforeColon, segments };
+    return { hasLineBreakBeforeColon, segments };
 }
 
 const join = (segments: Array<Segment>) => segments.map(({ text }) => text).join('');
@@ -413,7 +415,7 @@ for (const value of values) {
             ) {
                 continue;
             }
-            const { hasSpaceBeforeColon, segments } = write(value, spacing, repair);
+            const { hasLineBreakBeforeColon, segments } = write(value, spacing, repair);
             const reference = spacing.isPretty
                 ? write(value, PRETTY, repair).segments
                 : segments.filter(({ isSpace }) => !isSpace);
@@ -421,8 +423,8 @@ for (const value of values) {
             const referenceBody = join(reference);
             if (body === referenceBody) continue;
             const row =
-                hasSpaceBeforeColon && KEY_REPAIRS.includes(repair)
-                    ? `OPEN ${repair}, spacing before a colon`
+                hasLineBreakBeforeColon && KEY_REPAIRS.includes(repair)
+                    ? `OPEN ${repair}, a line break before a colon`
                     : spacing.name;
             const cutReference = createCutter(segments, reference);
             for (const { head, name, tail } of WRAPPERS) {

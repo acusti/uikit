@@ -139,11 +139,12 @@ before it is the `preamble`, and what follows it is the `postscript`.
   on `true`, `false` or `null`, and sets (`{"a", "b"}`). One of those is
   only taken for the JSON if it starts a line or follows a colon, and
   nothing follows it on its line but a full stop, a comma or a semicolon,
-  and a comment.
+  and a comment, or, after a brace, a key (`Here it is: {} "a": "b"}` is an
+  object that was closed too early).
 - If the value is valid JSON it is parsed as it is, unless a key follows an
-  object’s closing brace (the object was closed too early, as above, and is
-  repaired). Otherwise only a value that is unfinished or malformed is
-  repaired.
+  object’s closing brace, with or without spaces or tabs before its colon
+  (the object was closed too early, as above, and is repaired). Otherwise
+  only a value that is unfinished or malformed is repaired.
 - A line that starts with a letter after a member of an object or array,
   such as a line of prose, ends the JSON, whether or not a closing bracket
   follows it. It is not taken for a key or an item, and is the start of the
@@ -312,12 +313,16 @@ parseAsJSON('{"body": "See\r\n[here](https://example.com)"}').value;
 // { body: 'See\r\n[here](https://example.com)' }
 ```
 
-In an object, a line that starts with a key and its colon ends a string
-that was never closed. A model sometimes drops the closing quote mark at
-the end of a line, and this way the key after it is still read.
+In an object, a line that starts with a key and its colon, with or without
+spaces or tabs between them, ends a string that was never closed. A model
+sometimes drops the closing quote mark at the end of a line, and this way
+the key after it is still read.
 
 ```js
 parseAsJSON('{\n"label": "Go\n"rating": 5\n}').value;
+// { label: 'Go', rating: 5 }
+
+parseAsJSON('{\n"label" : "Go\n"rating" : 5\n}').value;
 // { label: 'Go', rating: 5 }
 ```
 
