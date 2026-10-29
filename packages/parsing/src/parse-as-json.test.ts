@@ -728,6 +728,8 @@ describe('@acusti/parsing', () => {
             // length of the run, and several seconds when it grows with its square)
             const spaces = ' '.repeat(100_000);
             const lines = '\n'.repeat(20_000);
+            // (the search from each line break in a string takes less time)
+            const linesInString = '\n'.repeat(50_000);
             const cases: Array<[string, unknown]> = [
                 // in a text that needs a repair (a trailing comma): spaces in a
                 // string, and between members
@@ -748,6 +750,21 @@ describe('@acusti/parsing', () => {
                 [`{"a": [1,],${lines.replaceAll('\n', '\r\n')}"b": 2}`, { a: [1], b: 2 }],
                 [`{"a": [1,], "b": 2,${lines}"c`, { a: [1], b: 2 }],
                 [`{"a": [1,]}${lines}Note`, { a: [1] }],
+                // line breaks in a string (of either kind, in an object, where a
+                // line that starts with a key would end the string), whole and as it
+                // streams in
+                [
+                    `{"a": "x${linesInString}y", "b": 1,}`,
+                    { a: `x${linesInString}y`, b: 1 },
+                ],
+                [
+                    `{"a": "x${linesInString.replaceAll('\n', '\r\n')}y", "b": 1,}`,
+                    { a: `x${linesInString.replaceAll('\n', '\r\n')}y`, b: 1 },
+                ],
+                [
+                    `{"a": [1,], "b": "x${linesInString}y`,
+                    { a: [1], b: `x${linesInString}y` },
+                ],
             ];
             for (const [text, value] of cases) {
                 const start = performance.now();
@@ -2008,6 +2025,8 @@ function endsOpenStringAtKeyLineTestCase() {
         ],
         // (a line break in the string before the line that ends it is kept)
         ['{"a": "one\ntwo\n"b": 2}', { a: 'one\ntwo', b: 2 }],
+        // (as is a space before the line break that ends it, with a blank line after)
+        ['{"a": "one \n\n"b": 2}', { a: 'one ', b: 2 }],
         // (a key that starts with something other than a letter)
         [
             '{"a": "one\n"_id": 2, "c": "three\n"2xl": 4, "d": "five\n"$ref": 6}',

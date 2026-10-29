@@ -1203,10 +1203,15 @@ export function parseAsJSON(text: string): ParsedResult {
                 if (
                     char === '\n' &&
                     stack.at(-1) === '}' &&
+                    !isPreceededBy({ char: '\n', index, text }) &&
                     OBJECT_KEY_REGEXP.test(text.substring(index + 1))
                 ) {
                     // if not escaped but we seem to no longer be in a string, break out
-                    // (a line that starts with a key is the next member of an object only)
+                    // (a line that starts with a key is the next member of an object
+                    // only; that is asked at the first line break in a run of
+                    // whitespace and not at the others, since the test goes past them
+                    // to the same line, and asked at each it would take time that
+                    // grows with the square of the run’s length)
                     isInsideString = false;
                     char = '",\n';
                 } else {
