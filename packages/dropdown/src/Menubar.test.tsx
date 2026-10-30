@@ -709,6 +709,45 @@ describe('@acusti/dropdown Menubar', () => {
         );
     });
 
+    it('submits once for two presses of Enter in a menu, and in the next menu when the arrow keys move to it', async () => {
+        const handleFileSubmitItem = vi.fn<() => void>();
+        const handleEditSubmitItem = vi.fn<() => void>();
+        const user = userEvent.setup();
+        render(
+            <Menubar>
+                <Dropdown onSubmitItem={handleFileSubmitItem}>
+                    File
+                    <ul data-testid="file-menu">
+                        <li data-ukt-item>New</li>
+                    </ul>
+                </Dropdown>
+                <Dropdown onSubmitItem={handleEditSubmitItem}>
+                    Edit
+                    <ul data-testid="edit-menu">
+                        <li data-ukt-item>Undo</li>
+                    </ul>
+                </Dropdown>
+            </Menubar>,
+        );
+
+        await user.click(screen.getByRole('menuitem', { name: 'File' }));
+        await user.keyboard('{ArrowDown}');
+        // keys go to whatever has focus, which follows the open menu
+        const press = (key: string) =>
+            fireEvent.keyDown(document.activeElement ?? document.body, { key });
+        press('Enter');
+        press('Enter');
+        press('ArrowRight');
+        press('ArrowDown');
+        press('Enter');
+
+        expect(handleFileSubmitItem).toHaveBeenCalledTimes(1);
+        expect(handleEditSubmitItem).toHaveBeenCalledTimes(1);
+        expect(handleEditSubmitItem).toHaveBeenCalledWith(
+            expect.objectContaining({ label: 'Undo' }),
+        );
+    });
+
     it('closes the open menu on Escape and returns focus to its trigger', async () => {
         const user = userEvent.setup();
         renderMenubar();
