@@ -290,9 +290,15 @@ describe('@acusti/parsing', () => {
             expect(parseAsJSON('Here they are: [fal').value).toEqual([]);
             expect(parseAsJSON('Here they are: [nu').value).toEqual([]);
             expect(parseAsJSON('Here they are: [true').value).toEqual([true]);
-            // …and where a full stop ends the line after it
+            // …and where a full stop ends the line after it (with spaces after it
+            // or not)
             expect(parseAsJSON('The sizes are: [1, 2].')).toEqual({
                 postscript: '',
+                preamble: 'The sizes are:',
+                value: [1, 2],
+            });
+            expect(parseAsJSON('The sizes are: [1, 2].  \nThat is all.')).toEqual({
+                postscript: '.  \nThat is all.',
                 preamble: 'The sizes are:',
                 value: [1, 2],
             });
@@ -730,6 +736,11 @@ describe('@acusti/parsing', () => {
                 // through, in an array and in an object (where its key is left out)
                 [`[[1,], "x${spaces}y", 1`, [[1], `x${spaces}y`]],
                 [`{"a": [1,], "b": "x${spaces}y", "c": 1`, { a: [1], b: `x${spaces}y` }],
+                // after the root, before a note (where no repair is needed), and
+                // after an array that starts a line of the preamble, before more of
+                // that line
+                [`{"a": 1}${spaces}Note`, { a: 1 }],
+                [`Note:\n[1]${spaces}then\n{"a": [1,]}`, { a: [1] }],
             ];
             for (const [text, value] of cases) {
                 const start = performance.now();

@@ -620,8 +620,11 @@ const FENCED_CODE_BLOCK_REGEXP =
 // a colon in prose)
 const OBJECT_KEY_REGEXP = /^\s*"[^"]+"[ \t]*:/;
 // what follows the brace that closes an object too early: a key, after a comma
-// or without one
-const NEXT_KEY_REGEXP = /^\s*,?\s*"[^"]+"[ \t]*:/;
+// or without one (the whitespace after a comma goes with the comma, so that a
+// run of whitespace with no key after it is tried in one way only: split
+// between two runs, it would be tried in one way for each index in it, in
+// time that grows with the square of its length)
+const NEXT_KEY_REGEXP = /^\s*(?:,\s*)?"[^"]+"[ \t]*:/;
 
 // What a brace or bracket has to be followed by to be taken for the start of
 // the JSON and not for part of the preamble.
@@ -649,9 +652,11 @@ const SCALAR_AFTER_BRACKET_REGEXP = new RegExp(
 );
 // the text after a value that is not in the middle of a line of prose: nothing
 // on its line but a full stop, comma or semicolon, and a comment (a block
-// comment as far as its own `*/`, so that nothing can follow it on the line)
+// comment as far as its own `*/`, so that nothing can follow it on the line;
+// the spaces after a full stop, comma or semicolon go with it, as they do in
+// NEXT_KEY_REGEXP)
 const END_OF_LINE_REGEXP =
-    /^[ \t]*[.,;]?[ \t]*(?:\/\/[^\n]*|\/\*(?:[^*]|\*(?!\/))*(?:\*\/[ \t]*|$)|\/$)?(?:\r?\n|$)/;
+    /^[ \t]*(?:[.,;][ \t]*)?(?:\/\/[^\n]*|\/\*(?:[^*]|\*(?!\/))*(?:\*\/[ \t]*|$)|\/$)?(?:\r?\n|$)/;
 // a comment where the text has got to, and the whitespace before it: all of one
 // that runs to the end of its line, as far as the `/*` of one that does not,
 // and the `/` that the text ends on. (Not `//]:`, which is how markdown writes
