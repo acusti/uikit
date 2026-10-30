@@ -371,8 +371,10 @@ type Props = {
     /**
      * Called when an item is submitted (click, Enter, or Space). Parent items
      * (submenus) disclose rather than submit, so this fires for leaf items
-     * only. For a nested (submenu) Dropdown, fires for submissions within its
-     * subtree only.
+     * only. A submit closes the dropdown 90ms later (unless the root dropdown
+     * sets keepOpenOnSubmit), and the dropdown ignores any other submit in
+     * that time, so this isn’t called twice for a double press. For a nested
+     * (submenu) Dropdown, fires for submissions within its subtree only.
      */
     onSubmitItem?: (payload: Item) => void;
     /**
@@ -762,6 +764,9 @@ that validates asynchronously, can’t keep it open.
 Enter in such an input, in the body or the trigger, counts the way a form
 would count it: not when a handler has prevented the key, as a combobox
 does to pick an option, and not when it commits an IME composition.
+
+The dropdown closes 90ms after a submit and ignores any other submit in
+that time. The form’s own `onSubmit` still runs for every submit.
 
 When a submit closes the dropdown while focus is in its body, focus returns
 to the trigger, as it does on Escape.
