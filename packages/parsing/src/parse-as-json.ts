@@ -1396,7 +1396,8 @@ export function parseAsJSON(text: string): ParsedResult {
     }
 
     // a comma that the text ends on separates nothing, so it is left out (the
-    // walk only keeps one there after the end of the root value)
+    // walk ends on one only after the end of the root value, where it keeps
+    // each comma that it reads: of two or more, only the last is left out)
     newText = dropLastComma(newText);
 
     // close any remaining open structures in the reverse order that they were opened
