@@ -56,6 +56,11 @@ bun run format
   bringing in the base: resolving a PR’s merge conflicts, a “base branch
   recovered” notice, and `update_pull_request_branch` (which creates a
   merge commit) all get a rebase instead.
+- To force-push a rebased or squashed `claude/` branch, write exactly
+  `git push --force-with-lease --force-if-includes origin claude/<branch>`,
+  with no `-u` and nothing after the branch name. `.claude/settings.json`
+  lets Claude Code run that and `git commit --amend …` without a prompt;
+  any other form of either still goes through the permission check.
 
 ## Changesets
 
