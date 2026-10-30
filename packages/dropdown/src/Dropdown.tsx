@@ -208,8 +208,10 @@ export type Props = {
     /**
      * Called when an item is submitted (click, Enter, or Space). Parent items
      * (submenus) disclose rather than submit, so this fires for leaf items
-     * only. For a nested (submenu) Dropdown, fires for submissions within its
-     * subtree only.
+     * only. A submit closes the dropdown 90ms later (unless the root dropdown
+     * sets keepOpenOnSubmit), and the dropdown ignores any other submit in
+     * that time, so this isn’t called twice for a double press. For a nested
+     * (submenu) Dropdown, fires for submissions within its subtree only.
      */
     onSubmitItem?: (payload: Item) => void;
     /**
@@ -837,6 +839,13 @@ function RootDropdown({
     }, [dropdownElement, isOpen, menubar]);
 
     const handleSubmitItem = (event: Event | React.SyntheticEvent<HTMLElement>) => {
+        // A submit has already started closing the dropdown, 90ms from now. One
+        // more inside that window is a repeat of it: a double press of Enter
+        // or a form submitted twice. handleMouseUp stands down the same way.
+        // Only a submit that closes arms the timer, so with keepOpenOnSubmit
+        // every submit still goes through
+        if (closingTimerRef.current != null) return;
+
         const element = hasItems ? getActiveItemElement(dropdownElement) : null;
 
         const submenuOfActive = element ? getSubmenuOfItem(element) : null;
@@ -861,7 +870,6 @@ function RootDropdown({
         if (isOpenRef.current && !keepOpenOnSubmit) {
             // A short timeout before closing is better UX when user selects an item so dropdown
             // doesn’t close before expected. It also enables using <Link />s in the dropdown body.
-            clearClosingTimer();
             closingTimerRef.current = setTimeout(() => {
                 // The body of a hasItems={false} dropdown can hold the focus
                 // (the input Enter was pressed in, the form’s Save button),

@@ -4271,6 +4271,253 @@ describe('@acusti/dropdown', () => {
         });
     });
 
+    describe('a second submit while a submit’s close is pending', () => {
+        const renderMenu = (props: Partial<Props> = {}) =>
+            render(
+                <Dropdown {...props}>
+                    Menu
+                    <ul>
+                        <li data-ukt-value="one">One</li>
+                        <li data-ukt-value="two">Two</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+        const renderFormatMenu = (props: Partial<Props> = {}) =>
+            render(
+                <Dropdown {...props}>
+                    Format
+                    <ul>
+                        <li data-ukt-item>Bold</li>
+                        <li data-ukt-item>Italic</li>
+                        <Dropdown label="Align">
+                            <ul>
+                                <li data-ukt-value="left">Left</li>
+                                <li data-ukt-value="center">Center</li>
+                            </ul>
+                        </Dropdown>
+                    </ul>
+                </Dropdown>,
+            );
+
+        it.each(['Enter', ' '])(
+            'submits the active item once for two presses of %j inside the close delay',
+            async (key) => {
+                const handleSubmitItem = vi.fn<(payload: Item) => void>();
+                const user = userEvent.setup();
+                renderMenu({ onSubmitItem: handleSubmitItem });
+
+                const trigger = screen.getByRole('button', { name: 'Menu' });
+                await user.click(trigger);
+                await user.keyboard('{ArrowDown}');
+                expect(fireEvent.keyDown(trigger, { key })).toBe(false);
+                // the second press is taken like the first, so it can’t
+                // press the trigger it was typed on
+                expect(fireEvent.keyDown(trigger, { key })).toBe(false);
+
+                expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+                expect(handleSubmitItem).toHaveBeenCalledWith(
+                    expect.objectContaining({ value: 'one' }),
+                );
+                await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+            },
+        );
+
+        it('creates a typed value once for two presses of Enter inside the close delay', async () => {
+            const handleSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown
+                    allowCreate
+                    isSearchable
+                    label="Tag"
+                    onSubmitItem={handleSubmitItem}
+                >
+                    <ul>
+                        <li data-ukt-value="apple">Apple</li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const input = screen.getByRole('combobox');
+            await user.click(input);
+            await user.keyboard('kiwi');
+            fireEvent.keyDown(input, { key: 'Enter' });
+            // submitting blurs the input, so the second press is on the page
+            fireEvent.keyDown(document.body, { key: 'Enter' });
+
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ element: null, value: 'kiwi' }),
+            );
+        });
+
+        it('clicks the button in an item once for two presses of Enter inside the close delay', async () => {
+            const handleButtonClick = vi.fn<() => void>();
+            const user = userEvent.setup();
+            render(
+                <Dropdown>
+                    Menu
+                    <ul>
+                        <li data-ukt-item data-ukt-value="action">
+                            <button onClick={handleButtonClick} type="button">
+                                Action
+                            </button>
+                        </li>
+                    </ul>
+                </Dropdown>,
+            );
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}');
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+
+            expect(handleButtonClick).toHaveBeenCalledTimes(1);
+        });
+
+        it('submits an item of a submenu once for two presses of Enter inside the close delay', async () => {
+            const handleRootSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            renderFormatMenu({ onSubmitItem: handleRootSubmitItem });
+
+            const trigger = screen.getByRole('button', { name: 'Format' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}{ArrowRight}');
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+
+            expect(handleRootSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleRootSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'left' }),
+            );
+        });
+
+        it('closes a hasItems={false} dropdown 90ms after its first submit, not after its last', () => {
+            vi.useFakeTimers();
+            onTestFinished(() => {
+                vi.useRealTimers();
+            });
+            const handleSubmit = vi.fn<(event: SubmitEvent) => void>((event) =>
+                event.preventDefault(),
+            );
+            render(
+                <Dropdown hasItems={false} isOpenOnMount keepOpenOnSubmit={false}>
+                    <button type="button">Settings</button>
+                    <form onSubmit={handleSubmit}>
+                        <label>
+                            Full name <input name="name" type="text" />
+                        </label>
+                        <button type="submit">Save</button>
+                    </form>
+                </Dropdown>,
+            );
+
+            const form = screen.getByRole('textbox').closest('form') as HTMLFormElement;
+            fireEvent.submit(form);
+            act(() => {
+                vi.advanceTimersByTime(60);
+            });
+            fireEvent.submit(form);
+            // the first submit’s close is the only one pending…
+            expect(vi.getTimerCount()).toBe(1);
+            act(() => {
+                vi.advanceTimersByTime(30);
+            });
+
+            // …and it isn’t put off by the second. The form still gets
+            // every submit
+            expect(handleSubmit).toHaveBeenCalledTimes(2);
+            expect(screen.queryByRole('textbox')).toBeNull();
+        });
+
+        it('submits every press of Enter inside the close delay when keepOpenOnSubmit is set', async () => {
+            const handleSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            renderMenu({ keepOpenOnSubmit: true, onSubmitItem: handleSubmitItem });
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}');
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+            fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+
+            expect(handleSubmitItem.mock.calls.map(([{ value }]) => value)).toEqual([
+                'one',
+                'one',
+                'two',
+            ]);
+            await waitPastCloseDelay();
+            expect(screen.getByRole('menu')).toBeTruthy();
+        });
+
+        it('submits an item of a submenu that a press of Enter on its parent item disclosed', async () => {
+            const handleSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            renderFormatMenu({ onSubmitItem: handleSubmitItem });
+
+            const trigger = screen.getByRole('button', { name: 'Format' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}{ArrowDown}{ArrowDown}');
+            // discloses the submenu and moves to its first item…
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+            expect(
+                screen.getByText('Align').closest('li')?.getAttribute('aria-expanded'),
+            ).toBe('true');
+            // …and arms no close for this to be taken as a repeat of
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+
+            expect(handleSubmitItem).toHaveBeenCalledTimes(1);
+            expect(handleSubmitItem).toHaveBeenCalledWith(
+                expect.objectContaining({ value: 'left' }),
+            );
+        });
+
+        it('leaves a parent item closed when Enter is pressed on it inside the close delay', async () => {
+            const user = userEvent.setup();
+            renderFormatMenu();
+
+            const trigger = screen.getByRole('button', { name: 'Format' });
+            await user.click(trigger);
+            await user.keyboard('{ArrowDown}');
+            // submits Bold, which closes the menu in 90ms. A click on the
+            // parent item is let go of in that time, and so is Enter
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+            fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+            fireEvent.keyDown(trigger, { key: 'ArrowDown' });
+            fireEvent.keyDown(trigger, { key: 'Enter' });
+
+            expect(
+                screen.getByText('Align').closest('li')?.getAttribute('aria-expanded'),
+            ).toBe('false');
+            await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+        });
+
+        it('submits again once the close has happened and the dropdown is reopened', async () => {
+            const handleSubmitItem = vi.fn<(payload: Item) => void>();
+            const user = userEvent.setup();
+            renderMenu({ onSubmitItem: handleSubmitItem });
+
+            const trigger = screen.getByRole('button', { name: 'Menu' });
+            for (const value of ['one', 'two']) {
+                await user.click(trigger);
+                await user.keyboard(
+                    value === 'one' ? '{ArrowDown}' : '{ArrowDown}{ArrowDown}',
+                );
+                fireEvent.keyDown(trigger, { key: 'Enter' });
+                await waitFor(() => expect(screen.queryByRole('menu')).toBeNull());
+            }
+
+            expect(handleSubmitItem.mock.calls.map(([{ value }]) => value)).toEqual([
+                'one',
+                'two',
+            ]);
+        });
+    });
+
     describe('the keys of an IME composition', () => {
         // The keydown of a key that an IME takes: isComposing while the
         // composition is under way, and a keyCode of 229 where it has
