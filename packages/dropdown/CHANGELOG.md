@@ -1,5 +1,17 @@
 # @acusti/dropdown
 
+## 1.2.1
+
+### Patch Changes
+
+- a30d70d: Fix a dropdown’s delayed close running after it unmounts
+
+    A Dropdown that unmounts within 90ms of an item being submitted no
+    longer runs its delayed close afterward. In a test run, that close
+    could land after the test environment was torn down and fail the run
+    with an uncaught `ReferenceError: window is not defined`, even when
+    every test passed.
+
 ## 1.2.0
 
 ### Minor Changes
