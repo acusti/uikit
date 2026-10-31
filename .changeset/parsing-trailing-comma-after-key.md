@@ -1,5 +1,5 @@
 ---
-'@acusti/parsing': patch
+'@acusti/parsing': minor
 ---
 
 Read on past a trailing comma after a key with no value
