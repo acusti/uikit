@@ -240,6 +240,15 @@ export default function InputText({
         };
     };
 
+    // the last initialValue applied to the input (the input is created with
+    // the first one as its defaultValue). React re-runs an effect without a
+    // change when an <Activity> is shown again and in StrictMode, and re-runs a
+    // layout effect when a <Suspense> boundary shows its content again after
+    // its fallback. Comparing against it keeps such a re-run from overwriting
+    // what was typed since then, and from changing the value discardOnEscape
+    // resets to
+    const appliedValueRef = useRef(valueFromProps);
+
     // a layout effect, so the input shows a new initialValue in the same commit
     // as the rest of the render that sets it: React only runs passive effects
     // in the commit’s own task for an update from flushSync or straight from a
@@ -247,6 +256,8 @@ export default function InputText({
     // transition or a pointermove, the input would show its old value until
     // they ran
     useLayoutEffect(() => {
+        if (appliedValueRef.current === valueFromProps) return;
+        appliedValueRef.current = valueFromProps;
         committedValueRef.current = valueFromProps;
         if (!inputRef.current) return;
         // if props.initialValue changes, override input value with it, unless
