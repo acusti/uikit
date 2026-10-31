@@ -1200,19 +1200,10 @@ export function parseAsJSON(text: string): ParsedResult {
                     const nextQuoteMarkIndex = text.indexOf('"', index + 1);
                     if (nextQuoteMarkIndex > index + 1) {
                         const lastControlChar = stack.at(-1);
-                        const nextControlCharIndex = lastControlChar
-                            ? text.indexOf(lastControlChar, index + 1)
-                            : -1;
+                        const nextText = text.slice(index + 1, nextQuoteMarkIndex);
                         // does a closing control char occur before the next quote mark?
-                        if (
-                            !lastControlChar ||
-                            nextControlCharIndex === -1 ||
-                            nextControlCharIndex > nextQuoteMarkIndex
-                        ) {
-                            const nextNewLineIndex = text.indexOf('\n', index + 1);
-                            isInsideString =
-                                nextNewLineIndex === -1 ||
-                                nextNewLineIndex > nextQuoteMarkIndex;
+                        if (!lastControlChar || !nextText.includes(lastControlChar)) {
+                            isInsideString = !nextText.includes('\n');
                         }
                     }
                 }
