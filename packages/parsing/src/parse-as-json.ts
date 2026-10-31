@@ -1262,14 +1262,12 @@ export function parseAsJSON(text: string): ParsedResult {
                 if (literal === '') {
                     // the text ends partway through the literal, so its value is not
                     // yet known: leave it out (with its key) rather than guess at it
-                    const writtenText = newChars.join('');
-                    const keptText =
-                        controlChar === '}'
-                            ? dropLastKey(writtenText)
-                            : dropLastCommas(writtenText);
-                    // (the walk is done, so what is kept can be one item)
-                    newChars.length = 0;
-                    newChars.push(keptText);
+                    if (controlChar === '}') {
+                        const keptText = dropLastKey(newChars.join(''));
+                        // (the walk is done, so what is kept can be one item)
+                        newChars.length = 0;
+                        newChars.push(keptText);
+                    }
                     index = text.length;
                     break;
                 }
@@ -1435,8 +1433,9 @@ export function parseAsJSON(text: string): ParsedResult {
     }
 
     // a comma that the text ends on separates nothing, so every such comma is
-    // left out (the walk ends on one only after the end of the root value, where
-    // it keeps each comma that it reads)
+    // left out (the walk ends on one after the end of the root value, where it
+    // keeps each comma that it reads, and before a literal that an array ends
+    // partway through, which it leaves out)
     newText = dropLastCommas(newText);
 
     // close any remaining open structures in the reverse order that they were opened
