@@ -775,6 +775,25 @@ describe('@acusti/parsing', () => {
             }
         });
 
+        it('gets through a long run of commas after the root in good time', () => {
+            // (each takes a few milliseconds when the time grows with the length of
+            // the run, and several seconds when it grows with its square)
+            const cases: Array<[string, string]> = [
+                ['commas', ','.repeat(100_000)],
+                ['commas and spaces', ', '.repeat(50_000)],
+                ['commas and line breaks', ',\n'.repeat(50_000)],
+            ];
+            for (const [label, run] of cases) {
+                // the text ends on the run, or a note follows it
+                for (const text of [`{"a": 1,}${run}`, `{"a": 1,}${run}\nNote`]) {
+                    const start = performance.now();
+                    const result = parseAsJSON(text);
+                    expect(performance.now() - start, label).toBeLessThan(1000);
+                    expect(result.value, label).toEqual({ a: 1 });
+                }
+            }
+        });
+
         it('gets through a long array or object that needs a repair in good time', () => {
             // (each takes tens of milliseconds when the time grows with the length
             // of the text, and seconds when it grows with its square)
@@ -3826,6 +3845,32 @@ function trailingCommasTestCase() {
     // …and where more of them come before a note
     expect(parseAsJSON('{"a": "b",},,\nNote: done')).toEqual({
         postscript: 'Note: done',
+        preamble: '',
+        value: { a: 'b' },
+    });
+    expect(parseAsJSON('{"a": "b",},,,\nNote')).toEqual({
+        postscript: 'Note',
+        preamble: '',
+        value: { a: 'b' },
+    });
+    // …and all of them where the text ends on two or more, however they are
+    // spaced, after a preamble or in a code block too
+    expect(parseAsJSON('{"a": "b",},,')).toEqual({
+        postscript: '',
+        preamble: '',
+        value: { a: 'b' },
+    });
+    expect(parseAsJSON('{"a": 1,},, \n').value).toEqual({ a: 1 });
+    expect(parseAsJSON('{"a": 1,}, ,\n,,').value).toEqual({ a: 1 });
+    expect(parseAsJSON('["a", "b",],,,').value).toEqual(['a', 'b']);
+    expect(parseAsJSON('{"a: "b",},,').value).toEqual({ 'a: "b': '' });
+    expect(parseAsJSON('Here it is: {"a": "b",},,')).toEqual({
+        postscript: '',
+        preamble: 'Here it is:',
+        value: { a: 'b' },
+    });
+    expect(parseAsJSON('```json\n{"a": "b",},,,\n```\nDone')).toEqual({
+        postscript: 'Done',
         preamble: '',
         value: { a: 'b' },
     });
