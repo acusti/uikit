@@ -821,6 +821,22 @@ describe('@acusti/parsing', () => {
             }
         });
 
+        it('gets through a long string with unescaped quote marks in good time', () => {
+            // (each takes tens of milliseconds when the time grows with the length
+            // of the string, and seconds when it grows with its square)
+            const string = 'he said "hi" to me, '.repeat(80_000);
+            const cases: Array<[string, string, unknown]> = [
+                ['in an object', `{"a": "${string}", "b": 1}`, { a: string, b: 1 }],
+                ['in an array', `["${string}", 1,]`, [string, 1]],
+            ];
+            for (const [label, text, value] of cases) {
+                const start = performance.now();
+                const result = parseAsJSON(text);
+                expect(performance.now() - start, label).toBeLessThan(1000);
+                expect(result.value, label).toEqual(value);
+            }
+        });
+
         it('reads the JSON in a code block, whatever comes before the block', () => {
             const fence = '```';
             // code with an object in it, and then the answer in a code block, with
@@ -4010,4 +4026,14 @@ function unescapedDoubleQuotesTestCase() {
             ],
         },
     });
+    // a closing bracket between two of them ends the string only if it is the
+    // one that is due: a `]` in an object or a `}` in an array is part of it
+    expect(parseAsJSON('{"a": "see "x" [1] and "y" here", "b": 1}').value).toEqual({
+        a: 'see "x" [1] and "y" here',
+        b: 1,
+    });
+    expect(parseAsJSON('["see "x" {1} and "y" here", 2]').value).toEqual([
+        'see "x" {1} and "y" here',
+        2,
+    ]);
 }
