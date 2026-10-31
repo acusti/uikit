@@ -277,13 +277,14 @@ function dropUnfinishedEscape(text: string) {
     return text.slice(0, escape.index + escape[1].length - 1);
 }
 
-// Leaves out the whitespace that the text ends on, and a comma before it. (A
-// search for `/,?\s*$/` would try each index in turn, and so go through each
-// run of whitespace in the text from each of its indexes: its time would grow
-// with the square of the run’s length.)
-function dropLastComma(text: string) {
+// Leaves out the commas and the whitespace that the text ends on. (A search for
+// `/[,\s]*$/` would try each index in turn, and so go through each run of commas
+// and whitespace in the text from each of its indexes: its time would grow with
+// the square of the run’s length.)
+function dropLastCommas(text: string) {
     text = text.trimEnd();
-    return text.endsWith(',') ? text.slice(0, -1) : text;
+    while (text.endsWith(',')) text = text.slice(0, -1).trimEnd();
+    return text;
 }
 
 // adds each character of text to chars, as an item of its own
@@ -326,7 +327,7 @@ function indexOfStringStart(text: string, index: number) {
 // time would grow with the square of the run’s length.)
 function dropLastKey(text: string) {
     const quoteIndex = indexOfStringStart(text, text.lastIndexOf('"'));
-    LAST_KEY_REGEXP.lastIndex = dropLastComma(
+    LAST_KEY_REGEXP.lastIndex = dropLastCommas(
         text.slice(0, Math.max(quoteIndex, 0)),
     ).length;
     const key = LAST_KEY_REGEXP.exec(text);
@@ -1261,14 +1262,12 @@ export function parseAsJSON(text: string): ParsedResult {
                 if (literal === '') {
                     // the text ends partway through the literal, so its value is not
                     // yet known: leave it out (with its key) rather than guess at it
-                    const writtenText = newChars.join('');
-                    const keptText =
-                        controlChar === '}'
-                            ? dropLastKey(writtenText)
-                            : dropLastComma(writtenText);
-                    // (the walk is done, so what is kept can be one item)
-                    newChars.length = 0;
-                    newChars.push(keptText);
+                    if (controlChar === '}') {
+                        const keptText = dropLastKey(newChars.join(''));
+                        // (the walk is done, so what is kept can be one item)
+                        newChars.length = 0;
+                        newChars.push(keptText);
+                    }
                     index = text.length;
                     break;
                 }
@@ -1433,10 +1432,11 @@ export function parseAsJSON(text: string): ParsedResult {
         }
     }
 
-    // a comma that the text ends on separates nothing, so it is left out (the
-    // walk ends on one only after the end of the root value, where it keeps
-    // each comma that it reads: of two or more, only the last is left out)
-    newText = dropLastComma(newText);
+    // a comma that the text ends on separates nothing, so every such comma is
+    // left out (the walk ends on one after the end of the root value, where it
+    // keeps each comma that it reads, and before a literal that an array ends
+    // partway through, which it leaves out)
+    newText = dropLastCommas(newText);
 
     // close any remaining open structures in the reverse order that they were opened
     for (let stackIndex = stack.length - 1; stackIndex >= 0; stackIndex--) {

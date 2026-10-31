@@ -152,6 +152,10 @@ before it is the `preamble`, and what follows it is the `postscript`.
   a line ends the JSON too, and the key holds `''`. (Where a value is due,
   after a comma in an array or after a colon, a `true`, `false` or `null`
   is a value.)
+- Commas after the JSON’s closing bracket separate nothing: however many
+  there are, the `value` is the same (`{"a": "b",},,` is `{ a: 'b' }`). The
+  exception is a key after an object’s closing brace: after one comma it is
+  repaired, as above, and after two or more it is left in the `postscript`.
 - A second value in the text is left in the `postscript`. To read it, call
   `parseAsJSON` on the `postscript`.
 
