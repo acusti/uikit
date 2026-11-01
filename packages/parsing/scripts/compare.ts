@@ -30,6 +30,7 @@ const HARNESSES = [
     'fuzz-structural',
     'corpus',
     'code-block-in-string',
+    'fuzz-quote-marks',
     'fuzz-preamble',
     'differential',
     'readme',
