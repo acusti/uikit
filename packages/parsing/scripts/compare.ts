@@ -31,6 +31,7 @@ const HARNESSES = [
     'corpus',
     'code-block-in-string',
     'fuzz-preamble',
+    'fuzz-quote-marks',
     'differential',
     'readme',
 ];

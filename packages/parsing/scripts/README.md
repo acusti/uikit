@@ -74,6 +74,12 @@ or only the base's or the branch's.
 - `fuzz-preamble`: each input after a preamble (prose with braces, brackets
   or quoted words in it, code, a citation, a task list, a markdown table, a
   lone bracket), read whole and cut around where the JSON starts.
+- `fuzz-quote-marks`: each input with quote marks put in at up to four
+  places, as a model leaves them unescaped in a string (alone, in quoted
+  words, as an inches mark, and with a closing bracket, a line break, a
+  comma or a colon next to them). Half have a trailing comma put in too.
+  Each is read bare, in a code block, after a preamble and before a note:
+  whole, and cut around each thing that was put in and at 6 more lengths.
 
 These have a known answer. They count each text that either version reads
 wrong, and write a few of each kind to `<name>.jsonl`.
