@@ -1251,15 +1251,15 @@ export function parseAsJSON(text: string): ParsedResult {
                 const literal = readLiteral({ index, isEndDelimited, text });
                 if (literal === '') {
                     // the text ends partway through the literal, so its value is not
-                    // yet known: leave it out (with its key) rather than guess at it
-                    const writtenText = newChars.join('');
-                    const keptText =
-                        controlChar === '}'
-                            ? dropLastKey(writtenText)
-                            : dropLastComma(writtenText);
-                    // (the walk is done, so what is kept can be one item)
-                    newChars.length = 0;
-                    newChars.push(keptText);
+                    // yet known: leave it out rather than guess at it (in an object,
+                    // with its key; in an array, the comma before it is left out at
+                    // the end of the walk)
+                    if (controlChar === '}') {
+                        const keptText = dropLastKey(newChars.join(''));
+                        // (the walk is done, so what is kept can be one item)
+                        newChars.length = 0;
+                        newChars.push(keptText);
+                    }
                     index = text.length;
                     break;
                 }
@@ -1424,9 +1424,11 @@ export function parseAsJSON(text: string): ParsedResult {
         }
     }
 
-    // a comma that the text ends on separates nothing, so it is left out (the
-    // walk ends on one only after the end of the root value, where it keeps
-    // each comma that it reads: of two or more, only the last is left out)
+    // a comma that the text ends on separates nothing, so it is left out. The
+    // walk ends on one only after the end of the root value, where it keeps each
+    // comma that it reads (of two or more, only the last is left out), and in an
+    // array, before a literal that the text ends partway through (where the walk
+    // stops, and leaves the literal out).
     newText = dropLastComma(newText);
 
     // close any remaining open structures in the reverse order that they were opened
