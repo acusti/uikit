@@ -1,7 +1,7 @@
 // @vitest-environment happy-dom
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { createRef, useState } from 'react';
+import { Activity, createRef, Suspense, use, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import type { Props } from './InputText.js';
@@ -122,6 +122,99 @@ describe('InputText.tsx', () => {
         expect(input.value).toBe('abc');
         await user.keyboard('{Escape}');
         expect(input.value).toBe('ab');
+    });
+
+    // Re-showing an Activity re-runs the effect that applies initialValue
+    // without initialValue having changed
+    describe('hidden and shown again by an Activity', () => {
+        function ActivityInputText({
+            mode,
+            ...props
+        }: Props & { mode: 'hidden' | 'visible' }) {
+            return (
+                <Activity mode={mode}>
+                    <InputText {...props} />
+                </Activity>
+            );
+        }
+
+        it('keeps what was typed', () => {
+            const { rerender } = render(
+                <ActivityInputText initialValue="saved" mode="visible" />,
+            );
+            const input = screen.getByRole('textbox') as HTMLInputElement;
+
+            fireEvent.change(input, { target: { value: 'saved + draft' } });
+            rerender(<ActivityInputText initialValue="saved" mode="hidden" />);
+            rerender(<ActivityInputText initialValue="saved" mode="visible" />);
+            expect(input.value).toBe('saved + draft');
+        });
+
+        it('still resets on Escape with discardOnEscape to the value it had when it was last blurred', async () => {
+            const user = userEvent.setup();
+            const { rerender } = render(
+                <ActivityInputText discardOnEscape initialValue="saved" mode="visible" />,
+            );
+            const input = screen.getByRole('textbox') as HTMLInputElement;
+
+            await user.type(input, ' + note');
+            await user.tab();
+            rerender(
+                <ActivityInputText discardOnEscape initialValue="saved" mode="hidden" />,
+            );
+            rerender(
+                <ActivityInputText discardOnEscape initialValue="saved" mode="visible" />,
+            );
+            await user.type(input, ' + draft');
+            await user.keyboard('{Escape}');
+            expect(input.value).toBe('saved + note');
+        });
+
+        it('applies an initialValue that changed while it was hidden', () => {
+            const { rerender } = render(
+                <ActivityInputText initialValue="saved" mode="visible" />,
+            );
+            const input = screen.getByRole('textbox') as HTMLInputElement;
+
+            fireEvent.change(input, { target: { value: 'saved + draft' } });
+            rerender(<ActivityInputText initialValue="saved" mode="hidden" />);
+            rerender(<ActivityInputText initialValue="" mode="hidden" />);
+            rerender(<ActivityInputText initialValue="" mode="visible" />);
+            expect(input.value).toBe('');
+        });
+    });
+
+    // React re-runs a layout effect when a Suspense boundary shows its content
+    // again after showing its fallback for an update that suspended
+    it('keeps what was typed when a Suspense boundary shows its fallback and then its content again', async () => {
+        const { promise, resolve } = Promise.withResolvers<null>();
+        function Suspender({ suspend }: { suspend: boolean }) {
+            if (suspend) use(promise);
+            return null;
+        }
+        function SuspenseInputText({ suspend }: { suspend: boolean }) {
+            return (
+                <Suspense fallback={<p>Loading</p>}>
+                    <InputText initialValue="saved" />
+                    <Suspender suspend={suspend} />
+                </Suspense>
+            );
+        }
+        const { rerender } = render(<SuspenseInputText suspend={false} />);
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+
+        fireEvent.change(input, { target: { value: 'saved + draft' } });
+        // not a transition, so the boundary shows its fallback
+        await act(async () => {
+            rerender(<SuspenseInputText suspend />);
+        });
+        expect(screen.getByText('Loading')).toBeTruthy();
+        await act(async () => {
+            resolve(null);
+            await promise;
+        });
+        expect(screen.queryByText('Loading')).toBeNull();
+        expect(input.value).toBe('saved + draft');
     });
 
     it('supports rendering multi-line inputs as a <textarea>', async () => {
