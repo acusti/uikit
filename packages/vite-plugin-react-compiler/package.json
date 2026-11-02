@@ -44,7 +44,7 @@
         "oxc-transform-react": "0.156.0"
     },
     "devDependencies": {
-        "@types/node": "^26.1.0",
+        "@types/node": "^26.6.6",
         "typescript": "^7",
         "vite": "^8",
         "vitest": "^5"
