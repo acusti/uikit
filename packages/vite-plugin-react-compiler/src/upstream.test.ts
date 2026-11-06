@@ -931,4 +931,29 @@ export function useDebouncedCallback<A extends unknown[]>(fn: (...args: A) => vo
         );
         expect(result?.code).toContain('react/compiler-runtime');
     });
+
+    // a component that increments a variable a closure captures, like a
+    // count of selected items that an onClick callback reads, was left
+    // uncompiled (“Handle UpdateExpression to variables captured within
+    // lambdas”), as babel-plugin-react-compiler@1.0.0 leaves it. Compiled
+    // upstream since 0.157.0 (https://github.com/oxc-project/oxc/pull/26893)
+    it('compiles an increment of a variable a closure captures, which the Babel plugin bails on', async () => {
+        const result = await transformCode(
+            `
+type Item = { id: string; selected: boolean };
+
+export function CheckoutButton({ items, onCheckout }: { items: Item[]; onCheckout: (count: number) => void }) {
+    let count = 0;
+    for (const item of items) {
+        if (item.selected) count++;
+    }
+    return <button onClick={() => onCheckout(count)}>Checkout ({count})</button>;
+}
+`,
+            '/src/CheckoutButton.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('count++');
+        expect(result?.code).toMatch(/\$\[\d+\] !== count\b/);
+    });
 });
