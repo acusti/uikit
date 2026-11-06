@@ -1041,7 +1041,13 @@ function indexOfFencedStart({
     return fenceIndex === -1 ? -1 : indexOfBlockJSON({ fenceIndex, search, text });
 }
 
-const CONTROL_TOKENS_REGEXP = /(^<\|im_start\|>|<\|im_end\|>$)/;
+// the ChatML tokens that a raw completion from a model in the Qwen family may
+// start with and ends with, and the whitespace around them; after the start
+// token, the role on its line (or as much of it as the text has so far, so that
+// a stream’s preamble holds none of it), which is a word in lowercase, as
+// ChatML’s roles are (so that a first line such as `References` or `5` after
+// the token alone is left in the text)
+const CONTROL_TOKENS_REGEXP = /^\s*<\|im_start\|>(?:[a-z]*(?:\n|$))?|<\|im_end\|>\s*$/g;
 
 // the backslashes that a text ends on, or that precede the unicode escape it
 // ends partway through

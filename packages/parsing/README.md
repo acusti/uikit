@@ -154,6 +154,15 @@ before it is the `preamble`, and what follows it is the `postscript`.
   is a value.)
 - A second value in the text is left in the `postscript`. To read it, call
   `parseAsJSON` on the `postscript`.
+- A raw completion from a model that uses ChatML (such as Qwen) ends with
+  `<|im_end|>`, and may start with `<|im_start|>` and the role, a word in
+  lowercase on a line of its own (`assistant`). Those are left out, and are
+  not part of the `preamble` or the `postscript`. The end token shows that
+  the text is whole, as a line break at its end does (see
+  [Reading a response as it streams in](#reading-a-response-as-it-streams-in)),
+  so a number right before the token is read. A token anywhere else in the
+  text, such as in one of the JSON’s strings, is kept as it is, and so is
+  one that the text ends partway through.
 
 ````js
 parseAsJSON(
@@ -199,6 +208,15 @@ parseAsJSON('{"tags": ["pasta", "salad"\nHope this helps!');
     preamble: '',
     value: { tags: ['pasta', 'salad'] },
     postscript: 'Hope this helps!',
+}
+*/
+
+parseAsJSON('<|im_start|>assistant\n{"a": "b"}<|im_end|>');
+/* results in:
+{
+    preamble: '',
+    value: { a: 'b' },
+    postscript: '',
 }
 */
 ````

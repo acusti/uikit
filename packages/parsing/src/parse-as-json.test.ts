@@ -1191,6 +1191,90 @@ describe('@acusti/parsing', () => {
             });
         });
 
+        it('leaves out the ChatML tokens that a raw completion starts and ends with', () => {
+            const readAs = (value: unknown, preamble = '') => ({
+                postscript: '',
+                preamble,
+                value,
+            });
+            // the end token alone, or with whitespace after it or before it
+            expect(parseAsJSON('{"a": "b"}<|im_end|>')).toEqual(readAs({ a: 'b' }));
+            expect(parseAsJSON('{"a": "b"}<|im_end|>\n')).toEqual(readAs({ a: 'b' }));
+            expect(parseAsJSON('{"a": "b"}\n<|im_end|>\n')).toEqual(readAs({ a: 'b' }));
+            // both tokens, with or without the role on its line after the first
+            expect(parseAsJSON('<|im_start|>{"a": "b"}<|im_end|>')).toEqual(
+                readAs({ a: 'b' }),
+            );
+            expect(parseAsJSON('\n<|im_start|>assistant\n{"a": "b"}<|im_end|>')).toEqual(
+                readAs({ a: 'b' }),
+            );
+            expect(parseAsJSON('<|im_start|>assistant\n{"a": "b"}<|im_end|>')).toEqual(
+                readAs({ a: 'b' }),
+            );
+            expect(
+                parseAsJSON('<|im_start|>assistant\n\n[{"a": "b"}]\n<|im_end|>\n'),
+            ).toEqual(readAs([{ a: 'b' }]));
+            // a role is a word in lowercase, so a first line that is not one is
+            // the preamble
+            expect(parseAsJSON('<|im_start|>Answer\n{"a": "b"}<|im_end|>')).toEqual(
+                readAs({ a: 'b' }, 'Answer'),
+            );
+            expect(parseAsJSON('<|im_start|>here you go\n{"a": "b"}<|im_end|>')).toEqual(
+                readAs({ a: 'b' }, 'here you go'),
+            );
+            // a preamble after the role, and a code block
+            expect(
+                parseAsJSON(
+                    '<|im_start|>assistant\nHere it is:\n```json\n{"a": "b"}\n```<|im_end|>',
+                ),
+            ).toEqual(readAs({ a: 'b' }, 'Here it is:'));
+            // a postscript before the end token
+            expect(
+                parseAsJSON(
+                    '<|im_start|>assistant\n{"a": "b"}\nHope this helps!<|im_end|>',
+                ),
+            ).toEqual({
+                postscript: 'Hope this helps!',
+                preamble: '',
+                value: { a: 'b' },
+            });
+            // the end token shows that a number that comes before it is whole
+            expect(
+                parseAsJSON(
+                    '<|im_start|>assistant\n{"a": "b", "rating": 4.5<|im_end|>\n',
+                ),
+            ).toEqual(readAs({ a: 'b', rating: 4.5 }));
+            // as the text streams in, the role is left out before its line is whole
+            expect(parseAsJSON('<|im_start|>')).toEqual(readAs(null));
+            expect(parseAsJSON('<|im_start|>assist')).toEqual(readAs(null));
+            expect(parseAsJSON('<|im_start|>assistant\n')).toEqual(readAs(null));
+            expect(parseAsJSON('<|im_start|>assistant\n{"a": "b", "c": "Our St')).toEqual(
+                readAs({ a: 'b', c: 'Our St' }),
+            );
+            // a token that the text ends partway through is kept until it is whole
+            expect(parseAsJSON('{"a": "b"}<|im_e')).toEqual({
+                postscript: '<|im_e',
+                preamble: '',
+                value: { a: 'b' },
+            });
+            // a token in one of the JSON’s strings is part of the string
+            expect(
+                parseAsJSON(
+                    '<|im_start|>assistant\n{"tokens": ["<|im_start|>user\\n", "<|im_end|>"]}<|im_end|>',
+                ),
+            ).toEqual(readAs({ tokens: ['<|im_start|>user\n', '<|im_end|>'] }));
+            // …and one in the preamble or the postscript is part of it
+            expect(
+                parseAsJSON(
+                    '<|im_start|>assistant\nIt ends on <|im_end|>, so:\n{"a": "b"}\n<|im_start|>user\nThanks!<|im_end|>\n',
+                ),
+            ).toEqual({
+                postscript: '<|im_start|>user\nThanks!',
+                preamble: 'It ends on <|im_end|>, so:',
+                value: { a: 'b' },
+            });
+        });
+
         describe('with a text that is JSON as far as it goes', () => {
             it('reads it whatever its spacing', () => {
                 // as it does a text that is whole
