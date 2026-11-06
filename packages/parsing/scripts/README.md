@@ -132,8 +132,23 @@ wrong, and write a few of each kind to `<name>.jsonl`.
   the token alone, a text whose first line, whole or as far as it goes, is
   one word in lowercase, which is read as the role (a cost), counted in a
   note.
+- `thinking-reasoning`: the answer after a thinking model’s reasoning reads
+  as it does alone, with the reasoning as written at the front of its
+  `preamble`. Each recorded test input is written after a `<think>` block
+  (on lines of its own or on one line, with a blank line, a line break or
+  nothing after it), and after reasoning that ends with a `</think>` on a
+  line of its own and has no `<think>`. The reasoning has a draft of the
+  JSON in it (on a line of its own, partway through a line, in a code
+  block, or another test input), prose with brackets, or nothing. Each is
+  read whole, and cut at every length of the input. A `<think>` block cut
+  before its end reads as `null`, with the text as its `preamble`. Its rows
+  that end in “as base reads it” have no known answer, and are right where
+  the branch reads the text as the base does: reasoning before its
+  `</think>` has arrived where there is no `<think>`, and a `<think>` block
+  after the input. Inputs with `<|im_start|>` in them are left out, since a
+  raw completion has its ChatML tokens around the reasoning, not in it.
 
-The first six fail where the branch reads a text wrong that the base read
+The first seven fail where the branch reads a text wrong that the base read
 right. Some of their rows are wrong in both versions by design (costs that
 a release accepted, named `COST`, and known gaps, named `OPEN`). A change
 in them is counted (`changed`, or `fixed`) but does not fail. The values
