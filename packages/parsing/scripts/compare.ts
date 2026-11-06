@@ -27,6 +27,7 @@ const HARNESSES = [
     'code-block-after',
     'root-before-answer',
     'spacing',
+    'chatml-tokens',
     'fuzz-structural',
     'corpus',
     'code-block-in-string',
