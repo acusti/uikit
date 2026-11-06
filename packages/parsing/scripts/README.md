@@ -130,8 +130,10 @@ wrong, and write a few of each kind to `<name>.jsonl`.
   postscript with none is left out, as it is from any text). Left out: an
   input that starts or ends with a token (it would have two), and, after
   the token alone, a text whose first line, whole or as far as it goes, is
-  one word in lowercase, which is read as the role (a cost), counted in a
-  note.
+  one word in lowercase, which is read as the role (a cost), and a cut in
+  the end token after an input whose whole value is a string, a number or a
+  literal (read only where nothing follows it, so the cut has no value to
+  compare with), each counted in a note.
 - `thinking-reasoning`: the answer after a thinking model’s reasoning reads
   as it does alone, with the reasoning as written at the front of its
   `preamble`. Each recorded test input is written after a `<think>` block
