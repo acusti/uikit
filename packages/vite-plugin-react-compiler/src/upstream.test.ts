@@ -592,4 +592,488 @@ export function Row({ id, label, onSelect }: { id: string; label: string; onSele
         );
         expect(extra).toContain('useCallback(');
     });
+
+    // a memo block that clamps a prop in place, as below, stored the
+    // clamped value as its cache key, so a later render whose prop equaled
+    // it reused the earlier output: a quantity of 3 after a quantity of 5
+    // (with 3 in stock) still read “Only 3 in stock”. A prop defaulted by
+    // reassignment (`title = title ?? …`) missed the cache on every render
+    // instead. babel-plugin-react-compiler@1.0.0 keys it the same way.
+    // Keyed on the value from before the block upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27420)
+    it('keys a memo block that reassigns a prop on its value before the block', async () => {
+        const result = await transformCode(
+            `
+export function CartQuantity({ quantity, stock }: { quantity: number; stock: number }) {
+    const notes: string[] = [];
+    if (quantity > stock) {
+        notes.push(\`Only \${stock} in stock\`);
+        quantity = stock;
+    }
+    return (
+        <p>
+            Qty {quantity} {notes.join(' ')}
+        </p>
+    );
+}
+`,
+            '/src/CartQuantity.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        // the key is a copy of quantity taken before the block clamps it
+        expect(result?.code).toMatch(
+            /const (\w+) = quantity;[^]*?if \([^)]*\$\[\d+\] !== \1\b/,
+        );
+    });
+
+    // a variable declared before a memo block and reassigned in a loop
+    // inside it wasn't restored from the cache when the block was skipped,
+    // so it kept its initial value from the second render with the same
+    // props on: below, the link pointed at “#” instead of the first invalid
+    // field; babel-plugin-react-compiler@1.0.0 does the same. Restored
+    // upstream since 0.157.0 (https://github.com/oxc-project/oxc/issues/27421)
+    it('restores a variable a memo block reassigns in a loop', async () => {
+        const result = await transformCode(
+            `
+type Field = { name: string; error?: string };
+
+export function FormErrors({ fields }: { fields: Field[] }) {
+    let firstInvalid = '';
+    const errors: string[] = [];
+    for (const field of fields) {
+        if (field.error) {
+            firstInvalid = field.name;
+            break;
+        }
+    }
+    for (const field of fields) {
+        if (field.error) errors.push(field.error);
+    }
+    return (
+        <div>
+            <a href={\`#\${firstInvalid}\`}>Go to first error</a>
+            <p>{errors.join(' ')}</p>
+        </div>
+    );
+}
+`,
+            '/src/FormErrors.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toMatch(/\bfirstInvalid = \$\[\d+\];/);
+    });
+
+    // a value assigned in a branch on a prop was treated as a constant when
+    // that branch also returned early on a condition that isn't reactive
+    // (a feature flag, `typeof window`), so the element built from it was
+    // cached once per mount: below, the status kept saying “Saving” after
+    // saving finished; babel-plugin-react-compiler@1.0.0 caches it the same
+    // way. Recomputed upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27418)
+    it('recomputes a value a branch on a prop assigns after an early return', async () => {
+        const result = await transformCode(
+            `
+import { features } from './features';
+
+export function SaveStatus({ isSaving }: { isSaving: boolean }) {
+    let label = 'All changes saved';
+    if (isSaving) {
+        if (!features.saveIndicator) return null;
+        label = 'Saving';
+    }
+    return <span role="status">{label}</span>;
+}
+`,
+            '/src/SaveStatus.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toMatch(/\$\[\d+\] !== label\b/);
+        expect(result?.code).not.toContain('react.memo_cache_sentinel');
+    });
+
+    // an allocation inside a useMemo result that depends on nothing, like
+    // the Set below, was cached once per mount, so the result was rebuilt
+    // when its dependencies changed but kept sharing the first Set: after
+    // the page changed, impressions on the new page were never tracked;
+    // babel-plugin-react-compiler@1.0.0 caches it the same way. Recreated
+    // with the result upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27427)
+    it('recreates an allocation in a useMemo result when its dependencies change', async () => {
+        const result = await transformCode(
+            `
+import { useMemo } from 'react';
+
+export function useImpressions(page: string, track: (page: string, id: string) => void) {
+    const session = useMemo(() => ({ page, seen: new Set<string>() }), [page]);
+    return (id: string) => {
+        if (session.seen.has(id)) return;
+        session.seen.add(id);
+        track(session.page, id);
+    };
+}
+`,
+            '/src/useImpressions.ts',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('seen: new Set()');
+        expect(result?.code).not.toContain('react.memo_cache_sentinel');
+    });
+
+    // a value that is only compared and passed to a state setter during
+    // render, as in the “adjust state when a prop changes” pattern below,
+    // lost its memoization, so a new object every render never equaled the
+    // stored one and the component crashed with “Too many re-renders”;
+    // babel-plugin-react-compiler@1.0.0 compiles it the same way. Memoized
+    // upstream since 0.157.0 (https://github.com/oxc-project/oxc/issues/27426)
+    it('memoizes a value passed to a state setter during render', async () => {
+        const result = await transformCode(
+            `
+import { useMemo, useState } from 'react';
+
+type Filters = { query: string; status: string };
+
+export function Pager({ query, status }: Filters) {
+    const filters = useMemo(() => ({ query, status }), [query, status]);
+    const [prevFilters, setPrevFilters] = useState<Filters | null>(null);
+    const [page, setPage] = useState(1);
+    if (filters !== prevFilters) {
+        setPrevFilters(filters);
+        setPage(1);
+    }
+    return <button onClick={() => setPage(page + 1)}>Page {page}</button>;
+}
+`,
+            '/src/Pager.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).not.toContain('const filters = {');
+        expect(result?.code).toMatch(/\$\[\d+\] !== query \|\| \$\[\d+\] !== status\)/);
+    });
+
+    // a callback reading `ref.current`, when the compiler can’t tell the
+    // value is a ref (a ref prop with a fallback, `boxRef ?? ownRef`), was
+    // cached against `ref.current.offsetWidth`, a guard that reads the ref
+    // during render, so the component threw on its first render, before the
+    // ref was attached; babel-plugin-react-compiler@1.0.0 guards it the same
+    // way. Cached against the ref upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27423)
+    it('caches a callback reading ref.current against the ref', async () => {
+        const result = await transformCode(
+            `
+import { useLayoutEffect, useRef, type RefObject } from 'react';
+
+export function MeasuredBox({
+    boxRef,
+    onMeasure,
+}: {
+    boxRef?: RefObject<HTMLDivElement | null>;
+    onMeasure: (width: number) => void;
+}) {
+    const ownRef = useRef<HTMLDivElement>(null);
+    const ref = boxRef ?? ownRef;
+    useLayoutEffect(() => {
+        onMeasure(ref.current!.offsetWidth);
+    }, [ref, onMeasure]);
+    return <div ref={ref} />;
+}
+`,
+            '/src/MeasuredBox.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('onMeasure(ref.current.offsetWidth)');
+        expect(result?.code).not.toContain('!== ref.current');
+    });
+
+    // a property read inside a JSX callback was hoisted into the cache
+    // guard, which runs during render, so a component threw (“Cannot read
+    // properties of null”) as soon as the object was null, even though the
+    // callback, behind a disabled button, never ran;
+    // babel-plugin-react-compiler@1.0.0 guards it the same way. Cached
+    // against the object upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27070)
+    it('caches a JSX callback against the object it reads from', async () => {
+        const result = await transformCode(
+            `
+type User = { id: string; name: string };
+
+export function FollowButton({ user, onFollow }: { user: User | null; onFollow: (id: string) => void }) {
+    return (
+        <button disabled={!user} onClick={() => onFollow(user!.id)}>
+            Follow
+        </button>
+    );
+}
+`,
+            '/src/FollowButton.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toMatch(/\$\[\d+\] !== user\b(?!\.)/);
+        expect(result?.code).not.toContain('!== user.id');
+    });
+
+    // a postfix increment of a property, like an id counter in a ref,
+    // was compiled to `ref.current = ref.current + 1` followed by a read of
+    // the new value, so `nextId.current++` handed out 1, 2, … instead of
+    // 0, 1, …, and a bigint counter threw (“Cannot mix BigInt and other
+    // types”); babel-plugin-react-compiler@1.0.0 compiles it the same way.
+    // Kept as an increment of the old value upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27424)
+    it('returns the old value from a postfix increment of a property', async () => {
+        const result = await transformCode(
+            `
+import { useRef, useState } from 'react';
+
+export function TodoList() {
+    const nextId = useRef(0);
+    const [todos, setTodos] = useState<Array<{ id: number; text: string }>>([]);
+    const addTodo = () => {
+        const id = nextId.current++;
+        setTodos((todos) => [...todos, { id, text: \`Todo \${id}\` }]);
+    };
+    return (
+        <>
+            <button onClick={addTodo}>Add</button>
+            <ul>
+                {todos.map((todo) => (
+                    <li key={todo.id}>{todo.text}</li>
+                ))}
+            </ul>
+        </>
+    );
+}
+`,
+            '/src/TodoList.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toMatch(
+            /let (\w+) = nextId\.current;\s+const (\w+) = \1\+\+;\s+nextId\.current = \1;\s+const id = \2;/,
+        );
+    });
+
+    // every BigInt literal in a compiled component or hook was printed as
+    // `undefined`, so arithmetic on it threw (“Cannot mix BigInt and other
+    // types”) and `useRef(0n)` started out undefined;
+    // babel-plugin-react-compiler@1.0.0 leaves such a function uncompiled
+    // (“Handle BigIntLiteral expressions”). Kept upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/26161)
+    it('keeps BigInt literals in compiled functions', async () => {
+        const result = await transformCode(
+            `
+export function Duration({ nanoseconds }: { nanoseconds: bigint }) {
+    const milliseconds = (nanoseconds + 500000n) / 1000000n;
+    return <span>{milliseconds.toString()} ms</span>;
+}
+`,
+            '/src/Duration.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('(nanoseconds + 500000n) / 1000000n');
+    });
+
+    // a component defined inside a factory function had a callback that
+    // only uses the factory’s arguments hoisted to a module-level
+    // function, outside their scope, so it threw “renderItem is not
+    // defined” on its first render; babel-plugin-react-compiler@1.0.0
+    // hoists it the same way. Kept in scope upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/26519)
+    it('keeps a callback using a factory’s arguments inside the factory', async () => {
+        const result = await transformCode(
+            `
+import type { ReactNode } from 'react';
+
+export function createList<T>(getKey: (item: T) => string, renderItem: (item: T) => ReactNode) {
+    const List = ({ items }: { items: T[] }) => (
+        <ul>
+            {items.map((item) => (
+                <li key={getKey(item)}>{renderItem(item)}</li>
+            ))}
+        </ul>
+    );
+    return List;
+}
+`,
+            '/src/createList.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain(
+            '(item) => <li key={getKey(item)}>{renderItem(item)}</li>',
+        );
+        expect(result?.code).not.toMatch(/function _temp\d*\(/);
+    });
+
+    // a hook whose memoized callbacks read the same ref in different places,
+    // with one stored as a property of the other, like a debounced callback
+    // with a cancel method, was left uncompiled (“Ref type environment did
+    // not converge”); babel-plugin-react-compiler@1.0.0 compiles it.
+    // Compiled upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/26181)
+    it('compiles a hook whose callbacks read a ref in different places', async () => {
+        const result = await transformCode(
+            `
+import { useMemo, useRef } from 'react';
+
+export function useDebouncedCallback<A extends unknown[]>(fn: (...args: A) => void, delay: number) {
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    return useMemo(() => {
+        const cancel = () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+        const debounced = (...args: A) => {
+            cancel();
+            timeoutRef.current = setTimeout(() => fn(...args), delay);
+        };
+        debounced.cancel = cancel;
+        return debounced;
+    }, [fn, delay]);
+}
+`,
+            '/src/useDebouncedCallback.ts',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
+
+    // a component that increments a variable a closure captures, like a
+    // count of selected items that an onClick callback reads, was left
+    // uncompiled (“Handle UpdateExpression to variables captured within
+    // lambdas”), as babel-plugin-react-compiler@1.0.0 leaves it. Compiled
+    // upstream since 0.157.0 (https://github.com/oxc-project/oxc/pull/26893)
+    it('compiles an increment of a variable a closure captures, which the Babel plugin bails on', async () => {
+        const result = await transformCode(
+            `
+type Item = { id: string; selected: boolean };
+
+export function CheckoutButton({ items, onCheckout }: { items: Item[]; onCheckout: (count: number) => void }) {
+    let count = 0;
+    for (const item of items) {
+        if (item.selected) count++;
+    }
+    return <button onClick={() => onCheckout(count)}>Checkout ({count})</button>;
+}
+`,
+            '/src/CheckoutButton.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('count++');
+        expect(result?.code).toMatch(/\$\[\d+\] !== count\b/);
+    });
+
+    // a callback passing an item to a handler that mutates a global, below
+    // `window.location.hash`, was treated as calling the handler during
+    // render, so the component was left uncompiled (“This value cannot be
+    // modified”), as babel-plugin-react-compiler@1.0.0 leaves it. Compiled
+    // upstream since 0.157.0 (https://github.com/oxc-project/oxc/issues/27309)
+    it('compiles a callback that passes an item to a handler mutating a global, which the Babel plugin bails on', async () => {
+        const result = await transformCode(
+            `
+type Item = { id: string; label: string };
+
+export function Menu({ items }: { items: Item[] }) {
+    function handleClick(id: string) {
+        window.location.hash = id;
+    }
+    return (
+        <ul>
+            {items.map((item) => (
+                <li key={item.id} onClick={() => handleClick(item.id)}>
+                    {item.label}
+                </li>
+            ))}
+        </ul>
+    );
+}
+`,
+            '/src/Menu.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
+
+    // a TypeScript assertion on that allocation (`[] as string[]`) still
+    // hides it from the fix above: the array is cached once per mount and
+    // shared by every result, so impressions on a new page are never
+    // tracked; babel-plugin-react-compiler@1.0.0 caches it the same way
+    it.fails('recreates an asserted allocation in a useMemo result when its dependencies change', async () => {
+        const result = await transformCode(
+            `
+import { useMemo } from 'react';
+
+export function useImpressions(page: string, track: (page: string, id: string) => void) {
+    const session = useMemo(() => ({ page, seen: [] as string[] }), [page]);
+    return (id: string) => {
+        if (session.seen.includes(id)) return;
+        session.seen.push(id);
+        track(session.page, id);
+    };
+}
+`,
+            '/src/useImpressions.ts',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).not.toContain('react.memo_cache_sentinel');
+    });
+
+    // a component in which a function returns the result of passing a
+    // callback that reassigns one of the function’s parameters or locals,
+    // like the loader below, is left uncompiled (“Cannot reassign variable
+    // after render completes”) since 0.157.0
+    // (https://github.com/oxc-project/oxc/pull/26893), which also fails the
+    // build with panicThreshold set to 'critical_errors' or 'all_errors'.
+    // Each call to load has its own `rows`, so memoizing load is safe, and
+    // 0.156.0 and babel-plugin-react-compiler@1.0.0 compile it. Upstream
+    // limited the check to bindings declared in the component or hook
+    // after 0.157.0 (https://github.com/oxc-project/oxc/pull/28820, fixing
+    // https://github.com/oxc-project/oxc/issues/28401), which should turn
+    // this test red
+    it.fails('compiles a function returning a promise whose callback reassigns its parameter', async () => {
+        const result = await transformCode(
+            `
+declare function fetchPage(page: number): Promise<string[]>;
+
+export function LoadAll({ onLoaded }: { onLoaded: (rows: string[]) => void }) {
+    const load = (page: number, rows: string[]) =>
+        fetchPage(page).then((next) => {
+            rows = rows.concat(next);
+            if (next.length === 0) onLoaded(rows);
+            else load(page + 1, rows);
+        });
+    return <button onClick={() => load(0, [])}>Load all</button>;
+}
+`,
+            '/src/LoadAll.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
+
+    // a hook or component in which an async function reassigns a variable
+    // declared in another callback, like an effect that stores a
+    // connection from an async IIFE for its cleanup, is left uncompiled
+    // (“Cannot reassign variable in async function”) since 0.157.0
+    // (https://github.com/oxc-project/oxc/pull/26893), which also fails the
+    // build with panicThreshold set to 'critical_errors' or 'all_errors'.
+    // The variable belongs to one run of the effect, so compiling it is
+    // safe, and 0.156.0 and babel-plugin-react-compiler@1.0.0 compile it.
+    // Reported upstream as https://github.com/oxc-project/oxc/issues/28401
+    // and fixed after 0.157.0 by
+    // https://github.com/oxc-project/oxc/pull/28820, which should turn this
+    // test red
+    it.fails('compiles an effect whose async callback reassigns an effect local', async () => {
+        const result = await transformCode(
+            `
+import { useEffect } from 'react';
+
+declare function connect(url: string): Promise<{ close(): void }>;
+
+export function useSocket(url: string) {
+    useEffect(() => {
+        let socket: { close(): void } | undefined;
+        (async () => {
+            socket = await connect(url);
+        })();
+        return () => socket?.close();
+    }, [url]);
+}
+`,
+            '/src/useSocket.ts',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
 });
