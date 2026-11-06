@@ -16,7 +16,10 @@
 // any text). An input that starts or ends with a token is left out (the tests
 // have a few), since it would be read with two. So is a text after the start
 // token alone whose first line, whole or as far as it goes, is one word in
-// lowercase, which is read as the role (a cost).
+// lowercase, which is read as the role (a cost). So is a cut partway through
+// the end token after a text whose whole value is a string, number or literal
+// in either version: such a value is read only where nothing follows it, so the
+// cut has no value to compare with.
 import path from 'node:path';
 
 import {
@@ -66,6 +69,7 @@ const versions = [
 ] as const;
 
 const { check, getFailures, rows, samples } = createKnownAnswers(run);
+let scalarCuts = 0;
 let roleLike = 0;
 // the text is read as expected, so its preamble and postscript hold the tokens
 // that the expected reading’s do, and no others
@@ -124,6 +128,10 @@ for (const text of texts) {
                 expected,
             );
     }
+    // a string, number or literal, which nothing can follow
+    const isScalar = [...wholeValue.values()].some((value) =>
+        /^(?:["\d-]|true|false)/.test(value),
+    );
     for (const { endings, label, start } of STARTS) {
         // (one text left out for each length that the ending is cut at)
         if (start === START && isTakenForRole(text)) {
@@ -137,6 +145,8 @@ for (const text of texts) {
                 const rest = ending.slice(0, end).trim();
                 if (rest === '' || rest === END) {
                     checkReading(`${kind}cut at or after the end of ${name}`, cut, whole);
+                } else if (isScalar) {
+                    scalarCuts++;
                 } else {
                     checkPart(
                         `OPEN: ${kind}cut in the end token of ${name}`,
@@ -157,6 +167,7 @@ report(dir, {
     notes: [
         `${texts.length} texts (${WITH_TOKENS.length} with a token in them)`,
         `${roleLike} texts left out (each a whole text or a cut of one): after the start token alone, a first line that is one word in lowercase, whole or as far as it goes (read as the role)`,
+        `${scalarCuts} cuts in the end token left out: after a text whose whole value is a string, number or literal`,
     ],
     rows,
     title: 'A raw completion with ChatML tokens reads as the text without them',
