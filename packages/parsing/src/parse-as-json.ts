@@ -621,8 +621,8 @@ function parseWholeJSON(text: string) {
 const hasTextContent = (text: string) => /\w/.test(text);
 
 // LLMs often demarcate the JSON part of the response with ``` or ```json
-const cleanThinkingText = (preamble: string) =>
-    preamble
+const withoutFenceLine = (text: string) =>
+    text
         .trim()
         .replace(/^```(?:[a-z0-9]{1,9})?$/im, '')
         .trim();
@@ -630,7 +630,7 @@ const cleanThinkingText = (preamble: string) =>
 // what follows the JSON is the postscript, less a comma that it starts with,
 // unless it has no content
 const toPostscript = (rest: string) =>
-    hasTextContent(rest) ? cleanThinkingText(rest.replace(/^\s*,/, '')) : '';
+    hasTextContent(rest) ? withoutFenceLine(rest.replace(/^\s*,/, '')) : '';
 
 const FENCED_CODE_BLOCK_REGEXP =
     /^([ \t]*)```(?:[a-z0-9_-]{1,20})?[ \t]*\n([\s\S]*?)\n\1```[ \t]*$/i;
@@ -1049,6 +1049,14 @@ function indexOfFencedStart({
 // the token alone is left in the text)
 const CONTROL_TOKENS_REGEXP = /^\s*<\|im_start\|>(?:[a-z]*(?:\n|$))?|<\|im_end\|>\s*$/g;
 
+// A thinking model’s reasoning (Qwen3, DeepSeek-R1), which is no part of the
+// JSON, even where it has a draft of it, and the whitespace after it: a
+// <think> block that the text starts with, up to its first </think> (or all of
+// the text, while the block is open), or all of the text up to the first
+// </think> that starts a line, where the chat template wrote the <think> into
+// the prompt (where a <think> comes before that, the match is not used)
+const REASONING_REGEXP = /^(?:<think>[^]*?(?:<\/think>|$)|(?:[^]*?\n)?<\/think>)\s*/;
+
 // the backslashes that a text ends on, or that precede the unicode escape it
 // ends partway through
 const UNFINISHED_ESCAPE_REGEXP = /(\\+)(?:u[0-9a-fA-F]{0,3})?$/;
@@ -1062,7 +1070,7 @@ type ParsedResult = {
 };
 
 export function parseAsJSON(text: string): ParsedResult {
-    let preamble = '';
+    let reasoning = '';
     // whether anything is known to have followed the text
     let isEndDelimited = false;
     if (text == null) {
@@ -1070,6 +1078,15 @@ export function parseAsJSON(text: string): ParsedResult {
     } else {
         const input = text;
         text = text.replace(CONTROL_TOKENS_REGEXP, '').trim();
+        // what follows a thinking model’s reasoning reads as it would alone (the
+        // pattern is only tried on a text that it can match)
+        if (text.startsWith('<think>') || text.includes('</think>')) {
+            reasoning = text.match(REASONING_REGEXP)?.[0] ?? '';
+            // (a <think> that is not where the reasoning starts came before the
+            // closing tag that it ends on, so that tag closes no reasoning)
+            if (reasoning.indexOf('<think>') > 0) reasoning = '';
+            text = text.slice(reasoning.length);
+        }
         // if payload is entirely wrapped in a fenced code block, unwrap it first
         // (one block: a fence within it that is in no string closes it, and
         // what follows is not part of it)
@@ -1082,6 +1099,7 @@ export function parseAsJSON(text: string): ParsedResult {
         // of a code block), then a number that the text ends on is a whole one
         if (!input.endsWith(text)) isEndDelimited = true;
     }
+    let preamble = reasoning.trim();
     // if the input is empty, use value: null to indicate failure
     if (text === '') return { postscript: '', preamble, value: null };
 
@@ -1120,6 +1138,8 @@ export function parseAsJSON(text: string): ParsedResult {
     // it has a word in it).
     const search: Search = {};
     let lastPart = '';
+    // the preamble that the search finds, after the reasoning
+    let searchPreamble = '';
     while (text !== '') {
         const precedingText = firstText.slice(0, firstText.length - text.length);
         let notStart;
@@ -1140,15 +1160,15 @@ export function parseAsJSON(text: string): ParsedResult {
             });
         }
         if (text[0] === '{' || text[0] === '[') {
-            preamble += lastPart;
+            searchPreamble += lastPart;
             lastPart = notStart;
         } else {
             lastPart += notStart;
         }
         text = text.slice(notStart.length);
     }
-    if (hasTextContent(lastPart)) preamble += lastPart;
-    preamble = cleanThinkingText(preamble);
+    if (hasTextContent(lastPart)) searchPreamble += lastPart;
+    preamble = (reasoning + withoutFenceLine(searchPreamble)).trim();
 
     // comments are no part of the JSON: read it without them (a number that a
     // comment follows is whole, as it is before anything else)
