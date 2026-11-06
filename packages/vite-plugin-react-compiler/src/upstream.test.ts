@@ -900,4 +900,35 @@ export function createList<T>(getKey: (item: T) => string, renderItem: (item: T)
         );
         expect(result?.code).not.toMatch(/function _temp\d*\(/);
     });
+
+    // a hook whose memoized callbacks read the same ref in different places,
+    // with one stored as a property of the other, like a debounced callback
+    // with a cancel method, was left uncompiled (“Ref type environment did
+    // not converge”); babel-plugin-react-compiler@1.0.0 compiles it.
+    // Compiled upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/26181)
+    it('compiles a hook whose callbacks read a ref in different places', async () => {
+        const result = await transformCode(
+            `
+import { useMemo, useRef } from 'react';
+
+export function useDebouncedCallback<A extends unknown[]>(fn: (...args: A) => void, delay: number) {
+    const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    return useMemo(() => {
+        const cancel = () => {
+            if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        };
+        const debounced = (...args: A) => {
+            cancel();
+            timeoutRef.current = setTimeout(() => fn(...args), delay);
+        };
+        debounced.cancel = cancel;
+        return debounced;
+    }, [fn, delay]);
+}
+`,
+            '/src/useDebouncedCallback.ts',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
 });
