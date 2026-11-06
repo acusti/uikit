@@ -869,4 +869,35 @@ export function Duration({ nanoseconds }: { nanoseconds: bigint }) {
         expect(result?.code).toContain('react/compiler-runtime');
         expect(result?.code).toContain('(nanoseconds + 500000n) / 1000000n');
     });
+
+    // a component defined inside a factory function had a callback that
+    // only uses the factory’s arguments hoisted to a module-level
+    // function, outside their scope, so it threw “renderItem is not
+    // defined” on its first render; babel-plugin-react-compiler@1.0.0
+    // hoists it the same way. Kept in scope upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/26519)
+    it('keeps a callback using a factory’s arguments inside the factory', async () => {
+        const result = await transformCode(
+            `
+import type { ReactNode } from 'react';
+
+export function createList<T>(getKey: (item: T) => string, renderItem: (item: T) => ReactNode) {
+    const List = ({ items }: { items: T[] }) => (
+        <ul>
+            {items.map((item) => (
+                <li key={getKey(item)}>{renderItem(item)}</li>
+            ))}
+        </ul>
+    );
+    return List;
+}
+`,
+            '/src/createList.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain(
+            '(item) => <li key={getKey(item)}>{renderItem(item)}</li>',
+        );
+        expect(result?.code).not.toMatch(/function _temp\d*\(/);
+    });
 });
