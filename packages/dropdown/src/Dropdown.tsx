@@ -727,11 +727,6 @@ function RootDropdown({
         }
     };
 
-    // Clear props.openOnHover’s close timer on unmount so it can’t fire against
-    // unmounted DOM. Deliberately unmount-only, see clearDisclosureTimer above.
-    // oxlint-disable-next-line react/exhaustive-effect-dependencies
-    useEffect(() => clearHoverCloseTimer, []);
-
     const clearClosingTimer = () => {
         if (closingTimerRef.current == null) return;
         clearTimeout(closingTimerRef.current);
@@ -771,13 +766,16 @@ function RootDropdown({
         }
     };
 
-    // A submit closes the dropdown 90ms later. If it unmounts in that window,
-    // close it now so the timer can’t fire against unmounted DOM, and if
-    // <Activity> hides it, so it isn’t shown again still open.
-    const closeOnPendingSubmit = useEffectEvent(() => {
-        if (closingTimerRef.current != null) closeDropdown();
+    // A submit closes the dropdown 90ms later, and props.openOnHover closes it
+    // 150ms after the pointer leaves. If it unmounts in either window, close it
+    // now so the timer can’t fire against unmounted DOM, and if <Activity>
+    // hides it, so it isn’t shown again still open.
+    const closeOnPendingTimer = useEffectEvent(() => {
+        if (closingTimerRef.current != null || hoverCloseTimerRef.current != null) {
+            closeDropdown();
+        }
     });
-    useEffect(() => () => closeOnPendingSubmit(), []);
+    useEffect(() => () => closeOnPendingTimer(), []);
 
     // The pointer entered the trigger or (if open) the body: cancel any
     // pending close and, if props.openOnHover and not already open, open now

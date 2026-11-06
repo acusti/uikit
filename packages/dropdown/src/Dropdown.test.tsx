@@ -1377,6 +1377,58 @@ describe('@acusti/dropdown', () => {
         expect(screen.queryByText('Item A')).toBeNull();
     });
 
+    it('leaves no close pending when an openOnHover dropdown unmounts as the pointer leaves', () => {
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        const { unmount } = render(
+            <Dropdown openOnHover>
+                <button type="button">Menu</button>
+                <ul>
+                    <li data-ukt-value="a">Item A</li>
+                </ul>
+            </Dropdown>,
+        );
+        const trigger = screen.getByRole('button', { name: 'Menu' });
+        fireEvent.mouseEnter(trigger);
+        // Arms the hover close, which runs 150ms later
+        fireEvent.mouseLeave(trigger);
+        expect(vi.getTimerCount()).toBe(1);
+
+        unmount();
+        expect(vi.getTimerCount()).toBe(0);
+    });
+
+    it('stays closed when <Activity> hides an openOnHover dropdown while its hover close is pending', () => {
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        const renderInActivity = (mode: 'hidden' | 'visible') => (
+            <Activity mode={mode}>
+                <Dropdown openOnHover>
+                    <button type="button">Menu</button>
+                    <ul>
+                        <li data-ukt-value="a">Item A</li>
+                    </ul>
+                </Dropdown>
+            </Activity>
+        );
+        const { rerender } = render(renderInActivity('visible'));
+        const trigger = screen.getByRole('button', { name: 'Menu' });
+        fireEvent.mouseEnter(trigger);
+        expect(screen.queryByText('Item A')).not.toBeNull();
+        // Arms the hover close, which runs 150ms later
+        fireEvent.mouseLeave(trigger);
+        rerender(renderInActivity('hidden'));
+        act(() => {
+            vi.advanceTimersByTime(150);
+        });
+        rerender(renderInActivity('visible'));
+        expect(screen.queryByText('Item A')).toBeNull();
+    });
+
     describe('click delegation to buttons and links', () => {
         it('invokes click on a button when the item contains exactly one button', async () => {
             const handleButtonClick = vi.fn<() => void>();
