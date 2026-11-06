@@ -127,11 +127,17 @@ wrong, and write a few of each kind to `<name>.jsonl`.
   be kept. In the rows named `OPEN` the text ends partway through a token:
   the value has to be the whole input’s, and the part of the token has to
   be in the reading if it has a letter or digit in it (a preamble or
-  postscript with none is left out, as it is from any text). Left out: an
-  input that starts or ends with a token (it would have two), and, after
-  the token alone, a text whose first line, whole or as far as it goes, is
-  one word in lowercase, which is read as the role (a cost), counted in a
-  note.
+  postscript with none is left out, as it is from any text). Three kinds of
+  text are left out, and the last two are counted in a note:
+    - An input that already starts or ends with a token, since wrapping it
+      would give it two.
+    - After `<|im_start|>` with no role, a text whose first line (so far)
+      is a single word in lowercase, such as `note`. The parser takes that
+      word for the role, a known cost.
+    - A cut partway through the end token after an input whose value is a
+      string, a number or a literal. Such a value is read only where
+      nothing follows it, so the cut reads `null`, and there is no value to
+      compare it with.
 - `thinking-reasoning`: the answer after a thinking model’s reasoning reads
   as it does alone, with the reasoning as written at the front of its
   `preamble`. Each recorded test input is written after a `<think>` block
