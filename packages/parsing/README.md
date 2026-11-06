@@ -112,6 +112,19 @@ before it is the `preamble`, and what follows it is the `postscript`.
       After a fence with no language, only JSON that can be read counts.
     - A code block inside one of the JSON’s own strings is part of the
       string, and is not taken for it.
+- A thinking model’s reasoning is always part of the `preamble`, even if it
+  contains a draft of the JSON, and is demarcated as the `<think>` block
+  that the text starts with through `</think>`, where the opening tag is
+  optional (the chat templates of some models, such as DeepSeek-R1 and QwQ,
+  end the prompt with the opening `<think>` rather than putting it in the
+  response text). Without the opening tag, the `</think>` has to start a
+  line.
+    - The text after the reasoning is read as if the reasoning weren’t
+      there, and the reasoning, tags and all, comes first in the
+      `preamble`, before any prose that precedes the JSON.
+    - While a block that the text starts with is open, the `value` is
+      `null`.
+    - A `<think>` or `</think>` anywhere else is treated as regular text.
 - The JSON starts at the first `{` that opens an object or `[` that opens
   an array. A bracket in the preamble that is not JSON is passed over, such
   as `{placeholders}`, a citation (`[1]`), a task list (`- [ ]`) or a set
@@ -201,6 +214,20 @@ parseAsJSON(
     '{"name": "Ann"}\nOr in Python:\n```python\n{"name": "Bo"}\n```',
 ).value;
 // { name: 'Ann' }
+
+parseAsJSON(
+    '<think>\nA first try:\n{"heading": "Hello"}\nToo plain.\n</think>\n\n{"heading": "Welcome home"}',
+);
+/* results in:
+{
+    preamble: '<think>\nA first try:\n{"heading": "Hello"}\nToo plain.\n</think>',
+    value: { heading: 'Welcome home' },
+    postscript: '',
+}
+*/
+
+parseAsJSON('<think>\nA first try:\n{"heading": "Hello"}\nToo').value;
+// null
 
 parseAsJSON('{"tags": ["pasta", "salad"\nHope this helps!');
 /* results in:

@@ -1707,6 +1707,202 @@ describe('@acusti/parsing', () => {
             },
         );
 
+        describe('with the reasoning of a thinking model', () => {
+            const reasoning =
+                '<think>\nA first try:\n{"heading": "Hello"}\nToo plain.\n</think>';
+            const answer = '{"heading": "Welcome home"}';
+            const readAs = (value: unknown, preamble = reasoning) => ({
+                postscript: '',
+                preamble,
+                value,
+            });
+
+            it('reads the JSON after a <think> block that the text starts with', () => {
+                expect(parseAsJSON(`${reasoning}\n\n${answer}`)).toEqual(
+                    readAs({ heading: 'Welcome home' }),
+                );
+                expect(parseAsJSON(`\n${reasoning}\n\n${answer}\n`)).toEqual(
+                    readAs({ heading: 'Welcome home' }),
+                );
+                // a draft partway through a line, or after a colon
+                const midLine =
+                    '<think>\nMaybe {"heading": "Hello"} would do. Too plain.\n</think>';
+                expect(parseAsJSON(`${midLine}\n\n${answer}`)).toEqual(
+                    readAs({ heading: 'Welcome home' }, midLine),
+                );
+                const afterColon = '<think>\nA first try: {"heading": "Hello"}\n</think>';
+                expect(parseAsJSON(`${afterColon}\n\n${answer}`)).toEqual(
+                    readAs({ heading: 'Welcome home' }, afterColon),
+                );
+                // an array, and a block that closes partway through a line
+                expect(
+                    parseAsJSON(
+                        '<think>\nThe list:\n["a", "b"]\nShorter.\n</think>\n\n["a"]',
+                    ),
+                ).toEqual(
+                    readAs(['a'], '<think>\nThe list:\n["a", "b"]\nShorter.\n</think>'),
+                );
+                expect(parseAsJSON('<think>A draft: {"a": 1}</think>{"a": 2}')).toEqual(
+                    readAs({ a: 2 }, '<think>A draft: {"a": 1}</think>'),
+                );
+                // the empty block of non-thinking mode
+                expect(parseAsJSON(`<think>\n\n</think>\n\n${answer}`)).toEqual(
+                    readAs({ heading: 'Welcome home' }, '<think>\n\n</think>'),
+                );
+                // a raw completion with the ChatML tokens around it
+                expect(
+                    parseAsJSON(
+                        `<|im_start|>assistant\n${reasoning}\n\n${answer}<|im_end|>`,
+                    ),
+                ).toEqual(readAs({ heading: 'Welcome home' }));
+                expect(
+                    parseAsJSON(
+                        '<|im_start|>assistant\n<think>\nA first try:\n{"heading": "Hello"}\nToo',
+                    ),
+                ).toEqual(
+                    readAs(null, '<think>\nA first try:\n{"heading": "Hello"}\nToo'),
+                );
+                // (where the end token shows that a number at the end is whole)
+                expect(
+                    parseAsJSON(
+                        `<|im_start|>assistant\n${reasoning}\n\n{"rating": 4.5<|im_end|>`,
+                    ),
+                ).toEqual(readAs({ rating: 4.5 }));
+                // prose, and a note after the answer
+                expect(
+                    parseAsJSON(`${reasoning}\n\nHere it is:\n${answer}\nEnjoy!`),
+                ).toEqual({
+                    postscript: 'Enjoy!',
+                    preamble: `${reasoning}\n\nHere it is:`,
+                    value: { heading: 'Welcome home' },
+                });
+            });
+
+            it('reads what follows a <think> block as it reads alone', () => {
+                // the reasoning is kept as written, with its code block
+                const fenced =
+                    '<think>\nA first try:\n```json\n{"heading": "Hello"}\n```\nToo plain.\n</think>';
+                expect(parseAsJSON(`${fenced}\n\n${answer}`)).toEqual(
+                    readAs({ heading: 'Welcome home' }, fenced),
+                );
+                expect(parseAsJSON(`${fenced}\n\n\`\`\`json\n${answer}\n\`\`\``)).toEqual(
+                    readAs({ heading: 'Welcome home' }, fenced),
+                );
+                // an answer that is all one code block is read as the block, so its
+                // closing fence is not taken into a string left open
+                expect(parseAsJSON('```json\n{"heading": "News\n```')).toEqual(
+                    readAs({ heading: 'News' }, ''),
+                );
+                expect(
+                    parseAsJSON(`${reasoning}\n\n\`\`\`json\n{"heading": "News\n\`\`\``),
+                ).toEqual(readAs({ heading: 'News' }));
+                // a string, number or literal too, which no ordinary preamble has
+                expect(parseAsJSON(`${reasoning}\n\n42`)).toEqual(readAs(42));
+                expect(parseAsJSON(`${reasoning}\n\n"Welcome home"`)).toEqual(
+                    readAs('Welcome home'),
+                );
+                // and a number at its end is whole
+                expect(parseAsJSON(`${reasoning}\n\n{"count": 12}`)).toEqual(
+                    readAs({ count: 12 }),
+                );
+                expect(parseAsJSON(`${reasoning}\n\n{"count": 12`)).toEqual(readAs({}));
+                expect(parseAsJSON(`${reasoning}\n\n{"count": 12\n`)).toEqual(
+                    readAs({ count: 12 }),
+                );
+                // prose before the answer, and an answer that needs a repair, with
+                // the reasoning as written before the preamble that the rest has
+                expect(parseAsJSON(`${fenced}\n\nHere it is:\n${answer}`)).toEqual(
+                    readAs({ heading: 'Welcome home' }, `${fenced}\n\nHere it is:`),
+                );
+                expect(parseAsJSON(`${reasoning}\n\n{"a": 1,}`)).toEqual(
+                    readAs({ a: 1 }),
+                );
+            });
+
+            it('reads nothing while a <think> block that the text starts with is open', () => {
+                for (const text of [
+                    '<think>',
+                    '<think>\nThe user wants a heading',
+                    '<think>\nA first try:\n{"heading": "Hello"}\nToo',
+                    '<think>\nA first try:\n{"heading": "Hello"}\nToo plain.\n</thi',
+                ]) {
+                    expect(parseAsJSON(text)).toEqual(readAs(null, text));
+                }
+                // closed, with the answer not started yet, or partway through
+                expect(parseAsJSON(`${reasoning}\n\n`)).toEqual(readAs(null));
+                expect(parseAsJSON(`${reasoning}\n\n{"heading": "Welc`)).toEqual(
+                    readAs({ heading: 'Welc' }),
+                );
+            });
+
+            it('reads the JSON after a </think> that starts a line with no <think> before it', () => {
+                // the chat template put the opening tag in the prompt
+                const unopened =
+                    'A first try:\n{"heading": "Hello"}\nToo plain.\n</think>';
+                expect(parseAsJSON(`${unopened}\n\n${answer}`)).toEqual(
+                    readAs({ heading: 'Welcome home' }, unopened),
+                );
+                expect(parseAsJSON(`\n</think>\n\n${answer}`)).toEqual(
+                    readAs({ heading: 'Welcome home' }, '</think>'),
+                );
+                expect(parseAsJSON(`${unopened}\n\n`)).toEqual(readAs(null, unopened));
+                // reasoning with a tag in it, an answer that is all one code block,
+                // and a closing tag written again after the answer
+                const withTag = 'It needs an <h1> tag:\n{"heading": "Hello"}\n</think>';
+                expect(parseAsJSON(`${withTag}\n\n${answer}`)).toEqual(
+                    readAs({ heading: 'Welcome home' }, withTag),
+                );
+                expect(
+                    parseAsJSON('</think>\n\n```json\n{"heading": "News\n```'),
+                ).toEqual(readAs({ heading: 'News' }, '</think>'));
+                expect(parseAsJSON(`${unopened}\n\n${answer}\n</think>`)).toEqual({
+                    postscript: '</think>',
+                    preamble: unopened,
+                    value: { heading: 'Welcome home' },
+                });
+                // until the closing tag arrives, the draft is read, as it is with no tags
+                expect(parseAsJSON('A first try:\n{"heading": "Hello"}\nToo')).toEqual({
+                    postscript: 'Too',
+                    preamble: 'A first try:',
+                    value: { heading: 'Hello' },
+                });
+            });
+
+            it('leaves a tag anywhere else as text', () => {
+                expect(parseAsJSON('{"stop": "</think>", "a": 1}')).toEqual(
+                    readAs({ a: 1, stop: '</think>' }, ''),
+                );
+                expect(parseAsJSON('{"tags": "<think>, </think>", "a": 1}')).toEqual(
+                    readAs({ a: 1, tags: '<think>, </think>' }, ''),
+                );
+                expect(parseAsJSON('Use </think> to end it: {"a": 1}')).toEqual(
+                    readAs({ a: 1 }, 'Use </think> to end it:'),
+                );
+                expect(parseAsJSON('{"a": 1}\n<think>\nHm.\n</think>')).toEqual({
+                    postscript: '<think>\nHm.\n</think>',
+                    preamble: '',
+                    value: { a: 1 },
+                });
+                // a transcript that runs on into the next turn: the next turn, its
+                // tokens and its reasoning are the postscript
+                expect(
+                    parseAsJSON(
+                        '{"a": 1}<|im_end|>\n<|im_start|>user\nMore?<|im_end|>\n<|im_start|>assistant\n<think>\nHm.\n</think>\n\n{"a": 2}<|im_end|>',
+                    ),
+                ).toEqual({
+                    postscript:
+                        '<|im_end|>\n<|im_start|>user\nMore?<|im_end|>\n<|im_start|>assistant\n<think>\nHm.\n</think>\n\n{"a": 2}',
+                    preamble: '',
+                    value: { a: 1 },
+                });
+                expect(
+                    parseAsJSON('Okay.\n<think>{"a": 1}</think>\n{"a": 2}').value,
+                ).toEqual({
+                    a: 1,
+                });
+            });
+        });
+
         describe('with bare literals', () => {
             it('reads literals on lines of their own', () => {
                 const text = `\
