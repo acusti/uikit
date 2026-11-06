@@ -592,4 +592,37 @@ export function Row({ id, label, onSelect }: { id: string; label: string; onSele
         );
         expect(extra).toContain('useCallback(');
     });
+
+    // a memo block that clamps a prop in place, as below, stored the
+    // clamped value as its cache key, so a later render whose prop equaled
+    // it reused the earlier output: a quantity of 3 after a quantity of 5
+    // (with 3 in stock) still read “Only 3 in stock”. A prop defaulted by
+    // reassignment (`title = title ?? …`) missed the cache on every render
+    // instead. babel-plugin-react-compiler@1.0.0 keys it the same way.
+    // Keyed on the value from before the block upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27420)
+    it('keys a memo block that reassigns a prop on its value before the block', async () => {
+        const result = await transformCode(
+            `
+export function CartQuantity({ quantity, stock }: { quantity: number; stock: number }) {
+    const notes: string[] = [];
+    if (quantity > stock) {
+        notes.push(\`Only \${stock} in stock\`);
+        quantity = stock;
+    }
+    return (
+        <p>
+            Qty {quantity} {notes.join(' ')}
+        </p>
+    );
+}
+`,
+            '/src/CartQuantity.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        // the key is a copy of quantity taken before the block clamps it
+        expect(result?.code).toMatch(
+            /const (\w+) = quantity;[^]*?if \([^)]*\$\[\d+\] !== \1\b/,
+        );
+    });
 });
