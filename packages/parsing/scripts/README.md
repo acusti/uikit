@@ -114,13 +114,31 @@ wrong, and write a few of each kind to `<name>.jsonl`.
   token. Its rows are named by the spacing. Those named `OPEN` are the two
   repairs that look for a key and its colon, where a line break comes
   before the colon, which they do not take.
+- `chatml-tokens`: a raw completion from a model that uses ChatML reads as
+  the text without its tokens. Each recorded test input is written before
+  `<|im_end|>`, with a line break after it or before it, or neither, with
+  `<|im_start|>` and the role on its line before it, or with nothing; and
+  between the start token alone and the end token alone. It reads as the
+  input does: cut in the input, as the input cut there; at the end of the
+  start token or in the role, as the empty text; and cut after the input,
+  as the input with a line break after it, since the end token shows that
+  it is whole. A few made-up texts with a token in a string, the preamble
+  or the postscript are read the same way, so a token anywhere else has to
+  be kept. In the rows named `OPEN` the text ends partway through a token:
+  the value has to be the whole input’s, and the part of the token has to
+  be in the reading if it has a letter or digit in it (a preamble or
+  postscript with none is left out, as it is from any text). Left out: an
+  input that starts or ends with a token (it would have two), and, after
+  the token alone, a text whose first line, whole or as far as it goes, is
+  one word in lowercase, which is read as the role (a cost), counted in a
+  note.
 
-The first five fail where the branch reads a text wrong that the base read
+The first six fail where the branch reads a text wrong that the base read
 right. Some of their rows are wrong in both versions by design (costs that
 a release accepted, named `COST`, and known gaps, named `OPEN`). A change
 in them is counted (`changed`, or `fixed`) but does not fail. The values
-that they put in their texts are the objects and arrays that the recorded
-test inputs read as, in either version.
+that the first five put in their texts are the objects and arrays that the
+recorded test inputs read as, in either version.
 
 - `readme`: every example in the branch's README returns what the README
   says. It fails wherever the branch reads one otherwise, whatever the base
