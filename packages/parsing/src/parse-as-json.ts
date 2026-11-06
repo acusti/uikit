@@ -621,8 +621,8 @@ function parseWholeJSON(text: string) {
 const hasTextContent = (text: string) => /\w/.test(text);
 
 // LLMs often demarcate the JSON part of the response with ``` or ```json
-const cleanThinkingText = (preamble: string) =>
-    preamble
+const withoutFenceLine = (text: string) =>
+    text
         .trim()
         .replace(/^```(?:[a-z0-9]{1,9})?$/im, '')
         .trim();
@@ -630,7 +630,7 @@ const cleanThinkingText = (preamble: string) =>
 // what follows the JSON is the postscript, less a comma that it starts with,
 // unless it has no content
 const toPostscript = (rest: string) =>
-    hasTextContent(rest) ? cleanThinkingText(rest.replace(/^\s*,/, '')) : '';
+    hasTextContent(rest) ? withoutFenceLine(rest.replace(/^\s*,/, '')) : '';
 
 const FENCED_CODE_BLOCK_REGEXP =
     /^([ \t]*)```(?:[a-z0-9_-]{1,20})?[ \t]*\n([\s\S]*?)\n\1```[ \t]*$/i;
@@ -1148,7 +1148,7 @@ export function parseAsJSON(text: string): ParsedResult {
         text = text.slice(notStart.length);
     }
     if (hasTextContent(lastPart)) preamble += lastPart;
-    preamble = cleanThinkingText(preamble);
+    preamble = withoutFenceLine(preamble);
 
     // comments are no part of the JSON: read it without them (a number that a
     // comment follows is whole, as it is before anything else)
