@@ -24,3 +24,7 @@ packages/parsing/scripts/runs/
 # claude code (all but the root settings that every session shares)
 **/.claude/*
 !.claude/settings.json
+
+# playwright output
+**/playwright-report/
+**/test-results/

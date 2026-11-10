@@ -46,3 +46,15 @@ jobs:
 
             - name: ⚡ Test
               run: bun run test
+
+            # the browser and the bundles don’t depend on node’s version
+            - name: 🎭 Install Chromium for Playwright
+              if: matrix.node-version == '24.x'
+              run: bunx playwright install --with-deps --only-shell chromium
+              working-directory: packages/styling
+
+            # against the build above, which the fixture app imports
+            - name: 🎭 End-to-end test @acusti/styling
+              if: matrix.node-version == '24.x'
+              run: bun run test:e2e
+              working-directory: packages/styling
