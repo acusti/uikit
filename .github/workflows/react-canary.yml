@@ -1,0 +1,61 @@
+# @acusti/styling relies on React behaviour that isn’t documented API: that
+# hydration adopts a server-rendered <style> by its data-href without reading
+# its children, and that hoisted <style>s go into the <head> in render order.
+# This runs its Style tests against React canary, on every change and weekly,
+# to catch a React change before a release ships it.
+
+name: React canary
+
+on:
+    push:
+        branches: [main]
+    # only for changes that can affect the result: a canary regression is
+    # outside any other pull request’s doing
+    pull_request:
+        branches: [main]
+        paths:
+            - 'packages/styling/**'
+            - '.github/workflows/react-canary.yml'
+    schedule:
+        - cron: '0 9 * * 1'
+    workflow_dispatch:
+
+jobs:
+    styling:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v7
+            - name: Use node.js 24.x
+              uses: actions/setup-node@v7
+              with:
+                  node-version: 24.x
+            - name: Use Bun
+              uses: oven-sh/setup-bun@v2
+              with:
+                  bun-version: 1.3.9
+
+            - name: 📥 Install deps with React canary
+              run: |
+                  version="$(npm view react@canary version)"
+                  echo "REACT_CANARY=$version" >> "$GITHUB_ENV"
+                  jq --arg v "$version" '.overrides.react = $v | .overrides["react-dom"] = $v' package.json > package.canary.json
+                  mv package.canary.json package.json
+                  bun install
+
+            - name: 🔍 Check the tests will run against it
+              working-directory: packages/styling
+              run: |
+                  node -e '
+                    const { createRequire } = require("node:module");
+                    const fromTestingLibrary = createRequire(require.resolve("@testing-library/react"));
+                    const versions = [require, fromTestingLibrary].flatMap((load) =>
+                        ["react", "react-dom"].map((name) => load(`${name}/package.json`).version),
+                    );
+                    console.log(versions);
+                    if (versions.some((version) => version !== process.env.REACT_CANARY)) process.exit(1);
+                  '
+
+            - name: ⚡ Test @acusti/styling’s Style
+              working-directory: packages/styling
+              run: bunx vitest run src/Style.test.tsx
