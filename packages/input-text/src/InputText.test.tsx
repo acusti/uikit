@@ -808,6 +808,37 @@ describe('InputText.tsx', () => {
         expect(parseFloat(textarea.style.height)).toBe(100);
     });
 
+    it('sizes a multiLine input to a new initialValue', () => {
+        const { rerender } = render(<InputText initialValue="" multiLine />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        // happy-dom does no layout, so give the textarea 20px per line
+        Object.defineProperty(textarea, 'scrollHeight', {
+            get: () => textarea.value.split('\n').length * 20,
+        });
+
+        // React shows a new initialValue in a textarea that hasn’t been typed in
+        rerender(<InputText initialValue={'one\ntwo\nthree'} multiLine />);
+        expect(textarea.style.height).toBe('60px');
+
+        // …and the component writes it to one that has, e.g. to empty it once
+        // its form is submitted
+        fireEvent.change(textarea, { target: { value: 'one\ntwo' } });
+        rerender(<InputText initialValue="" multiLine />);
+        expect(textarea.value).toBe('');
+        expect(textarea.style.height).toBe('20px');
+    });
+
+    it('leaves the height of a single-line input alone when initialValue changes', () => {
+        const { rerender } = render(
+            <InputText initialValue="" style={{ height: '40px' }} />,
+        );
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+
+        rerender(<InputText initialValue="foo" style={{ height: '40px' }} />);
+        expect(input.value).toBe('foo');
+        expect(input.style.height).toBe('40px');
+    });
+
     // NOTE cannot test maxHeight prop for multiLine inputs in happy-dom
     // due to limitations in how it calculates layout and dimensions
 

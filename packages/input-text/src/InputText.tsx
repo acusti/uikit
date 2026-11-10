@@ -168,6 +168,7 @@ export default function InputText({
     const inputRef = useRef<InputRef>(null);
     const valueFromProps = initialValue ?? '';
     const committedValueRef = useRef(valueFromProps);
+    const sizedValueRef = useRef(valueFromProps);
 
     const setInputHeight = () => {
         if (!inputRef.current || SUPPORTS_FIELD_SIZING) return;
@@ -261,6 +262,17 @@ export default function InputText({
         if (inputRef.current.value === valueFromProps) return;
         inputRef.current.value = valueFromProps;
     }, [valueFromProps]);
+
+    // a new initialValue fires no input event, whether the effect above
+    // writes it or React does (to an input that hasn’t been typed in), so a
+    // multi-line input is sized to it here. it checks for a new initialValue
+    // itself instead of taking dependencies, which would have to include
+    // setInputHeight, a new function on every render
+    useLayoutEffect(() => {
+        if (sizedValueRef.current === valueFromProps) return;
+        sizedValueRef.current = valueFromProps;
+        if (multiLine) setInputHeight();
+    });
 
     const [readOnlyState, setReadOnlyState] = useState<boolean | undefined>(
         readOnly ?? doubleClickToEdit,
