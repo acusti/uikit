@@ -93,31 +93,6 @@ function DropdownDocsPage() {
     );
 }
 
-function ChevronDownIcon(props: React.SVGProps<SVGSVGElement>) {
-    return (
-        <svg
-            aria-hidden="true"
-            fill="none"
-            focusable="false"
-            height="12"
-            viewBox="0 0 12 12"
-            width="12"
-            {...props}
-        >
-            <path
-                d="M2.5 4.5 6 8l3.5-3.5"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="1.5"
-            />
-        </svg>
-    );
-}
-// the docs “Show code” panel prints a component under its displayName, and
-// falls back to the function’s name, which a production build minifies
-ChevronDownIcon.displayName = 'ChevronDownIcon';
-
 const meta: Meta<typeof Dropdown> = {
     // storybook names these spies after their arg keys, and only a named spy
     // is logged to the Actions panel, so a story with its own render function
@@ -473,18 +448,7 @@ export const SearchableWithLabel: Story = {
         ),
         className: 'searchable-with-label',
         isSearchable: true,
-        label: (
-            <span
-                style={{
-                    alignItems: 'center',
-                    display: 'inline-flex',
-                    gap: '0.25rem',
-                }}
-            >
-                Font size
-                <ChevronDownIcon />
-            </span>
-        ),
+        label: 'Font size',
     },
 };
 
@@ -970,6 +934,7 @@ const DIRECTION_RECIPE_ROWS = [
                 '--uktdd-body-position-area': 'block-start span-inline-end',
                 '--uktdd-body-position-try-fallback-1': '--uktdd-bottom-start',
                 '--uktdd-body-position-try-fallback-2': '--uktdd-top-end',
+                '--uktdd-trigger-icon-rotate': '180deg',
             },
         },
         {
@@ -980,6 +945,7 @@ const DIRECTION_RECIPE_ROWS = [
                 '--uktdd-body-position-area': 'block-start span-inline-start',
                 '--uktdd-body-position-try-fallback-1': '--uktdd-bottom-end',
                 '--uktdd-body-position-try-fallback-2': '--uktdd-top-start',
+                '--uktdd-trigger-icon-rotate': '180deg',
             },
         },
     ],
@@ -989,7 +955,7 @@ export const DirectionRecipes: Story = {
     parameters: {
         docs: {
             description: {
-                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallback-1` and `-2` (see the README’s [“Changing the Default Direction”](https://github.com/acusti/uikit/tree/main/packages/dropdown#changing-the-default-direction) section for the full cheatsheet). Each dropdown carries its recipe on its `style` prop, so “Show code” below displays the exact variables. Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. The top-opening pair also flips `--uktdd-body-fill-fallbacks` so the last-resort fill prefers the upward side. Each recipe opens in its named direction whenever that side has room, independent of where the trigger sits; the bottom pair is placed near the top of the canvas and the top pair near the bottom only so each menu opens into empty space instead of overlapping the other row.',
+                story: 'The four `@position-try` recipes the component ships, each pairing `--uktdd-body-position-area` with its matching `--uktdd-body-position-try-fallback-1` and `-2` (see the README’s [“Changing the Default Direction”](https://github.com/acusti/uikit/tree/main/packages/dropdown#changing-the-default-direction) section for the full cheatsheet). Each dropdown carries its recipe on its `style` prop, so “Show code” below displays the exact variables. Each is named for the edge that stays flush with the trigger, not the direction the body extends toward: “start” keeps the body’s inline-start edge flush with the trigger’s, extending toward inline-end; “end” is the mirror image. The top-opening pair also flips `--uktdd-body-fill-fallbacks` so the last-resort fill prefers the upward side, and sets `--uktdd-trigger-icon-rotate` so the trigger chevron points up. Each recipe opens in its named direction whenever that side has room, independent of where the trigger sits; the bottom pair is placed near the top of the canvas and the top pair near the bottom only so each menu opens into empty space instead of overlapping the other row.',
             },
         },
     },
@@ -1020,10 +986,158 @@ export const DirectionRecipes: Story = {
     },
 };
 
+// an icon as a --uktdd-trigger-icon value: the SVG as a data URI, its
+// viewBox cropped square around the stroked paths’ bounds (measured with
+// getBBox() plus half the stroke), so the size and gap measure the ink
+function iconURL(viewBox: string, strokeWidth: number, paths: Array<string>) {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${viewBox}" fill="none" stroke="black" stroke-width="${strokeWidth}" stroke-linecap="round" stroke-linejoin="round">${paths
+        .map((d) => `<path d="${d}"/>`)
+        .join('')}</svg>`;
+    return `url("data:image/svg+xml,${encodeURIComponent(svg)}")`;
+}
+
+const TRIGGER_CHEVRON_ROWS = [
+    {
+        heading: 'Stroke',
+        triggers: [
+            { label: 'Default', style: {} },
+            { label: '1px stroke', style: { '--uktdd-trigger-icon-stroke': '1px' } },
+            {
+                label: '1.5px stroke',
+                style: { '--uktdd-trigger-icon-stroke': '1.5px' },
+            },
+            {
+                label: 'Small, 1px stroke',
+                style: {
+                    '--uktdd-trigger-icon-gap': '0.375em',
+                    '--uktdd-trigger-icon-size': '6px',
+                    '--uktdd-trigger-icon-stroke': '1px',
+                    fontSize: '11px',
+                },
+            },
+        ],
+    },
+    {
+        heading: 'Size',
+        triggers: [
+            { label: 'Large', style: { fontSize: '20px' } },
+            {
+                label: 'Large, 2.5px stroke',
+                style: { '--uktdd-trigger-icon-stroke': '2.5px', fontSize: '20px' },
+            },
+            {
+                label: 'Upward',
+                style: { '--uktdd-trigger-icon-rotate': '180deg', fontSize: '20px' },
+            },
+        ],
+    },
+    {
+        heading: 'No built-in icon',
+        triggers: [
+            { label: 'None', style: { '--uktdd-trigger-icon': 'none' } },
+            {
+                className: 'trigger-own-indicator',
+                label: 'Own ::after',
+                style: { '--uktdd-trigger-icon': 'none' },
+            },
+        ],
+    },
+    {
+        heading: 'Custom icon',
+        triggers: [
+            {
+                label: 'Arrow in a circle',
+                style: {
+                    '--uktdd-trigger-icon': iconURL('2.25 2.25 19.5 19.5', 1.5, [
+                        'm9 12.75 3 3m0 0 3-3m-3 3v-7.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z',
+                    ]),
+                    '--uktdd-trigger-icon-size': '1em',
+                },
+            },
+            {
+                label: 'Cursor click',
+                style: {
+                    '--uktdd-trigger-icon': iconURL('1.54 1.5 20.92 20.92', 1.5, [
+                        'M15.042 21.672 13.684 16.6m0 0-2.51 2.225.569-9.47 5.227 7.917-3.286-.672ZM12 2.25V4.5m5.834.166-1.591 1.591M20.25 10.5H18M7.757 14.743l-1.59 1.59M6 10.5H3.75m4.007-4.243-1.59-1.59',
+                    ]),
+                    '--uktdd-trigger-icon-size': '1em',
+                },
+            },
+            {
+                label: 'Carrot',
+                style: {
+                    '--uktdd-trigger-icon': iconURL('1 1 22 22', 2, [
+                        'M15 16a1 1 0 0 0-7-7q-4 4-5.987 12.385a.5.5 0 0 0 .602.602Q11 20 15 16l-3-3',
+                        'M15 9q4 4 7 0-3-4-7 0 4-4 0-7-4 3 0 7',
+                        'm8 15-2.58-2.58',
+                    ]),
+                    '--uktdd-trigger-icon-size': '0.8em',
+                },
+            },
+            {
+                label: 'Pointer',
+                style: {
+                    '--uktdd-trigger-icon': iconURL('0.89 0.95 22.11 22.11', 2, [
+                        'M22 14a8 8 0 0 1-8 8',
+                        'M18 11v-1a2 2 0 0 0-2-2a2 2 0 0 0-2 2',
+                        'M14 10V9a2 2 0 0 0-2-2a2 2 0 0 0-2 2v1',
+                        'M10 9.5V4a2 2 0 0 0-2-2a2 2 0 0 0-2 2v10',
+                        'M18 11a2 2 0 1 1 4 0v3a8 8 0 0 1-8 8h-2c-2.8 0-4.5-.86-5.99-2.34l-3.6-3.6a2 2 0 0 1 2.83-2.82L7 15',
+                    ]),
+                    '--uktdd-trigger-icon-size': '0.8em',
+                },
+            },
+        ],
+    },
+] as const;
+
+export const TriggerChevron: Story = {
+    parameters: {
+        docs: {
+            description: {
+                story: 'The generated trigger’s chevron and the custom properties that style it, each set on the dropdown’s `style` prop so “Show code” below shows the exact values. `--uktdd-trigger-icon-stroke` takes any length where the browser supports `clip-path: shape()`; elsewhere every chevron here draws at the default stroke. `--uktdd-trigger-icon: none` turns the chevron off, which also frees the `::after` for an indicator of your own (the second trigger draws a `▾` there); that row needs container style queries, which is what `none` works through. The last row replaces the chevron through `--uktdd-trigger-icon` with four icons (heroicons’ arrow-down-circle and cursor-arrow-rays, and Lucide’s carrot and pointer), each a data URI whose `viewBox` is cropped square around the icon’s ink. The cursor is taller than it is wide, so its square is set by its height and leaves a little room at the sides. See the README’s [“The trigger chevron”](https://github.com/acusti/uikit/tree/main/packages/dropdown#the-trigger-chevron) section.',
+            },
+        },
+    },
+    render({ onSubmitItem }) {
+        return (
+            <div className="trigger-chevron-variants">
+                {TRIGGER_CHEVRON_ROWS.map(({ heading, triggers }) => (
+                    <section key={heading}>
+                        <h3>{heading}</h3>
+                        <div className="trigger-chevron-row">
+                            {triggers.map((trigger) => (
+                                <Dropdown
+                                    className={
+                                        'className' in trigger
+                                            ? trigger.className
+                                            : undefined
+                                    }
+                                    key={trigger.label}
+                                    onSubmitItem={onSubmitItem}
+                                    style={trigger.style}
+                                >
+                                    {trigger.label}
+                                    <ul>
+                                        <li data-ukt-value="one">Item one</li>
+                                        <li data-ukt-value="two">Item two</li>
+                                        <li data-ukt-value="three">Item three</li>
+                                    </ul>
+                                </Dropdown>
+                            ))}
+                        </div>
+                    </section>
+                ))}
+            </div>
+        );
+    },
+};
+
 // a component, not an array built in each render function, so that the docs
 // “Show code” panel prints one <TallMenuItems /> line per list in place of
-// all 30 items when it prints a story’s rendered JSX; it sets a displayName
-// for the same reason ChevronDownIcon does
+// all 30 items when it prints a story’s rendered JSX. That panel prints a
+// component under its displayName, falling back to the function’s name,
+// which a production build minifies, hence the displayName
 function TallMenuItems() {
     return Array.from({ length: 30 }, (_, index) => (
         <li data-ukt-value={`item-${index + 1}`} key={index}>
@@ -1246,18 +1360,7 @@ export const OpenOnHover: Story = {
                 onSubmitItem={onSubmitItem}
                 openOnHover
             >
-                <button
-                    className="uktdropdown-trigger"
-                    style={{
-                        alignItems: 'center',
-                        display: 'inline-flex',
-                        gap: '0.25rem',
-                    }}
-                    type="button"
-                >
-                    Account
-                    <ChevronDownIcon />
-                </button>
+                Account
                 <ul>
                     <li data-ukt-value="profile">Profile</li>
                     <li data-ukt-value="settings">Settings</li>
