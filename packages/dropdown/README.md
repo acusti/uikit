@@ -244,6 +244,14 @@ These are _newly available_ Baseline features: they work in up-to-date
 browser versions but not in ones predating that support, which the
 component requires.
 
+The [trigger chevron](#the-trigger-chevron) also uses `clip-path: shape()`
+([Baseline 2026](https://developer.mozilla.org/en-US/docs/Web/CSS/basic-shape/shape))
+where it’s supported, for a stroke you can set, and falls back to an SVG
+mask at the default stroke where it isn’t. Turning it off with
+`--uktdd-trigger-icon: none` relies on container style queries
+([Baseline 2026](https://developer.mozilla.org/en-US/docs/Web/CSS/@container#container_style_queries));
+without them (Firefox 147–150), the chevron is hidden but keeps its space.
+
 ## API Reference
 
 ### Props
@@ -496,6 +504,17 @@ Typography, sizing, and spacing:
 | `--uktdd-submenu-gap`           | `0px` (parent item ↔ submenu)             |
 | `--uktdd-label-gap`             | `0.625em` (`props.label` text ↔ trigger)  |
 
+The generated trigger’s chevron (see
+[The trigger chevron](#the-trigger-chevron)):
+
+| Property                      | Default                          |
+| ----------------------------- | -------------------------------- |
+| `--uktdd-trigger-icon`        | the built-in chevron (or `none`) |
+| `--uktdd-trigger-icon-size`   | `0.7em` (the chevron’s width)    |
+| `--uktdd-trigger-icon-stroke` | 2/17 of the size (`≈ 0.08em`)    |
+| `--uktdd-trigger-icon-gap`    | `0.5em` (trigger text ↔ chevron) |
+| `--uktdd-trigger-icon-rotate` | `0deg`                           |
+
 Placement (see
 [Placement Customization](#placement-customization-with-css-variables) and
 [Submenu placement and styling](#submenu-placement-and-styling)):
@@ -525,7 +544,7 @@ part of the public API along with the `data-ukt-*` attributes:
 - `.uktdropdown` — the root, with the state classes `.is-open`,
   `.is-searchable`, and `.is-disabled`
 - `.uktdropdown-trigger` — the generated trigger (a custom trigger keeps
-  its own classes)
+  its own classes), whose `::after` is the [chevron](#the-trigger-chevron)
 - `.uktdropdown-label` and `.uktdropdown-label-text` — the wrapper and text
   rendered for `props.label`
 - `.uktdropdown-body` — the anchored popover shell, with `.has-items`
@@ -537,6 +556,112 @@ part of the public API along with the `data-ukt-*` attributes:
   the highlighted item at each open level (the styling hook for the
   highlight, alongside `aria-expanded` on open parent items and
   `aria-selected` on the selected option)
+
+### The trigger chevron
+
+The generated button trigger ends with a chevron that marks it as something
+that opens. It’s an `::after` pseudo-element, so it adds no markup and
+leaves the trigger’s accessible name alone, and it’s painted in the
+trigger’s `currentColor`, so it follows the trigger’s text color (including
+its disabled color). A searchable dropdown’s trigger is a text input, which
+can’t have one, and [`Menubar`](#menubar) triggers don’t get one. A custom
+trigger gets one only if it carries the `uktdropdown-trigger` class, since
+the rule matches the class rather than the generated element.
+
+The trigger is `white-space: nowrap`, like a native `<select>`, so the
+chevron stays on the line with the label; a label too long for a
+fixed-width trigger overflows it rather than wrapping. To let a long label
+wrap, see the flex recipe at the end of this section.
+
+The chevron is drawn with `clip-path: shape()`, so its stroke is a custom
+property: `--uktdd-trigger-icon-stroke` sets it, and by default it stays
+2/17 of `--uktdd-trigger-icon-size`, so resizing the chevron keeps its
+weight in proportion. Browsers without `shape()` (it’s
+[Baseline 2026](https://developer.mozilla.org/en-US/docs/Web/CSS/basic-shape/shape))
+draw the same chevron as an SVG mask instead, at the default proportion,
+ignoring `--uktdd-trigger-icon-stroke`. Its box is square and as wide as
+the visible chevron, so `--uktdd-trigger-icon-size` is the chevron’s width
+and `--uktdd-trigger-icon-gap` is the actual space between it and the text.
+In a flex trigger, that gap adds to the trigger’s own `gap`; set it to `0`
+there.
+
+To use your own icon, set `--uktdd-trigger-icon` to an image: an SVG
+`url()` or a gradient, used as a mask so it still takes the trigger’s color
+(`--uktdd-trigger-icon-stroke` doesn’t apply to it). Crop its `viewBox`
+tight to the icon horizontally and keep it square, or built-in side margins
+will make it look smaller and further from the text than the size and gap
+suggest:
+
+```css
+.uktdropdown-trigger {
+    --uktdd-trigger-icon: url('/icons/my-chevron.svg');
+}
+```
+
+A relative `url()` in this property resolves against the page, not your
+stylesheet: the property is substituted in the dropdown’s own stylesheet,
+which is inline. Use a root-relative, absolute or `data:` URL, or, for a
+file next to your stylesheet, set the mask on the `::after` directly:
+
+```css
+.uktdropdown-trigger::after {
+    clip-path: none;
+    mask: url('./my-chevron.svg') center / contain no-repeat;
+}
+```
+
+Set `--uktdd-trigger-icon-size` to suit the icon: cropped to its ink, a
+dense icon reads larger than an outlined one at the same size (the
+[`TriggerChevron` story][] uses `1em` for an arrow in a circle and `0.8em`
+for a pointing hand). The box stays centered on the label at any size, but
+the icon’s strokes scale with it, so a much smaller icon needs a heavier
+`stroke-width` in its SVG to keep its weight.
+
+[`TriggerChevron` story]:
+    https://uikit.acusti.ca/?path=/docs/uikit-controls-Dropdown--docs#trigger-chevron
+
+The default rules have the specificity of a bare element, so a class
+selector overrides them regardless of stylesheet order.
+
+The chevron is the trigger’s `currentColor`. Setting `color` on the
+`::after` recolors it, but that color then also holds in forced colors
+mode, where the trigger’s own text takes the forced color.
+
+To remove the chevron, set `--uktdd-trigger-icon` to `none`, on a class or
+inline through the dropdown’s `style` prop
+(`style={{ '--uktdd-trigger-icon': 'none' }}`):
+
+```css
+.my-dropdown {
+    --uktdd-trigger-icon: none;
+}
+```
+
+This relies on container style queries
+([Baseline 2026](https://developer.mozilla.org/en-US/docs/Web/CSS/@container#container_style_queries)).
+Without them (Firefox 147–150), the chevron is hidden but keeps its space.
+`all: revert` on the trigger’s `::after` removes it in every browser, and
+leaves the `::after` free for an indicator of your own.
+
+In a full-width trigger, the chevron trails the centered label. To pin it
+to the inline end with the label at the start, the way a `<select>` does:
+
+```css
+.uktdropdown-trigger {
+    display: flex;
+    align-items: center;
+    gap: var(--uktdd-trigger-icon-gap);
+}
+
+.uktdropdown-trigger::after {
+    margin-inline-start: auto;
+}
+```
+
+The same rule lets a long label wrap while the chevron keeps its own
+column: add `white-space: normal` and `text-align: start`, and use
+`align-items: first baseline` to keep the chevron beside the label’s first
+line.
 
 ## Usage Examples
 
@@ -846,8 +971,9 @@ properties to the corresponding values:
 (The `…try-fallback-N` columns are `--uktdd-body-position-try-fallback-1`
 and `-2`.)
 
-The two Top rows should also flip the last-resort fill pair to match:
-`--uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom`.
+The two Top rows should also flip the last-resort fill pair to match
+(`--uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom`) and
+turn the trigger chevron up (`--uktdd-trigger-icon-rotate: 180deg`).
 
 For example, to make a dropdown open upward and end-aligned (useful for a
 trigger pinned to the bottom of the viewport, near the inline-end edge):
@@ -858,13 +984,17 @@ trigger pinned to the bottom of the viewport, near the inline-end edge):
     --uktdd-body-position-try-fallback-1: --uktdd-bottom-end;
     --uktdd-body-position-try-fallback-2: --uktdd-top-start;
     --uktdd-body-fill-fallbacks: --uktdd-fill-top, --uktdd-fill-bottom;
+    --uktdd-trigger-icon-rotate: 180deg;
 }
 ```
 
-The last line flips the last-resort fill pair to match the recipe’s
+The fill line flips the last-resort fill pair to match the recipe’s
 direction: when the body is too tall to fit anywhere at its natural size,
 it fills and scrolls on the upward side first (more on the fill pair
-below).
+below). The last line turns the [trigger chevron](#the-trigger-chevron) to
+point in the recipe’s preferred direction. It’s static: when the primary
+placement doesn’t fit and a fallback opens the body on the other side, the
+chevron still points the preferred way.
 
 See the [`DirectionRecipes` story][] for a live demo of all four.
 

@@ -75,6 +75,11 @@
     --uktdd-body-color-path: currentColor;
     /* the space between the label text and the trigger */
     --uktdd-label-gap: 0.625em;
+    /* the trigger chevron; --uktdd-trigger-icon and -stroke stay unset here
+       so their defaults resolve per trigger, not against :root’s size */
+    --uktdd-trigger-icon-gap: 0.5em;
+    --uktdd-trigger-icon-rotate: 0deg;
+    --uktdd-trigger-icon-size: 0.7em;
     --uktdd-submenu-position-area: inline-end span-block-end;
     /* the submenu’s only author fallback (the natural opposite placement) */
     --uktdd-submenu-position-try-fallback: --uktdd-submenu-inline-start;
@@ -125,6 +130,104 @@
 
     > :first-child {
         anchor-name: --uktdd-anchor;
+    }
+}
+
+/* like a <select>: keeps the chevron on the label’s line */
+:where(.uktdropdown-trigger) {
+    white-space: nowrap;
+}
+
+/* the chevron: currentColor cut to shape by this mask, or by the shape()
+   clip below where supported; :where() lets any consumer rule win */
+:where(.uktdropdown-trigger)::after {
+    content: "";
+    display: inline-block;
+    inline-size: var(--uktdd-trigger-icon-size);
+    block-size: var(--uktdd-trigger-icon-size);
+    /* keeps its size when the trigger is a flex container */
+    flex-shrink: 0;
+    margin-inline-start: var(--uktdd-trigger-icon-gap);
+    vertical-align: middle;
+    background-color: currentColor;
+    /* the transparent layer hides the box when the icon is none and the
+       @container rule below isn’t supported */
+    mask:
+        var(
+                --uktdd-trigger-icon,
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='3.5 3.5 17 17' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E")
+            )
+            center / contain no-repeat,
+        linear-gradient(transparent 0 0);
+    rotate: var(--uktdd-trigger-icon-rotate);
+    /* forced colors: take the trigger’s forced color, not Canvas (none
+       first, for engines without preserve-parent-color) */
+    forced-color-adjust: none;
+    forced-color-adjust: preserve-parent-color;
+}
+
+/* The chevron as a shape(), so its stroke can be a custom property.
+
+   1. The outline: a round-capped V traced in relative steps; each arm runs
+      50% minus the stroke’s radius, and a cap spans stroke/√2 (the chord).
+   2. Alignment: the box centers on the cap height (right for full-height
+      custom icons) and the chevron’s ink drops back to the x-height, which
+      also lifts a rotated, upward chevron; the drop is capped so a small
+      chevron keeps its tip.
+   3. A custom icon also lands in clip-path, where a url() or gradient
+      doesn’t clip, so its mask shows. */
+@supports (clip-path: shape(from 0 0, line to 0 0)) {
+    :where(.uktdropdown-trigger)::after {
+        --uktdd-chevron-stroke: var(
+            --uktdd-trigger-icon-stroke,
+            calc(var(--uktdd-trigger-icon-size) * 2 / 17)
+        );
+        --uktdd-chevron-radius: calc(var(--uktdd-chevron-stroke) / 2);
+        --uktdd-chevron-chord: calc(var(--uktdd-chevron-stroke) / sqrt(2));
+        --uktdd-chevron-run: calc(50% - var(--uktdd-chevron-radius));
+        --uktdd-chevron-back: calc(
+            var(--uktdd-chevron-chord) / 2 - var(--uktdd-chevron-run)
+        );
+        --uktdd-chevron-drop: min(0.5cap - 0.5ex, 25% - var(--uktdd-chevron-stroke) / 4);
+        vertical-align: calc(0.5cap - 0.5 * var(--uktdd-trigger-icon-size));
+        mask:
+            var(--uktdd-trigger-icon, linear-gradient(#000 0 0)) center / contain
+                no-repeat,
+            linear-gradient(transparent 0 0);
+        clip-path: var(
+            --uktdd-trigger-icon,
+            shape(
+                from calc(var(--uktdd-chevron-radius) - var(--uktdd-chevron-chord) / 2)
+                    calc(
+                        25% + var(--uktdd-chevron-radius) / 2 +
+                            var(--uktdd-chevron-chord) / 2 + var(--uktdd-chevron-drop)
+                    ),
+                line by var(--uktdd-chevron-run) var(--uktdd-chevron-run),
+                arc by var(--uktdd-chevron-chord) 0 of var(--uktdd-chevron-radius) ccw,
+                line by var(--uktdd-chevron-run) calc(-1 * var(--uktdd-chevron-run)),
+                arc by calc(-1 * var(--uktdd-chevron-chord))
+                    calc(-1 * var(--uktdd-chevron-chord)) of var(--uktdd-chevron-radius)
+                    ccw,
+                line by var(--uktdd-chevron-back) calc(-1 * var(--uktdd-chevron-back)),
+                line by var(--uktdd-chevron-back) var(--uktdd-chevron-back),
+                arc by calc(-1 * var(--uktdd-chevron-chord)) var(--uktdd-chevron-chord) of
+                    var(--uktdd-chevron-radius) ccw,
+                close
+            )
+        );
+    }
+}
+
+/* an icon-only trigger centers its chevron */
+:where(.uktdropdown-trigger:empty)::after {
+    margin-inline-start: 0;
+}
+
+/* --uktdd-trigger-icon: none turns the chevron off and frees the ::after
+   for a consumer’s own indicator */
+@container style(--uktdd-trigger-icon: none) {
+    :where(.uktdropdown-trigger)::after {
+        all: revert;
     }
 }
 
@@ -370,6 +473,11 @@ div.uktdropdown-body {
        trigger already has, so it works regardless of how it’s styled */
     .uktdropdown.is-open .uktdropdown-trigger {
         box-shadow: inset 0 0 0 100vmax var(--uktdd-menubar-trigger-bg-color-active);
+    }
+
+    /* menu bar titles open on their own terms, with no chevron */
+    :where(&) :where(.uktdropdown-trigger)::after {
+        content: none;
     }
 }
 
