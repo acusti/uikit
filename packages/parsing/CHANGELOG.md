@@ -1,5 +1,114 @@
 # @acusti/parsing
 
+## 0.24.0
+
+### Minor Changes
+
+- 3234b1d: Leave out the ChatML tokens of a raw completion
+
+    A raw completion from a Qwen model, which ends with `<|im_end|>` and
+    may start with `<|im_start|>` and the role on its own line
+    (`assistant`), now reads with neither token nor the role in its
+    `preamble` or `postscript`, whatever whitespace comes around them. The
+    end token also shows that a number right before it is whole, so
+    `"rating": 4.5<|im_end|>\n` now reads as `4.5`, not `4`. A token
+    anywhere else in the text is kept as it is.
+
+- 6e03ddf: Read spaces and tabs around a comma or colon in a text that
+  needs a repair
+
+    In a text that needs a repair (a trailing comma, say), a string now
+    ends at its closing quote mark whatever the spaces or tabs around the
+    comma or colon after it. And where the text ends after a key and its
+    colon, the key holds `''` whatever the spacing before the colon. So
+    `{"a": "b" , "c": "d",}` gives `{ a: 'b', c: 'd' }`, `["a" , "b",]`
+    gives `['a', 'b']`, and `{"tags": ["a",], "rating" :` gives
+    `{ tags: ['a'], rating: '' }`.
+
+    The two repairs that find a key by its colon take the same spacing: a
+    line that starts with a key ends a string that was left open, and a key
+    after an object’s closing brace shows that the object was closed too
+    early, with spaces or tabs between the key and its colon too. So
+    `{"heading" : "Our Story"}, "subheading" : "About us"}` gives
+    `{ heading: 'Our Story', subheading: 'About us' }`.
+
+    Look out for prose with a quote mark left unescaped in it. Where a
+    quoted word is followed by a comma, with spaces or tabs around it, and
+    another quoted word, the string now ends at the first word’s closing
+    quote mark, and the rest of it is read as a key:
+    `{"tip": "Pick "yes" , "no" or both"}` gives
+    `{ tip: 'Pick "yes', 'no" or both': '' }`. The same goes for a quoted
+    word followed by a tab or two spaces and then a colon (one space
+    already ended the string there). That can leave a `value` of `null`.
+
+    Look out too for a quoted word, then spaces or tabs and a colon, after
+    a bare answer with only whitespace between them
+    (`"Le Petit Prince" : un conte…` on a line after it): it is read into
+    the answer as a key holding `''`, as such a word without the spacing
+    already was.
+
+- e083bbe: Leave a line of prose after a member of an array or object to
+  the `postscript`
+
+    Where a line of prose follows a member of an array or object, the
+    `value` now ends at that member: `["a", "b"\nHope this helps!` gives
+    `['a', 'b']`, and `{"a": {"b": 1}\nHope this helps!` gives
+    `{ a: { b: 1 } }` (previously `null`). After a key’s colon, such a line
+    leaves the key holding `''`, whatever the whitespace before it
+    (`{"a": "b", "c":\nHope this helps!` gives `{ a: 'b', c: '' }`).
+
+    A key that has lost its opening quote mark at the start of a line is no
+    longer read: `{"a": "b"\nc": "d"}` gives `{ a: 'b' }`, and where such a
+    key is the first of the outermost object, the `value` is `null`.
+
+- d46d6a2: Start the `postscript` after a comma that ends the JSON
+
+    Where the JSON stops at a comma that no item or key follows, the
+    `postscript` now starts after that comma, as it already did after the
+    JSON’s closing bracket: `["a", "b",\nHope this helps!` gives the
+    `postscript` `'Hope this helps!'`. Only postscripts that started with a
+    comma change; the `value` is the same for every input.
+
+- f409d3e: Read the JSON after a thinking model’s reasoning
+
+    Make the reasoning that Qwen3, DeepSeek-R1 and other thinking models
+    write before their answer part of the `preamble`, so that a draft of
+    the JSON in it is no longer read for the `value`. The answer after the
+    reasoning reads as it would on its own, and while a `<think>` block is
+    still streaming in, the `value` is `null`.
+
+- 5b80a9a: Read on past a trailing comma after a key with no value
+
+    Where a key with no value is followed by a trailing comma (`"c",}`),
+    the key is still given `''`, and the rest of the text is now read too:
+    `{"x": {"a": 1, "c",}, "y": 2}` gives `{ x: { a: 1, c: '' }, y: 2 }`.
+    After the root, the `postscript` is the text after its closing brace,
+    as it is after any other root.
+
+### Patch Changes
+
+- 27f915a: Improve performance on long texts that need a repair
+
+    A long array or object in a text that `parseAsJSON` has to repair (a
+    missing comma, say, or a trailing comma, even one in each of its
+    objects) is now read in time that grows with its length, where a few
+    hundred kilobytes took seconds. This changes no reading.
+
+- 884ece3: Improve performance on long strings with unescaped quote marks
+
+    A long string with many unescaped quote marks in it is now read in time
+    that grows with its length (previously, tens of thousands of them took
+    seconds). The `value`, `preamble` and `postscript` it returns are
+    unchanged.
+
+- 374f7e6: Improve performance on long runs of whitespace
+
+    A long run of spaces or line breaks in a text that `parseAsJSON` has to
+    repair (a trailing comma, say), or between the JSON and a note after
+    it, is now read in time that grows with its length, where it took
+    seconds. The `value`, `preamble` and `postscript` it returns are
+    unchanged.
+
 ## 0.23.0
 
 ### Minor Changes
