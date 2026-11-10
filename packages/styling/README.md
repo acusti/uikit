@@ -6,643 +6,262 @@
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
 
-`@acusti/styling` provides React 19+ optimized styling utilities, including
-the `Style` component that leverages React’s new `<style>` element special
-rendering behavior and a collection of CSS utilities. It’s designed for
-modern React applications that need efficient, SSR-friendly styling with
-automatic optimization.
+Component stylesheets for a server-rendered React 19 app built with
+[Vite][], without shipping each one twice.
 
-> [!WARNING] Maintenance mode only: this package is no longer under active
-> feature development. It receives critical fixes only.
+```tsx
+import { Style } from '@acusti/styling';
 
-## Key Features
+import sheet from './card.css?style';
 
-- **React 19+ optimized** - Uses React’s new `<style>` element special
-  rendering behavior
-- **Automatic minification** - CSS is minified and cached for optimal
-  performance
-- **SSR-friendly** - No hydration errors with server-side rendering
-- **Style deduplication** - Identical styles are automatically deduplicated
-- **Suspense integration** - Assets in CSS suspend properly during loading
-- **Global cache** - Minified styles are cached to avoid re-computation
-- **CSS utilities** - Includes useful CSS constants like system fonts
+export default function Card() {
+    return (
+        <>
+            <Style sheet={sheet} />
+            <div className="card">…</div>
+        </>
+    );
+}
+```
+
+`<Style>` renders the sheet as a hoisted `<style>`: React puts it in the
+`<head>` once, in render order among the sheets of its precedence. A server
+render carries the CSS text in its HTML. With `stripClientText` on, the
+client build leaves the text out of its JavaScript: on hydration React
+adopts the `<style>` the server rendered, and a sheet the page didn’t draw
+(a component that first appears on a client navigation) is fetched as a
+`.css` file.
+
+It was extracted from [Outlyne][], where it runs in production.
+
+[vite]: https://vite.dev
+[outlyne]: https://outlyne.com
+
+## What it saves
+
+Inlined CSS ships twice on a server-rendered page: once in the HTML and
+again as strings in the JavaScript that hydrates it. On Outlyne’s published
+pages, stripping that text took **41 KB gzip (10%)** off the JavaScript
+each page preloads (410,618 → 369,325 bytes), and the lazy layout chunks
+lost another 47 KB between them. Every element’s computed style and
+full-page screenshots were identical before and after.
+
+The runtime adds about 540 bytes gzip to a client bundle.
 
 ## Installation
 
 ```bash
 npm install @acusti/styling
-# or
-yarn add @acusti/styling
 ```
 
-## Quick Start
+It needs React 19.2 or later (and below 20) and, for the plugin, Vite 6 or
+later.
 
-```tsx
-import { Style } from '@acusti/styling';
+## Setup
 
-function MyComponent() {
-    return (
-        <>
-            <Style>
-                {`
-                    .my-button {
-                        background: #007bff;
-                        color: white;
-                        border: none;
-                        padding: 8px 16px;
-                        border-radius: 4px;
-                        cursor: pointer;
-                    }
-                    .my-button:hover {
-                        background: #0056b3;
-                    }
-                `}
-            </Style>
+Add the plugin to your Vite config. Turn on `stripClientText` only for an
+app whose pages are all server-rendered by a build with the same plugin:
 
-            <button className="my-button">Click me</button>
-        </>
-    );
-}
+```ts
+// vite.config.ts
+import styleSheets from '@acusti/styling/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+    plugins: [styleSheets({ stripClientText: true })],
+});
 ```
 
-## React 19+ `<style>` Special Behavior
+For the types of `?style` imports, add `@acusti/styling/client` to
+`compilerOptions.types` in your `tsconfig.json`, or reference it from a
+`.d.ts` file:
 
-This package leverages React 19’s new `<style>` element
-[special rendering behavior](https://react.dev/reference/react-dom/components/style#special-rendering-behavior):
+```ts
+/// <reference types="@acusti/styling/client" />
+```
 
-> React will move `<style>` components to the document’s `<head>`,
-> de-duplicate identical stylesheets, and suspend while the stylesheet is
-> loading.
+### Plugin options
 
-**Benefits:**
+- **`prefix`** (string, default `''`): put ahead of every href. A library
+  built with this plugin needs one, such as its package name
+  (`@scope/ui/`), so its hrefs can’t match an app’s or another library’s
+  (see [Caveats](#caveats)).
+- **`root`** (string): the directory each sheet’s href is relative to,
+  resolved against the Vite root, which it defaults to. The server and
+  client builds must agree on it, since the client finds a server-rendered
+  sheet by its href.
+- **`stripClientText`** (boolean, default `false`): leave the CSS text out
+  of the client build. It applies only to `vite build` in an environment
+  whose consumer is the client; the server build and the dev server always
+  keep the text.
 
-- **SSR-friendly** - No hydration errors between server and client
-- **Automatic deduplication** - Identical styles are merged automatically
-- **Suspense integration** - CSS assets (fonts, images) suspend properly
-  during loading
-- **Performance optimized** - Styles are hoisted to `<head>` for optimal
-  loading
+## How a `?style` import works
 
-## API Reference
+`import sheet from './card.css?style'` gives a `StyleSheet`:
 
-### `Style` Component
+- **`{ href, css }`** in the server build, in dev, and in a client build
+  without `stripClientText`. `css` is Vite’s own `?inline` output for the
+  file, processed and minified as any inlined CSS is.
+- **`{ href, url }`** in a client build with `stripClientText`. `url` is
+  Vite’s `?url` asset of the same processed CSS.
 
-```tsx
-type Props = {
-    children: string;
-    href?: string;
-    precedence?: string;
+The href is `prefix` and the file’s path from `root` (`src/card.css`), so
+it is the same in every build and unique to the file within the build.
+
+`<Style sheet={sheet} />` then finds the text in one of three places:
+
+1. **The sheet**, when it carries `css`.
+2. **The document**, when a server render already put the sheet there.
+   React adopts a hoisted `<style>` whose `data-href` lists the href and
+   never reads the children, so `<Style>` renders it without any. A server
+   render merges the sheets of each precedence into one `<style>`, and the
+   client never needs to split it.
+3. **The sheet’s `.css` asset**, fetched otherwise. The render suspends
+   until it arrives, then the text goes in as a `<style>`, in render order.
+   A `<link rel="stylesheet">` would not keep that order: React inserts a
+   new `<link>` ahead of every `<style>` new in the same commit.
+
+A fetch is made once per URL. One that fails leaves the content unstyled
+rather than throwing to an error boundary, calls the `onError` handler, and
+is not retried, so a sheet a deploy removed isn’t asked for on every
+render.
+
+In dev, each `?style` module accepts updates to its CSS file and swaps the
+new text into the `<style>` that holds it, in the page and in same-origin
+iframes, since React never updates the text of a hoisted `<style>` it has
+already inserted.
+
+## API
+
+### `Style`
+
+```ts
+type StyleProps = {
+    precedence?: string; // defaults to 'medium'
+    sheet: StyleSheet; // a ./x.css?style import
 };
 ```
 
-**Props:**
+### `StyleProvider`
 
-- **`children`** (string, required): The CSS string to render
-- **`href`** (string, optional): Custom identifier for the stylesheet.
-  Defaults to minified CSS content
-- **`precedence`** (string, optional): Controls loading priority. Defaults
-  to `'medium'`
+Tells each `<Style>` below it which document it renders into and what to do
+when a stripped sheet fails to load. Each prop it leaves out comes from the
+provider above it.
 
-```tsx
-import { Style } from '@acusti/styling';
-
-function MyComponent() {
-    return (
-        <Style precedence="high" href="critical-styles">
-            {`.critical { display: block !important; }`}
-        </Style>
-    );
-}
+```ts
+type StyleProviderProps = {
+    children?: ReactNode;
+    document?: Document;
+    onError?: (
+        error: unknown,
+        sheet: { readonly href: string; readonly url: string },
+    ) => void;
+};
 ```
 
-### CSS Minification Function
+- **`document`**: the document the subtree renders into, for content
+  portalled into an iframe. A sheet the page has but the frame lacks is
+  then fetched for the frame. Context passes through portals, so a portal
+  from the frame back into the page needs a provider of its own.
+- **`onError`**: called once for each sheet whose text fails to load.
+  Defaults to [`reportError`][reporterror], which logs it as an uncaught
+  error and passes it to any `error` event listener, such as an error
+  monitor’s.
+
+[reporterror]:
+    https://developer.mozilla.org/docs/Web/API/Window/reportError
 
 ```tsx
-import { minifyStyles } from '@acusti/styling';
+import { StyleProvider } from '@acusti/styling';
+import { type ReactNode, useState } from 'react';
+import { createPortal } from 'react-dom';
 
-const minified = minifyStyles(`
-    .button {
-        background-color: #ffffff;
-        padding: 10px 20px;
-        border: 1px solid #cccccc;
-    }
-`);
-// Result: ".button{background-color:#fff;padding:10px 20px;border:1px solid #ccc}"
-```
-
-### CSS Constants
-
-- **`SYSTEM_UI_FONT`**: Cross-platform system UI font stack
-
-```tsx
-import { Style, SYSTEM_UI_FONT } from '@acusti/styling';
-
-function SystemStyles() {
-    return <Style>{':root { font-family: ${SYSTEM_UI_FONT}; }'}</Style>;
-}
-```
-
-## Usage Examples
-
-### Component-Scoped Styles
-
-```tsx
-import { Style } from '@acusti/styling';
-
-function Card({ title, children }) {
+function Frame({ children }: { children: ReactNode }) {
+    const [body, setBody] = useState<HTMLElement | null>(null);
     return (
         <>
-            <Style>
-                {`
-                    .card {
-                        border: 1px solid #e0e0e0;
-                        border-radius: 8px;
-                        padding: 16px;
-                        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-                        background: white;
-                    }
-                    .card-title {
-                        margin: 0 0 12px 0;
-                        font-size: 18px;
-                        font-weight: 600;
-                        color: #333;
-                    }
-                    .card-content {
-                        color: #666;
-                        line-height: 1.5;
-                    }
-                `}
-            </Style>
-
-            <div className="card">
-                <h3 className="card-title">{title}</h3>
-                <div className="card-content">{children}</div>
-            </div>
+            {body == null
+                ? null
+                : createPortal(
+                      <StyleProvider document={body.ownerDocument}>
+                          {children}
+                      </StyleProvider>,
+                      body,
+                  )}
+            <iframe
+                onLoad={(event) =>
+                    setBody(
+                        event.currentTarget.contentDocument?.body ?? null,
+                    )
+                }
+                srcDoc="<!doctype html><html><head></head><body></body></html>"
+                title="preview"
+            />
         </>
     );
 }
 ```
 
-### Global Styles with System Fonts
+### `StyleText`
+
+Renders CSS generated at runtime as a hoisted `<style>`, among the sheets
+of its precedence in render order. It is a separate export, so a bundle
+that doesn’t use it leaves it out.
 
 ```tsx
-import { Style, SYSTEM_UI_FONT } from '@acusti/styling';
+import { StyleText } from '@acusti/styling';
 
-function GlobalStyles() {
-    return (
-        <Style precedence="low" href="global-styles">
-            {`
-                * {
-                    box-sizing: border-box;
-                }
-                
-                body {
-                    margin: 0;
-                    font-family: ${SYSTEM_UI_FONT};
-                    line-height: 1.5;
-                    color: #333;
-                    background: #fff;
-                }
-                
-                button {
-                    font-family: inherit;
-                    cursor: pointer;
-                }
-                
-                input, textarea {
-                    font-family: inherit;
-                }
-            `}
-        </Style>
-    );
-}
+<StyleText href={`theme-${theme.id}`}>
+    {`:root { --accent: ${theme.accent}; }`}
+</StyleText>;
 ```
 
-### Theme-Based Styling
+React keeps one stylesheet per href and never updates its text, so CSS that
+changes needs an href that changes with it. A server render may merge
+several into one `<style>`, listing every href in its `data-href`. The href
+is URI-encoded, since React can’t hydrate a hoisted `<style>` whose href
+has a space.
 
-```tsx
-import { Style } from '@acusti/styling';
+### `SYSTEM_UI_FONT`
 
-function ThemedButton({ theme = 'primary', children }) {
-    const themes = {
-        primary: {
-            bg: '#007bff',
-            hoverBg: '#0056b3',
-            color: 'white',
-        },
-        secondary: {
-            bg: '#6c757d',
-            hoverBg: '#545b62',
-            color: 'white',
-        },
-        success: {
-            bg: '#28a745',
-            hoverBg: '#1e7e34',
-            color: 'white',
-        },
-    };
+A cross-platform system UI font stack, for `font-family`.
 
-    const currentTheme = themes[theme] || themes.primary;
+## Caveats
 
-    return (
-        <>
-            <Style href={`button-${theme}`}>
-                {`
-                    .btn-${theme} {
-                        background: ${currentTheme.bg};
-                        color: ${currentTheme.color};
-                        border: none;
-                        padding: 8px 16px;
-                        border-radius: 4px;
-                        font-size: 14px;
-                        font-weight: 500;
-                        cursor: pointer;
-                        transition: background-color 0.2s;
-                    }
-                    .btn-${theme}:hover {
-                        background: ${currentTheme.hoverBg};
-                    }
-                    .btn-${theme}:focus {
-                        outline: 2px solid ${currentTheme.bg};
-                        outline-offset: 2px;
-                    }
-                `}
-            </Style>
+- **The server must render with the same plugin.** A stripped client finds
+  a sheet’s text in the server-rendered HTML, so every page it hydrates
+  must have been rendered by a build that uses this plugin with the same
+  `root`. A sheet missing from the HTML still works, at the cost of a
+  fetch. A client-rendered app gains nothing from stripping: every sheet
+  would be fetched.
+- **A fetch suspends.** Render a component whose sheet may be fetched in a
+  transition (as router navigations are) or below a `<Suspense>` boundary,
+  as you would a lazy component.
+- **A fetched sheet costs a round trip.** A sheet the page lacks is
+  requested only once the component that renders it does, after its chunk
+  loads.
+- **It relies on how React handles resources.** That hydration adopts a
+  server-rendered `<style>` by `data-href` without reading its children,
+  and that a fetched sheet’s `<style>` goes into the `<head>` in render
+  order, are React behaviour, not documented API. The package’s tests check
+  both, and CI runs them against React canary to catch a change before a
+  release ships it.
+- **Hrefs must be unique across a document, not just a build.** React keeps
+  one stylesheet per href, and `<Style>` takes any `<style>` that lists its
+  href as the sheet already being there. So when separately built bundles
+  render into one document (an app and a component library built with this
+  plugin, two such libraries, or a host page and an embedded widget), two
+  files at the same relative path collide: the second sheet is dropped, or,
+  stripped, never fetched. Give each library its own `prefix`.
+- **Hrefs are file paths.** Each one appears in the server-rendered HTML,
+  so a deep path costs a few bytes per sheet.
 
-            <button className={`btn-${theme}`}>{children}</button>
-        </>
-    );
-}
-```
+## Upgrading from v2
 
-### Dynamic Styles
-
-```tsx
-import { Style } from '@acusti/styling';
-import { useState } from 'react';
-
-function DynamicCard() {
-    const [isExpanded, setIsExpanded] = useState(false);
-    const [accentColor, setAccentColor] = useState('#007bff');
-
-    return (
-        <>
-            <Style href={`dynamic-card-${accentColor}`}>
-                {`
-                    .dynamic-card {
-                        border: 2px solid ${accentColor};
-                        border-radius: 8px;
-                        padding: 16px;
-                        transition: all 0.3s ease;
-                        cursor: pointer;
-                        background: white;
-                    }
-                    
-                    .dynamic-card:hover {
-                        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-                        transform: translateY(-2px);
-                    }
-                    
-                    .dynamic-card.expanded {
-                        background: ${accentColor}10;
-                    }
-                    
-                    .card-header {
-                        color: ${accentColor};
-                        font-weight: 600;
-                        margin-bottom: 8px;
-                    }
-                    
-                    .card-controls {
-                        margin-top: 16px;
-                        display: flex;
-                        gap: 8px;
-                        align-items: center;
-                    }
-                `}
-            </Style>
-
-            <div
-                className={`dynamic-card ${isExpanded ? 'expanded' : ''}`}
-                onClick={() => setIsExpanded(!isExpanded)}
-            >
-                <div className="card-header">
-                    Dynamic Card{' '}
-                    {isExpanded ? '(Expanded)' : '(Collapsed)'}
-                </div>
-
-                <p>Click to toggle expansion state</p>
-
-                {isExpanded && (
-                    <div className="card-controls">
-                        <label>Accent Color:</label>
-                        <input
-                            type="color"
-                            value={accentColor}
-                            onChange={(e) =>
-                                setAccentColor(e.target.value)
-                            }
-                            onClick={(e) => e.stopPropagation()}
-                        />
-                    </div>
-                )}
-            </div>
-        </>
-    );
-}
-```
-
-### Critical CSS with High Precedence
-
-```tsx
-import { Style } from '@acusti/styling';
-
-function CriticalStyles() {
-    return (
-        <Style precedence="high" href="critical">
-            {`
-                /* Critical above-the-fold styles */
-                .hero {
-                    height: 100vh;
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                    color: white;
-                    text-align: center;
-                }
-                
-                .hero h1 {
-                    font-size: clamp(2rem, 5vw, 4rem);
-                    margin: 0;
-                    font-weight: 700;
-                }
-                
-                .hero p {
-                    font-size: clamp(1rem, 3vw, 1.5rem);
-                    margin: 1rem 0 2rem 0;
-                    opacity: 0.9;
-                }
-                
-                .cta-button {
-                    background: rgba(255,255,255,0.2);
-                    border: 2px solid rgba(255,255,255,0.3);
-                    color: white;
-                    padding: 12px 24px;
-                    border-radius: 8px;
-                    font-size: 16px;
-                    font-weight: 600;
-                    cursor: pointer;
-                    transition: all 0.3s;
-                    backdrop-filter: blur(10px);
-                }
-                
-                .cta-button:hover {
-                    background: rgba(255,255,255,0.3);
-                    border-color: rgba(255,255,255,0.5);
-                    transform: translateY(-2px);
-                }
-            `}
-        </Style>
-    );
-}
-```
-
-### Animation Styles
-
-```tsx
-import { Style } from '@acusti/styling';
-
-function AnimatedModal({ isOpen, onClose, children }) {
-    return (
-        <>
-            <Style href="modal-animations">
-                {`
-                    @keyframes fadeIn {
-                        from { opacity: 0; }
-                        to { opacity: 1; }
-                    }
-                    
-                    @keyframes slideUp {
-                        from { 
-                            opacity: 0;
-                            transform: translateY(20px);
-                        }
-                        to { 
-                            opacity: 1;
-                            transform: translateY(0);
-                        }
-                    }
-                    
-                    .modal-overlay {
-                        position: fixed;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        bottom: 0;
-                        background: rgba(0,0,0,0.5);
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        animation: fadeIn 0.2s ease-out;
-                        z-index: 1000;
-                    }
-                    
-                    .modal-content {
-                        background: white;
-                        border-radius: 8px;
-                        padding: 24px;
-                        max-width: 500px;
-                        width: 90%;
-                        max-height: 80vh;
-                        overflow: auto;
-                        animation: slideUp 0.3s ease-out;
-                    }
-                    
-                    .modal-close {
-                        position: absolute;
-                        top: 16px;
-                        right: 16px;
-                        background: none;
-                        border: none;
-                        font-size: 24px;
-                        cursor: pointer;
-                        color: #666;
-                    }
-                `}
-            </Style>
-
-            {isOpen && (
-                <div className="modal-overlay" onClick={onClose}>
-                    <div
-                        className="modal-content"
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <button className="modal-close" onClick={onClose}>
-                            ×
-                        </button>
-                        {children}
-                    </div>
-                </div>
-            )}
-        </>
-    );
-}
-```
-
-## Performance Considerations
-
-### Style Caching
-
-The component automatically caches minified styles to avoid recomputation:
-
-```tsx
-// These will use the same cached minified styles
-function Button1() {
-    return <Style>{buttonStyles}</Style>;
-}
-
-function Button2() {
-    return <Style>{buttonStyles}</Style>; // Reuses cache
-}
-```
-
-### Custom href for Better Caching
-
-Use custom `href` values for better caching control:
-
-```tsx
-// Good: Uses custom href for consistent caching
-<Style href="button-primary">
-    {generateButtonStyles('primary')}
-</Style>
-
-// Less optimal: href changes with dynamic content
-<Style>
-    {generateButtonStyles(dynamicTheme)}
-</Style>
-```
-
-### Precedence for DOM Order
-
-Control CSS parsing priority with precedence:
-
-```tsx
-// Critical styles load first
-<Style precedence="high" href="critical">
-    {criticalStyles}
-</Style>
-
-// Component styles load normally
-<Style precedence="medium" href="components">
-    {componentStyles}
-</Style>
-
-// Non-critical styles load last
-<Style precedence="low" href="animations">
-    {animationStyles}
-</Style>
-```
-
-## CSS Minification
-
-The package includes a powerful CSS minifier that:
-
-- Removes comments (except `/*!` important comments)
-- Normalizes whitespace
-- Removes unnecessary semicolons
-- Optimizes values (e.g., `0px` → `0`, `#ffffff` → `#fff`)
-- Preserves `calc()` expressions
-- Handles string literals safely
-
-```tsx
-import { minifyStyles } from '@acusti/styling';
-
-const original = `
-    /* Comment */
-    .button {
-        background-color: #ffffff;
-        padding: 10px 20px;
-        border: 1px solid #cccccc;
-        margin: 0px 0px 0px 0px;
-    }
-`;
-
-const minified = minifyStyles(original);
-// ".button{background-color:#fff;padding:10px 20px;border:1px solid #ccc;margin:0}"
-```
-
-## Best Practices
-
-### Component-Level Styles
-
-Keep styles close to their components:
-
-```tsx
-// ✅ Good: Styles are colocated with component
-function Newsletter() {
-    return (
-        <>
-            <Style href="newsletter">{newsletterStyles}</Style>
-            <div className="newsletter">...</div>
-        </>
-    );
-}
-```
-
-### Global vs Component Styles
-
-Use precedence to control loading order:
-
-```tsx
-// ✅ Global styles with low precedence
-function GlobalStyles() {
-    return (
-        <Style precedence="low" href="global">
-            {globalStyles}
-        </Style>
-    );
-}
-
-// ✅ Critical component styles with high precedence
-function Hero() {
-    return (
-        <Style precedence="high" href="hero">
-            {heroStyles}
-        </Style>
-    );
-}
-```
-
-### Custom Properties for Theming
-
-Use CSS custom properties for dynamic theming:
-
-```tsx
-<Style href="theme">
-    {`
-        :root {
-            --primary-color: ${theme.primary};
-            --secondary-color: ${theme.secondary};
-        }
-        
-        .button {
-            background: var(--primary-color);
-        }
-    `}
-</Style>
-```
-
-## Common Use Cases
-
-- **Component libraries** - Style components without external CSS files
-- **Dynamic themes** - Generate styles based on user preferences
-- **SSR applications** - Avoid hydration issues with server-rendered styles
-- **Critical CSS** - Inline above-the-fold styles for faster rendering
-- **CSS-in-JS alternative** - Use regular CSS with React 19+ benefits
-- **Animation libraries** - Define keyframes and animations inline
-- **Responsive components** - Include media queries with components
-
-This package provides a modern, efficient way to handle CSS in React 19+
-applications while maintaining the familiarity and power of traditional
-CSS.
+v3 is a new API. `<Style>` takes a `sheet` from a `?style` import instead
+of a CSS string as `children`. Move static CSS strings into `.css` files.
+For CSS built at runtime, use `<StyleText>`, and give it an href that
+changes whenever the CSS does: v2 derived an href from the CSS, but React
+keeps the first text it inserts under an href, so a fixed one freezes the
+first CSS. `minifyStyles` is gone: Vite minifies `?style` imports, and
+`StyleText` renders its CSS as given.
