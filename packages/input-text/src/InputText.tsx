@@ -220,22 +220,27 @@ export default function InputText({
         }
 
         // Setup ResizeObserver for multiLine inputs
-        if (!element || !multiLine || SUPPORTS_FIELD_SIZING) {
-            // Return ref cleanup if present
-            return cleanup;
+        let observer: ResizeObserver | undefined = undefined;
+        if (element && multiLine && !SUPPORTS_FIELD_SIZING) {
+            // Initialize input height
+            setInputHeight();
+
+            observer = new ResizeObserver(setInputHeight);
+            observer.observe(element);
         }
 
-        // Initialize input height
-        setInputHeight();
-
-        const observer = new ResizeObserver(setInputHeight);
-        observer.observe(element);
-
-        // Return cleanup function that disconnects observer and calls ref cleanup
+        // React calls this cleanup when the element detaches instead of
+        // calling handleRef with null, so it undoes all of the above and
+        // releases the forwarded ref as React would have
         return () => {
-            observer.disconnect();
-            if (typeof cleanup === 'function') {
+            observer?.disconnect();
+            inputRef.current = null;
+            if (cleanup) {
                 cleanup();
+            } else if (typeof ref === 'function') {
+                ref(null);
+            } else if (ref) {
+                ref.current = null;
             }
         };
     };
