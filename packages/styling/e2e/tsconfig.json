@@ -1,0 +1,14 @@
+{
+    "extends": "../../../tsconfig.base.json",
+    "compilerOptions": {
+        "allowImportingTsExtensions": true,
+        "composite": false,
+        "noEmit": true,
+        "paths": {
+            "@acusti/styling": ["../src/index.ts"],
+            "@acusti/styling/vite": ["../src/vite.ts"]
+        },
+        "types": ["node"]
+    },
+    "include": ["*.ts", "../client.d.ts", "fixture/src", "fixture/vite.config.ts"]
+}
