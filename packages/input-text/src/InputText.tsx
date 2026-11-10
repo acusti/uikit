@@ -243,11 +243,22 @@ export default function InputText({
             ref.current = element;
         }
 
+        // React calls the cleanup that handleRef returns when the element
+        // detaches instead of calling handleRef with null, so the cleanup
+        // releases the forwarded ref as React would have
+        const release = () => {
+            inputRef.current = null;
+            if (cleanup) {
+                cleanup();
+            } else if (typeof ref === 'function') {
+                ref(null);
+            } else if (ref) {
+                ref.current = null;
+            }
+        };
+
         // Setup ResizeObserver for multiLine inputs
-        if (!element || !multiLine || SUPPORTS_FIELD_SIZING) {
-            // Return ref cleanup if present
-            return cleanup;
-        }
+        if (!element || !multiLine || SUPPORTS_FIELD_SIZING) return release;
 
         // Initialize input height
         setInputHeight();
@@ -277,13 +288,11 @@ export default function InputText({
         rootNode.addEventListener('reset', handleReset, true);
 
         // Return cleanup function that disconnects observer, removes the reset
-        // listener and calls ref cleanup
+        // listener and releases the forwarded ref
         return () => {
             observer.disconnect();
             rootNode.removeEventListener('reset', handleReset, true);
-            if (typeof cleanup === 'function') {
-                cleanup();
-            }
+            release();
         };
     };
 
