@@ -1,16 +1,17 @@
 {
     "name": "@acusti/styling",
     "version": "2.1.5",
-    "description": "React component that renders a CSS style string as a <style> element in the <head> of the document (with global style de-duplication)",
+    "description": "React stylesheets from CSS imports, server-rendered with their text and left out of the client bundle (React 19 + Vite)",
     "keywords": [
         "css",
-        "css-in-js",
         "react",
         "react-component",
         "ssr",
         "styles",
         "ts",
-        "typescript"
+        "typescript",
+        "vite",
+        "vite-plugin"
     ],
     "homepage": "https://github.com/acusti/uikit/tree/main/packages/styling#readme",
     "bugs": {
@@ -24,13 +25,26 @@
         "directory": "packages/styling"
     },
     "files": [
+        "client.d.ts",
         "dist"
     ],
     "type": "module",
     "sideEffects": false,
     "main": "./dist/index.js",
     "types": "./dist/index.d.ts",
-    "exports": "./dist/index.js",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "default": "./dist/index.js"
+        },
+        "./vite": {
+            "types": "./dist/vite.d.ts",
+            "default": "./dist/vite.js"
+        },
+        "./client": {
+            "types": "./client.d.ts"
+        }
+    },
     "scripts": {
         "test": "vitest",
         "build": "vite build && tsc -p tsconfig.build.json",
@@ -39,8 +53,9 @@
     "devDependencies": {
         "@testing-library/dom": "^10.4.1",
         "@testing-library/react": "^16.3.2",
-        "@testing-library/user-event": "^14.6.1",
+        "@types/node": "^26.1.0",
         "@types/react": "^19.3",
+        "@types/react-dom": "^19.3",
         "happy-dom": "^21.0.4",
         "react": "^19.3",
         "react-dom": "^19.3",
@@ -50,6 +65,12 @@
     },
     "peerDependencies": {
         "react": "^19.2",
-        "react-dom": "^19.2"
+        "react-dom": "^19.2",
+        "vite": ">=6.0.0"
+    },
+    "peerDependenciesMeta": {
+        "vite": {
+            "optional": true
+        }
     }
 }
