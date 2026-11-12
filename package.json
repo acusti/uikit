@@ -52,7 +52,7 @@
         "@testing-library/user-event": "^14.6.1",
         "@types/node": "^26.1.0",
         "@types/react": "^19.3",
-        "@vitejs/plugin-react": "^6.1.0",
+        "@vitejs/plugin-react": "^6.3.0",
         "eslint-plugin-perfectionist": "^5.9.1",
         "happy-dom": "^21.0.4",
         "oxc-transform-react": "^0.156.0",
