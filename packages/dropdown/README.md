@@ -250,7 +250,8 @@ where it’s supported, for a stroke you can set, and falls back to an SVG
 mask at the default stroke where it isn’t. Turning it off with
 `--uktdd-trigger-icon: none` relies on container style queries
 ([Baseline 2026](https://developer.mozilla.org/en-US/docs/Web/CSS/@container#container_style_queries));
-without them (Firefox 147–150), the chevron is hidden but keeps its space.
+without them (Firefox before 151), the chevron is hidden but keeps its
+space.
 
 ## API Reference
 
@@ -639,12 +640,12 @@ inline through the dropdown’s `style` prop
 
 This relies on container style queries
 ([Baseline 2026](https://developer.mozilla.org/en-US/docs/Web/CSS/@container#container_style_queries)).
-Without them (Firefox 147–150), the chevron is hidden but keeps its space.
-`all: revert` on the trigger’s `::after` removes it in every browser, and
-leaves the `::after` free for an indicator of your own.
+Without them (Firefox before 151), the chevron is hidden but keeps its
+space. `all: revert` on the trigger’s `::after` removes it in every
+browser, and leaves the `::after` free for an indicator of your own.
 
 In a full-width trigger, the chevron trails the centered label. To pin it
-to the inline end with the label at the start, the way a `<select>` does:
+to the inline end with the label at the start:
 
 ```css
 .uktdropdown-trigger {
