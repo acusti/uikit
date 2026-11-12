@@ -1,12 +1,15 @@
 import {
     Controls,
     Description,
+    DocsContainer,
+    type DocsContainerProps,
     Primary,
     Stories,
     Subtitle,
     Title,
 } from '@storybook/addon-docs/blocks';
 import { fn } from 'storybook/test';
+import { themes } from 'storybook/theming';
 import * as React from 'react';
 
 import CSSValueInput from '../../css-value-input/src/CSSValueInput.js';
@@ -79,6 +82,34 @@ function ColorSchemeToggle() {
     );
 }
 
+// the docs page’s own color-scheme: the one ColorSchemeToggle sets on the
+// document root, or the OS/browser preference
+function isDocsPageDark() {
+    const { colorScheme } = document.documentElement.style;
+    return colorScheme
+        ? colorScheme === 'dark'
+        : window.matchMedia('(prefers-color-scheme: dark)').matches;
+}
+
+function subscribeToDocsColorScheme(onChange: () => void) {
+    const observer = new MutationObserver(onChange);
+    observer.observe(document.documentElement, { attributeFilter: ['style'] });
+    const media = window.matchMedia('(prefers-color-scheme: dark)');
+    media.addEventListener('change', onChange);
+    return () => {
+        observer.disconnect();
+        media.removeEventListener('change', onChange);
+    };
+}
+
+// Storybook styles the docs page (its text, the controls table, the code
+// panels) from its own theme rather than from color-scheme, so the page
+// switches theme to follow the toggle along with the stories
+function ColorSchemeDocsContainer(props: React.PropsWithChildren<DocsContainerProps>) {
+    const isDark = React.useSyncExternalStore(subscribeToDocsColorScheme, isDocsPageDark);
+    return <DocsContainer {...props} theme={isDark ? themes.dark : themes.light} />;
+}
+
 function DropdownDocsPage() {
     return (
         <>
@@ -111,6 +142,7 @@ const meta: Meta<typeof Dropdown> = {
                 component:
                     '`Dropdown` is a React component that renders a menu-like UI with a trigger that the user clicks to disclose a dropdown positioned below the trigger. The body of the dropdown can include any DOM, and many dropdowns can be combined to form a multi-item menu, like the system menu in the top toolbar of macOS.',
             },
+            container: ColorSchemeDocsContainer,
             page: DropdownDocsPage,
         },
     },
