@@ -749,4 +749,38 @@ export function Pager({ query, status }: Filters) {
         expect(result?.code).not.toContain('const filters = {');
         expect(result?.code).toMatch(/\$\[\d+\] !== query \|\| \$\[\d+\] !== status\)/);
     });
+
+    // a callback reading `ref.current`, when the compiler can’t tell the
+    // value is a ref (a ref prop with a fallback, `boxRef ?? ownRef`), was
+    // cached against `ref.current.offsetWidth`, a guard that reads the ref
+    // during render, so the component threw on its first render, before the
+    // ref was attached; babel-plugin-react-compiler@1.0.0 guards it the same
+    // way. Cached against the ref upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27423)
+    it('caches a callback reading ref.current against the ref', async () => {
+        const result = await transformCode(
+            `
+import { useLayoutEffect, useRef, type RefObject } from 'react';
+
+export function MeasuredBox({
+    boxRef,
+    onMeasure,
+}: {
+    boxRef?: RefObject<HTMLDivElement | null>;
+    onMeasure: (width: number) => void;
+}) {
+    const ownRef = useRef<HTMLDivElement>(null);
+    const ref = boxRef ?? ownRef;
+    useLayoutEffect(() => {
+        onMeasure(ref.current!.offsetWidth);
+    }, [ref, onMeasure]);
+    return <div ref={ref} />;
+}
+`,
+            '/src/MeasuredBox.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('onMeasure(ref.current.offsetWidth)');
+        expect(result?.code).not.toContain('!== ref.current');
+    });
 });
