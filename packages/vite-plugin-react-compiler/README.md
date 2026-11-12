@@ -23,8 +23,8 @@ production.
 Vite ships a native React Compiler integration now: as of
 `@vitejs/plugin-react` 6.1, passing `compiler: true` runs
 [oxc-transform-react][] — the same Rust bindings this plugin uses — instead
-of Babel. For a plain Vite + React app, that flag is the whole story; this
-plugin has nothing to add.
+of Babel. For a plain Vite + React app, that flag may be all you need,
+apart from choosing which version of the bindings to run (see below).
 
 The catch is that `compiler: true` is an option of `@vitejs/plugin-react`
 itself, and plenty of setups don’t run that plugin. React Router in
@@ -42,6 +42,14 @@ oxc-transform-react directly, with `enforce: 'pre'` (the position
 stays in charge of that. (oxc-transform-react strips TypeScript syntax
 itself, matching how the Babel path uses @babel/preset-typescript.)
 
+It also curates which bindings release you run. With `compiler: true`, you
+install oxc-transform-react yourself, so picking a version and checking it
+against your code is up to you. The bindings move fast, and a release that
+fixes a dozen miscompiles can also start skipping, or failing the build on,
+code that compiled before. This plugin pins a release that has been checked
+for exactly that, and skips releases whose regressions outweigh their fixes
+(see [Bindings version](#bindings-version)).
+
 ## Usage
 
 ```
@@ -53,14 +61,6 @@ pnpm add --save-dev @acusti/vite-plugin-react-compiler
 # or
 bun add --dev @acusti/vite-plugin-react-compiler
 ```
-
-The plugin depends on an exact, tested version of [oxc-transform-react][]:
-the bindings are on a fast-moving 0.x release train tracking React Compiler
-main, and new bindings releases are close to 100% bug fixes (the Rust port
-chases parity with the existing widely-used Babel plugin), so the plugin
-pins the newest version that passes this repo’s test suite and ships it in
-regular plugin releases. If you need a different version, use your package
-manager’s `overrides` (npm, pnpm, bun) or `resolutions` (yarn) to force it.
 
 Like [@acusti/vite-plugin-svg-react][], this plugin requires Vite ≥ 8: it
 plugs into the native oxc/rolldown transform pipeline that Vite 8
@@ -81,6 +81,30 @@ export default defineConfig({
     plugins: [reactRouter(), reactCompiler()],
 });
 ```
+
+### Bindings version
+
+The plugin depends on an exact, vetted version of [oxc-transform-react][].
+The bindings are on a fast-moving 0.x release train that tracks React
+Compiler main. Most of each release is bug fixes, as the Rust port chases
+parity with the widely used Babel plugin, but not all of it. So each new
+version is checked before a plugin release ships it:
+
+- a suite of tests pins the compiler fixes the plugin relies on, and the
+  gaps upstream still has (see
+  [Caveats, and results from production](#caveats-and-results-from-production))
+- every JavaScript and TypeScript file in this repo and its dependencies is
+  compiled with the old and new bindings, and the outputs are compared
+- fixes are checked at runtime against the uncompiled code and
+  babel-plugin-react-compiler@1.0.0
+
+A release whose regressions, such as newly skipping or failing code it has
+no reason to reject, outweigh its fixes is skipped in favor of the next one
+that fixes them. Regressions that ship anyway, and changes to what compiles
+because the new behavior is correct, are called out in the plugin’s
+changelog and tracked in the upstream-tracking suite. If you need a
+different version, use your package manager’s `overrides` (npm, pnpm, bun)
+or `resolutions` (yarn) to force it.
 
 ### Options
 
@@ -176,7 +200,7 @@ against the pinned bindings version: it pins both kinds of divergence, pins
 Babel-parity fixes as they land (react-hooks lint suppressions opt
 functions out of compilation since 0.144.0), and tracks known upstream gaps
 as they arise, re-verified on every bindings bump before it ships in a
-plugin release.
+plugin release (see [Bindings version](#bindings-version)).
 
 Measured at launch, on oxc-transform-react 0.142.0, in the production Vite
 8 + React Router app this plugin was extracted from, against
