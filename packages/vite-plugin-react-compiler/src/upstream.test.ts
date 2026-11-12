@@ -783,4 +783,31 @@ export function MeasuredBox({
         expect(result?.code).toContain('onMeasure(ref.current.offsetWidth)');
         expect(result?.code).not.toContain('!== ref.current');
     });
+
+    // a property read inside a JSX callback was hoisted into the cache
+    // guard, which runs during render, so a component threw (“Cannot read
+    // properties of null”) as soon as the object was null, even though the
+    // callback, behind a disabled button, never ran;
+    // babel-plugin-react-compiler@1.0.0 guards it the same way. Cached
+    // against the object upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27070)
+    it('caches a JSX callback against the object it reads from', async () => {
+        const result = await transformCode(
+            `
+type User = { id: string; name: string };
+
+export function FollowButton({ user, onFollow }: { user: User | null; onFollow: (id: string) => void }) {
+    return (
+        <button disabled={!user} onClick={() => onFollow(user!.id)}>
+            Follow
+        </button>
+    );
+}
+`,
+            '/src/FollowButton.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toMatch(/\$\[\d+\] !== user\b(?!\.)/);
+        expect(result?.code).not.toContain('!== user.id');
+    });
 });
