@@ -849,4 +849,24 @@ export function TodoList() {
             /let (\w+) = nextId\.current;\s+const (\w+) = \1\+\+;\s+nextId\.current = \1;\s+const id = \2;/,
         );
     });
+
+    // every BigInt literal in a compiled component or hook was printed as
+    // `undefined`, so arithmetic on it threw (“Cannot mix BigInt and other
+    // types”) and `useRef(0n)` started out undefined;
+    // babel-plugin-react-compiler@1.0.0 leaves such a function uncompiled
+    // (“Handle BigIntLiteral expressions”). Kept upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/26161)
+    it('keeps BigInt literals in compiled functions', async () => {
+        const result = await transformCode(
+            `
+export function Duration({ nanoseconds }: { nanoseconds: bigint }) {
+    const milliseconds = (nanoseconds + 500000n) / 1000000n;
+    return <span>{milliseconds.toString()} ms</span>;
+}
+`,
+            '/src/Duration.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('(nanoseconds + 500000n) / 1000000n');
+    });
 });
