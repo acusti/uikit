@@ -718,4 +718,35 @@ export function useImpressions(page: string, track: (page: string, id: string) =
         expect(result?.code).toContain('seen: new Set()');
         expect(result?.code).not.toContain('react.memo_cache_sentinel');
     });
+
+    // a value that is only compared and passed to a state setter during
+    // render, as in the “adjust state when a prop changes” pattern below,
+    // lost its memoization, so a new object every render never equaled the
+    // stored one and the component crashed with “Too many re-renders”;
+    // babel-plugin-react-compiler@1.0.0 compiles it the same way. Memoized
+    // upstream since 0.157.0 (https://github.com/oxc-project/oxc/issues/27426)
+    it('memoizes a value passed to a state setter during render', async () => {
+        const result = await transformCode(
+            `
+import { useMemo, useState } from 'react';
+
+type Filters = { query: string; status: string };
+
+export function Pager({ query, status }: Filters) {
+    const filters = useMemo(() => ({ query, status }), [query, status]);
+    const [prevFilters, setPrevFilters] = useState<Filters | null>(null);
+    const [page, setPage] = useState(1);
+    if (filters !== prevFilters) {
+        setPrevFilters(filters);
+        setPage(1);
+    }
+    return <button onClick={() => setPage(page + 1)}>Page {page}</button>;
+}
+`,
+            '/src/Pager.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).not.toContain('const filters = {');
+        expect(result?.code).toMatch(/\$\[\d+\] !== query \|\| \$\[\d+\] !== status\)/);
+    });
 });
