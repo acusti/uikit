@@ -810,4 +810,43 @@ export function FollowButton({ user, onFollow }: { user: User | null; onFollow: 
         expect(result?.code).toMatch(/\$\[\d+\] !== user\b(?!\.)/);
         expect(result?.code).not.toContain('!== user.id');
     });
+
+    // a postfix increment of a property, like an id counter in a ref,
+    // was compiled to `ref.current = ref.current + 1` followed by a read of
+    // the new value, so `nextId.current++` handed out 1, 2, … instead of
+    // 0, 1, …, and a bigint counter threw (“Cannot mix BigInt and other
+    // types”); babel-plugin-react-compiler@1.0.0 compiles it the same way.
+    // Kept as an increment of the old value upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27424)
+    it('returns the old value from a postfix increment of a property', async () => {
+        const result = await transformCode(
+            `
+import { useRef, useState } from 'react';
+
+export function TodoList() {
+    const nextId = useRef(0);
+    const [todos, setTodos] = useState<Array<{ id: number; text: string }>>([]);
+    const addTodo = () => {
+        const id = nextId.current++;
+        setTodos((todos) => [...todos, { id, text: \`Todo \${id}\` }]);
+    };
+    return (
+        <>
+            <button onClick={addTodo}>Add</button>
+            <ul>
+                {todos.map((todo) => (
+                    <li key={todo.id}>{todo.text}</li>
+                ))}
+            </ul>
+        </>
+    );
+}
+`,
+            '/src/TodoList.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toMatch(
+            /let (\w+) = nextId\.current;\s+const (\w+) = \1\+\+;\s+nextId\.current = \1;\s+const id = \2;/,
+        );
+    });
 });
