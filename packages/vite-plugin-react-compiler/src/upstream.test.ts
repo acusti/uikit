@@ -690,4 +690,32 @@ export function SaveStatus({ isSaving }: { isSaving: boolean }) {
         expect(result?.code).toMatch(/\$\[\d+\] !== label\b/);
         expect(result?.code).not.toContain('react.memo_cache_sentinel');
     });
+
+    // an allocation inside a useMemo result that depends on nothing, like
+    // the Set below, was cached once per mount, so the result was rebuilt
+    // when its dependencies changed but kept sharing the first Set: after
+    // the page changed, impressions on the new page were never tracked;
+    // babel-plugin-react-compiler@1.0.0 caches it the same way. Recreated
+    // with the result upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27427)
+    it('recreates an allocation in a useMemo result when its dependencies change', async () => {
+        const result = await transformCode(
+            `
+import { useMemo } from 'react';
+
+export function useImpressions(page: string, track: (page: string, id: string) => void) {
+    const session = useMemo(() => ({ page, seen: new Set<string>() }), [page]);
+    return (id: string) => {
+        if (session.seen.has(id)) return;
+        session.seen.add(id);
+        track(session.page, id);
+    };
+}
+`,
+            '/src/useImpressions.ts',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('seen: new Set()');
+        expect(result?.code).not.toContain('react.memo_cache_sentinel');
+    });
 });
