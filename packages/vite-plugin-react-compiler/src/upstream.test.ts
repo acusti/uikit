@@ -1010,4 +1010,34 @@ export function useImpressions(page: string, track: (page: string, id: string) =
         expect(result?.code).toContain('react/compiler-runtime');
         expect(result?.code).not.toContain('react.memo_cache_sentinel');
     });
+
+    // a component in which a function returns the result of passing a
+    // callback that reassigns one of the function’s parameters or locals,
+    // like the loader below, was left uncompiled on 0.157.0 (“Cannot
+    // reassign variable after render completes”,
+    // https://github.com/oxc-project/oxc/pull/26893), which also failed the
+    // build with panicThreshold set to 'critical_errors' or 'all_errors'.
+    // Each call to load has its own `rows`, so memoizing load is safe, and
+    // 0.156.0 and babel-plugin-react-compiler@1.0.0 compile it. Compiled
+    // again since 0.158.0, which limits the check to bindings declared in
+    // the component or hook (https://github.com/oxc-project/oxc/pull/28820)
+    it('compiles a function returning a promise whose callback reassigns its parameter', async () => {
+        const result = await transformCode(
+            `
+declare function fetchPage(page: number): Promise<string[]>;
+
+export function LoadAll({ onLoaded }: { onLoaded: (rows: string[]) => void }) {
+    const load = (page: number, rows: string[]) =>
+        fetchPage(page).then((next) => {
+            rows = rows.concat(next);
+            if (next.length === 0) onLoaded(rows);
+            else load(page + 1, rows);
+        });
+    return <button onClick={() => load(0, [])}>Load all</button>;
+}
+`,
+            '/src/LoadAll.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
 });
