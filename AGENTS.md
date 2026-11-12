@@ -99,6 +99,50 @@ bun run lockfile:commits --commit   # creates the commits
   an unsandboxed terminal. Use `git -c color.ui=never` when filtering diff
   output with `grep`/`sed`, since color codes break line-prefix matches.
 
+## Bumping oxc-transform-react
+
+`@acusti/vite-plugin-react-compiler` pins an exact oxc-transform-react, and
+its README promises that each release is vetted before a plugin release
+ships it. For each bump:
+
+1. **Triage upstream.** List the oxc-project/oxc commits between the two
+   `crates_v*` tags that touch `crates/oxc_react_compiler` or
+   `napi/transform-react`, plus `fix` commits in the shared crates (parser,
+   semantic, transformer, codegen). Diff the bindings’ `index.d.ts` too.
+2. **Compare corpora.** Compile every JS/TS file in this repo, in
+   `node_modules` and in Outlyne (`outlyne/outlyne`, the production app
+   using the plugin, with its own plugin options) with the old and new
+   bindings. Use the plugin’s `transform()` options plus
+   `reportDiagnostics: true`, in default mode and `compilationMode: 'all'`.
+    - Compare code, diagnostics, `fatal`, and whether each file imports
+      `react/compiler-runtime`, and attribute every change to an upstream
+      commit.
+    - Give a dependency file an id outside `node_modules`, which the
+      compiler skips.
+    - Run each version in its own child process: a native panic aborts it.
+3. **Check behavior at runtime.** Render each fix’s input and each newly
+   skipped shape in sequence (React 19 on happy-dom) four ways: uncompiled,
+   compiled by each version, and compiled by
+   babel-plugin-react-compiler@1.0.0. The uncompiled pass has to set
+   `reactCompiler: false`, since `transform()` compiles by default.
+4. **Pin what matters** in the plugin’s `src/upstream.test.ts`, one commit
+   per test.
+    - Pin fixes whose shapes are plausible in real code (look for instances
+      in the corpora) and every crash, since a panic takes down the dev
+      server.
+    - Prove each pin fails against the old bindings and passes against the
+      new, with a throwaway Vitest config that aliases
+      `oxc-transform-react` to an install of the old version.
+    - Promote any `it.fails` the bump fixes to a plain test.
+5. **Decide.** Skip a release whose regressions (code it newly skips or
+   fails without reason, which `panicThreshold` turns into build failures)
+   outweigh its fixes, and wait for the one that fixes them. A regression
+   that ships anyway gets an `it.fails`, an upstream issue and a changeset
+   paragraph.
+6. **Write the changeset** for users of the last plugin release: describe
+   the change from the bindings version that release shipped, not from a
+   skipped one.
+
 ## Pull Request Reviews
 
 - Treat PR review comments as an issue tracker: reply on each actionable
