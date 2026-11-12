@@ -662,4 +662,32 @@ export function FormErrors({ fields }: { fields: Field[] }) {
         expect(result?.code).toContain('react/compiler-runtime');
         expect(result?.code).toMatch(/\bfirstInvalid = \$\[\d+\];/);
     });
+
+    // a value assigned in a branch on a prop was treated as a constant when
+    // that branch also returned early on a condition that isn't reactive
+    // (a feature flag, `typeof window`), so the element built from it was
+    // cached once per mount: below, the status kept saying “Saving” after
+    // saving finished; babel-plugin-react-compiler@1.0.0 caches it the same
+    // way. Recomputed upstream since 0.157.0
+    // (https://github.com/oxc-project/oxc/issues/27418)
+    it('recomputes a value a branch on a prop assigns after an early return', async () => {
+        const result = await transformCode(
+            `
+import { features } from './features';
+
+export function SaveStatus({ isSaving }: { isSaving: boolean }) {
+    let label = 'All changes saved';
+    if (isSaving) {
+        if (!features.saveIndicator) return null;
+        label = 'Saving';
+    }
+    return <span role="status">{label}</span>;
+}
+`,
+            '/src/SaveStatus.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toMatch(/\$\[\d+\] !== label\b/);
+        expect(result?.code).not.toContain('react.memo_cache_sentinel');
+    });
 });
