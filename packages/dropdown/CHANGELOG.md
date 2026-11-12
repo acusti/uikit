@@ -1,5 +1,53 @@
 # @acusti/dropdown
 
+## 1.3.0
+
+### Minor Changes
+
+- 9e473ed: Add a chevron to the generated trigger button
+
+    A dropdown whose trigger is the generated button now shows a down
+    chevron after the button’s text, painted in the trigger’s text color.
+    Searchable and `Menubar` triggers don’t get one, nor does a custom
+    trigger unless it uses the `uktdropdown-trigger` class. Style it with
+    `--uktdd-trigger-icon-size`, `--uktdd-trigger-icon-stroke`,
+    `--uktdd-trigger-icon-gap`, and `--uktdd-trigger-icon-rotate` (set it
+    to `180deg` on a dropdown that opens upward). The stroke applies to the
+    built-in chevron only, and only in browsers that support `shape()`.
+
+    To use your own icon instead, set `--uktdd-trigger-icon` to an SVG
+    `url()` or a gradient, used as a mask. To have no icon, set it to
+    `none`. If your triggers already show an open indicator, you’ll now see
+    the built-in chevron next to it (or in its place, if yours is drawn on
+    `::after`), so move your icon into `--uktdd-trigger-icon` or set it to
+    `none`.
+
+    The trigger is now `white-space: nowrap`, like a native `<select>`, so
+    the chevron stays beside the label. A trigger with a fixed width needs
+    room for it (about 1.2em at the default size and gap); a label that no
+    longer fits overflows instead of wrapping. To let a long label wrap
+    with the chevron in its own column, see the README’s flex recipe.
+
+### Patch Changes
+
+- 1b7a375: Fix a double press of Enter or Space submitting a dropdown item
+  twice
+
+    A dropdown that closes on submit now ignores any other submit in the
+    90ms before it closes, so two quick presses of Enter or Space on the
+    active item call `onSubmitItem` once and click the item’s button or
+    link once. A form in a `hasItems={false}` body still gets every
+    `submit` event, and a dropdown with `keepOpenOnSubmit` still submits on
+    every press.
+
+- b1738dc: Keep an `openOnHover` Dropdown closed when `<Activity>` hides it
+
+    A Dropdown that `<Activity mode="hidden">` hides within 150ms of the
+    pointer leaving it now stays closed when it’s shown again (previously
+    it came back open). Its `onClose` is called when it’s shown again, not
+    when it’s hidden, because Activity pauses effects while its content is
+    hidden.
+
 ## 1.2.1
 
 ### Patch Changes
