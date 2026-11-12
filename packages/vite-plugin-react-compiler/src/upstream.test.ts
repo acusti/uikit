@@ -1073,4 +1073,30 @@ export function useSocket(url: string) {
         );
         expect(result?.code).toContain('react/compiler-runtime');
     });
+
+    // a component that keeps the result of a call it passes a callback to,
+    // when that callback reassigns one of the component’s own variables, is
+    // left uncompiled (“Cannot reassign variable after render completes”)
+    // inside an `if`, a loop, a `switch`, a ternary or `&&` since 0.157.0
+    // (https://github.com/oxc-project/oxc/pull/26893), as it already was
+    // outside them, and the diagnostic fails the build with panicThreshold
+    // set to 'critical_errors' or 'all_errors'. 0.156.0,
+    // babel-plugin-react-compiler@1.0.0 and its latest experimental build
+    // compile it; a discarded result still compiles
+    it.fails('compiles a component that keeps, inside an if, a call result whose callback reassigns its variable', async () => {
+        const result = await transformCode(
+            `
+declare function validate(value: string, onWarning: (message: string) => void): boolean;
+
+export function EmailField({ value, touched }: { value: string; touched: boolean }) {
+    let warning = '';
+    let valid = true;
+    if (touched) valid = validate(value, (message) => { warning = message; });
+    return <p className={valid ? 'ok' : 'error'}>{warning}</p>;
+}
+`,
+            '/src/EmailField.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
 });
