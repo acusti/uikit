@@ -986,4 +986,28 @@ export function Menu({ items }: { items: Item[] }) {
         );
         expect(result?.code).toContain('react/compiler-runtime');
     });
+
+    // a TypeScript assertion on that allocation (`[] as string[]`) still
+    // hides it from the fix above: the array is cached once per mount and
+    // shared by every result, so impressions on a new page are never
+    // tracked; babel-plugin-react-compiler@1.0.0 caches it the same way
+    it.fails('recreates an asserted allocation in a useMemo result when its dependencies change', async () => {
+        const result = await transformCode(
+            `
+import { useMemo } from 'react';
+
+export function useImpressions(page: string, track: (page: string, id: string) => void) {
+    const session = useMemo(() => ({ page, seen: [] as string[] }), [page]);
+    return (id: string) => {
+        if (session.seen.includes(id)) return;
+        session.seen.push(id);
+        track(session.page, id);
+    };
+}
+`,
+            '/src/useImpressions.ts',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).not.toContain('react.memo_cache_sentinel');
+    });
 });
