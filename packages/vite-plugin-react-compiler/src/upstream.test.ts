@@ -956,4 +956,34 @@ export function CheckoutButton({ items, onCheckout }: { items: Item[]; onCheckou
         expect(result?.code).toContain('count++');
         expect(result?.code).toMatch(/\$\[\d+\] !== count\b/);
     });
+
+    // a callback passing an item to a handler that mutates a global, below
+    // `window.location.hash`, was treated as calling the handler during
+    // render, so the component was left uncompiled (“This value cannot be
+    // modified”), as babel-plugin-react-compiler@1.0.0 leaves it. Compiled
+    // upstream since 0.157.0 (https://github.com/oxc-project/oxc/issues/27309)
+    it('compiles a callback that passes an item to a handler mutating a global, which the Babel plugin bails on', async () => {
+        const result = await transformCode(
+            `
+type Item = { id: string; label: string };
+
+export function Menu({ items }: { items: Item[] }) {
+    function handleClick(id: string) {
+        window.location.hash = id;
+    }
+    return (
+        <ul>
+            {items.map((item) => (
+                <li key={item.id} onClick={() => handleClick(item.id)}>
+                    {item.label}
+                </li>
+            ))}
+        </ul>
+    );
+}
+`,
+            '/src/Menu.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
 });
