@@ -1,3 +1,19 @@
+/* Storybook sets no page font, so give the page one for the dropdowns to
+   inherit */
+body:has(.uktdropdown) {
+    font-family:
+        system-ui,
+        Segoe UI,
+        Roboto,
+        Oxygen-Sans,
+        Ubuntu,
+        Cantarell,
+        Helvetica Neue,
+        Helvetica,
+        Arial,
+        sans-serif;
+}
+
 #storybook-root,
 .sb-story > div {
     display: flex;
@@ -264,7 +280,6 @@
 
     h3 {
         margin: 0 0 0.5rem;
-        font-family: var(--uktdd-font-family);
         font-size: 0.75rem;
         text-transform: uppercase;
         letter-spacing: 1px;

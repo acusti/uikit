@@ -1,7 +1,7 @@
 :root {
-    --uktdd-font-family:
-        system-ui, Segoe UI, Roboto, Oxygen-Sans, Ubuntu, Cantarell, Helvetica Neue,
-        Helvetica, Arial, sans-serif;
+    /* inherits the surrounding font, like --uktdd-color-scheme below; set it
+       on an ancestor or a dropdown’s class to give dropdowns their own */
+    --uktdd-font-family: inherit;
     /* the popover is page content, not OS chrome — a native OS context menu
        always renders in the OS’s own scheme regardless of the host page,
        but this component should match whatever color-scheme the host page
