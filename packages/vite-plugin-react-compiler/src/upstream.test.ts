@@ -625,4 +625,41 @@ export function CartQuantity({ quantity, stock }: { quantity: number; stock: num
             /const (\w+) = quantity;[^]*?if \([^)]*\$\[\d+\] !== \1\b/,
         );
     });
+
+    // a variable declared before a memo block and reassigned in a loop
+    // inside it wasn't restored from the cache when the block was skipped,
+    // so it kept its initial value from the second render with the same
+    // props on: below, the link pointed at “#” instead of the first invalid
+    // field; babel-plugin-react-compiler@1.0.0 does the same. Restored
+    // upstream since 0.157.0 (https://github.com/oxc-project/oxc/issues/27421)
+    it('restores a variable a memo block reassigns in a loop', async () => {
+        const result = await transformCode(
+            `
+type Field = { name: string; error?: string };
+
+export function FormErrors({ fields }: { fields: Field[] }) {
+    let firstInvalid = '';
+    const errors: string[] = [];
+    for (const field of fields) {
+        if (field.error) {
+            firstInvalid = field.name;
+            break;
+        }
+    }
+    for (const field of fields) {
+        if (field.error) errors.push(field.error);
+    }
+    return (
+        <div>
+            <a href={\`#\${firstInvalid}\`}>Go to first error</a>
+            <p>{errors.join(' ')}</p>
+        </div>
+    );
+}
+`,
+            '/src/FormErrors.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toMatch(/\bfirstInvalid = \$\[\d+\];/);
+    });
 });
