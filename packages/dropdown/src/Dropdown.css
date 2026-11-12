@@ -1,19 +1,24 @@
-:root {
-    /* inherits the surrounding font, like --uktdd-color-scheme below; set it
-       on an ancestor or a dropdown’s class to give dropdowns their own */
-    --uktdd-font-family: inherit;
-    /* the popover is page content, not OS chrome — a native OS context menu
-       always renders in the OS’s own scheme regardless of the host page,
-       but this component should match whatever color-scheme the host page
-       itself declares (light, if the page hasn’t opted into dark mode),
-       so it inherits rather than forcing one. Override to `light dark` (or
-       `light`/`dark`) to follow the user’s OS/browser preference instead,
-       irrespective of the host page */
-    --uktdd-color-scheme: inherit;
+/* :where() keeps these defaults at zero specificity, so a consumer’s own
+   value wins wherever it’s set, html and :root included, in any order */
+:where(:root) {
+    /* --uktdd-font-family and --uktdd-color-scheme have no default: a var()
+       with nothing to substitute is invalid at computed-value time, which
+       makes font-family and color-scheme (both inherited properties) take
+       their parent’s value. So when unset:
+
+       1. --uktdd-font-family: dropdowns use the surrounding font.
+       2. --uktdd-color-scheme: the popover is page content, not OS chrome —
+          a native OS context menu always renders in the OS’s own scheme
+          regardless of the host page, but this component should match
+          whatever color-scheme the host page itself declares (light, if the
+          page hasn’t opted into dark mode), so it inherits rather than
+          forcing one. Set it to `light dark` (or `light`/`dark`) to follow
+          the user’s OS/browser preference instead, irrespective of the host
+          page. */
     /* Canvas(Text)/Highlight(Text) are UA system colors, so the color defaults
        below need no prefers-color-scheme query of their own to work in both
        schemes. The UA default is light-only regardless of OS/browser preference
-       until something opts in, which is what --uktdd-color-scheme above is for */
+       until something opts in, which is what --uktdd-color-scheme is for */
     --uktdd-body-bg-color: Canvas;
     --uktdd-body-bg-color-hover: Highlight;
     --uktdd-body-color-hover: HighlightText;

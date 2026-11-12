@@ -214,7 +214,7 @@ one is still a plain custom property, so setting it directly overrides the
 derived default outright. `--uktdd-body-box-shadow` is the exception — a
 fixed `rgba(0, 0, 0, 0.25)` rather than a scheme-aware mix, since mixing in
 `CanvasText` turns it into a diffuse white glow in dark mode instead of a
-shadow. `color-scheme` (set via `--uktdd-color-scheme`, default `inherit`)
+shadow. `color-scheme` (set via `--uktdd-color-scheme`, unset by default)
 is left to inherit from the host page rather than forced to `light dark`:
 the popover is page content, not OS chrome, so it matches whatever scheme
 the page itself has opted into — light, if the page hasn’t adopted dark
@@ -466,16 +466,17 @@ type Item = {
 ### CSS custom properties
 
 Every `--uktdd-*` custom property the component reads, with its default.
-Set them on the dropdown’s root (a class, or the `style` prop, which
-accepts them) or on an ancestor to theme a whole subtree. Anything not
-listed here — the `--uktdd-anchor` and `--uktdd-submenu-anchor` anchor
-names, and the `data-ukt-generated-id` attribute — is internal.
+Set them on the dropdown (a class, or the `style` prop, which accepts
+them), on an ancestor to theme a whole subtree, or on `:root` to theme
+every dropdown on the page. Anything not listed here — the `--uktdd-anchor`
+and `--uktdd-submenu-anchor` anchor names, and the `data-ukt-generated-id`
+attribute — is internal.
 
 Colors (see [Color Scheme](#color-scheme)):
 
 | Property                                  | Default                                              |
 | ----------------------------------------- | ---------------------------------------------------- |
-| `--uktdd-color-scheme`                    | `inherit`                                            |
+| `--uktdd-color-scheme`                    | none (inherits the surrounding `color-scheme`)       |
 | `--uktdd-body-bg-color`                   | `Canvas`                                             |
 | `--uktdd-body-color`                      | `CanvasText`                                         |
 | `--uktdd-body-bg-color-hover`             | `Highlight`                                          |
@@ -491,7 +492,7 @@ Typography, sizing, and spacing:
 
 | Property                        | Default                                   |
 | ------------------------------- | ----------------------------------------- |
-| `--uktdd-font-family`           | `inherit` (the page’s font)               |
+| `--uktdd-font-family`           | none (inherits the surrounding font)      |
 | `--uktdd-body-buffer`           | `10px` (viewport inset for the max sizes) |
 | `--uktdd-body-min-height`       | `30px`                                    |
 | `--uktdd-body-max-height`       | `calc(100dvh - var(--uktdd-body-buffer))` |
