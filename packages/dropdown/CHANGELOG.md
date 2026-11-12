@@ -1,5 +1,35 @@
 # @acusti/dropdown
 
+## 1.4.0
+
+### Minor Changes
+
+- c0eb2db: Use the page’s font in dropdowns by default
+
+    Dropdowns, their triggers and the menu bar now inherit the font of the
+    page around them, where they used to set the system UI font stack. If
+    your app sets its font on `html` or `body`, dropdowns now match it
+    without any configuration. If your page sets no font of its own,
+    dropdowns now use the browser’s default font, like the rest of the
+    page. To give dropdowns a font of their own (such as the previous
+    system stack), set `--uktdd-font-family` on `:root`, an ancestor, or a
+    dropdown’s class:
+
+    ```css
+    :root {
+        --uktdd-font-family: system-ui, sans-serif;
+    }
+    ```
+
+### Patch Changes
+
+- 09cb6c3: Apply `--uktdd-*` tokens set on `html` or `:root` in any order
+
+    The dropdown’s default tokens now have zero specificity, so a value you
+    set on `html` or `:root` always applies. Before, a value on `html`
+    always lost to the package’s defaults, and one on `:root` lost whenever
+    your stylesheet came before the package’s.
+
 ## 1.3.1
 
 ### Patch Changes
