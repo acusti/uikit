@@ -491,7 +491,7 @@ Typography, sizing, and spacing:
 
 | Property                        | Default                                   |
 | ------------------------------- | ----------------------------------------- |
-| `--uktdd-font-family`           | the system UI font stack                  |
+| `--uktdd-font-family`           | `inherit` (the page’s font)               |
 | `--uktdd-body-buffer`           | `10px` (viewport inset for the max sizes) |
 | `--uktdd-body-min-height`       | `30px`                                    |
 | `--uktdd-body-max-height`       | `calc(100dvh - var(--uktdd-body-buffer))` |
