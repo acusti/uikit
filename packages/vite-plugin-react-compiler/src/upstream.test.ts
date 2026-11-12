@@ -1099,4 +1099,25 @@ export function EmailField({ value, touched }: { value: string; touched: boolean
         );
         expect(result?.code).toContain('react/compiler-runtime');
     });
+
+    // a ref-like name that starts with a non-ASCII letter, like `élanRef`,
+    // made the compiler panic through 0.157.0, aborting the process, a dev
+    // server included; babel-plugin-react-compiler@1.0.0 compiles it.
+    // Compiled upstream since 0.158.0
+    // (https://github.com/oxc-project/oxc/pull/28758)
+    it('compiles a ref-like name that starts with a non-ASCII letter', async () => {
+        const result = await transformCode(
+            `
+import { useRef } from 'react';
+
+export function Counter() {
+    const élanRef = useRef(0);
+    return <button onClick={() => { élanRef.current += 1; }}>+</button>;
+}
+`,
+            '/src/Counter.tsx',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+        expect(result?.code).toContain('const élanRef = useRef(0);');
+    });
 });
