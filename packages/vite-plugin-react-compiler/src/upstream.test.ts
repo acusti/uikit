@@ -1040,4 +1040,37 @@ export function LoadAll({ onLoaded }: { onLoaded: (rows: string[]) => void }) {
         );
         expect(result?.code).toContain('react/compiler-runtime');
     });
+
+    // a hook or component in which an async function reassigns a variable
+    // declared in another callback, like an effect that stores a
+    // connection from an async IIFE for its cleanup, was left uncompiled on
+    // 0.157.0 (“Cannot reassign variable in async function”,
+    // https://github.com/oxc-project/oxc/pull/26893), which also failed the
+    // build with panicThreshold set to 'critical_errors' or 'all_errors'.
+    // The variable belongs to one run of the effect, so compiling it is
+    // safe, and 0.156.0 and babel-plugin-react-compiler@1.0.0 compile it.
+    // Compiled again since 0.158.0
+    // (https://github.com/oxc-project/oxc/issues/28401, fixed by
+    // https://github.com/oxc-project/oxc/pull/28820)
+    it('compiles an effect whose async callback reassigns an effect local', async () => {
+        const result = await transformCode(
+            `
+import { useEffect } from 'react';
+
+declare function connect(url: string): Promise<{ close(): void }>;
+
+export function useSocket(url: string) {
+    useEffect(() => {
+        let socket: { close(): void } | undefined;
+        (async () => {
+            socket = await connect(url);
+        })();
+        return () => socket?.close();
+    }, [url]);
+}
+`,
+            '/src/useSocket.ts',
+        );
+        expect(result?.code).toContain('react/compiler-runtime');
+    });
 });
