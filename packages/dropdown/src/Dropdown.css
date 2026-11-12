@@ -111,8 +111,9 @@
     );
 }
 
-.uktdropdown,
-.uktdropdown-trigger {
+/* at zero specificity, this still replaces a button’s default font, but a
+   consumer’s own unlayered font rule (such as one on button) wins */
+:where(.uktdropdown, .uktdropdown-trigger, .uktmenubar) {
     font-family: var(--uktdd-font-family);
 }
 
@@ -466,7 +467,6 @@ div.uktdropdown-body {
     display: flex;
     align-items: stretch;
     width: max-content;
-    font-family: var(--uktdd-font-family);
 
     /* the open menu’s trigger reads as active, like the highlighted item in
        the macOS menu bar; the default tints over whatever background the
