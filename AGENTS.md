@@ -25,6 +25,9 @@ bun run format:check
 - `bun run buildall` includes the docs package
 - `bun run dev` starts Storybook for `@acusti/uikit-docs`
 - For a single workspace, use `bun run --filter '@acusti/<pkg>' <script>`
+- `gh pr create`, `gh pr edit` and `gh pr comment` take `--attach` (gh
+  2.99+) to upload images and videos into the body; use it rather than
+  hosting them on a branch
 
 ## Validation
 
