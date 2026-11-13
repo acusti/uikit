@@ -4,7 +4,7 @@ import { userEvent } from '@testing-library/user-event';
 import { createRef, useState } from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 
-import type { Props } from './InputText.js';
+import type { InputElement, Props } from './InputText.js';
 
 // Stub CSS.supports to return false for field-sizing to test fallback behavior
 vi.stubGlobal('CSS', {
@@ -808,6 +808,37 @@ describe('InputText.tsx', () => {
         expect(parseFloat(textarea.style.height)).toBe(100);
     });
 
+    it('sizes a multiLine input to a new initialValue', () => {
+        const { rerender } = render(<InputText initialValue="" multiLine />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        // happy-dom does no layout, so give the textarea 20px per line
+        Object.defineProperty(textarea, 'scrollHeight', {
+            get: () => textarea.value.split('\n').length * 20,
+        });
+
+        // React shows a new initialValue in a textarea that hasn’t been typed in
+        rerender(<InputText initialValue={'one\ntwo\nthree'} multiLine />);
+        expect(textarea.style.height).toBe('60px');
+
+        // …and the component writes it to one that has, e.g. to empty it once
+        // its form is submitted
+        fireEvent.change(textarea, { target: { value: 'one\ntwo' } });
+        rerender(<InputText initialValue="" multiLine />);
+        expect(textarea.value).toBe('');
+        expect(textarea.style.height).toBe('20px');
+    });
+
+    it('leaves the height of a single-line input alone when initialValue changes', () => {
+        const { rerender } = render(
+            <InputText initialValue="" style={{ height: '40px' }} />,
+        );
+        const input = screen.getByRole('textbox') as HTMLInputElement;
+
+        rerender(<InputText initialValue="foo" style={{ height: '40px' }} />);
+        expect(input.value).toBe('foo');
+        expect(input.style.height).toBe('40px');
+    });
+
     // NOTE cannot test maxHeight prop for multiLine inputs in happy-dom
     // due to limitations in how it calculates layout and dimensions
 
@@ -870,6 +901,74 @@ describe('InputText.tsx', () => {
         const inputRef = createRef<HTMLInputElement>();
         render(<InputText ref={inputRef} />);
         expect(inputRef.current?.tagName).toBe('INPUT');
+    });
+
+    // The component gives its element a ref callback that returns a cleanup
+    // function, which React calls when the element detaches instead of calling
+    // the ref callback with null, so the forwarded ref is released as React
+    // would release it if it were on the element itself
+    describe('releasing the forwarded ref when the element detaches', () => {
+        it.each([false, true])('clears an object ref (multiLine: %s)', (multiLine) => {
+            const ref = createRef<InputElement>();
+            const { unmount } = render(<InputText multiLine={multiLine} ref={ref} />);
+            expect(ref.current).toBe(screen.getByRole('textbox'));
+
+            unmount();
+            expect(ref.current).toBeNull();
+        });
+
+        it.each([false, true])(
+            'calls a callback ref with null (multiLine: %s)',
+            (multiLine) => {
+                const ref = vi.fn<(element: InputElement | null) => void>();
+                const { unmount } = render(<InputText multiLine={multiLine} ref={ref} />);
+                const element = screen.getByRole('textbox');
+                expect(ref.mock.calls).toEqual([[element]]);
+
+                unmount();
+                expect(ref.mock.calls).toEqual([[element], [null]]);
+            },
+        );
+
+        it.each([false, true])(
+            'calls the cleanup a callback ref returns, and not the callback ref with null (multiLine: %s)',
+            (multiLine) => {
+                const refCleanup = vi.fn<() => void>();
+                const ref = vi.fn<(element: InputElement | null) => () => void>(
+                    () => refCleanup,
+                );
+                const { unmount } = render(<InputText multiLine={multiLine} ref={ref} />);
+
+                unmount();
+                expect(ref).toHaveBeenCalledTimes(1);
+                expect(refCleanup).toHaveBeenCalledTimes(1);
+            },
+        );
+
+        it('moves a callback ref from the textarea to the input when multiLine is turned off', () => {
+            const ref = vi.fn<(element: InputElement | null) => void>();
+            const { rerender } = render(<InputText multiLine ref={ref} />);
+            const textarea = screen.getByRole('textbox');
+
+            rerender(<InputText ref={ref} />);
+            const input = screen.getByRole('textbox');
+            expect(input.tagName).toBe('INPUT');
+            expect(ref.mock.calls).toEqual([[textarea], [null], [input]]);
+        });
+    });
+
+    it('disconnects the ResizeObserver of a multiLine input when the textarea detaches', () => {
+        const disconnect = vi.spyOn(ResizeObserver.prototype, 'disconnect');
+        const { rerender, unmount } = render(<InputText multiLine />);
+        expect(disconnect).not.toHaveBeenCalled();
+
+        rerender(<InputText />);
+        expect(disconnect).toHaveBeenCalledTimes(1);
+
+        rerender(<InputText multiLine />);
+        unmount();
+        expect(disconnect).toHaveBeenCalledTimes(2);
+        disconnect.mockRestore();
     });
 
     it('forwards aria-* attributes to the textarea when multiLine', () => {

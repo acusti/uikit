@@ -168,6 +168,7 @@ export default function InputText({
     const inputRef = useRef<InputRef>(null);
     const valueFromProps = initialValue ?? '';
     const committedValueRef = useRef(valueFromProps);
+    const sizedValueRef = useRef(valueFromProps);
 
     const setInputHeight = () => {
         if (!inputRef.current || SUPPORTS_FIELD_SIZING) return;
@@ -220,22 +221,27 @@ export default function InputText({
         }
 
         // Setup ResizeObserver for multiLine inputs
-        if (!element || !multiLine || SUPPORTS_FIELD_SIZING) {
-            // Return ref cleanup if present
-            return cleanup;
+        let observer: ResizeObserver | undefined = undefined;
+        if (element && multiLine && !SUPPORTS_FIELD_SIZING) {
+            // Initialize input height
+            setInputHeight();
+
+            observer = new ResizeObserver(setInputHeight);
+            observer.observe(element);
         }
 
-        // Initialize input height
-        setInputHeight();
-
-        const observer = new ResizeObserver(setInputHeight);
-        observer.observe(element);
-
-        // Return cleanup function that disconnects observer and calls ref cleanup
+        // React calls this cleanup when the element detaches instead of
+        // calling handleRef with null, so it undoes all of the above and
+        // releases the forwarded ref as React would have
         return () => {
-            observer.disconnect();
-            if (typeof cleanup === 'function') {
+            observer?.disconnect();
+            inputRef.current = null;
+            if (cleanup) {
                 cleanup();
+            } else if (typeof ref === 'function') {
+                ref(null);
+            } else if (ref) {
+                ref.current = null;
             }
         };
     };
@@ -256,6 +262,17 @@ export default function InputText({
         if (inputRef.current.value === valueFromProps) return;
         inputRef.current.value = valueFromProps;
     }, [valueFromProps]);
+
+    // a new initialValue fires no input event, whether the effect above
+    // writes it or React does (to an input that hasn’t been typed in), so a
+    // multi-line input is sized to it here. it checks for a new initialValue
+    // itself instead of taking dependencies, which would have to include
+    // setInputHeight, a new function on every render
+    useLayoutEffect(() => {
+        if (sizedValueRef.current === valueFromProps) return;
+        sizedValueRef.current = valueFromProps;
+        if (multiLine) setInputHeight();
+    });
 
     const [readOnlyState, setReadOnlyState] = useState<boolean | undefined>(
         readOnly ?? doubleClickToEdit,
