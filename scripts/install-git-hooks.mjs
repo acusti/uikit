@@ -1,16 +1,16 @@
 import { spawnSync } from 'node:child_process';
 import { existsSync } from 'node:fs';
 
+function info(message) {
+    console.log(`hooks: ${message}`);
+}
+
 function run(command, args, options = {}) {
     return spawnSync(command, args, {
         encoding: 'utf8',
         stdio: ['ignore', 'pipe', 'pipe'],
         ...options,
     });
-}
-
-function info(message) {
-    console.log(`hooks: ${message}`);
 }
 
 function warn(message) {
