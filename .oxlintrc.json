@@ -112,6 +112,19 @@
         ],
         "vitest/valid-expect": ["error", { "maxArgs": 2 }]
     },
+    "overrides": [
+        {
+            "files": [
+                "scripts/**",
+                "vite.config.base.js",
+                "vitest.config.js",
+                "vitest.setup.js"
+            ],
+            "rules": {
+                "typescript/strict-boolean-expressions": "off"
+            }
+        }
+    ],
     "settings": {
         "jsx-a11y": {
             "components": {
