@@ -4,6 +4,8 @@ import react from '@vitejs/plugin-react';
 import { defineConfig as defineConfigVite } from 'vite';
 import { configDefaults } from 'vitest/config';
 
+import { assertInstallMatchesLockfile } from './scripts/assert-install-matches-lockfile.mjs';
+
 export const defineConfig = (options = {}) => {
     const {
         build: buildOptions,
@@ -14,6 +16,12 @@ export const defineConfig = (options = {}) => {
         react: isReact = false,
         target,
     } = options;
+
+    // a test run against an install that lags bun.lock stops here, before
+    // Vitest caches any module resolved against it
+    if (process.env.VITEST) {
+        assertInstallMatchesLockfile(fileURLToPath(new URL('.', import.meta.url)));
+    }
 
     return defineConfigVite({
         build: {
