@@ -7,8 +7,12 @@ if (
     typeof HTMLElement !== 'undefined' &&
     typeof HTMLElement.prototype.showPopover !== 'function'
 ) {
-    HTMLElement.prototype.showPopover = function showPopover() {};
-    HTMLElement.prototype.hidePopover = function hidePopover() {};
+    HTMLElement.prototype.showPopover = function showPopover() {
+        // no-op: happy-dom has no top layer
+    };
+    HTMLElement.prototype.hidePopover = function hidePopover() {
+        // no-op: happy-dom has no top layer
+    };
     HTMLElement.prototype.togglePopover = function togglePopover(force) {
         const willShow = typeof force === 'boolean' ? force : true;
         return willShow;
