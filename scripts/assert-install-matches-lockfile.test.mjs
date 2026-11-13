@@ -332,7 +332,9 @@ describe('findInstallProblems', () => {
     // A Bun release that changes the lockfile’s shape would otherwise block
     // every test run on mismatches that aren’t there, which no install clears.
     it('lets a lockfile in another format through, with a warning', () => {
-        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+        const warn = vi.spyOn(console, 'warn').mockImplementation(() => {
+            // silence the expected warning; the test asserts on it below
+        });
         onTestFinished(() => warn.mockRestore());
         const root = createCheckout({
             links: { 'packages/plugin/node_modules/transformer': 'transformer@0.156.0' },
