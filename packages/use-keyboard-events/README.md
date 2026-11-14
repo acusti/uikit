@@ -1,7 +1,7 @@
 # @acusti/use-keyboard-events
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/use-keyboard-events)](https://npmx.dev/package/@acusti/use-keyboard-events)
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/use-keyboard-events)](https://npmx.dev/package/@acusti/use-keyboard-events)
+[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/use-keyboard-events)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/use-keyboard-events)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/use-keyboard-events)](https://npmx.dev/package/@acusti/use-keyboard-events)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/use-keyboard-events)](https://npmx.dev/package/@acusti/use-keyboard-events)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/use-keyboard-events)](https://npmx.dev/package/@acusti/use-keyboard-events)

@@ -1,7 +1,7 @@
 # @acusti/styling
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
+[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/styling)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/styling)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/styling)](https://npmx.dev/package/@acusti/styling)

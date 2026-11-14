@@ -1,7 +1,7 @@
 # @acusti/css-value-input
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)
+[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/css-value-input)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/css-value-input)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/css-value-input)](https://npmx.dev/package/@acusti/css-value-input)

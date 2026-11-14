@@ -1,7 +1,7 @@
 # @acusti/parsing
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/parsing)](https://npmx.dev/package/@acusti/parsing)
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/parsing)](https://npmx.dev/package/@acusti/parsing)
+[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/parsing)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/parsing)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/parsing)](https://npmx.dev/package/@acusti/parsing)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/parsing)](https://npmx.dev/package/@acusti/parsing)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/parsing)](https://npmx.dev/package/@acusti/parsing)

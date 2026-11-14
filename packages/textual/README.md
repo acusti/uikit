@@ -1,7 +1,7 @@
 # @acusti/textual
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/textual)](https://npmx.dev/package/@acusti/textual)
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/textual)](https://npmx.dev/package/@acusti/textual)
+[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/textual)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/textual)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/textual)](https://npmx.dev/package/@acusti/textual)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/textual)](https://npmx.dev/package/@acusti/textual)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/textual)](https://npmx.dev/package/@acusti/textual)

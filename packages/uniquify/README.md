@@ -1,7 +1,7 @@
 # @acusti/uniquify
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/size/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
+[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/uniquify)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/uniquify)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)
