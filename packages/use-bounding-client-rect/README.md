@@ -1,7 +1,7 @@
 # @acusti/use-bounding-client-rect
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/use-bounding-client-rect)](https://npmx.dev/package/@acusti/use-bounding-client-rect)
-[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/use-bounding-client-rect)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/use-bounding-client-rect)
+[![minzip size](https://bundlebadge.acusti.ca/minzip/@acusti/use-bounding-client-rect)](https://bundlebadge.acusti.ca/package/@acusti/use-bounding-client-rect)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/use-bounding-client-rect)](https://npmx.dev/package/@acusti/use-bounding-client-rect)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/use-bounding-client-rect)](https://npmx.dev/package/@acusti/use-bounding-client-rect)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/use-bounding-client-rect)](https://npmx.dev/package/@acusti/use-bounding-client-rect)

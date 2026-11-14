@@ -1,7 +1,7 @@
 # @acusti/aws-signature-v4
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/aws-signature-v4)](https://npmx.dev/package/@acusti/aws-signature-v4)
-[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/aws-signature-v4)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/aws-signature-v4)
+[![minzip size](https://bundlebadge.acusti.ca/minzip/@acusti/aws-signature-v4)](https://bundlebadge.acusti.ca/package/@acusti/aws-signature-v4)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/aws-signature-v4)](https://npmx.dev/package/@acusti/aws-signature-v4)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/aws-signature-v4)](https://npmx.dev/package/@acusti/aws-signature-v4)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/aws-signature-v4)](https://npmx.dev/package/@acusti/aws-signature-v4)

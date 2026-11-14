@@ -1,7 +1,7 @@
 # @acusti/input-text
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)
-[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/input-text)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/input-text)
+[![minzip size](https://bundlebadge.acusti.ca/minzip/@acusti/input-text)](https://bundlebadge.acusti.ca/package/@acusti/input-text)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)

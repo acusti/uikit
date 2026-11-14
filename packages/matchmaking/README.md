@@ -1,7 +1,7 @@
 # @acusti/matchmaking
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)
-[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/matchmaking)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/matchmaking)
+[![minzip size](https://bundlebadge.acusti.ca/minzip/@acusti/matchmaking)](https://bundlebadge.acusti.ca/package/@acusti/matchmaking)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)

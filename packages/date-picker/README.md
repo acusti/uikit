@@ -1,7 +1,7 @@
 # @acusti/date-picker
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
-[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/date-picker)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/date-picker)
+[![minzip size](https://bundlebadge.acusti.ca/minzip/@acusti/date-picker)](https://bundlebadge.acusti.ca/package/@acusti/date-picker)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/date-picker)](https://npmx.dev/package/@acusti/date-picker)

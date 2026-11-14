@@ -1,7 +1,7 @@
 # @acusti/use-is-out-of-bounds
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/use-is-out-of-bounds)](https://npmx.dev/package/@acusti/use-is-out-of-bounds)
-[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/use-is-out-of-bounds)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/use-is-out-of-bounds)
+[![minzip size](https://bundlebadge.acusti.ca/minzip/@acusti/use-is-out-of-bounds)](https://bundlebadge.acusti.ca/package/@acusti/use-is-out-of-bounds)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/use-is-out-of-bounds)](https://npmx.dev/package/@acusti/use-is-out-of-bounds)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/use-is-out-of-bounds)](https://npmx.dev/package/@acusti/use-is-out-of-bounds)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/use-is-out-of-bounds)](https://npmx.dev/package/@acusti/use-is-out-of-bounds)

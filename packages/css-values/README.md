@@ -1,7 +1,7 @@
 # @acusti/css-values
 
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/css-values)](https://npmx.dev/package/@acusti/css-values)
-[![minzip size](https://bundle-badge.andrew-ab6.workers.dev/minzip/@acusti/css-values)](https://bundle-badge.andrew-ab6.workers.dev/package/@acusti/css-values)
+[![minzip size](https://bundlebadge.acusti.ca/minzip/@acusti/css-values)](https://bundlebadge.acusti.ca/package/@acusti/css-values)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/css-values)](https://npmx.dev/package/@acusti/css-values)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/css-values)](https://npmx.dev/package/@acusti/css-values)
 [![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/css-values)](https://npmx.dev/package/@acusti/css-values)
