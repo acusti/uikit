@@ -158,33 +158,35 @@ function dependenciesOf({ dependencies, devDependencies, optionalDependencies })
     ];
 }
 
-// whether the os, cpu and libc a bun.lock entry is limited to (each a name, a
-// list of names, or names negated with `!`) include this machine’s
+// whether the os, cpu and libc a bun.lock entry is limited to (each a name or
+// a list of names, either allowed or excluded with `!`) include this
+// machine’s; libc counts on Linux alone
 function isForThisPlatform({ cpu, libc, os }) {
     return (
         matches(os, process.platform) &&
         matches(cpu, process.arch) &&
-        (process.platform !== 'linux' || matches(libc, getLibc()))
+        (process.platform !== 'linux' || matches(libc, getMachineLibc()))
     );
 }
 
-// as npm reads these lists: an exclusion of the value rules it out, and a list
-// that names any values has to name this one
-function matches(allowed, value) {
-    if (allowed == null) return true;
-    const names = [allowed].flat();
+// bun.lock writes the platforms a build is for as a name or a list of names:
+// the ones it allows or, when that list would be longer, the ones it excludes,
+// each prefixed with `!`, and `"none"` when it allows none
+function matches(listed, value) {
+    if (listed == null) return true;
+    const names = [listed].flat();
     if (names.includes(`!${value}`)) return false;
-    const included = names.filter((name) => !name.startsWith('!'));
-    return included.length === 0 || included.includes(value);
+    const allowed = names.filter((name) => !name.startsWith('!'));
+    return allowed.length === 0 || allowed.includes(value);
 }
 
 // a glibc runtime reports its version, and musl doesn’t; the report takes tens
 // of milliseconds to build, so it is built once
-let libc;
-function getLibc() {
-    libc ??=
+let machineLibc;
+function getMachineLibc() {
+    machineLibc ??=
         process.report.getReport().header.glibcVersionRuntime == null ? 'musl' : 'glibc';
-    return libc;
+    return machineLibc;
 }
 
 // The bun.lock key a dependency of `parentKey` resolves to. Keys spell the
