@@ -31,7 +31,7 @@ const QUERY = '?sheet';
 const PREFIX = '\0style-sheet:';
 // the virtual id ends in `.js` so that Vite’s CSS plugins, which claim any id
 // ending in `.css` (with or without a query), leave it alone
-const SUFFIX = '.style.js';
+const SUFFIX = '.sheet.js';
 
 /**
  * Turns `import sheet from './x.css?sheet'` into a sheet for `<Style>`:
@@ -67,7 +67,10 @@ export default function styleSheets({
                 if (!id.startsWith(PREFIX)) return;
                 const { config, mode } = this.environment;
                 const isClient = config.consumer === 'client';
-                const file = id.slice(PREFIX.length, -SUFFIX.length);
+                const file = resolve(
+                    config.root,
+                    id.slice(PREFIX.length, -SUFFIX.length),
+                );
                 const path = relative(resolve(config.root, root), file)
                     .split(sep)
                     .join('/');
@@ -105,7 +108,16 @@ export default function styleSheets({
                     { skipSelf: true },
                 );
                 if (resolved == null) return;
-                return `${PREFIX}${resolved.id}${SUFFIX}`;
+                // A build that keeps comments (a library’s, by default) names
+                // each module by its id, so a build’s is relative to the Vite
+                // root. Dev keeps the absolute path: it serves the module at a
+                // URL made from the id, where `..` segments would collapse.
+                const { config, mode } = this.environment;
+                const file =
+                    mode === 'build'
+                        ? relative(config.root, resolved.id).split(sep).join('/')
+                        : resolved.id;
+                return `${PREFIX}${file}${SUFFIX}`;
             },
         },
     };
