@@ -255,9 +255,32 @@ export default function InputText({
         const observer = new ResizeObserver(setInputHeight);
         observer.observe(element);
 
-        // Return cleanup function that disconnects observer and calls ref cleanup
+        // A form reset restores the input’s default value with no input event,
+        // no commit and (with the height set) no resize, so fit the input to
+        // it here. Listen on the root rather than on element.form, which can
+        // change (e.g. with the form prop) without this ref callback running
+        // again, and in the capture phase, so that a listener that stops the
+        // event can’t hide it. reset fires before the form’s controls are
+        // reset, and after a click on a reset button even a microtask runs too
+        // early to see the reset value, so fit in a timeout. Skip it if the
+        // input was replaced by then (e.g. by a re-render that turns multiLine
+        // off), or if it still has the value it was fitted to, as after a
+        // canceled reset or a reset of another form
+        const rootNode = element.getRootNode();
+        const handleReset = () => {
+            setTimeout(() => {
+                if (inputRef.current !== element) return;
+                if (element.value === fittedValueRef.current) return;
+                setInputHeight();
+            }, 0);
+        };
+        rootNode.addEventListener('reset', handleReset, true);
+
+        // Return cleanup function that disconnects observer, removes the reset
+        // listener and calls ref cleanup
         return () => {
             observer.disconnect();
+            rootNode.removeEventListener('reset', handleReset, true);
             if (typeof cleanup === 'function') {
                 cleanup();
             }
