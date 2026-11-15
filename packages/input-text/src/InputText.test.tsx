@@ -41,6 +41,19 @@ function stubTextareaScrollHeight() {
     return scrollHeight;
 }
 
+// Resets a form the way browsers do: fire a cancelable reset event, then
+// reset the form’s controls if it wasn’t canceled. happy-dom’s form.reset()
+// resets them first, and fires reset afterwards
+function resetForm(form: HTMLFormElement) {
+    const event = new Event('reset', { bubbles: true, cancelable: true });
+    if (!form.dispatchEvent(event)) return;
+    for (const element of form.elements) {
+        if (element instanceof HTMLTextAreaElement) {
+            element.value = element.defaultValue;
+        }
+    }
+}
+
 afterEach(cleanup);
 
 describe('InputText.tsx', () => {
@@ -966,6 +979,89 @@ describe('InputText.tsx', () => {
         await user.keyboard('{Escape}');
         expect(textarea.value).toBe('');
         expect(textarea.style.height).toBe('20px');
+    });
+
+    it('resizes a multiLine input to fit the value that a reset of its form restores', () => {
+        stubTextareaScrollHeight();
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        render(
+            <form>
+                <InputText initialValue="hello" multiLine />
+            </form>,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        fireEvent.input(textarea, { target: { value: 'x'.repeat(100) } });
+        expect(textarea.style.height).toBe('120px');
+        resetForm(textarea.form as HTMLFormElement);
+        vi.runAllTimers();
+        expect(textarea.value).toBe('hello');
+        expect(textarea.style.height).toBe('25px');
+    });
+
+    it('resizes a multiLine input to fit the value that a reset of its form restores when a listener stops the reset’s propagation', () => {
+        stubTextareaScrollHeight();
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        render(
+            <form onReset={(event) => event.stopPropagation()}>
+                <InputText initialValue="hello" multiLine />
+            </form>,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        fireEvent.input(textarea, { target: { value: 'x'.repeat(100) } });
+        resetForm(textarea.form as HTMLFormElement);
+        vi.runAllTimers();
+        expect(textarea.style.height).toBe('25px');
+    });
+
+    it('resizes a multiLine input to fit the value that a reset restores of the form its form prop names, after the form prop changes', () => {
+        stubTextareaScrollHeight();
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        const getUI = (form: string) => (
+            <>
+                <form id="first-form" />
+                <form id="second-form" />
+                <InputText form={form} initialValue="hello" multiLine />
+            </>
+        );
+        const { rerender } = render(getUI('first-form'));
+        rerender(getUI('second-form'));
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        fireEvent.input(textarea, { target: { value: 'x'.repeat(100) } });
+        expect(textarea.style.height).toBe('120px');
+        resetForm(textarea.form as HTMLFormElement);
+        vi.runAllTimers();
+        expect(textarea.value).toBe('hello');
+        expect(textarea.style.height).toBe('25px');
+    });
+
+    it('doesn’t measure a multiLine input again for a reset of its form that’s canceled', () => {
+        const scrollHeight = stubTextareaScrollHeight();
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        render(
+            <form onReset={(event) => event.preventDefault()}>
+                <InputText initialValue="hello" multiLine />
+            </form>,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        fireEvent.input(textarea, { target: { value: 'x'.repeat(100) } });
+        scrollHeight.mockClear();
+        resetForm(textarea.form as HTMLFormElement);
+        vi.runAllTimers();
+        expect(textarea.value).toBe('x'.repeat(100));
+        expect(textarea.style.height).toBe('120px');
+        expect(scrollHeight).not.toHaveBeenCalled();
     });
 
     it('forwards aria-* attributes and role to the input', () => {
