@@ -16,7 +16,7 @@ type Hook<Handler> = { filter: { id: RegExp }; handler: Handler };
 
 const ROOT = '/project';
 const FILE = '/project/app/components/card.css';
-const ID = `\0style-sheet:${FILE}.style.js`;
+const ID = '\0style-sheet:app/components/card.css.sheet.js';
 
 function load({
     consumer = 'client',
@@ -39,12 +39,17 @@ function load({
     );
 }
 
-function resolveId(source: string, resolved: null | { id: string }) {
+function resolveId(
+    source: string,
+    resolved: null | { id: string },
+    mode: Environment['mode'] = 'build',
+) {
     const plugin = styleSheets();
     const calls: Array<unknown> = [];
     const hook = plugin.resolveId as Hook<
         (
             this: {
+                environment: { config: { root: string }; mode: Environment['mode'] };
                 resolve: (...args: Array<unknown>) => Promise<null | { id: string }>;
             },
             source: string,
@@ -53,6 +58,7 @@ function resolveId(source: string, resolved: null | { id: string }) {
     >;
     const result = hook.handler.call(
         {
+            environment: { config: { root: ROOT }, mode },
             resolve: (...args) => {
                 calls.push(args);
                 return Promise.resolve(resolved);
@@ -85,6 +91,18 @@ describe('resolveId', () => {
         expect(calls).toEqual([
             ['./card.css', '/project/app/components/Card.tsx', { skipSelf: true }],
         ]);
+    });
+
+    // in dev, the module is served at a URL made from its id, where the `..`
+    // segments of a path from the Vite root would collapse
+    it('keeps the absolute path in a dev id', async () => {
+        const { result } = resolveId(
+            '../../shared/card.css?sheet',
+            { id: '/shared/card.css' },
+            'dev',
+        );
+
+        expect(await result).toBe('\0style-sheet:/shared/card.css.sheet.js');
     });
 
     it('leaves other imports alone', async () => {
@@ -134,8 +152,7 @@ describe('load', () => {
     });
 
     it('encodes a space, which would split the href in a server render’s data-href', () => {
-        const file = '/project/app/my card.css';
-        expect(load({ id: `\0style-sheet:${file}.style.js` })).toContain(
+        expect(load({ id: '\0style-sheet:app/my card.css.sheet.js' })).toContain(
             'href: "app/my%20card.css"',
         );
     });
@@ -216,14 +233,20 @@ describe('build', () => {
             join(root, 'src/entry.js'),
             "import sheet from './sheet.css?sheet';\nexport default sheet;\n",
         );
+        await writeFile(
+            join(root, 'src/component.js'),
+            "import sheet from './sheet.css?sheet';\nexport default () => sheet.href;\n",
+        );
     });
 
     afterAll(() => rm(root, { force: true, recursive: true }));
 
     async function buildEntry({
+        entry = 'src/entry.js',
         options,
         ssr = false,
     }: {
+        entry?: string;
         options?: Options;
         ssr?: boolean;
     }) {
@@ -231,7 +254,7 @@ describe('build', () => {
             build: {
                 minify: false,
                 rolldownOptions: {
-                    input: join(root, 'src/entry.js'),
+                    input: join(root, entry),
                     preserveEntrySignatures: 'strict',
                 },
                 ssr,
@@ -265,6 +288,16 @@ describe('build', () => {
 
         expect(code).toContain('from-the-sheet');
         expect(assets.filter((file) => file.fileName.endsWith('.css'))).toEqual([]);
+    });
+
+    // a build that keeps comments, as a library’s does by default, names each
+    // module in the output by its id
+    it('keeps the path of the directory it builds in out of the output', async () => {
+        const { code } = await buildEntry({ entry: 'src/component.js' });
+
+        // the comment spells out the id’s NUL as `\0`
+        expect(code).toContain('// \\0style-sheet:src/sheet.css.sheet.js');
+        expect(code).not.toMatch(/style-sheet:\//);
     });
 
     it('keeps the text in a server build that strips', async () => {
