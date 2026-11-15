@@ -236,6 +236,10 @@ describe('findInstallProblems', () => {
     // to one an earlier install left behind. A list that names platforms and
     // also excludes some limits the build to the ones it names, as npm reads it.
     const otherOS = process.platform === 'win32' ? 'linux' : 'win32';
+    // a glibc runtime reports its version and musl doesn’t
+    const thisLibc =
+        process.report.getReport().header.glibcVersionRuntime == null ? 'musl' : 'glibc';
+    const otherLibc = thisLibc === 'glibc' ? 'musl' : 'glibc';
     it.each([
         ['names another platform', { os: otherOS }],
         ['names platforms alongside an exclusion', { os: [otherOS, '!aix'] }],
@@ -249,10 +253,6 @@ describe('findInstallProblems', () => {
     it.runIf(process.platform === 'linux')(
         'passes over a stale link to the build for the other libc',
         () => {
-            const otherLibc =
-                process.report.getReport().header.glibcVersionRuntime == null
-                    ? 'glibc'
-                    : 'musl';
             const root = checkoutWithStaleBuild({
                 cpu: process.arch,
                 libc: otherLibc,
@@ -263,7 +263,9 @@ describe('findInstallProblems', () => {
         },
     );
 
-    // this platform’s build is what the bindings load, so a stale one counts
+    // This platform’s build is what the bindings load, so a stale one counts.
+    // On Linux it names this machine’s libc, as the glibc bindings of
+    // oxc-transform-react and oxlint do.
     it('reports this platform’s build at the wrong version', () => {
         const root = createCheckout({
             links: { 'packages/plugin/node_modules/transformer': 'transformer@0.158.0' },
@@ -272,7 +274,11 @@ describe('findInstallProblems', () => {
                     '@transformer/binding-here': [
                         '@transformer/binding-here@0.158.0',
                         '',
-                        { cpu: process.arch, os: process.platform },
+                        {
+                            cpu: process.arch,
+                            os: process.platform,
+                            ...(process.platform === 'linux' ? { libc: thisLibc } : {}),
+                        },
                         'sha512-',
                     ],
                     transformer: [
