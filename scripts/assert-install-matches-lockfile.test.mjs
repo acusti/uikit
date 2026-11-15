@@ -233,8 +233,10 @@ describe('findInstallProblems', () => {
     }
 
     // Bun skips another platform’s build, and resolution can still reach a link
-    // to one an earlier install left behind. A list that names platforms and
-    // also excludes some limits the build to the ones it names, as npm reads it.
+    // to one an earlier install left behind. bun.lock names the platforms a
+    // build is for, or the ones it excludes with `!`, alone or in a list, and
+    // writes `"none"` for a build none of Bun’s platforms can run (riscv64,
+    // which Bun doesn’t list, among them).
     const otherOS = process.platform === 'win32' ? 'linux' : 'win32';
     // a glibc runtime reports its version and musl doesn’t
     const thisLibc =
@@ -242,10 +244,30 @@ describe('findInstallProblems', () => {
     const otherLibc = thisLibc === 'glibc' ? 'musl' : 'glibc';
     it.each([
         ['names another platform', { os: otherOS }],
-        ['names platforms alongside an exclusion', { os: [otherOS, '!aix'] }],
-        ['excludes this platform', { os: [`!${process.platform}`] }],
+        ['names other platforms in a list', { os: [otherOS, 'aix'] }],
+        ['names no CPU Bun knows', { cpu: 'none' }],
+        ['excludes this platform', { os: `!${process.platform}` }],
+        ['excludes this platform in a list', { os: ['!aix', `!${process.platform}`] }],
     ])('passes over a stale link to a build that %s', (_, platform) => {
         expect(findInstallProblems(checkoutWithStaleBuild(platform))).toEqual([]);
+    });
+
+    it('reports a stale link to a build that excludes only another platform', () => {
+        expect(
+            findInstallProblems(checkoutWithStaleBuild({ os: `!${otherOS}` })),
+        ).toEqual([
+            '@transformer/binding (via transformer@0.158.0): installed 0.156.0, bun.lock has 0.158.0',
+        ]);
+    });
+
+    it('reports a stale link to a build that lists this platform among others', () => {
+        expect(
+            findInstallProblems(
+                checkoutWithStaleBuild({ os: [otherOS, process.platform] }),
+            ),
+        ).toEqual([
+            '@transformer/binding (via transformer@0.158.0): installed 0.156.0, bun.lock has 0.158.0',
+        ]);
     });
 
     // the layout this check was written for: a glibc machine holding a stale
