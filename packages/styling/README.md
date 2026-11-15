@@ -55,7 +55,7 @@ The runtime adds about 540 bytes gzip to a client bundle.
 npm install @acusti/styling
 ```
 
-It needs React 19.2 or later and, for the plugin, Vite 6 or later.
+It needs React 19.2 or later and Vite 6 or later.
 
 ## Setup
 
@@ -231,6 +231,68 @@ changes needs an href that changes with it. A server render merges the
 sheets of each precedence into one `<style>`, listing their hrefs in its
 `data-href` separated by spaces, so the href is URI-encoded: React can’t
 hydrate a hoisted `<style>` whose href has a space.
+
+## Building a component library
+
+A component library can import its sheets with `?sheet` too, without its
+consumers installing anything. It publishes what Vite’s `?inline` import
+suffix and a hoisted `<style href precedence>` give: each sheet ships as a
+minified string next to its component, so an app needs no setup,
+server-rendered or not, and a bundler that drops an unused component drops
+its CSS too.
+
+In v3.0, what the plugin adds is hot reloading in development: an edit to a
+sheet updates in place in the library’s own Vite dev server (e.g. a
+Storybook built with Vite), where an `?inline` import rendered in a
+`<style>` needs a page reload to show it. It also names each sheet after
+its path, under the library’s `prefix`. v3.1 will add dual publishing: apps
+that use `@acusti/styling` will get all of its benefits for the library’s
+sheets, while apps that don’t will get what they get from v3.0 or a plain
+`?inline` import.
+
+Add `@acusti/styling` as a dev dependency only, and render each sheet with
+a plain `<style>` rather than a `<Style>` (the `Style` component only
+matters for stripping sheets from the build):
+
+```tsx
+import cardSheet from './card.css?sheet';
+
+export default function Card() {
+    return (
+        <>
+            <style href={cardSheet.href} precedence="medium">
+                {cardSheet.css}
+            </style>
+            <div className="card">…</div>
+        </>
+    );
+}
+```
+
+Build it with the plugin and a `prefix` of its own, leaving
+`stripClientCSS` off:
+
+```ts
+// vite.config.ts
+import styleSheets from '@acusti/styling/vite';
+import { defineConfig } from 'vite';
+
+export default defineConfig({
+    build: {
+        lib: { entry: 'src/index.ts', formats: ['es'] },
+        // Vite 8 calls it `rolldownOptions` and still takes this name
+        rollupOptions: { external: [/^react(-dom)?(\/|$)/] },
+    },
+    plugins: [styleSheets({ prefix: '@scope/ui/' })],
+});
+```
+
+Each sheet compiles to a `{ href, css }` object, so the published package
+imports neither the plugin nor `@acusti/styling`.
+
+In v3.0, the library’s CSS has to be stored in its JS bundle: unlike a
+separate `.css` file, it isn’t cached on its own, and an app’s
+`stripClientCSS` applies only to the sheets the app imports itself.
 
 ## Caveats
 
