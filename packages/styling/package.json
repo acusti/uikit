@@ -69,10 +69,5 @@
         "react": "^19.2",
         "react-dom": "^19.2",
         "vite": ">=6.0.0"
-    },
-    "peerDependenciesMeta": {
-        "vite": {
-            "optional": true
-        }
     }
 }
