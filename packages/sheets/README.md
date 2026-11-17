@@ -82,6 +82,9 @@ or reference it from a `.d.ts` file:
 
 ### Plugin options
 
+- **`library`** (`'default'` or `'raw'`): builds a component library in one
+  of the two forms it publishes (see
+  [Building a component library](#building-a-component-library)).
 - **`prefix`** (string, default `''`): put ahead of every href. A library
   built with this plugin needs one, such as its package name
   (`@scope/ui/`), so its hrefs can’t match an app’s or another library’s
@@ -234,65 +237,80 @@ hydrate a hoisted `<style>` whose href has a space.
 
 ## Building a component library
 
-A component library can import its sheets with `?sheet` too, without its
-consumers installing anything. It publishes what Vite’s `?inline` import
-suffix and a hoisted `<style href precedence>` give: each sheet ships as a
-minified string next to its component, so an app needs no setup,
-server-rendered or not, and a bundler that drops an unused component drops
-its CSS too.
+A component library can import its sheets with `?sheet` and render them
+with `<Style>`, as an app does, and publish two builds of itself:
 
-In v3.0, what the plugin adds is hot reloading in development: an edit to a
-sheet updates in place in the library’s own Vite dev server (e.g. a
-Storybook built with Vite), where an `?inline` import rendered in a
-`<style>` needs a page reload to show it. It also names each sheet after
-its path, under the library’s `prefix`. v3.1 will add dual publishing: apps
-that use `@acusti/sheets` will get all of its benefits for the library’s
-sheets, while apps that don’t will get what they get from v3.0 or a plain
-`?inline` import.
+- **A default build** that works in any React 19 app, with or without Vite,
+  the plugin or a server render. Each sheet ships as a minified string next
+  to its component and renders as a plain hoisted `<style>`, as with Vite’s
+  `?inline` import suffix, and the build imports nothing from
+  `@acusti/sheets`, so a bundler that drops an unused component drops its
+  CSS too.
+- **A raw build** that the client of a Vite app with the plugin loads
+  instead. Its sheets go through the app’s plugin like the app’s own, so
+  with `stripClientCSS` they leave the client bundle too.
 
-Add `@acusti/sheets` as a dev dependency only, and render each sheet with a
-plain `<style>` rather than a `<Style>` (the `Style` component only matters
-for stripping sheets from the build):
+In the library’s own Vite dev server (e.g. a Storybook built with Vite), an
+edit to a sheet hot-reloads, where React would keep the old text until a
+reload.
 
-```tsx
-import cardSheet from './card.css?sheet';
-
-export default function Card() {
-    return (
-        <>
-            <style href={cardSheet.href} precedence="medium">
-                {cardSheet.css}
-            </style>
-            <div className="card">…</div>
-        </>
-    );
-}
-```
-
-Build it with the plugin and a `prefix` of its own, leaving
-`stripClientCSS` off:
+Build both with the plugin’s `library` option and a `prefix` of its own,
+with `vite build` and `vite build --mode raw`, in either order:
 
 ```ts
 // vite.config.ts
 import styleSheets from '@acusti/sheets/vite';
 import { defineConfig } from 'vite';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     build: {
-        lib: { entry: 'src/index.ts', formats: ['es'] },
+        lib: { entry: 'src/index.ts', fileName: 'index', formats: ['es'] },
+        // a directory each, since a build empties its own first
+        outDir: mode === 'raw' ? 'dist/raw' : 'dist/default',
         // Vite 8 calls it `rolldownOptions` and still takes this name
         rollupOptions: { external: [/^react(-dom)?(\/|$)/] },
     },
-    plugins: [styleSheets({ prefix: '@scope/ui/' })],
-});
+    plugins: [
+        styleSheets({
+            library: mode === 'raw' ? 'raw' : 'default',
+            prefix: '@scope/ui/',
+        }),
+    ],
+}));
 ```
 
-Each sheet compiles to a `{ href, css }` object, so the published package
-imports neither the plugin nor `@acusti/sheets`.
+Leave `@acusti/sheets` off the `external` list: the plugin replaces it in
+the default build and keeps it external in the raw one. The raw build
+imports each sheet as `./src/card.css?sheet=<href>`, with the library’s
+processed CSS emitted next to it, so its chunks must sit at the root of its
+output, and every sheet inside the library’s Vite root. The plugin fails a
+library build that breaks any of these. (On Vite 8.3, once a raw build in
+watch mode fails a rebuild, it fails every later one until you restart it.
+Vite 8.4 fixes that.)
 
-In v3.0, the library’s CSS has to be stored in its JS bundle: unlike a
-separate `.css` file, it isn’t cached on its own, and an app’s
-`stripClientCSS` applies only to the sheets the app imports itself.
+Publish the raw build under the `acusti-sheets` export condition, and add
+`@acusti/sheets` as an optional peer dependency (and as a dev dependency,
+for the plugin):
+
+```json
+{
+    "exports": {
+        ".": {
+            "acusti-sheets": "./dist/raw/index.js",
+            "default": "./dist/default/index.js"
+        }
+    },
+    "devDependencies": { "@acusti/sheets": "^3.1.0" },
+    "peerDependencies": { "@acusti/sheets": "^3.1.0" },
+    "peerDependenciesMeta": { "@acusti/sheets": { "optional": true } }
+}
+```
+
+The plugin turns the condition on for an app’s client only. Its server
+keeps the default build, which Node loads for a dependency Vite leaves
+external, and both builds name each sheet the same, so the client adopts
+the `<style>` the server rendered. An app without the plugin only ever sees
+the default build, and needn’t install `@acusti/sheets`.
 
 ## Caveats
 
