@@ -47,7 +47,7 @@
     },
     "scripts": {
         "test": "vitest",
-        "test:e2e": "playwright test -c e2e/playwright.config.ts",
+        "test:e2e": "node e2e/library/build.mjs && playwright test -c e2e/playwright.config.ts",
         "build": "vite build && tsc -p tsconfig.build.json",
         "tsc": "tsc --noEmit && tsc --noEmit -p e2e"
     },

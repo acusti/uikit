@@ -1,0 +1,5 @@
+.badge {
+    --styling-e2e-marker: "badge";
+    color: rgb(0, 128, 0);
+    text-decoration: underline;
+}
