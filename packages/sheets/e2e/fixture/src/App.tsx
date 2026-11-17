@@ -1,4 +1,5 @@
 import { Style } from '@acusti/sheets';
+import { Badge } from '@fixture/ui';
 import { lazy, startTransition, useEffect, useState } from 'react';
 
 import a from './a.css?sheet';
@@ -26,6 +27,8 @@ export default function App() {
                 <Style sheet={b} />
                 <p className="a">styled by a</p>
                 <p className="b">styled by b</p>
+                {/* a component from a dual-published library */}
+                <Badge>styled by the library</Badge>
                 <button
                     data-hydrated={isHydrated}
                     onClick={() => startTransition(() => setIsShowingMore(true))}
