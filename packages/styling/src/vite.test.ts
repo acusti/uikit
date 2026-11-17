@@ -2,7 +2,7 @@
 import { mkdir, mkdtemp, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { build, type Rolldown } from 'vite';
+import { build, defaultClientConditions, type Rolldown } from 'vite';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 
 import styleSheets, { type Options } from './vite.js';
@@ -12,7 +12,18 @@ type Environment = {
     mode: 'build' | 'dev';
 };
 
-type Hook<Handler> = { filter: { id: RegExp }; handler: Handler };
+type Hook<Handler> = { filter: { id: Array<RegExp> }; handler: Handler };
+
+type ResolveContext = {
+    environment: { config: { root: string }; mode: Environment['mode'] };
+    resolve: (...args: Array<unknown>) => Promise<null | { id: string }>;
+};
+
+type ResolveHandler = (
+    this: ResolveContext,
+    source: string,
+    importer: string,
+) => Promise<string | undefined | { external: boolean; id: string }>;
 
 const ROOT = '/project';
 const FILE = '/project/app/components/card.css';
@@ -43,19 +54,10 @@ function resolveId(
     source: string,
     resolved: null | { id: string },
     mode: Environment['mode'] = 'build',
+    plugin = styleSheets(),
 ) {
-    const plugin = styleSheets();
     const calls: Array<unknown> = [];
-    const hook = plugin.resolveId as Hook<
-        (
-            this: {
-                environment: { config: { root: string }; mode: Environment['mode'] };
-                resolve: (...args: Array<unknown>) => Promise<null | { id: string }>;
-            },
-            source: string,
-            importer: string,
-        ) => Promise<string | undefined>
-    >;
+    const hook = plugin.resolveId as Hook<ResolveHandler>;
     const result = hook.handler.call(
         {
             environment: { config: { root: ROOT }, mode },
@@ -73,14 +75,20 @@ function resolveId(
 // what Rolldown checks before calling into JavaScript at all
 it('filters each hook to the ids it handles', () => {
     const plugin = styleSheets();
-    const resolveFilter = (plugin.resolveId as Hook<unknown>).filter.id;
-    const loadFilter = (plugin.load as Hook<unknown>).filter.id;
+    const matches = (hook: unknown, id: string) =>
+        (hook as Hook<unknown>).filter.id.some((filter) => filter.test(id));
 
-    expect(resolveFilter.test('./card.css?sheet')).toBe(true);
-    expect(resolveFilter.test('./card.css?inline')).toBe(false);
-    expect(resolveFilter.test('./card.css')).toBe(false);
-    expect(loadFilter.test(ID)).toBe(true);
-    expect(loadFilter.test(FILE)).toBe(false);
+    expect(matches(plugin.resolveId, './card.css?sheet')).toBe(true);
+    expect(matches(plugin.resolveId, './card.css?sheet=%40scope%2Fui%2Fcard.css')).toBe(
+        true,
+    );
+    expect(matches(plugin.resolveId, '@acusti/styling')).toBe(true);
+    expect(matches(plugin.resolveId, './card.css?inline')).toBe(false);
+    expect(matches(plugin.resolveId, './card.css')).toBe(false);
+    expect(matches(plugin.resolveId, '@acusti/styling/vite')).toBe(false);
+    expect(matches(plugin.load, ID)).toBe(true);
+    expect(matches(plugin.load, '\0acusti-styling:inline')).toBe(true);
+    expect(matches(plugin.load, FILE)).toBe(false);
 });
 
 describe('resolveId', () => {
@@ -114,6 +122,86 @@ describe('resolveId', () => {
 
     it('leaves an import it can’t resolve to Vite', async () => {
         expect(await resolveId('./missing.css?sheet', null).result).toBeUndefined();
+    });
+});
+
+describe('a dual-published library', () => {
+    it('resolves @acusti/styling to plain <style>s in a default library build', async () => {
+        const plugin = styleSheets({ library: 'default' });
+        const { result } = resolveId('@acusti/styling', null, 'build', plugin);
+
+        expect(await result).toBe('\0acusti-styling:inline');
+        expect(load({ id: '\0acusti-styling:inline' })).toContain(
+            "jsx('style', { children: sheet.css, href: sheet.href, precedence })",
+        );
+    });
+
+    it('leaves @acusti/styling external in a raw library build', async () => {
+        const plugin = styleSheets({ library: 'raw' });
+        const { result } = resolveId('@acusti/styling', null, 'build', plugin);
+
+        expect(await result).toEqual({ external: true, id: '@acusti/styling' });
+    });
+
+    it('leaves @acusti/styling to Vite in an app', async () => {
+        expect(await resolveId('@acusti/styling', null).result).toBeUndefined();
+    });
+
+    it('takes the href a raw library build’s import carries', async () => {
+        const plugin = styleSheets({ prefix: '@app/' });
+        const { calls, result } = resolveId(
+            './card.css?sheet=%40scope%2Fui%2Fsrc%2Fcard.css',
+            { id: FILE },
+            'build',
+            plugin,
+        );
+        const id = (await result) as string;
+        const hook = plugin.load as Hook<
+            (this: { environment: Environment }, id: string) => string
+        >;
+
+        expect(calls).toEqual([
+            ['./card.css', '/project/app/components/Card.tsx', { skipSelf: true }],
+        ]);
+        expect(
+            hook.handler.call(
+                {
+                    environment: {
+                        config: { consumer: 'client', root: ROOT },
+                        mode: 'build',
+                    },
+                },
+                id,
+            ),
+        ).toContain('href: "@scope/ui/src/card.css"');
+    });
+
+    // the server keeps the default build, which Node loads for a dependency
+    // Vite leaves external
+    it('resolves a library to its raw build in an app’s client only', () => {
+        const configEnvironment = (options?: Options) => {
+            const hook = styleSheets(options).configEnvironment as (
+                name: string,
+                config: {
+                    consumer?: 'client' | 'server';
+                    resolve?: { conditions?: Array<string> };
+                },
+            ) => unknown;
+            return hook;
+        };
+
+        expect(configEnvironment()('client', {})).toEqual({
+            resolve: { conditions: ['acusti-styling', ...defaultClientConditions] },
+        });
+        expect(
+            configEnvironment()('client', { resolve: { conditions: ['custom'] } }),
+        ).toEqual({ resolve: { conditions: ['acusti-styling', 'custom'] } });
+        expect(configEnvironment()('ssr', {})).toBeUndefined();
+        expect(configEnvironment()('client', { consumer: 'server' })).toBeUndefined();
+        expect(configEnvironment()('edge', { consumer: 'client' })).toEqual({
+            resolve: { conditions: ['acusti-styling', ...defaultClientConditions] },
+        });
+        expect(configEnvironment({ library: 'raw' })('client', {})).toBeUndefined();
     });
 });
 
@@ -234,6 +322,11 @@ describe('build', () => {
             "import sheet from './sheet.css?sheet';\nexport default sheet;\n",
         );
         await writeFile(
+            join(root, 'src/library.js'),
+            "import { Style } from '@acusti/styling';\nimport sheet from './sheet.css?sheet';\nexport default () => Style({ sheet });\n",
+        );
+        await mkdir(join(root, 'src/inner'));
+        await writeFile(
             join(root, 'src/component.js'),
             "import sheet from './sheet.css?sheet';\nexport default () => sheet.href;\n",
         );
@@ -242,18 +335,24 @@ describe('build', () => {
     afterAll(() => rm(root, { force: true, recursive: true }));
 
     async function buildEntry({
+        cssMinify = false,
         entry = 'src/entry.js',
         options,
         ssr = false,
+        viteRoot = root,
     }: {
+        cssMinify?: boolean;
         entry?: string;
         options?: Options;
         ssr?: boolean;
+        viteRoot?: string;
     }) {
         const output = (await build({
             build: {
+                cssMinify,
                 minify: false,
                 rolldownOptions: {
+                    external: [/^react(\/|$)/],
                     input: join(root, entry),
                     preserveEntrySignatures: 'strict',
                 },
@@ -263,7 +362,7 @@ describe('build', () => {
             configFile: false,
             logLevel: 'silent',
             plugins: [styleSheets(options)],
-            root,
+            root: viteRoot,
         })) as Rolldown.RolldownOutput;
         const code = output.output
             .filter((file) => file.type === 'chunk')
@@ -298,6 +397,64 @@ describe('build', () => {
         // the comment spells out the id’s NUL as `\0`
         expect(code).toContain('// \\0style-sheet:src/sheet.css.sheet.js');
         expect(code).not.toMatch(/style-sheet:\//);
+    });
+
+    it('keeps the text in a default library build with stripping on', async () => {
+        const { assets, code } = await buildEntry({
+            entry: 'src/library.js',
+            options: { library: 'default', stripClientCSS: true },
+        });
+
+        expect(code).toContain('from-the-sheet');
+        expect(assets).toEqual([]);
+    });
+
+    it('builds a default library that imports nothing from @acusti/styling', async () => {
+        const { assets, code } = await buildEntry({
+            entry: 'src/library.js',
+            options: { library: 'default', prefix: '@scope/ui/' },
+        });
+
+        expect(code).not.toContain('@acusti/styling"');
+        expect(code).toContain('jsx("style"');
+        expect(code).toContain('from-the-sheet');
+        expect(code).toContain('href: "@scope/ui/src/sheet.css"');
+        expect(assets).toEqual([]);
+    });
+
+    it('builds a raw library that keeps its sheet imports, with their hrefs', async () => {
+        const { assets, code } = await buildEntry({
+            entry: 'src/library.js',
+            options: { library: 'raw', prefix: '@scope/ui/' },
+        });
+
+        expect(code).toContain('from "@acusti/styling"');
+        expect(code).toContain(
+            'from "./src/sheet.css?sheet=%40scope%2Fui%2Fsrc%2Fsheet.css"',
+        );
+        expect(assets.map((file) => file.fileName)).toEqual(['src/sheet.css']);
+        // the library’s processed text, as the default build carries it
+        expect(String(assets[0]!.source)).toContain('from-the-sheet');
+    });
+
+    it('emits the library’s processed CSS in a raw library build', async () => {
+        const { assets } = await buildEntry({
+            cssMinify: true,
+            entry: 'src/library.js',
+            options: { library: 'raw' },
+        });
+
+        expect(String(assets[0]!.source)).toBe('.from-the-sheet{color:#010203}');
+    });
+
+    it('refuses a raw library sheet outside the Vite root', async () => {
+        await expect(
+            buildEntry({
+                entry: 'src/library.js',
+                options: { library: 'raw' },
+                viteRoot: join(root, 'src/inner'),
+            }),
+        ).rejects.toThrow(/outside the Vite root/);
     });
 
     it('keeps the text in a server build that strips', async () => {

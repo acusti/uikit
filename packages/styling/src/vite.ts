@@ -1,10 +1,22 @@
-import type { Plugin } from 'vite';
-
 import { relative, resolve, sep } from 'node:path';
+import { defaultClientConditions, type Plugin } from 'vite';
 
 import replaceText from './replaceText.js';
 
 export type Options = {
+    /**
+     * Builds a component library in one of the two forms it publishes:
+     * - `'default'`: each sheet compiled to `{ href, css }`, and
+     *   `@acusti/styling` replaced by a few lines that render plain `<style>`
+     *   elements, so the output imports nothing from it and works in any
+     *   React 19 app.
+     * - `'raw'`: each `?sheet` import kept, carrying its href, with the
+     *   library’s processed CSS emitted next to the output, and
+     *   `@acusti/styling` left external, for an app whose plugin strips the
+     *   text. Publish it under the `acusti-styling` export condition, which the
+     *   plugin turns on for an app’s client.
+     */
+    library?: 'default' | 'raw';
     /**
      * Put ahead of every href. React keeps one stylesheet per href in a
      * document, so a library built with this plugin needs one of its own,
@@ -22,13 +34,32 @@ export type Options = {
     /**
      * Leave the CSS text out of this build’s client bundle. Only worth it when
      * the pages are server-rendered: the client fetches each sheet a page is
-     * missing.
+     * missing. A library build ignores it.
      */
     stripClientCSS?: boolean;
 };
 
 const QUERY = '?sheet';
+// a raw library build’s import carries the sheet’s href: `./x.css?sheet=<href>`
+const HREF_QUERY = /\?sheet=([^&?]*)$/;
 const PREFIX = '\0style-sheet:';
+// the export condition under which a library publishes its raw build
+const CONDITION = 'acusti-styling';
+const PACKAGE = '@acusti/styling';
+const INLINE_RUNTIME = '\0acusti-styling:inline';
+// What a default library build renders in place of `@acusti/styling`. Its
+// sheets always carry their text, so a plain hoisted `<style>` does.
+const INLINE_RUNTIME_CODE = `import { jsx } from 'react/jsx-runtime';
+export function Style({ precedence = 'medium', sheet }) {
+    return jsx('style', { children: sheet.css, href: sheet.href, precedence });
+}
+export function RuntimeStyle({ children, href, precedence = 'medium' }) {
+    return jsx('style', { children, href: encodeURI(href), precedence });
+}
+export function StyleProvider({ children }) {
+    return children;
+}
+`;
 // the virtual id ends in `.js` so that Vite’s CSS plugins, which claim any id
 // ending in `.css` (with or without a query), leave it alone
 const SUFFIX = '.sheet.js';
@@ -52,18 +83,36 @@ const SUFFIX = '.sheet.js';
  *    whose href it has already inserted.
  */
 export default function styleSheets({
+    library,
     prefix = '',
     root = '.',
     stripClientCSS = false,
 }: Options = {}): Plugin {
+    // the hrefs a raw library build’s imports carry, by file
+    const givenHrefs = new Map<string, string>();
+    // the paths of the CSS files a raw library build has emitted
+    const emitted = new Set<string>();
+    const getHref = (viteRoot: string, file: string) =>
+        encodeURI(`${prefix}${getPath(resolve(viteRoot, root), file)}`);
     // Each hook has a filter, so Rolldown (Vite 8) calls into JavaScript only
     // for the ids it handles. The guards repeat them for Vite 6.0–6.2, whose
     // dev server ignores hook filters.
     return {
+        // An app’s client resolves a dual-published library to its raw build.
+        // Its server keeps the default one, which Node loads for a dependency
+        // Vite leaves external, so both render a sheet under the same href.
+        configEnvironment(name, config) {
+            if (library != null) return;
+            const consumer = config.consumer ?? (name === 'client' ? 'client' : 'server');
+            if (consumer !== 'client') return;
+            const conditions = config.resolve?.conditions ?? defaultClientConditions;
+            return { resolve: { conditions: [CONDITION, ...conditions] } };
+        },
         enforce: 'pre',
         load: {
-            filter: { id: /^\0style-sheet:/ },
+            filter: { id: [/^\0style-sheet:/, /^\0acusti-styling:inline$/] },
             handler(id) {
+                if (id === INLINE_RUNTIME) return INLINE_RUNTIME_CODE;
                 if (!id.startsWith(PREFIX)) return;
                 const { config, mode } = this.environment;
                 const isClient = config.consumer === 'client';
@@ -71,13 +120,14 @@ export default function styleSheets({
                     config.root,
                     id.slice(PREFIX.length, -SUFFIX.length),
                 );
-                const path = relative(resolve(config.root, root), file)
-                    .split(sep)
-                    .join('/');
                 // encoded, since a space would split the href in the
                 // space-separated list a server render puts in `data-href`
-                const href = JSON.stringify(encodeURI(`${prefix}${path}`));
-                if (stripClientCSS && isClient && mode === 'build') {
+                const href = JSON.stringify(
+                    givenHrefs.get(file) ?? getHref(config.root, file),
+                );
+                // a library’s default build always keeps the text, which its
+                // plain `<style>`s render
+                if (stripClientCSS && library == null && isClient && mode === 'build') {
                     return `import url from ${JSON.stringify(`${file}?url`)};\nexport default { href: ${href}, url };\n`;
                 }
                 const inline = JSON.stringify(`${file}?inline`);
@@ -99,26 +149,71 @@ export default function styleSheets({
         },
         name: '@acusti/styling',
         resolveId: {
-            filter: { id: /\?sheet$/ },
+            filter: { id: [/\?sheet(=[^&?]*)?$/, /^@acusti\/styling$/] },
             async handler(source, importer) {
-                if (!source.endsWith(QUERY)) return;
+                if (source === PACKAGE) {
+                    if (library === 'default') return INLINE_RUNTIME;
+                    if (library === 'raw') return { external: true, id: PACKAGE };
+                    return;
+                }
+                const given = HREF_QUERY.exec(source);
+                if (!source.endsWith(QUERY) && given == null) return;
                 const resolved = await this.resolve(
-                    source.slice(0, -QUERY.length),
+                    source.slice(0, source.lastIndexOf(QUERY)),
                     importer,
                     { skipSelf: true },
                 );
                 if (resolved == null) return;
+                if (given != null) {
+                    givenHrefs.set(resolved.id, decodeURIComponent(given[1]!));
+                }
+                if (library === 'raw') {
+                    const { config } = this.environment;
+                    const path = getPath(config.root, resolved.id);
+                    if (path.startsWith('../')) {
+                        this.error(
+                            `${resolved.id} is outside the Vite root, so a raw library build can’t emit it next to its output`,
+                        );
+                    }
+                    if (!emitted.has(path)) {
+                        emitted.add(path);
+                        // the library’s own processed CSS, as `?inline` gives
+                        // it, so that the app adopts the same text the
+                        // default build carries
+                        const inline = await this.resolve(
+                            `${resolved.id}?inline`,
+                            importer,
+                        );
+                        const { code } = await this.load({ id: inline!.id });
+                        const css = /^export default ("(?:[^"\\]|\\.)*");?\s*$/.exec(
+                            code ?? '',
+                        );
+                        if (css == null) {
+                            this.error(`unexpected ?inline output for ${resolved.id}`);
+                        }
+                        this.emitFile({
+                            fileName: path,
+                            source: JSON.parse(css[1]!) as string,
+                            type: 'asset',
+                        });
+                    }
+                    // relative to the output’s root, where a library’s entry is
+                    const href = encodeURIComponent(getHref(config.root, resolved.id));
+                    return { external: true, id: `./${path}?sheet=${href}` };
+                }
                 // A build that keeps comments (a library’s, by default) names
                 // each module by its id, so a build’s is relative to the Vite
                 // root. Dev keeps the absolute path: it serves the module at a
                 // URL made from the id, where `..` segments would collapse.
                 const { config, mode } = this.environment;
                 const file =
-                    mode === 'build'
-                        ? relative(config.root, resolved.id).split(sep).join('/')
-                        : resolved.id;
+                    mode === 'build' ? getPath(config.root, resolved.id) : resolved.id;
                 return `${PREFIX}${file}${SUFFIX}`;
             },
         },
     };
+}
+
+function getPath(from: string, file: string) {
+    return relative(from, file).split(sep).join('/');
 }
