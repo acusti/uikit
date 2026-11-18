@@ -1,6 +1,6 @@
 {
     "name": "@acusti/styling",
-    "version": "2.1.5",
+    "version": "3.0.0-rc.0",
     "description": "React stylesheets from CSS imports, server-rendered with their text and left out of the client bundle (React 19 + Vite)",
     "keywords": [
         "css",
