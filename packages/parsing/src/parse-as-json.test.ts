@@ -129,6 +129,10 @@ describe('@acusti/parsing', () => {
             rawControlCharactersTestCase,
         );
         it('handles extraneous escape characters', extraneousEscapeCharactersTestCase);
+        it(
+            'reads a backslash that starts no JSON escape as a mistake in the string',
+            invalidEscapesTestCase,
+        );
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
         it(
             'tells a closing quote mark by what follows it, whatever its spacing',
@@ -834,6 +838,24 @@ describe('@acusti/parsing', () => {
                 const result = parseAsJSON(text);
                 expect(performance.now() - start, label).toBeLessThan(1000);
                 expect(result.value, label).toEqual(value);
+            }
+        });
+
+        it('gets through a long run of backslashes in a string in good time', () => {
+            // (each takes tens of milliseconds when the time grows with the length
+            // of the run, and many seconds when it grows with its square)
+            const run = '\\'.repeat(400_001);
+            // (a backslash that starts no escape comes after 200,000 escaped ones)
+            const value = `${'\\'.repeat(200_001)}d`;
+            const cases: Array<[string, string, unknown]> = [
+                ['in an object', `{"a": "${run}d", "b": 1}`, { a: value, b: 1 }],
+                ['in an array', `["${run}d", 1]`, [value, 1]],
+            ];
+            for (const [label, text, expected] of cases) {
+                const start = performance.now();
+                const result = parseAsJSON(text);
+                expect(performance.now() - start, label).toBeLessThan(1000);
+                expect(result.value, label).toEqual(expected);
             }
         });
 
@@ -2813,6 +2835,48 @@ function getPageStreamPieces() {
 //
 // `isAwaitingValue` is for a text that stops between a key and its value, which
 // parseAsJSON reads as that key holding '' whatever its value turns out to be.
+function invalidEscapesTestCase() {
+    // a backslash before an apostrophe (as JavaScript writes one) is left out
+    const values: Array<[string, unknown]> = [
+        ['{"a": "don\\\'t", "b": 1}', { a: "don't", b: 1 }],
+        ['["it\\\'s", "x"]', ["it's", 'x']],
+        ['{"a\\\'b": 1}', { "a'b": 1 }],
+        // a backslash before anything else is a backslash (a Windows path, a regular
+        // expression, CSS that escapes a space or a LaTeX command that does), also
+        // before a `u` with no code point after it
+        [
+            '{"css": "@media (min-width: 40em) {\\ .a { b: c; } }"}',
+            { css: '@media (min-width: 40em) {\\ .a { b: c; } }' },
+        ],
+        ['["x\\ y"]', ['x\\ y']],
+        ['{"a\\ b": 1}', { 'a\\ b': 1 }],
+        ['{"path": "C:\\Users\\Ann\\users.txt"}', { path: 'C:\\Users\\Ann\\users.txt' }],
+        ['{"re": "^\\d+\\.\\d$", "b": 1}', { b: 1, re: '^\\d+\\.\\d$' }],
+        ['{"math": "\\( x \\) and \\[ y \\]"}', { math: '\\( x \\) and \\[ y \\]' }],
+        ['{"a": "\\u12 and \\users"}', { a: '\\u12 and \\users' }],
+        // an escape that JSON has is whole, and so is an escaped backslash before a
+        // space or an apostrophe (the first backslash makes this text need the walk)
+        [
+            '{"a": "\\d\\"\\\\\\/\\b\\f\\n\\r\\t\\u00e9\\u00E9 \\\\ x \\\\\' \\u123"}',
+            { a: '\\d"\\/\b\f\n\r\t\u00e9\u00E9 \\ x \\\' \\u123' },
+        ],
+        // (and the backslash of each of three in a row is read in its turn)
+        ['{"a": "\\\\\\ b"}', { a: '\\\\ b' }],
+        ['{"a": "\\\\\\d"}', { a: '\\\\d' }],
+    ];
+    for (const [text, value] of values) {
+        expect(parseAsJSON(text), text).toEqual({ postscript: '', preamble: '', value });
+    }
+    // a text that ends partway through an escape is read as before the escape
+    expect(parseAsJSON('{"a": "x\\').value).toEqual({ a: 'x' });
+    expect(parseAsJSON('{"a": "x\\u00').value).toEqual({ a: 'x' });
+    // (also where the walk reads the text, as it does when it has another slip in it)
+    expect(parseAsJSON('{"a": "x\\u12A').value).toEqual({ a: 'x' });
+    expect(parseAsJSON('{"a": "\\d x\\u12A').value).toEqual({ a: '\\d x' });
+    expect(parseAsJSON('{"a": "x\\ y').value).toEqual({ a: 'x\\ y' });
+    expect(parseAsJSON('{"a": "x\\d').value).toEqual({ a: 'x\\d' });
+}
+
 function isPrefixOf({
     isAwaitingValue = false,
     isOpenEnd = true,
@@ -3848,9 +3912,6 @@ function rawControlCharactersTestCase() {
             b: `z${char}`,
         });
     }
-    // (the range ends at U+001F: a space is not one, so a backslash before it is
-    // no mistake to take out)
-    expect(parseAsJSON('{"a": "x\\ y", "b": 1}').value).toBe(null);
     // (only a line break that a key follows ends a string, as before: a tab or a
     // carriage return before a key is part of the string)
     expect(parseAsJSON('{"a": "b", "c\t"d": 1}').value).toEqual({ a: 'b', 'c\t"d': 1 });
