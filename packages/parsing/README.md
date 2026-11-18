@@ -413,6 +413,26 @@ parseAsJSON('{"tip": "Pick "yes" , "no" or both", "next": "Go"}').value;
 // { tip: 'Pick "yes', 'no" or both': '', next: 'Go' }
 ```
 
+## A backslash in a string that starts no escape
+
+JSON has few escapes: a backslash before a quote mark, a backslash, `/`,
+`b`, `f`, `n`, `r`, `t`, or `u` and four hexadecimal digits. A model
+sometimes writes a backslash before something else. `parseAsJSON` leaves it
+out before an apostrophe (as JavaScript writes one). Before any other
+character but a control character (see above, where a raw line break or tab
+after one is left out too) it keeps the backslash, as a Windows path, a
+regular expression, CSS or a LaTeX command has it. A backslash that does
+start an escape is read as one, as `JSON.parse` reads it: `\frac` has a
+form feed in it, and `C:\new` a line break.
+
+```js
+parseAsJSON('{"css": "a {\\ b: c; }", "tip": "don\\\'t"}').value;
+// { css: 'a {\\ b: c; }', tip: "don't" }
+
+parseAsJSON('{"path": "C:\\Users\\Ann", "re": "\\d+"}').value;
+// { path: 'C:\\Users\\Ann', re: '\\d+' }
+```
+
 ## What it repairs, and what it doesn’t
 
 Every repair and rule in `parseAsJSON` has a cost: bytes in your bundle,

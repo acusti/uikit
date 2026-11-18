@@ -116,6 +116,14 @@ const UNFINISHED_KEY_REGEXP = /([{,])\s*"(?:[^"\\]|\\.)*\\?$/;
 // a quote mark, a backslash or a control character
 // eslint-disable-next-line no-control-regex
 const STRING_RUN_REGEXP = /[^"\\\x00-\x1f]+/y;
+// a backslash that starts no escape that JSON has: one before a character that
+// is none of those that make an escape (nor a control character, which a raw
+// line break after a backslash is), or before a `u` that no four hexadecimal
+// digits follow (a text that ends partway through them may yet have them). A
+// backslash before another is read with it, before this is asked.
+const INVALID_ESCAPE_REGEXP =
+    // eslint-disable-next-line no-control-regex
+    /\\(?:[^"/bfnrtu\x00-\x1f]|u(?![0-9a-fA-F]{4}|[0-9a-fA-F]{0,3}$))/y;
 
 type GenericObject = Record<string, unknown>;
 
@@ -1242,6 +1250,22 @@ export function parseAsJSON(text: string): ParsedResult {
                         char = '",';
                     }
                 }
+            } else if (char === '\\' && text[index + 1] === '\\') {
+                // an escaped backslash is whole, and escapes nothing after it (so
+                // that each backslash after it is read for what it starts, and a
+                // run of them is read once)
+                newChars.push('\\\\');
+                index++;
+                continue;
+            } else if (
+                char === '\\' &&
+                matchAt({ index, regexp: INVALID_ESCAPE_REGEXP, text })
+            ) {
+                // a backslash that starts no escape that JSON has is left out
+                // before an apostrophe (as JavaScript writes one), and is a
+                // backslash of its own, as it is in a path, a regular expression
+                // or CSS, before anything else
+                char = text[index + 1] === "'" ? '' : '\\\\';
             } else if (text.charCodeAt(index) < 0x20) {
                 // a raw control character (JSON has none in a string)
                 if (
