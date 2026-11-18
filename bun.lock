@@ -210,7 +210,7 @@
     },
     "packages/styling": {
       "name": "@acusti/styling",
-      "version": "2.1.5",
+      "version": "3.0.0-rc.0",
       "devDependencies": {
         "@playwright/test": "^1.65.0",
         "@testing-library/dom": "^10.4.1",
@@ -306,7 +306,7 @@
     },
     "packages/vite-plugin-react-compiler": {
       "name": "@acusti/vite-plugin-react-compiler",
-      "version": "0.11.0",
+      "version": "0.12.0",
       "dependencies": {
         "oxc-transform-react": "0.158.0",
       },
