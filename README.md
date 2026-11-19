@@ -137,12 +137,10 @@ bun changeset publish
 git push --follow-tags
 ```
 
-Lastly, run `bun install` to update any internal workspace dependency
-ranges in `bun.lock` and, if it produces changes, commit and push the
-refreshed lockfile. When a release bumps no internal dependency ranges,
-this is a no-op: bun skips the lockfile write when only workspace `version`
-fields changed (publishing doesn’t read them — versions come from each
-`package.json` — and they sync on the next real lockfile write).
+Lastly, run `bun install`, which records the new workspace versions (and
+any internal dependency ranges the release bumped) in `bun.lock`, then
+commit and push the refreshed lockfile. Every release leaves one to commit:
+until it lands, each `bun install` on `main` rewrites `bun.lock` again.
 
 ### Prereleases (for alpha, can substitute for beta or rc)
 

@@ -30,10 +30,10 @@ jobs:
               uses: actions/setup-node@v7
               with:
                   node-version: 24.x
+            # with no version given, setup-bun installs the one packageManager
+            # pins in package.json
             - name: Use Bun
               uses: oven-sh/setup-bun@v2
-              with:
-                  bun-version: 1.3.9
 
             - name: 📥 Install deps with React canary
               run: |
