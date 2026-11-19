@@ -26,7 +26,7 @@ function createCheckout({ links, lock, store }) {
     roots.push(root);
     writeFileSync(
         join(root, 'bun.lock'),
-        JSON.stringify({ lockfileVersion: 1, ...lock }, null, 2).replace(
+        JSON.stringify({ lockfileVersion: 2, ...lock }, null, 2).replace(
             /\n(\s*)([}\]])/g,
             ',\n$1$2',
         ),
@@ -367,7 +367,7 @@ describe('findInstallProblems', () => {
         const root = createCheckout({
             links: { 'packages/plugin/node_modules/transformer': 'transformer@0.156.0' },
             lock: {
-                lockfileVersion: 2,
+                lockfileVersion: 3,
                 packages: { transformer: ['transformer@0.158.0', '', {}, 'sha512-'] },
                 workspaces: workspaces({ transformer: '0.158.0' }),
             },
@@ -375,7 +375,33 @@ describe('findInstallProblems', () => {
         });
 
         expect(findInstallProblems(root)).toEqual([]);
-        expect(warn).toHaveBeenCalledWith(expect.stringContaining('version 2'));
+        expect(warn).toHaveBeenCalledWith(expect.stringContaining('version 3'));
+    });
+
+    // Bun 1.4 writes version 2 for a new lockfile and keeps an existing version
+    // 1 as it is; the two share their layout, and an entry in either can record
+    // whether its package has install scripts
+    it.each([1, 2])('checks a lockfile in version %i’s format', (lockfileVersion) => {
+        const root = createCheckout({
+            links: { 'packages/plugin/node_modules/transformer': 'transformer@0.156.0' },
+            lock: {
+                lockfileVersion,
+                packages: {
+                    transformer: [
+                        'transformer@0.158.0',
+                        '',
+                        { hasInstallScript: true },
+                        'sha512-',
+                    ],
+                },
+                workspaces: workspaces({ transformer: '0.158.0' }),
+            },
+            store: { 'transformer@0.156.0': { name: 'transformer', version: '0.156.0' } },
+        });
+
+        expect(findInstallProblems(root)).toEqual([
+            'transformer (the @repo/plugin workspace): installed 0.156.0, bun.lock has 0.158.0',
+        ]);
     });
 
     // a workspace, git or file dependency has no registry version to hold it to
@@ -459,7 +485,7 @@ describe('assertInstallMatchesLockfile', () => {
 
         writeFileSync(
             join(root, 'bun.lock'),
-            JSON.stringify({ lockfileVersion: 1, ...lock('0.159.0') }),
+            JSON.stringify({ lockfileVersion: 2, ...lock('0.159.0') }),
         );
 
         expect(() => assertInstallMatchesLockfile(root)).toThrow(
