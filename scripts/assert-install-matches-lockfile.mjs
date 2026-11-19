@@ -19,11 +19,17 @@ import { basename, dirname, join } from 'node:path';
 //    caches the old versions’ paths under the new bun.lock’s hash, and the
 //    install that follows doesn’t clear them. A run this stops caches nothing.
 // 4. What it doesn’t understand, it lets through. A bun.lock in a format other
-//    than the one it reads would make it report mismatches that aren’t there,
-//    and `bun install` couldn’t clear those.
+//    than the ones it reads would make it report mismatches that aren’t
+//    there, and `bun install` couldn’t clear those. Versions 1 and 2 share
+//    their layout. An entry in either can record the libc a build is for and
+//    whether a package has install scripts (Bun 1.4.4 writes both, and Bun
+//    1.4.0 to 1.4.3 drop them when they rewrite the lockfile), which this
+//    reads or ignores alike.
 
 // list the first ten; past that, a count says as much
 const MAX_LISTED = 10;
+
+const SUPPORTED_LOCKFILE_VERSIONS = new Set([1, 2]);
 
 // The bun.lock text each root last passed with, by root. Vite bundles each
 // project’s config with what it imports, so a run of every package loads this
@@ -64,9 +70,9 @@ export function findInstallProblems(root) {
 
 function findProblems(root, text) {
     const lock = parseLockfile(text);
-    if (lock.lockfileVersion !== 1) {
+    if (!SUPPORTED_LOCKFILE_VERSIONS.has(lock.lockfileVersion)) {
         console.warn(
-            `Skipped checking node_modules against bun.lock: scripts/assert-install-matches-lockfile.mjs reads lockfileVersion 1, and this bun.lock is version ${lock.lockfileVersion}.`,
+            `Skipped checking node_modules against bun.lock: scripts/assert-install-matches-lockfile.mjs reads lockfileVersion ${[...SUPPORTED_LOCKFILE_VERSIONS].join(' and ')}, and this bun.lock is version ${lock.lockfileVersion}.`,
         );
         return [];
     }
