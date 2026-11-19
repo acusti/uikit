@@ -98,6 +98,18 @@ const NEXT_ITEM_REGEXP = new RegExp(
 // string, with any spaces or tabs around them (not any other space: French prose
 // has a no-break space before a colon)
 const STRING_END_REGEXP = /[ \t]*(?::|,[ \t]*")/y;
+// what follows the closing quote mark of a key: a colon
+const KEY_END_REGEXP = /[ \t]*:/y;
+// a closing bracket after a quote mark (and a trailing comma before it), and what
+// may follow it in JSON: a comma and the next member or item, another closing
+// bracket, a code fence or the end of the text (not a comma and a word, as in
+// JavaScript)
+const PAIR_CLOSE_REGEXP = /\s*,?\s*[}\]]\s*(?:,\s*["{[\d-]|[}\]]|```|$)/y;
+// a closing bracket after a quote mark, with a trailing comma before it or not
+const BRACKET_REGEXP = /\s*,?\s*[}\]]/y;
+// what follows a quote mark that ends a string: a colon, or a comma and the next
+// key, which may start on a line of its own
+const PAIR_END_REGEXP = /[ \t]*(?::|,\s*")/y;
 // the start of a bare literal that runs to the end of the text
 const UNFINISHED_LITERAL_REGEXP =
     /(?:t(?:ru?)?|f(?:a(?:ls?)?)?|n(?:ul?)?|-?\d*(?:\.\d*)?(?:[eE][+-]?\d*)?)$/y;
@@ -1232,7 +1244,58 @@ export function parseAsJSON(text: string): ParsedResult {
                     )
                 ) {
                     const nextQuoteMarkIndex = text.indexOf('"', index + 1);
-                    if (nextQuoteMarkIndex > index + 1) {
+                    if (nextQuoteMarkIndex === index + 1) {
+                        // a pair of quote marks (an empty attribute value, in a
+                        // string of HTML) is part of the string, unless the second
+                        // opens a key (a string that a colon follows: where the
+                        // string has no end yet, nothing is at index 0 to match)…
+                        isInsideString = !matchAt({
+                            index: indexOfStringEnd(text, nextQuoteMarkIndex) + 1,
+                            regexp: KEY_END_REGEXP,
+                            text,
+                        });
+                        // …or ends the string as a quote mark alone would: what
+                        // ends a string follows it, or a closing bracket and what
+                        // may follow one (and not the brackets after it, in the
+                        // string, of CSS or a script)
+                        if (
+                            isInsideString &&
+                            !matchAt({
+                                index: index + 2,
+                                regexp: PAIR_END_REGEXP,
+                                text,
+                            }) &&
+                            !(
+                                stack.at(-1) === ']' &&
+                                matchAt({
+                                    index: index + 2,
+                                    regexp: NEXT_ITEM_REGEXP,
+                                    text,
+                                })
+                            ) &&
+                            !matchAt({
+                                index: index + 2,
+                                regexp: PAIR_CLOSE_REGEXP,
+                                text,
+                            }) &&
+                            // (nor is the bracket that closes the root, with no
+                            // quote mark after it: in the root, the string that
+                            // holds CSS or a script has its own after any bracket)
+                            !(
+                                stack.length === 1 &&
+                                matchAt({
+                                    index: index + 2,
+                                    regexp: BRACKET_REGEXP,
+                                    text,
+                                })?.at(-1) === stack[0] &&
+                                !text.includes('"', index + 2)
+                            )
+                        ) {
+                            newChars.push('\\"\\"');
+                            index++;
+                            continue;
+                        }
+                    } else if (nextQuoteMarkIndex > index + 1) {
                         const lastControlChar = stack.at(-1);
                         const nextText = text.slice(index + 1, nextQuoteMarkIndex);
                         // does a closing control char occur before the next quote mark?
