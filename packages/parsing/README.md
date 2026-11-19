@@ -413,6 +413,38 @@ parseAsJSON('{"tip": "Pick "yes" , "no" or both", "next": "Go"}').value;
 // { tip: 'Pick "yes', 'no" or both': '', next: 'Go' }
 ```
 
+A pair of quote marks side by side is repaired too (an empty attribute
+value in a string of HTML, say): the string carries on past it, through the
+CSS, scripts and line breaks after it. It ends a string only where what
+follows its second quote mark ends one: a colon, a comma and the next key
+or item (which may start on a line of its own), or a closing bracket (after
+a trailing comma or not) and then a comma and the next member or item,
+another bracket, a closing code fence or the end of the text. The bracket
+that closes the root ends it too when no quote mark comes after it, so text
+after the JSON that has none is text after the JSON. A pair also ends a
+string where the second opens a key (a colon follows the string that it
+opens).
+
+```js
+parseAsJSON('{"html": "<p id=\\"a\\" hidden="">x</p>", "n": 1}').value;
+// { html: '<p id="a" hidden="">x</p>', n: 1 }
+
+parseAsJSON(
+    '{"css": ".a::before { content: ""; } .b { color: red; }", "n": 1}',
+).value;
+// { css: '.a::before { content: ""; } .b { color: red; }', n: 1 }
+
+parseAsJSON('{\n  "summary": "The team voted "yes"",\n  "next": "Ship"\n}')
+    .value;
+// { summary: 'The team voted "yes"', next: 'Ship' }
+
+parseAsJSON('{"b": 1, "a": "voted "yes""}\nDone.');
+// { postscript: 'Done.', preamble: '', value: { b: 1, a: 'voted "yes"' } }
+
+parseAsJSON('{"a": "x""b": 1}').value;
+// { a: 'x', b: 1 }
+```
+
 ## A backslash in a string that starts no escape
 
 JSON has few escapes: a backslash before a quote mark, a backslash, `/`,

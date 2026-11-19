@@ -135,6 +135,14 @@ describe('@acusti/parsing', () => {
         );
         it('handles unescaped double quotes', unescapedDoubleQuotesTestCase);
         it(
+            'keeps a pair of quote marks that sit side by side in a string',
+            adjacentQuoteMarksTestCase,
+        );
+        it(
+            'reads a page that is written as one JSON string, slips and all',
+            pageInStringTestCase,
+        );
+        it(
             'tells a closing quote mark by what follows it, whatever its spacing',
             closingQuoteSpacingTestCase,
         );
@@ -2097,6 +2105,166 @@ Here is the button:
 // where none of that makes valid JSON (the text stops partway through a literal
 // or an escape), and where the text stops on a number, which more digits could
 // still follow.
+function adjacentQuoteMarksTestCase() {
+    // the quote marks that a model leaves bare in a string of HTML have no other
+    // quote marks to be told from, and an empty attribute value is a pair of them
+    const values: Array<[string, unknown]> = [
+        [
+            '{"html": "<p id=\\"a\\" class="b" hidden="">x</p>", "n": 1}',
+            { html: '<p id="a" class="b" hidden="">x</p>', n: 1 },
+        ],
+        // (as the string’s last member, with a key after it, and with an array)
+        [
+            '{"html": "<img alt=\\"\\" src="a.jpg" title="">"}',
+            { html: '<img alt="" src="a.jpg" title="">' },
+        ],
+        [
+            '{"html": "<p hidden="">x</p>", "title": "T", "n": [1, 2]}',
+            { html: '<p hidden="">x</p>', n: [1, 2], title: 'T' },
+        ],
+        [
+            '{"a": [{"html": "<p hidden="">x</p>"}, "b"]}',
+            { a: [{ html: '<p hidden="">x</p>' }, 'b'] },
+        ],
+        // (at the end of the string, where the third quote mark is the one that
+        // closes it)
+        ['{"html": "<p title=\\"a\\" id="""}', { html: '<p title="a" id=""' }],
+        ['{"a": "x=""", "n": 1}', { a: 'x=""', n: 1 }],
+        // (before a raw line break, and at the end of a stream)
+        [
+            '{"html": "<input value=""/>\n<p>x</p>", "b": 1}',
+            { html: '<input value=""/>\n<p>x</p>', b: 1 },
+        ],
+        ['{"html": "<p hidden="">x', { html: '<p hidden="">x' }],
+        ['["x=""", 1]', ['x=""', 1]],
+        // (with a closing bracket after the pair, which ends the string that it
+        // is in, as the comma and the next key or item that follow it do)
+        ['{"a": "x=""}', { a: 'x="' }],
+        ['{"a": "x="" }', { a: 'x="' }],
+        ['["x=""]', ['x="']],
+        ['{"a": "x="", "b": 1}', { a: 'x="', b: 1 }],
+        ['["x="", 1]', ['x="', 1]],
+        // (in an object, the same comma and item are code in the string)
+        ['{"code": "f("", 1, 2) { x }"}', { code: 'f("", 1, 2) { x }' }],
+        // (the bracket may close a nested object or array, and what follows it
+        // comes after any whitespace)
+        ['{"a": {"b": "x=""}, "c": 1}', { a: { b: 'x="' }, c: 1 }],
+        ['{"a": {"b": "x=""}}', { a: { b: 'x="' } }],
+        ['[["x=""]]', [['x="']]],
+        ['[{"a": "x=""}, {"b": 1}]', [{ a: 'x="' }, { b: 1 }]],
+        ['[["x=""], ["y"]]', [['x="'], ['y']]],
+        ['[["x=""], 1]', [['x="'], 1]],
+        ['[["x=""], -1]', [['x="'], -1]],
+        ['{"a": {"b": "x="" } ,\n "c": 1}', { a: { b: 'x="' }, c: 1 }],
+        // (a comma and a word after the bracket are code, as in JavaScript)
+        [
+            '{"js": "var o = {a: ""}, b = 1;", "n": 1}',
+            { js: 'var o = {a: ""}, b = 1;', n: 1 },
+        ],
+        ['{"a": {"b": "x="" }\n, "c": 1}', { a: { b: 'x="' }, c: 1 }],
+        // (a closing bracket after it, in the string, does not end it: CSS, or a
+        // script, and the keys that follow the string are read as well)
+        [
+            '{"css": ".a::before { content: ""; } .b { color: red; }", "n": 1}',
+            { css: '.a::before { content: ""; } .b { color: red; }', n: 1 },
+        ],
+        [
+            '{"title": "Home", "html": "<p id=\\"a\\" hidden=""><script>if (x) { go(); }</script>", "slug": "home"}',
+            {
+                html: '<p id="a" hidden=""><script>if (x) { go(); }</script>',
+                slug: 'home',
+                title: 'Home',
+            },
+        ],
+        [
+            '{"html": "<p hidden="">x</p><style>.a { b: c }</style><p title="">y</p>", "n": 1}',
+            {
+                html: '<p hidden="">x</p><style>.a { b: c }</style><p title="">y</p>',
+                n: 1,
+            },
+        ],
+        // (a string that ends in a bare-quoted word, with the next key on its own
+        // line, and with a code fence after the closing bracket)
+        [
+            '{\n  "summary": "The team voted "yes"",\n  "next": "Ship"\n}',
+            { next: 'Ship', summary: 'The team voted "yes"' },
+        ],
+        ['{"a": "x="",\n\n\t"b": 1}', { a: 'x="', b: 1 }],
+        // (and a key that ends in a bare-quoted word)
+        ['{"say "hi"": 1}', { 'say "hi"': 1 }],
+        // (with a trailing comma after it, in an object and in an array)
+        ['{\n  "a": "voted "yes"",\n}', { a: 'voted "yes"' }],
+        ['{"a": {"b": "voted "yes"",\n}, "c": 1}', { a: { b: 'voted "yes"' }, c: 1 }],
+        ['[\n  "b",\n  "voted "yes"",\n]', ['b', 'voted "yes"']],
+        // (a bracket of the other kind does not close the root, nor does one that
+        // a quote mark follows)
+        ['{"a": "x="" ]\nDone.', { a: 'x="" ]\nDone.' }],
+        ['{"a": "x="" }\nDone", "b": 1}', { a: 'x="" }\nDone', b: 1 }],
+        // (CSS in a member of the root has its string’s closing quote mark after
+        // the bracket, so the bracket does not close the root)
+        [
+            '{"css": "a::before{content:""}b{c:d}", "n": 1}',
+            { css: 'a::before{content:""}b{c:d}', n: 1 },
+        ],
+    ];
+    for (const [text, value] of values) {
+        expect(parseAsJSON(text).value, text).toEqual(value);
+    }
+    // (a string that ends in one, as the last member of an object that a code
+    // fence closes, after a preamble and not)
+    for (const preamble of ['', 'Here is the summary:']) {
+        expect(
+            parseAsJSON(
+                `${preamble}\n\n\`\`\`json\n{\n  "next": "Ship",\n  "summary": "The team voted "yes""\n}\n\`\`\``,
+            ),
+            preamble,
+        ).toEqual({
+            postscript: '',
+            preamble,
+            value: { next: 'Ship', summary: 'The team voted "yes"' },
+        });
+    }
+    // (or by the root’s closing bracket, with a postscript after it that has no
+    // quote mark in it)
+    for (const [text, value, postscript] of [
+        [
+            '{\n  "b": 1,\n  "a": "voted "yes""\n}\n\nLet me know if you want changes.',
+            { a: 'voted "yes"', b: 1 },
+            'Let me know if you want changes.',
+        ],
+        ['{"b": 1, "a": "voted "yes""}\nDone.', { a: 'voted "yes"', b: 1 }, 'Done.'],
+        ['[\n  "b",\n  "voted "yes""\n]\nDone.', ['b', 'voted "yes"'], 'Done.'],
+        ['{\n  "a": "voted "yes""\n}\n</answer>', { a: 'voted "yes"' }, '</answer>'],
+        ['{\n  "a": "voted "yes"",\n}\nDone.', { a: 'voted "yes"' }, 'Done.'],
+    ] as const) {
+        expect(parseAsJSON(text), text).toEqual({ postscript, preamble: '', value });
+    }
+    // inside a code block, after a preamble and before a postscript
+    expect(
+        parseAsJSON(
+            'Here it is:\n```json\n{"html": "<p class="a" hidden="">x</p>"}\n```\nDone.',
+        ),
+    ).toEqual({
+        postscript: 'Done.',
+        preamble: 'Here it is:',
+        value: { html: '<p class="a" hidden="">x</p>' },
+    });
+    // a pair of quote marks that ends a string and starts the key after it, as it
+    // is where a comma was left out, is still read so
+    expect(parseAsJSON('{"a": "x""b": 1}').value).toEqual({ a: 'x', b: 1 });
+    expect(parseAsJSON('{"a": "x""b" : 1}').value).toEqual({ a: 'x', b: 1 });
+    expect(parseAsJSON('{"a": "x""b"	: 1}').value).toEqual({ a: 'x', b: 1 });
+    expect(parseAsJSON('{"a": "x""b": "y", "c": 2}').value).toEqual({
+        a: 'x',
+        b: 'y',
+        c: 2,
+    });
+    // an empty string is whole wherever it stands
+    expect(parseAsJSON('{"a": "", "b": ""}').value).toEqual({ a: '', b: '' });
+    expect(parseAsJSON('{"a": ""}').value).toEqual({ a: '' });
+    expect(parseAsJSON('["", ""]').value).toEqual(['', '']);
+}
+
 function closeCutText(text: string): { closed: unknown; isAwaitingValue: boolean } {
     let closers = '';
     let isInString = false;
@@ -3411,6 +3579,74 @@ function numberValuesTestCase() {
         preamble: '',
         value: [{ foo: 0 }, { bar: 1 }, { baz: 'qux' }],
     });
+}
+
+function pageInStringTestCase() {
+    // A page of three sections that a model writes as one string, with its quote marks
+    // escaped but for the slips that real replies have: some left bare (empty
+    // attribute values among them), the line breaks of the style block raw, and a
+    // backslash before a space where a line break was meant (which stays).
+    const css = [
+        'a { color: red; }',
+        '.a::before { content: ""; }',
+        '[data-appear] { opacity: 0; }',
+        '{ margin: 0; }',
+        '.b::after { content: ""',
+        '}',
+        '@media (max-width: 760px) {',
+        '  .cols { gap: 1px; }',
+        '}',
+    ];
+    const section = (index: number) =>
+        [
+            `<section id="s${index}" class="cols" data-appear="">`,
+            `  <h2 class="t">Section ${index}</h2>`,
+            `  <p class="body" lang="en">It’s “quiet” here, and the doors stay open.</p>`,
+            `</section>`,
+        ].join('\n');
+    const sections = Array.from({ length: 3 }, (_, index) => section(index));
+    const page = (style: string, body: string) =>
+        `<!doctype html><html><head><style>${style}</style></head><body>${body}</body></html>`;
+    const expected = page(css.join('\n'), sections.join('\n'));
+
+    const escape = (text: string) => JSON.stringify(text).slice(1, -1);
+    // (the attributes of every third section are bare, and its line breaks escaped)
+    const body = sections
+        .map((text, index) =>
+            index % 3 === 0 ? escape(text).replaceAll('\\"', '"') : escape(text),
+        )
+        .join('\\n');
+    const style = css.join('\n');
+    const wrap = (html: string) =>
+        `{"message": "Here it is", "operations": [{"name": "rewrite", "payload": {"html": "${html}"}}], "next": ""}`;
+    const read = (text: string) =>
+        (
+            parseAsJSON(text).value as {
+                operations: Array<{ payload: { html: string } }>;
+            } | null
+        )?.operations[0].payload.html;
+
+    expect(read(wrap(page(style, body)))).toBe(expected);
+    // …and with a backslash before the space where the braces of a rule were
+    expect(read(wrap(page(style.replace('{ margin', '{\\ margin'), body)))).toBe(
+        expected.replace('{ margin', '{\\ margin'),
+    );
+
+    // each cut of the text reads as a prefix of the page that gets past each pair
+    // (the cuts inside an escape or between the two quote marks of a pair aside, and
+    // those that end on a closing bracket after a pair, which may close the string
+    // and the object as well)
+    const text = wrap(page(style, body));
+    let length = 0;
+    for (let cut = text.indexOf('""') + 2; cut < text.length; cut++) {
+        const cutText = text.slice(0, cut);
+        const html = read(cutText) ?? '';
+        expect(expected.startsWith(html), `${cut}`).toBe(true);
+        if (/[}\]]\s*$/.test(cutText)) continue;
+        expect(html.length, `${cut}`).toBeGreaterThanOrEqual(length);
+        length = html.length;
+    }
+    expect(length).toBeGreaterThan(expected.length - 100);
 }
 
 function partialResponsesTestCase() {
