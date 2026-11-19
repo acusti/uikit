@@ -20,6 +20,11 @@ bun run format:check
 
 ## Repo-specific facts
 
+- Use the Bun that `packageManager` pins, or a later one. Bun before 1.4
+  doesn’t read `bun.lock`’s lockfileVersion 2: it prints
+  `Ignoring lockfile`, re-resolves every dependency and writes a new
+  lockfile. Bun 1.4.0–1.4.3 reads it, but drops the `libc` and
+  `hasInstallScript` fields whenever it writes it, without a warning
 - `bun run build` builds workspaces in dependency order and excludes
   `@acusti/uikit-docs`
 - `bun run buildall` includes the docs package

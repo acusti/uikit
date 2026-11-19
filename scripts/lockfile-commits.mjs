@@ -7,7 +7,7 @@
 //   bun scripts/lockfile-commits.mjs     # print the plan (dry run, changes nothing)
 //   bun scripts/lockfile-commits.mjs --commit
 //
-// How it works: bun.lock (lockfileVersion 1) is one line per package, so the diff
+// How it works: bun.lock (lockfileVersion 1 or 2) is one line per package, so the diff
 // against HEAD is a set of changed package keys. Each key is attributed to a changed
 // direct dependency (an "anchor") that reaches it through the dependency graph
 // (dependencies and optionalDependencies, plus peerDependencies that changed, in the
