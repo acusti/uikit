@@ -1,5 +1,30 @@
 # @acusti/parsing
 
+## 0.25.0
+
+### Minor Changes
+
+- 88908a8: Read a string with empty attribute values left unescaped in it
+
+    A pair of unescaped quote marks side by side in a string (`hidden=""`
+    or `content: ""` in HTML whose other quote marks are escaped) is now
+    repaired: the string carries on past it, through the CSS, scripts and
+    line breaks after it, unless the string ends there. So a page that a
+    model writes with a few of its quote marks left bare now reads whole
+    (previously cut short or `null`), and so does a string that ends in a
+    quoted word (`"The team voted "yes""`), in a pretty-printed object,
+    with a trailing comma after it, or before the root’s closing bracket
+    with a closing code fence or text after it. Look out for a comma left
+    out between two strings with nothing between them: `["a""b"]` is now
+    one string, though `{"a": "x""b": 1}` still reads as two members.
+
+- f722b8c: Read a string with a backslash in it that starts no JSON escape
+
+    A backslash before an apostrophe (`don\'t`) is now left out, and one
+    before anything else is kept as a backslash (`C:\Users`, `\d+`,
+    `{\ margin: 0 }`), where `value` was `null`. Look out for code in a
+    string: `'it\'s'` now reads `'it's'`.
+
 ## 0.24.0
 
 ### Minor Changes
