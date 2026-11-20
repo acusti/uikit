@@ -68,5 +68,5 @@
     "overrides": {
         "zod-validation-error": "^4.0.2"
     },
-    "packageManager": "bun@1.4.4"
+    "packageManager": "bun@1.4.5"
 }

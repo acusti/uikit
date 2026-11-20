@@ -3,4 +3,4 @@ command = "bun run buildall"
 publish = "packages/docs/dist/"
 # keep BUN_VERSION equal to the Bun packageManager pins in package.json, which
 # scripts/bun-version.test.mjs checks
-environment = { NODE_VERSION = "22", BUN_VERSION = "1.4.4" }
+environment = { NODE_VERSION = "22", BUN_VERSION = "1.4.5" }
