@@ -93,6 +93,10 @@ bun run lockfile:commits --commit   # creates the commits
   (e.g. `ws`, `magic-string`) are listed under "Warnings" and go to the
   owner with the largest commit; move one with
   `--assign <key>=<dependency>`. Combine commits with `--merge <a>,<b>`.
+- Entries that changed only in `libc` or `hasInstallScript` go in one
+  commit of their own. Bun 1.4.0–1.4.3 (Dependabot’s included) drops both
+  fields when it writes the lockfile, and a regeneration with Bun 1.4.4
+  brings them back at versions that didn’t change.
 - `bun.lock` must be the only modified file. If its `workspaces` section
   changed (`package.json` edits, workspace version bumps), commit that
   separately first; the script refuses to run otherwise.

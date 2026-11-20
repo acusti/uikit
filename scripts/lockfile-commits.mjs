@@ -14,9 +14,10 @@
 // old or new lockfile; see `reach`).
 // Anchors that are connected and moved between the same two versions (e.g. the
 // storybook packages) are merged. Changed keys with no changed ancestor become their
-// own groups. The groups are replayed on top of HEAD's lockfile one at a time, with
-// the dependency graph checked after every step; the final state must be
-// byte-identical to the regenerated lockfile or nothing is committed.
+// own groups, and keys whose only change is in METADATA_FIELDS share one. The groups
+// are replayed on top of HEAD's lockfile one at a time, with the dependency graph
+// checked after every step; the final state must be byte-identical to the
+// regenerated lockfile or nothing is committed.
 import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
@@ -27,6 +28,10 @@ const ENTRY_LINE = /^ {4}"((?:[^"\\]|\\.)+)": \[/;
 const EDGE_FIELDS = ['dependencies', 'optionalDependencies', 'peerDependencies'];
 // ranges we trust Bun.semver to evaluate (skips tags, urls, `workspace:`, prereleases)
 const PLAIN_RANGE = /^[\sv\d.^~<>=*xX|,-]+$/;
+// Fields Bun 1.4.4 records on an entry and Bun 1.4.0–1.4.3 drops whenever it writes
+// the lockfile (Dependabot’s Bun among them), with no change of version. An entry
+// that changed in these alone is no bump, so they all go in one commit.
+const METADATA_FIELDS = ['libc', 'hasInstallScript'];
 
 const HELP = `Usage: bun scripts/lockfile-commits.mjs [options]
 
@@ -158,16 +163,32 @@ const resolveDependency = (nodes, key, dependency) => {
 };
 
 const nodeCache = new Map();
+const readTuple = (line) => {
+    const match = ENTRY_LINE.exec(line);
+    return JSON.parse(line.slice(match[0].length - 1).replace(/,\s*$/, ''));
+};
 const readNode = (line) => {
     let node = nodeCache.get(line);
     if (!node) {
-        const match = ENTRY_LINE.exec(line);
-        const tuple = JSON.parse(line.slice(match[0].length - 1).replace(/,\s*$/, ''));
+        const tuple = readTuple(line);
         const meta = tuple[2] && typeof tuple[2] === 'object' ? tuple[2] : {};
         node = { meta, version: tuple[0].slice(tuple[0].lastIndexOf('@') + 1) };
         nodeCache.set(line, node);
     }
     return node;
+};
+
+// an entry's line as it would read without METADATA_FIELDS
+const withoutMetadata = (line) => {
+    const tuple = readTuple(line);
+    if (tuple[2] && typeof tuple[2] === 'object') {
+        tuple[2] = Object.fromEntries(
+            Object.entries(tuple[2]).filter(
+                ([field]) => !METADATA_FIELDS.includes(field),
+            ),
+        );
+    }
+    return JSON.stringify(tuple);
 };
 
 const buildGraph = (entries) => {
@@ -282,9 +303,18 @@ const newLines = new Map(newLock.entries.map((entry) => [entry.key, entry.line])
 const newOrder = newLock.entries.map((entry) => entry.key);
 const newIndex = new Map(newOrder.map((key, index) => [key, index]));
 
-const changed = [...new Set([...oldLines.keys(), ...newLines.keys()])].filter(
+const allChanged = [...new Set([...oldLines.keys(), ...newLines.keys()])].filter(
     (key) => oldLines.get(key) !== newLines.get(key),
 );
+const metadataOnly = allChanged.filter(
+    (key) =>
+        oldLines.has(key) &&
+        newLines.has(key) &&
+        withoutMetadata(oldLines.get(key)) === withoutMetadata(newLines.get(key)),
+);
+const metadataSet = new Set(metadataOnly);
+// what the grouping below sorts into bumps; metadataOnly gets a group of its own
+const changed = allChanged.filter((key) => !metadataSet.has(key));
 
 const changedSet = new Set(changed);
 const reachAnyCache = new Map();
@@ -438,7 +468,14 @@ for (const group of orphanGroups.values()) {
     if (group.leaders.length === 0) group.leaders = members;
 }
 
-// 4. user overrides
+// 4. entries whose only change is in METADATA_FIELDS
+if (metadataOnly.length > 0) {
+    const group = { leaders: [...metadataOnly], members: new Set(metadataOnly) };
+    groups.push(group);
+    for (const key of metadataOnly) groupOfKey.set(key, group);
+}
+
+// 5. user overrides
 const findGroup = (key, flag) => {
     const group = groupOfKey.get(key);
     if (!group) fail(`${flag}: "${key}" is not a changed lockfile entry`);
@@ -476,9 +513,9 @@ for (const spec of options.assign ?? []) {
 
 // every changed key must be in exactly one group
 const grouped = groups.reduce((sum, group) => sum + group.members.size, 0);
-if (grouped !== changed.length || changed.some((key) => !groupOfKey.has(key))) {
+if (grouped !== allChanged.length || allChanged.some((key) => !groupOfKey.has(key))) {
     fail(
-        `internal error: ${grouped} grouped entries for ${changed.length} changed entries`,
+        `internal error: ${grouped} grouped entries for ${allChanged.length} changed entries`,
     );
 }
 
@@ -488,8 +525,30 @@ if (grouped !== changed.length || changed.some((key) => !groupOfKey.has(key))) {
 
 const verbOf = (key) =>
     !oldGraph.nodes.has(key) ? 'Add' : !newGraph.nodes.has(key) ? 'Remove' : 'Bump';
+// a group of metadata entries alone, titled by which way the fields went
+const metadataChangeOf = (key) => {
+    const before = readNode(oldLines.get(key)).meta;
+    const after = readNode(newLines.get(key)).meta;
+    const gained = METADATA_FIELDS.some((field) => field in after && !(field in before));
+    const lost = METADATA_FIELDS.some((field) => field in before && !(field in after));
+    return gained === lost ? 'Update' : gained ? 'Record' : 'Drop';
+};
+const metadataTitleOf = (group) => {
+    const verbs = new Set([...group.members].map(metadataChangeOf));
+    const verb = verbs.size === 1 ? [...verbs][0] : 'Update';
+    return verb === 'Drop'
+        ? 'Drop libc and install-script metadata from bun.lock'
+        : `${verb} libc and install-script metadata in bun.lock`;
+};
 const titleOf = (group) => {
-    const leaders = [...group.leaders].sort((a, b) => a.localeCompare(b));
+    // A metadata entry changed no version, so it never names a bump. When
+    // --merge or --assign put a bump with metadata entries, the bump's entries
+    // name the commit, whether they lead their group or joined it as members.
+    const isBump = (key) => !metadataSet.has(key);
+    let leaders = group.leaders.filter(isBump);
+    if (leaders.length === 0) leaders = [...group.members].filter(isBump);
+    if (leaders.length === 0) return metadataTitleOf(group);
+    leaders.sort((a, b) => a.localeCompare(b));
     const verbs = new Set(leaders.map(verbOf));
     const verb = verbs.size === 1 ? [...verbs][0] : 'Update';
     let subject;
@@ -583,6 +642,14 @@ if (serialize({ ...newLock, entries: current }) !== newText) {
 // ---------------------------------------------------------------------------
 
 const describeKey = (key) => {
+    if (metadataSet.has(key)) {
+        const before = readNode(oldLines.get(key)).meta;
+        const after = readNode(newLines.get(key)).meta;
+        const fields = METADATA_FIELDS.filter(
+            (field) => JSON.stringify(before[field]) !== JSON.stringify(after[field]),
+        );
+        return `${key}@${versionOf(newGraph, key)}: ${fields.join(', ')}`;
+    }
     const from = versionOf(oldGraph, key);
     const to = versionOf(newGraph, key);
     return `${key}: ${from ?? '(none)'} -> ${to ?? '(none)'}`;
@@ -591,7 +658,7 @@ const describeKey = (key) => {
 const countOf = (count, singular, plural) =>
     `${count} ${count === 1 ? singular : plural}`;
 console.log(
-    `${countOf(changed.length, 'changed lockfile entry', 'changed lockfile entries')} -> ${countOf(steps.length, 'commit', 'commits')}\n`,
+    `${countOf(allChanged.length, 'changed lockfile entry', 'changed lockfile entries')} -> ${countOf(steps.length, 'commit', 'commits')}\n`,
 );
 steps.forEach((step, index) => {
     console.log(
