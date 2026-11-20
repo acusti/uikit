@@ -6,9 +6,17 @@
         "noEmit": true,
         "paths": {
             "@acusti/styling": ["../src/index.ts"],
-            "@acusti/styling/vite": ["../src/vite.ts"]
+            "@acusti/styling/vite": ["../src/vite.ts"],
+            "@fixture/ui": ["./library/src/index.ts"]
         },
         "types": ["node"]
     },
-    "include": ["*.ts", "../client.d.ts", "fixture/src", "fixture/vite.config.ts"]
+    "include": [
+        "*.ts",
+        "../client.d.ts",
+        "fixture/src",
+        "fixture/vite.config.ts",
+        "library/src",
+        "library/vite.config.ts"
+    ]
 }
