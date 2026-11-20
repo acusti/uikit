@@ -2,7 +2,7 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { createRef, useState } from 'react';
-import { afterEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, describe, expect, it, onTestFinished, vi } from 'vitest';
 
 import type { Props } from './InputText.js';
 
@@ -25,6 +25,20 @@ vi.unstubAllGlobals();
 function EchoingInputText(props: Props) {
     const [value, setValue] = useState('');
     return <InputText {...props} initialValue={value} onChangeValue={setValue} />;
+}
+
+// happy-dom does no layout, so give each textarea a scrollHeight that grows
+// with its value: 20px when empty, plus 1px per character
+function stubTextareaScrollHeight() {
+    const scrollHeight = vi
+        .spyOn(HTMLTextAreaElement.prototype, 'scrollHeight', 'get')
+        .mockImplementation(function (this: HTMLTextAreaElement) {
+            return 20 + this.value.length;
+        });
+    onTestFinished(() => {
+        scrollHeight.mockRestore();
+    });
+    return scrollHeight;
 }
 
 afterEach(cleanup);
@@ -830,6 +844,128 @@ describe('InputText.tsx', () => {
 
         expect(height).toBeGreaterThanOrEqual(50);
         expect(height).toBeLessThanOrEqual(100);
+    });
+
+    it('keeps the transition timings from the style prop when a multiLine input is fitted twice in one task', () => {
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        const style = { transitionDuration: '200ms' };
+        // an inline callback ref is a new function each render, so each
+        // render runs the ref callback again, which fits the textarea
+        const { rerender } = render(
+            <InputText multiLine ref={vi.fn<() => void>()} style={style} />,
+        );
+        rerender(<InputText multiLine ref={vi.fn<() => void>()} style={style} />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        expect(textarea.style.transitionDuration).toBe('0s');
+        vi.runAllTimers();
+        expect(textarea.style.transitionDuration).toBe('200ms');
+    });
+
+    it.each([
+        ['fitted again by an inline callback ref', () => vi.fn<() => void>()],
+        ['not fitted again', () => undefined],
+    ])(
+        'keeps a transition timing that the style prop changes before the restore (a multiLine input %s)',
+        (_, getRef) => {
+            vi.useFakeTimers();
+            onTestFinished(() => {
+                vi.useRealTimers();
+            });
+            const { rerender } = render(
+                <InputText
+                    multiLine
+                    ref={getRef()}
+                    style={{ transitionDuration: '200ms' }}
+                />,
+            );
+            rerender(
+                <InputText
+                    multiLine
+                    ref={getRef()}
+                    style={{ transitionDuration: '300ms' }}
+                />,
+            );
+            const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+            vi.runAllTimers();
+            expect(textarea.style.transitionDuration).toBe('300ms');
+        },
+    );
+
+    it('resizes a multiLine input to fit a new initialValue', () => {
+        stubTextareaScrollHeight();
+        // e.g. a note field that its parent empties once the note is saved
+        const { rerender } = render(
+            <InputText initialValue={'x'.repeat(200)} multiLine />,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        expect(textarea.style.height).toBe('220px');
+        rerender(<InputText initialValue="" multiLine />);
+        expect(textarea.value).toBe('');
+        expect(textarea.style.height).toBe('20px');
+    });
+
+    it('resizes a multiLine input that hasn’t been typed in to fit a new initialValue', () => {
+        stubTextareaScrollHeight();
+        // e.g. an edit form that mounts empty and gets its record once it loads
+        const { rerender } = render(<InputText initialValue="" multiLine />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        expect(textarea.style.height).toBe('20px');
+        rerender(<InputText initialValue={'x'.repeat(200)} multiLine />);
+        expect(textarea.value).toBe('x'.repeat(200));
+        expect(textarea.style.height).toBe('220px');
+    });
+
+    it('keeps the transition timings from the style prop when a new initialValue and minHeight resize a multiLine input', () => {
+        stubTextareaScrollHeight();
+        vi.useFakeTimers();
+        onTestFinished(() => {
+            vi.useRealTimers();
+        });
+        const style = { transitionDuration: '200ms' };
+        const { rerender } = render(
+            <InputText
+                initialValue={'x'.repeat(200)}
+                minHeight={10}
+                multiLine
+                style={style}
+            />,
+        );
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        vi.runAllTimers();
+        // the new minHeight gives the ref callback a new identity, so it fits
+        // the old value, and the new initialValue is fitted in the same commit
+        rerender(<InputText initialValue="" minHeight={15} multiLine style={style} />);
+        expect(textarea.style.height).toBe('20px');
+        vi.runAllTimers();
+        expect(textarea.style.transitionDuration).toBe('200ms');
+    });
+
+    it('measures a multiLine input once per keystroke when its parent passes each change back as initialValue', () => {
+        const scrollHeight = stubTextareaScrollHeight();
+        render(<EchoingInputText multiLine />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        scrollHeight.mockClear();
+        fireEvent.input(textarea, { target: { value: 'a' } });
+        fireEvent.input(textarea, { target: { value: 'ab' } });
+        fireEvent.input(textarea, { target: { value: 'abc' } });
+        expect(textarea.style.height).toBe('23px');
+        expect(scrollHeight).toHaveBeenCalledTimes(3);
+    });
+
+    it('resizes a multiLine input to fit the value that Escape restores with discardOnEscape', async () => {
+        stubTextareaScrollHeight();
+        const user = userEvent.setup();
+        render(<InputText discardOnEscape multiLine />);
+        const textarea = screen.getByRole('textbox') as HTMLTextAreaElement;
+        await user.click(textarea);
+        fireEvent.input(textarea, { target: { value: 'x'.repeat(100) } });
+        expect(textarea.style.height).toBe('120px');
+        await user.keyboard('{Escape}');
+        expect(textarea.value).toBe('');
+        expect(textarea.style.height).toBe('20px');
     });
 
     it('forwards aria-* attributes and role to the input', () => {
