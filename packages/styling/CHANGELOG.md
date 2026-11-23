@@ -1,6 +1,6 @@
 # @acusti/styling
 
-## 3.0.0-rc.0
+## 3.0.0 and 3.0.0-rc.0
 
 ### Major Changes
 
