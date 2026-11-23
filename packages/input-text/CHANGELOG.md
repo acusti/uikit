@@ -1,5 +1,56 @@
 # @acusti/input-text
 
+## 2.7.2
+
+### Patch Changes
+
+- 1769832: Keep what was typed in an `InputText` that is hidden and shown
+  again
+
+    An `InputText` now applies `initialValue` only when it changes. When an
+    `<Activity>` around it is hidden and shown again, or a `<Suspense>`
+    boundary around it shows its fallback and then its content again, the
+    input keeps what was typed in it, and `discardOnEscape` still resets to
+    `initialValue` or to the value it had when it was last blurred,
+    whichever is more recent. An `initialValue` that changed while it was
+    hidden is applied when it is shown.
+
+    This fixes a regression in 2.7.1 for an `InputText` inside a
+    `<Suspense>` boundary.
+
+- 068bbec: Resize a `multiLine` input when its form is reset
+
+    In browsers without `field-sizing: content`, a `multiLine` input now
+    resizes to fit the value that a reset of its form restores, from a
+    `<button type="reset">` or from `form.reset()`, instead of keeping the
+    height of the text that the reset cleared.
+
+- 23afe22: Resize a `multiLine` input to fit a new `initialValue`
+
+    In browsers without `field-sizing: content`, a `multiLine` input now
+    resizes to fit a new `initialValue` before the browser paints it. A
+    note field that its parent empties after saving, for example, shrinks
+    back to the height of an empty field, and an edit form’s field grows to
+    fit the record it loads. The same goes for the value that Escape
+    restores with `discardOnEscape`.
+
+- 96165e5: Clear a multi-line `InputText`’s `ref` when its textarea is
+  removed
+
+    In browsers without `field-sizing: content` support, a `ref` passed to
+    a `multiLine` `InputText` kept pointing at its `<textarea>` after it
+    was removed. An object ref is now set to `null`, and a callback ref is
+    called with `null` unless it returned a cleanup function, in which case
+    the cleanup function is invoked.
+
+- e132d47: Keep the transition timings in a `multiLine` input’s `style`
+
+    In browsers without `field-sizing: content`, a `multiLine` input now
+    keeps the transition timings from its `style` prop when it resizes.
+    They were erased on each keystroke when typing re-rendered an input
+    whose callback ref is written inline, and a `style` change made while
+    it resized was undone.
+
 ## 2.7.1
 
 ### Patch Changes
