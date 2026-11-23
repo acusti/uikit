@@ -26,8 +26,14 @@ const GIT_ENV = {
     GIT_COMMITTER_NAME: 'Test',
 };
 
+// color.ui=never keeps a global `color.ui=always` from putting escape codes
+// in output the tests parse
 const git = (root, ...args) =>
-    execFileSync('git', args, { cwd: root, encoding: 'utf8', env: GIT_ENV });
+    execFileSync('git', ['-c', 'color.ui=never', ...args], {
+        cwd: root,
+        encoding: 'utf8',
+        env: GIT_ENV,
+    });
 
 // bun.lock in the layout the script reads: one line per package, a blank
 // line between entries, a trailing comma after the last member of every
@@ -161,7 +167,7 @@ describe('lockfile-commits', () => {
             '--grep=^Record',
             '-1',
         ).trim();
-        const changedLines = git(root, 'show', '--format=', metadataCommit)
+        const changedLines = git(root, 'show', '--no-color', '--format=', metadataCommit)
             .split('\n')
             .filter((line) => /^\+ {4}"/.test(line));
         expect(changedLines).toEqual([
