@@ -226,7 +226,7 @@ describe('build', () => {
     const CSS = '.from-the-sheet {\n    color: rgb(1, 2, 3);\n}\n';
 
     beforeAll(async () => {
-        root = await mkdtemp(join(tmpdir(), 'styling-vite-'));
+        root = await mkdtemp(join(tmpdir(), 'sheets-vite-'));
         await mkdir(join(root, 'src'));
         await writeFile(join(root, 'src/sheet.css'), CSS);
         await writeFile(

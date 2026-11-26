@@ -1,4 +1,4 @@
-import { RuntimeStyle, Style } from '@acusti/styling';
+import { RuntimeStyle, Style } from '@acusti/sheets';
 
 import c from './c.css?sheet';
 

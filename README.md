@@ -20,7 +20,7 @@ fetch utility, and more_
 | **[@acusti/input-text][]**                 | [![version](https://npmx.dev/api/registry/badge/version/@acusti/input-text)](https://npmx.dev/package/@acusti/input-text)                                 | React component that renders an uncontrolled text input                          |
 | **[@acusti/matchmaking][]**                | [![version](https://npmx.dev/api/registry/badge/version/@acusti/matchmaking)](https://npmx.dev/package/@acusti/matchmaking)                               | Utilities for approximate string matching (i.e. fuzzy search)                    |
 | **[@acusti/parsing][]**                    | [![version](https://npmx.dev/api/registry/badge/version/@acusti/parsing)](https://npmx.dev/package/@acusti/parsing)                                       | Loosely parse a string as JSON with numerous affordances for syntax errors       |
-| **[@acusti/styling][]**                    | [![version](https://npmx.dev/api/registry/badge/version/@acusti/styling)](https://npmx.dev/package/@acusti/styling)                                       | React stylesheets from CSS imports, optionally left out of the client bundle     |
+| **[@acusti/sheets][]**                     | [![version](https://npmx.dev/api/registry/badge/version/@acusti/sheets)](https://npmx.dev/package/@acusti/sheets)                                         | React stylesheets from CSS imports, optionally left out of the client bundle     |
 | **[@acusti/uniquify][]**                   | [![version](https://npmx.dev/api/registry/badge/version/@acusti/uniquify)](https://npmx.dev/package/@acusti/uniquify)                                     | A function that ensures a string is unique amongst items                         |
 | **[@acusti/use-bounding-client-rect][]**   | [![version](https://npmx.dev/api/registry/badge/version/@acusti/use-bounding-client-rect)](https://npmx.dev/package/@acusti/use-bounding-client-rect)     | React hook for getting an element’s `boundingClientRect`                         |
 | **[@acusti/use-keyboard-events][]**        | [![version](https://npmx.dev/api/registry/badge/version/@acusti/use-keyboard-events)](https://npmx.dev/package/@acusti/use-keyboard-events)               | React hook for adding key event listeners to your UI                             |
@@ -63,8 +63,7 @@ not new features.
 [@acusti/parsing]:
     https://github.com/acusti/uikit/tree/main/packages/parsing
 [@acusti/post]: https://github.com/acusti/uikit/tree/main/packages/post
-[@acusti/styling]:
-    https://github.com/acusti/uikit/tree/main/packages/styling
+[@acusti/sheets]: https://github.com/acusti/uikit/tree/main/packages/sheets
 [@acusti/textual]:
     https://github.com/acusti/uikit/tree/main/packages/textual
 [@acusti/uniquify]:

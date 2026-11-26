@@ -1,6 +1,6 @@
 import { defineConfig, devices } from '@playwright/test';
 
-// The fixture app imports `@acusti/styling` as published, from `dist`, so
+// The fixture app imports `@acusti/sheets` as published, from `dist`, so
 // build the package (`bun run build`) before running these.
 
 const BUILD_PORT = 4391;

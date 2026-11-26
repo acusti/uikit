@@ -1,16 +1,16 @@
-# @acusti/styling
+# @acusti/sheets
 
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
-[![minzip size](https://bundlebadge.acusti.ca/minzip/@acusti/styling)](https://bundlebadge.acusti.ca/package/@acusti/styling)
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
-[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/styling)](https://npmx.dev/package/@acusti/styling)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/version/@acusti/sheets)](https://npmx.dev/package/@acusti/sheets)
+[![minzip size](https://bundlebadge.acusti.ca/minzip/@acusti/sheets)](https://bundlebadge.acusti.ca/package/@acusti/sheets)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/dependencies/@acusti/sheets)](https://npmx.dev/package/@acusti/sheets)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/downloads-month/@acusti/sheets)](https://npmx.dev/package/@acusti/sheets)
+[![Open on npmx.dev](https://npmx.dev/api/registry/badge/updated/@acusti/sheets)](https://npmx.dev/package/@acusti/sheets)
 
 Colocated component styles for a server-rendered React 19 app built with
 [Vite][], without duplicating them in your JS bundle.
 
 ```tsx
-import { Style } from '@acusti/styling';
+import { Style } from '@acusti/sheets';
 
 import cardSheet from './card.css?sheet';
 
@@ -52,7 +52,7 @@ The runtime adds about 540 bytes gzip to a client bundle.
 ## Installation
 
 ```bash
-npm install @acusti/styling
+npm install @acusti/sheets
 ```
 
 It needs React 19.2 or later and Vite 6 or later.
@@ -64,7 +64,7 @@ whose pages are all server-rendered:
 
 ```ts
 // vite.config.ts
-import styleSheets from '@acusti/styling/vite';
+import styleSheets from '@acusti/sheets/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -73,11 +73,11 @@ export default defineConfig({
 ```
 
 To get the TypeScript types of `?sheet` imports, add
-`@acusti/styling/client` to `compilerOptions.types` in your
-`tsconfig.json`, or reference it from a `.d.ts` file:
+`@acusti/sheets/client` to `compilerOptions.types` in your `tsconfig.json`,
+or reference it from a `.d.ts` file:
 
 ```ts
-/// <reference types="@acusti/styling/client" />
+/// <reference types="@acusti/sheets/client" />
 ```
 
 ### Plugin options
@@ -175,7 +175,7 @@ type StyleProviderProps = {
     https://developer.mozilla.org/docs/Web/API/Window/reportError
 
 ```tsx
-import { StyleProvider } from '@acusti/styling';
+import { StyleProvider } from '@acusti/sheets';
 import { type ReactNode, useState } from 'react';
 import { createPortal } from 'react-dom';
 
@@ -219,7 +219,7 @@ render order among the other sheets with the same precedence. If it isn’t
 used, it will be tree-shaken out of the JS bundle.
 
 ```tsx
-import { RuntimeStyle } from '@acusti/styling';
+import { RuntimeStyle } from '@acusti/sheets';
 
 <RuntimeStyle href={`theme-${theme.id}`}>
     {`:root { --accent: ${theme.accent}; }`}
@@ -246,13 +246,13 @@ sheet updates in place in the library’s own Vite dev server (e.g. a
 Storybook built with Vite), where an `?inline` import rendered in a
 `<style>` needs a page reload to show it. It also names each sheet after
 its path, under the library’s `prefix`. v3.1 will add dual publishing: apps
-that use `@acusti/styling` will get all of its benefits for the library’s
+that use `@acusti/sheets` will get all of its benefits for the library’s
 sheets, while apps that don’t will get what they get from v3.0 or a plain
 `?inline` import.
 
-Add `@acusti/styling` as a dev dependency only, and render each sheet with
-a plain `<style>` rather than a `<Style>` (the `Style` component only
-matters for stripping sheets from the build):
+Add `@acusti/sheets` as a dev dependency only, and render each sheet with a
+plain `<style>` rather than a `<Style>` (the `Style` component only matters
+for stripping sheets from the build):
 
 ```tsx
 import cardSheet from './card.css?sheet';
@@ -274,7 +274,7 @@ Build it with the plugin and a `prefix` of its own, leaving
 
 ```ts
 // vite.config.ts
-import styleSheets from '@acusti/styling/vite';
+import styleSheets from '@acusti/sheets/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({
@@ -288,7 +288,7 @@ export default defineConfig({
 ```
 
 Each sheet compiles to a `{ href, css }` object, so the published package
-imports neither the plugin nor `@acusti/styling`.
+imports neither the plugin nor `@acusti/sheets`.
 
 In v3.0, the library’s CSS has to be stored in its JS bundle: unlike a
 separate `.css` file, it isn’t cached on its own, and an app’s
