@@ -1,5 +1,5 @@
 .c {
-    --styling-e2e-marker: "c";
+    --sheets-e2e-marker: "c";
     color: rgb(255, 0, 0);
     font-weight: 700;
 }

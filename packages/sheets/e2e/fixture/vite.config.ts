@@ -1,4 +1,4 @@
-import styleSheets from '@acusti/styling/vite';
+import styleSheets from '@acusti/sheets/vite';
 import { defineConfig } from 'vite';
 
 export default defineConfig({

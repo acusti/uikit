@@ -208,8 +208,8 @@
         "vitest": "^5",
       },
     },
-    "packages/styling": {
-      "name": "@acusti/styling",
+    "packages/sheets": {
+      "name": "@acusti/sheets",
       "version": "3.0.0",
       "devDependencies": {
         "@playwright/test": "^1.65.0",
@@ -369,7 +369,7 @@
 
     "@acusti/post": ["@acusti/post@workspace:packages/post"],
 
-    "@acusti/styling": ["@acusti/styling@workspace:packages/styling"],
+    "@acusti/sheets": ["@acusti/sheets@workspace:packages/sheets"],
 
     "@acusti/textual": ["@acusti/textual@workspace:packages/textual"],
 

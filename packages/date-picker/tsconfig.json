@@ -5,6 +5,5 @@
         "rootDir": "./src"
     },
     "include": ["src/**/*"],
-    "exclude": ["dist", "node_modules"],
-    "references": [{ "path": "../styling" }]
+    "exclude": ["dist", "node_modules"]
 }

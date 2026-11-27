@@ -1,13 +1,16 @@
-# @acusti/styling
+# @acusti/sheets
 
 ## 3.0.0 and 3.0.0-rc.0
+
+`@acusti/sheets` 3.0.0 is `@acusti/styling` 3.0.0 under a new name, with no
+other changes. Every earlier version was published as `@acusti/styling`.
 
 ### Major Changes
 
 - dd9b9f9: Render stylesheets from `?sheet` imports, optionally leaving
   their text out of the client JS bundle
 
-    Using the `@acusti/styling/vite` plugin, you can
+    Using the `@acusti/sheets/vite` plugin, you can
     `import x from './x.css?sheet'` and render it with
     `<Style sheet={x} />` as a hoisted `<style>` element. Each sheet goes
     through Vite’s CSS pipeline like any other CSS import, with your

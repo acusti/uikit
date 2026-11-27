@@ -1,4 +1,4 @@
-# @acusti/styling relies on undocumented React behavior: hydration adopts a
+# @acusti/sheets relies on undocumented React behavior: hydration adopts a
 # server-rendered <style> by its data-href without reading its children, and
 # hoisted <style>s go into the <head> in render order. This runs its Style
 # tests against React canary, on every change and weekly, to catch a React
@@ -14,14 +14,14 @@ on:
     pull_request:
         branches: [main]
         paths:
-            - 'packages/styling/**'
+            - 'packages/sheets/**'
             - '.github/workflows/react-canary.yml'
     schedule:
         - cron: '0 9 * * 1'
     workflow_dispatch:
 
 jobs:
-    styling:
+    sheets:
         runs-on: ubuntu-latest
 
         steps:
@@ -44,7 +44,7 @@ jobs:
                   bun install
 
             - name: 🔍 Check the tests will run against it
-              working-directory: packages/styling
+              working-directory: packages/sheets
               run: |
                   node -e '
                     const { createRequire } = require("node:module");
@@ -56,6 +56,6 @@ jobs:
                     if (versions.some((version) => version !== process.env.REACT_CANARY)) process.exit(1);
                   '
 
-            - name: ⚡ Test @acusti/styling’s Style
-              working-directory: packages/styling
+            - name: ⚡ Test @acusti/sheets’s Style
+              working-directory: packages/sheets
               run: bunx vitest run src/Style.test.tsx
