@@ -11,7 +11,7 @@
         { "path": "packages/matchmaking" },
         { "path": "packages/parsing" },
         { "path": "packages/post" },
-        { "path": "packages/styling" },
+        { "path": "packages/sheets" },
         { "path": "packages/textual" },
         { "path": "packages/uniquify" },
         { "path": "packages/use-bounding-client-rect" },

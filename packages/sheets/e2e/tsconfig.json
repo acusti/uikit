@@ -5,8 +5,8 @@
         "composite": false,
         "noEmit": true,
         "paths": {
-            "@acusti/styling": ["../src/index.ts"],
-            "@acusti/styling/vite": ["../src/vite.ts"]
+            "@acusti/sheets": ["../src/index.ts"],
+            "@acusti/sheets/vite": ["../src/vite.ts"]
         },
         "types": ["node"]
     },

@@ -4,7 +4,7 @@ import { readdir, readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 // a custom property only the fixture’s stylesheets declare
-const MARKER = '--styling-e2e-marker';
+const MARKER = '--sheets-e2e-marker';
 const DIST = join(import.meta.dirname, 'fixture/dist');
 
 function getHoistedStyles(page: Page) {

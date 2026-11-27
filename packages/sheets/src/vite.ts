@@ -97,7 +97,7 @@ export default function styleSheets({
                 return `${code.join('\n')}\n`;
             },
         },
-        name: '@acusti/styling',
+        name: '@acusti/sheets',
         resolveId: {
             filter: { id: /\?sheet$/ },
             async handler(source, importer) {
